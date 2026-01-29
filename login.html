@@ -101,24 +101,39 @@
     const loginForm = document.getElementById('loginForm');
     const errorMessage = document.getElementById('errorMessage');
 
+    // --- DANH SÁCH TÀI KHOẢN (Thêm user mới tại đây) ---
+    const users = [
+      { username: "oodlesmath@icanread.edu.vn",   password: "ICR@123456788" },
+      { username: "tri.pham@icanread.edu.vn",    password: "ICR@12345678" },
+    ];
+
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const user = document.getElementById('username').value;
-      const pass = document.getElementById('password').value;
+      
+      // Lấy dữ liệu người dùng nhập vào
+      const inputUser = document.getElementById('username').value.trim();
+      const inputPass = document.getElementById('password').value.trim();
 
-      // --- ACCOUNT CONFIGURATION ---
-      // Current login: user="admin", pass="123"
-      if (user === "admin" && pass === "123") {
-        // Save login state to browser
-        localStorage.setItem('isLoggedIn', 'true');
+      // --- KIỂM TRA ĐĂNG NHẬP ---
+      // Tìm xem có tài khoản nào trong danh sách khớp với thông tin nhập vào không
+      const validUser = users.find(u => u.username === inputUser && u.password === inputPass);
+
+      if (validUser) {
+        // Nếu tìm thấy tài khoản đúng (Đăng nhập thành công)
         
-        // Redirect to Homepage
+        // 1. Lưu trạng thái vào localStorage
+        localStorage.setItem('isLoggedIn', 'true');
+        // Lưu tên người dùng để hiển thị xin chào (nếu cần sau này)
+        localStorage.setItem('username', validUser.username);
+        
+        // 2. Chuyển hướng về trang chủ
         window.location.href = 'index.html';
+
       } else {
-        // Show error message
+        // Nếu không tìm thấy (Đăng nhập thất bại)
         errorMessage.classList.remove('hidden');
         
-        // Shake animation for visual feedback
+        // Hiệu ứng rung lắc báo lỗi
         document.querySelector('.glass-card').animate([
           { transform: 'translateX(0)' },
           { transform: 'translateX(-10px)' },
