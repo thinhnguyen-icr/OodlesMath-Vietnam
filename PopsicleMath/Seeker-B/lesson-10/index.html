@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fruit Math Adventure!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-sky: #87CEEB;
+            --font-main: 'Poppins', sans-serif;
+            --c-red: #FF6B6B;
+            --c-blue: #4ECDC4;
+            --c-green: #95E1D3;
+            --c-yellow: #FFE66D;
+            --c-orange: #FFA500;
+            --c-purple: #C39BD3;
+            --c-white: #FFFFFF;
+            --shadow-soft: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-sky);
+            background-image: 
+                radial-gradient(circle at 50% 50%, white 10px, transparent 11px),
+                radial-gradient(circle at 10% 20%, rgba(255,255,255,0.6) 20px, transparent 21px),
+                radial-gradient(circle at 90% 80%, rgba(255,255,255,0.6) 30px, transparent 31px);
+            background-size: 100px 100px, 200px 200px, 300px 300px;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- Header --- */
+        header {
+            width: 100%;
+            max-width: 850px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 25px;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .title-group h1 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .speaker-btn {
+            background: var(--c-yellow);
+            border: 3px solid #F1C40F;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+            box-shadow: 0 4px 0 #D4AC0D;
+        }
+
+        .speaker-btn:active { transform: scale(0.9); box-shadow: 0 2px 0 #D4AC0D; }
+
+        .score-board {
+            background: var(--c-blue);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            box-shadow: 0 4px 0 #2A9D8F;
+            text-align: center;
+        }
+
+        /* --- Main Stage --- */
+        #main-stage {
+            width: 100%;
+            max-width: 850px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 35px;
+            padding: 30px;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            min-height: 550px;
+        }
+
+        .screen {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .screen.active { display: flex; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .instruction-text {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 800;
+        }
+
+        /* --- Fruit Counting Area --- */
+        .fruits-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 30px;
+            max-width: 600px;
+            padding: 20px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 20px;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+
+        .fruit-item {
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.1));
+        }
+
+        .fruit-item:hover { transform: scale(1.2) rotate(5deg); }
+        .fruit-item.counted { opacity: 0.15; transform: scale(0.8); cursor: default; filter: grayscale(1); }
+
+        /* --- Graph Styling --- */
+        .graph-display {
+            width: 100%;
+            background: white;
+            padding: 25px;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .graph-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .row-label { font-size: 2.2rem; width: 50px; text-align: center; }
+
+        .bar-container {
+            flex: 1;
+            display: flex;
+            gap: 6px;
+            height: 40px;
+            background: transparent;
+            border-radius: 8px;
+            padding: 2px;
+        }
+
+        .graph-box {
+            width: 36px; /* Fixed width to show difference */
+            height: 36px;
+            background: transparent;
+            border: 3px solid #e2e8f0;
+            border-radius: 8px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .graph-box.filled {
+            border-color: transparent;
+            transform: scale(1);
+            animation: fillPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes fillPop {
+            0% { transform: scale(0.5); }
+            100% { transform: scale(1); }
+        }
+
+        .count-badge {
+            width: 45px;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: #475569;
+            text-align: right;
+        }
+
+        /* --- Answer Buttons --- */
+        .answers-wrap {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .ans-btn {
+            background: white;
+            border: 3px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 15px 35px;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #2c3e50;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #cbd5e1;
+            transition: 0.1s;
+        }
+
+        .ans-btn:hover { background: #f8fafc; transform: translateY(-2px); }
+        .ans-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #cbd5e1; }
+
+        /* --- Number Bond Styling --- */
+        .bond-container {
+            position: relative;
+            width: 300px;
+            height: 250px;
+            margin: 20px 0;
+        }
+
+        .bond-node {
+            position: absolute;
+            width: 85px;
+            height: 85px;
+            background: white;
+            border: 4px solid var(--c-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #2c3e50;
+            box-shadow: 0 6px 0 #2A9D8F;
+            z-index: 2;
+        }
+
+        .bond-whole { top: 0; left: 50%; transform: translateX(-50%); width: 100px; height: 100px; font-size: 2.8rem; border-color: var(--c-purple); box-shadow: 0 6px 0 #9F7AEA;}
+        .bond-part-1 { bottom: 0; left: 0; }
+        .bond-part-2 { bottom: 0; right: 0; }
+
+        .bond-line {
+            position: absolute;
+            height: 4px;
+            background: #cbd5e1;
+            z-index: 1;
+            transform-origin: left center;
+        }
+
+        /* --- Feedback Labels --- */
+        .feedback-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 15px 30px;
+            border-radius: 20px;
+            font-size: 2rem;
+            font-weight: 800;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: none;
+            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes bounceIn { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+
+        /* --- Victory --- */
+        #victory-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .victory-content {
+            background: white;
+            padding: 50px;
+            border-radius: 40px;
+            text-align: center;
+            max-width: 450px;
+            animation: bounceIn 0.6s;
+        }
+
+        .victory-content h2 { font-size: 2.5rem; color: var(--c-purple); margin-bottom: 10px; font-weight: 800; }
+        .btn-restart {
+            background: var(--c-green);
+            color: #2c3e50;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #6DBBAF;
+            margin-top: 25px;
+            transition: 0.1s;
+        }
+        .btn-restart:active { transform: translateY(4px); box-shadow: 0 2px 0 #6DBBAF; }
+
+        #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 150; }
+
+        @media (max-width: 600px) {
+            .instruction-text { font-size: 1.1rem; }
+            .fruit-item { font-size: 2.2rem; }
+            .graph-display { padding: 15px; }
+            .row-label { font-size: 1.5rem; width: 35px; }
+            .graph-box { width: 28px; height: 28px; border-width: 2px; }
+            .bar-container { height: 32px; gap: 4px; }
+            .bond-container { width: 220px; height: 180px; }
+            .bond-node { width: 60px; height: 60px; font-size: 1.5rem; }
+            .bond-whole { width: 75px; height: 75px; font-size: 1.8rem; }
+            .ans-btn { padding: 10px 25px; font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <header>
+        <div class="title-group">
+            <h1>Fruit Math! 🍓</h1>
+        </div>
+        <div class="controls">
+            <button class="speaker-btn" onclick="speakCurrentTask()" title="Listen">🔊</button>
+            <div class="score-board">Round: <span id="round-val">1</span> / 5</div>
+        </div>
+    </header>
+
+    <main id="main-stage">
+        <!-- Screen 1: Counting & Graphing -->
+        <div id="counting-screen" class="screen active">
+            <div class="instruction-text">Click to count all fruits!</div>
+            <div id="fruits-area" class="fruits-grid"></div>
+            <div class="graph-display" id="graph-container">
+                <!-- Graph rows injected here -->
+            </div>
+        </div>
+
+        <!-- Screen 2: Quiz -->
+        <div id="quiz-screen" class="screen">
+            <div class="instruction-text" id="quiz-instr">How many apples?</div>
+            <div id="quiz-fruits-preview" class="fruits-grid" style="min-height: 120px;"></div>
+            <div class="answers-wrap" id="quiz-answers"></div>
+        </div>
+
+        <!-- Screen 3: Addition (Number Bond) -->
+        <div id="addition-screen" class="screen">
+            <div class="instruction-text">Find the total number of fruits!</div>
+            <div class="bond-container">
+                <div class="bond-line" id="line1"></div>
+                <div class="bond-line" id="line2"></div>
+                <div class="bond-whole bond-node" id="node-whole">?</div>
+                <div class="bond-part-1 bond-node" id="node-part1">0</div>
+                <div class="bond-part-2 bond-node" id="node-part2">0</div>
+            </div>
+            <div class="answers-wrap" id="bond-answers"></div>
+        </div>
+    </main>
+
+    <div id="feedback" class="feedback-label"></div>
+
+    <div id="victory-modal">
+        <div class="victory-content">
+            <div style="font-size: 5rem;">🎉</div>
+            <h2>Math Master!</h2>
+            <p>You completed all the rounds perfectly!</p>
+            <button class="btn-restart" onclick="location.reload()">Play Again</button>
+        </div>
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <script>
+        const FRUIT_TYPES = [
+            { type: 'apple', emoji: '🍎', color: '#FF6B6B' },
+            { type: 'banana', emoji: '🍌', color: '#FFE66D' },
+            { type: 'grape', emoji: '🍇', color: '#A29BFE' },
+            { type: 'orange', emoji: '🍊', color: '#FFA94D' }
+        ];
+
+        let state = {
+            round: 1,
+            counts: {},
+            totalInRound: 0,
+            countedInRound: 0,
+            hasMistake: false,
+            currentTask: ""
+        };
+
+        const screens = {
+            counting: document.getElementById('counting-screen'),
+            quiz: document.getElementById('quiz-screen'),
+            addition: document.getElementById('addition-screen')
+        };
+
+        // --- Utils ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSfx(freq, type = 'sine', duration = 0.2) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function speakCurrentTask() {
+            window.speechSynthesis.cancel();
+            const ut = new SpeechSynthesisUtterance(state.currentTask);
+            ut.lang = 'en-US';
+            ut.rate = 0.9;
+            window.speechSynthesis.speak(ut);
+        }
+
+        function showScreen(name) {
+            Object.values(screens).forEach(s => s.classList.remove('active'));
+            screens[name].classList.add('active');
+            
+            if(name === 'counting') state.currentTask = "Click on each fruit to count them and fill the graph.";
+            if(name === 'quiz') state.currentTask = document.getElementById('quiz-instr').innerText;
+            if(name === 'addition') state.currentTask = "What is the total sum of these two groups?";
+        }
+
+        function showFeedback(text, color) {
+            const f = document.getElementById('feedback');
+            f.innerText = text;
+            f.style.color = color;
+            f.style.display = 'block';
+            setTimeout(() => { f.style.display = 'none'; }, 1000);
+        }
+
+        // --- Core Logic ---
+        function initRound() {
+            state.counts = { apple: 0, banana: 0, grape: 0, orange: 0 };
+            state.totalInRound = 0;
+            state.countedInRound = 0;
+            state.hasMistake = false;
+            document.getElementById('round-val').innerText = state.round;
+
+            const fruitsPool = [];
+            const graphContainer = document.getElementById('graph-container');
+            graphContainer.innerHTML = '';
+
+            FRUIT_TYPES.forEach(ft => {
+                const targetCount = Math.floor(Math.random() * 4) + 4; // 4 to 7
+                state.counts[ft.type + "_target"] = targetCount;
+                state.totalInRound += targetCount;
+                
+                for(let i=0; i<targetCount; i++) fruitsPool.push(ft);
+
+                // Build Graph Rows (Always show 10 potential boxes)
+                const row = document.createElement('div');
+                row.className = 'graph-row';
+                row.innerHTML = `
+                    <div class="row-label">${ft.emoji}</div>
+                    <div class="bar-container" id="bar-${ft.type}">
+                        ${Array(10).fill(0).map((_, i) => `<div class="graph-box" id="box-${ft.type}-${i}"></div>`).join('')}
+                    </div>
+                    <div class="count-badge" id="count-${ft.type}">0</div>
+                `;
+                graphContainer.appendChild(row);
+            });
+
+            // Shuffle & Render Fruits
+            fruitsPool.sort(() => Math.random() - 0.5);
+            const area = document.getElementById('fruits-area');
+            area.innerHTML = '';
+            fruitsPool.forEach(ft => {
+                const el = document.createElement('div');
+                el.className = 'fruit-item';
+                el.innerText = ft.emoji;
+                el.onclick = () => handleFruitClick(el, ft);
+                area.appendChild(el);
+            });
+
+            showScreen('counting');
+        }
+
+        function handleFruitClick(el, ft) {
+            if (el.classList.contains('counted')) return;
+            
+            el.classList.add('counted');
+            playSfx(600, 'sine', 0.1);
+            
+            const currentCount = state.counts[ft.type];
+            state.counts[ft.type]++;
+            state.countedInRound++;
+
+            // Update Graph (Fill the box at the current count index)
+            const box = document.getElementById(`box-${ft.type}-${currentCount}`);
+            if(box) {
+                box.classList.add('filled');
+                box.style.backgroundColor = ft.color;
+            }
+            document.getElementById(`count-${ft.type}`).innerText = state.counts[ft.type];
+
+            if (state.countedInRound === state.totalInRound) {
+                setTimeout(setupQuiz, 1000);
+            }
+        }
+
+        function setupQuiz() {
+            const types = FRUIT_TYPES.filter(t => state.counts[t.type] > 0);
+            const targetType = types[Math.floor(Math.random() * types.length)];
+            const correct = state.counts[targetType.type];
+            
+            document.getElementById('quiz-instr').innerText = `How many ${targetType.type}s are there?`;
+            
+            const preview = document.getElementById('quiz-fruits-preview');
+            preview.innerHTML = '';
+            for(let i=0; i<correct; i++) {
+                const e = document.createElement('div');
+                e.className = 'fruit-item';
+                e.innerText = targetType.emoji;
+                preview.appendChild(e);
+            }
+
+            const answers = [correct];
+            while(answers.length < 4) {
+                let w = correct + Math.floor(Math.random() * 5) - 2;
+                if(w > 0 && !answers.includes(w)) answers.push(w);
+            }
+            renderAnswers('quiz-answers', answers, correct, setupAddition);
+            showScreen('quiz');
+        }
+
+        function setupAddition() {
+            const types = FRUIT_TYPES.filter(t => state.counts[t.type] > 0).sort(() => Math.random() - 0.5);
+            const p1 = state.counts[types[0].type];
+            const p2 = state.counts[types[1].type];
+            const sum = p1 + p2;
+
+            document.getElementById('node-part1').innerText = p1;
+            document.getElementById('node-part2').innerText = p2;
+            document.getElementById('node-whole').innerText = '?';
+
+            const answers = [sum];
+            while(answers.length < 3) {
+                let w = sum + Math.floor(Math.random() * 6) - 3;
+                if(w > 0 && !answers.includes(w)) answers.push(w);
+            }
+
+            positionLines();
+
+            renderAnswers('bond-answers', answers, sum, () => {
+                document.getElementById('node-whole').innerText = sum;
+                setTimeout(handleRoundEnd, 1500);
+            });
+            showScreen('addition');
+        }
+
+        function renderAnswers(containerId, list, correct, onWin) {
+            const wrap = document.getElementById(containerId);
+            wrap.innerHTML = '';
+            list.sort(() => Math.random() - 0.5).forEach(val => {
+                const btn = document.createElement('button');
+                const stateObj = { isLocked: false };
+                btn.className = 'ans-btn';
+                btn.innerText = val;
+                btn.onclick = () => {
+                    if(stateObj.isLocked) return;
+                    if(val === correct) {
+                        stateObj.isLocked = true;
+                        playSfx(800, 'sine', 0.4);
+                        showFeedback("Great Job! 🎉", "var(--c-green)");
+                        onWin();
+                    } else {
+                        playSfx(150, 'sawtooth', 0.2);
+                        showFeedback("Try Again! 💪", "var(--c-red)");
+                    }
+                };
+                wrap.appendChild(btn);
+            });
+        }
+
+        function handleRoundEnd() {
+            if(state.round < 5) {
+                state.round++;
+                initRound();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('victory-modal').style.display = 'flex';
+            startConfetti();
+        }
+
+        function positionLines() {
+            const container = document.querySelector('.bond-container');
+            const whole = document.getElementById('node-whole');
+            const p1 = document.getElementById('node-part1');
+            const p2 = document.getElementById('node-part2');
+            const l1 = document.getElementById('line1');
+            const l2 = document.getElementById('line2');
+
+            const updateLine = (line, from, to) => {
+                const fRect = from.getBoundingClientRect();
+                const tRect = to.getBoundingClientRect();
+                const cRect = container.getBoundingClientRect();
+
+                const x1 = fRect.left + fRect.width/2 - cRect.left;
+                const y1 = fRect.top + fRect.height/2 - cRect.top;
+                const x2 = tRect.left + tRect.width/2 - cRect.left;
+                const y2 = tRect.top + tRect.height/2 - cRect.top;
+
+                const length = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+                const angle = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI;
+
+                line.style.width = length + 'px';
+                line.style.left = x1 + 'px';
+                line.style.top = y1 + 'px';
+                line.style.transform = `rotate(${angle}deg)`;
+            };
+
+            setTimeout(() => {
+                updateLine(l1, whole, p1);
+                updateLine(l2, whole, p2);
+            }, 50);
+        }
+
+        // --- Confetti ---
+        function startConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            let particles = [];
+            for(let i=0; i<150; i++) {
+                particles.push({
+                    x: Math.random()*canvas.width, y: Math.random()*canvas.height - canvas.height,
+                    size: Math.random()*8+4, color: `hsl(${Math.random()*360}, 70%, 50%)`,
+                    speed: Math.random()*3+2, angle: Math.random()*6.2
+                });
+            }
+            function loop() {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speed; p.x += Math.sin(p.angle);
+                    if(p.y > canvas.height) p.y = -20;
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(p.x, p.y, p.size, p.size);
+                });
+                requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        window.onload = initRound;
+    </script>
+</body>
+</html>

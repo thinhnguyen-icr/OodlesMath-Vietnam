@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fun Measurement Class</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            /* Thay đổi nền thành bầu trời xanh */
+            background: linear-gradient(to bottom, #7DD3FC, #E0F2FE);
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .wood-table {
+            background: linear-gradient(180deg, #FCD34D 0%, #F59E0B 100%);
+            border-top: 16px solid #D97706;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
+            border-radius: 20px 20px 0 0;
+            margin: 0 10px;
+        }
+
+        .game-object {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+
+        .game-object:active {
+            transform: scale(0.95);
+        }
+
+        .game-object:hover {
+            filter: brightness(1.05) drop-shadow(0 6px 8px rgba(0,0,0,0.15));
+            transform: translateY(-5px);
+        }
+
+        /* Animations */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes floatClouds {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-30px); }
+        }
+
+        .animate-bounce-happy {
+            animation: bounce 0.6s infinite;
+        }
+
+        .animate-wiggle {
+            animation: wiggle 0.4s ease-in-out;
+        }
+
+        .animate-pop {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .cloud-anim {
+            animation: floatClouds 4s infinite alternate ease-in-out;
+            position: absolute;
+            z-index: 0; /* Đặt mây ở dưới cùng */
+            pointer-events: none;
+        }
+
+        /* Star styling */
+        .star-icon {
+            filter: drop-shadow(0px 2px 0px rgba(0,0,0,0.2));
+        }
+
+        .speech-bubble {
+            position: relative;
+            background: #ffffff;
+            border-radius: 1em;
+            border: 4px solid #60A5FA;
+            z-index: 20;
+        }
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border: 12px solid transparent;
+            border-top-color: #60A5FA;
+            border-bottom: 0;
+            margin-left: -12px;
+            margin-bottom: -12px;
+        }
+
+        /* Mini-game Styles */
+        #mini-game-layer {
+            background: linear-gradient(180deg, #A5F3FC 0%, #E0F2FE 100%);
+        }
+        .basket {
+            bottom: 30px;
+            width: 110px;
+            height: 70px;
+            background: #A0522D; /* Sienna */
+            border-radius: 10px 10px 30px 30px;
+            border: 4px solid #8B4513;
+            position: absolute;
+            box-shadow: 0 8px 10px rgba(0,0,0,0.2);
+            z-index: 50;
+        }
+        /* Basket handle */
+        .basket:before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: 10px;
+            width: 82px;
+            height: 40px;
+            border: 5px solid #8B4513;
+            border-bottom: none;
+            border-radius: 40px 40px 0 0;
+            z-index: -1;
+        }
+        
+        .falling-item {
+            position: absolute;
+            font-size: 45px;
+            top: -60px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            z-index: 40;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col select-none relative overflow-hidden">
+<img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <!-- Global Clouds Background -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden">
+        <div class="cloud-anim text-white/60 text-6xl" style="top: 10%; left: 10%; animation-duration: 6s;">☁️</div>
+        <div class="cloud-anim text-white/50 text-5xl" style="top: 20%; right: 15%; animation-duration: 7s; animation-delay: 1s;">☁️</div>
+        <div class="cloud-anim text-white/40 text-4xl" style="top: 40%; left: 25%; animation-duration: 8s; animation-delay: 2s;">☁️</div>
+        <div class="cloud-anim text-white/30 text-7xl" style="top: 5%; left: 50%; animation-duration: 9s;">☁️</div>
+        <div class="cloud-anim text-white/40 text-5xl" style="top: 30%; right: 5%; animation-duration: 6.5s;">☁️</div>
+    </div>
+
+    <!-- Top Bar: Progress and Score -->
+    <div class="flex justify-between items-center p-4 z-30 absolute top-0 w-full pointer-events-none">
+        <div class="flex gap-4 items-center pointer-events-auto">
+            <div class="flex gap-2" id="star-container">
+                <!-- Stars will be injected here -->
+            </div>
+            <div class="bg-white/90 backdrop-blur px-5 py-2 rounded-full font-bold text-orange-500 shadow-md flex items-center gap-2 border-2 border-orange-200">
+                <span class="text-2xl">🍎</span> <span id="fruit-score" class="text-xl">0</span>
+            </div>
+        </div>
+        <button onclick="toggleSound()" id="sound-btn" class="pointer-events-auto bg-white p-3 rounded-full shadow-lg text-2xl hover:bg-gray-50 transition border-2 border-gray-100 text-gray-600">
+            🔊
+        </button>
+    </div>
+
+    <!-- Main Game Area (Comparison) -->
+    <div id="main-game-layer" class="flex-grow flex flex-col items-center justify-end relative pb-0 h-full z-10 transition-all duration-500">
+        
+        <!-- Teacher/Prompt Area -->
+        <div class="absolute top-24 left-0 right-0 flex flex-col items-center z-20 transition-all duration-500" id="prompt-container">
+            <div onclick="speakCurrentPrompt()" class="cursor-pointer speech-bubble bg-white px-8 py-5 shadow-xl mb-4 transform hover:scale-105 transition max-w-lg w-[90%]">
+                <h1 id="question-text" class="text-3xl md:text-5xl font-bold text-gray-700 text-center tracking-wide leading-tight">Loading...</h1>
+                <div class="flex justify-center mt-2">
+                    <span id="speaker-icon" class="text-2xl text-blue-400 animate-pulse">🔈</span>
+                </div>
+            </div>
+            
+            <!-- Character Mascot -->
+            <div class="relative mt-2">
+                <!-- Owl sits directly on the sky background now -->
+                <div class="text-8xl filter drop-shadow-xl relative z-10">🦉</div>
+            </div>
+        </div>
+
+        <!-- The "Table" where objects sit -->
+        <div class="wood-table w-full h-[55%] flex items-end justify-center gap-6 md:gap-16 pb-12 px-4 relative">
+            <!-- Objects will be injected here -->
+            <div id="game-stage" class="flex items-end justify-center w-full gap-6 md:gap-20 h-full max-w-4xl"></div>
+        </div>
+
+    </div>
+
+    <!-- Mini-game Area (Fruit Catching) -->
+    <div id="mini-game-layer" class="absolute inset-0 z-20 hidden flex-col items-center pointer-events-none transition-opacity duration-500 opacity-0">
+        <div class="mt-28 text-center pointer-events-auto z-30">
+            <h2 class="text-5xl font-bold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)] mb-3">Fruit Party!</h2>
+            <!-- Removed the instruction text as requested -->
+        </div>
+        <div id="mini-game-area" class="w-full flex-grow relative overflow-hidden pointer-events-auto touch-none">
+            <div id="basket" class="basket left-1/2 -translate-x-1/2 transition-all duration-75 ease-out"></div>
+        </div>
+    </div>
+
+    <!-- Victory Overlay -->
+    <div id="victory-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center backdrop-blur-md">
+        <div class="bg-white rounded-[2rem] p-10 flex flex-col items-center shadow-2xl animate-pop border-8 border-yellow-300 max-w-sm w-[90%] relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-4 bg-yellow-300"></div>
+            <div class="text-8xl mb-6 filter drop-shadow-md">🏆</div>
+            <h2 class="text-4xl font-bold text-yellow-500 mb-2">Great Job!</h2>
+            <p class="text-xl text-gray-500 mb-8 text-center font-medium">You are a measuring star!</p>
+            <div class="text-3xl font-bold text-orange-500 mb-8 bg-orange-50 px-8 py-3 rounded-2xl border-2 border-orange-100 flex items-center gap-3">
+                <span>🍎</span> <span id="final-fruit-score">0</span>
+            </div>
+            <button onclick="restartGame()" class="w-full bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white text-2xl font-bold py-4 rounded-xl shadow-lg transform transition active:scale-95 border-b-4 border-green-600">
+                Play Again
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Game State ---
+        let score = 0;
+        const maxScore = 5;
+        let fruitScore = 0;
+        let currentLevelData = null;
+        let soundEnabled = true;
+        let isProcessing = false;
+        let isMiniGameActive = false;
+
+        // --- Audio Context ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playTone(freq, type, duration, volume = 0.1) {
+            if (!soundEnabled) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playSuccessSound() {
+            // Happy major chord arpeggio
+            playTone(523.25, 'sine', 0.1, 0.1); // C5
+            setTimeout(() => playTone(659.25, 'sine', 0.1, 0.1), 100); // E5
+            setTimeout(() => playTone(783.99, 'sine', 0.3, 0.1), 200); // G5
+            speak("Correct!");
+        }
+
+        function playErrorSound() {
+            // Low error thud
+            playTone(150, 'triangle', 0.1, 0.2);
+            setTimeout(() => playTone(100, 'triangle', 0.2, 0.2), 100);
+        }
+        
+        function playCatchSound() { playTone(1200, 'sine', 0.08, 0.05); } // High ping
+        function playBombSound() { playTone(100, 'sawtooth', 0.4, 0.2); } // Low buzz
+
+        function speak(text) {
+            if (!soundEnabled) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US'; 
+            utterance.rate = 0.95;
+            utterance.pitch = 1.1;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-btn').innerText = soundEnabled ? '🔊' : '🔇';
+            if(soundEnabled && audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        // --- Asset Generators (SVGs) ---
+        // Enhanced colors
+        const colors = {
+            red: '#FF8FAB',      // Soft Pink/Red
+            blue: '#48CAE4',     // Cyan Blue
+            green: '#90BE6D',    // Pistachio Green
+            yellow: '#F9C74F',   // Maize Crayola
+            purple: '#CDB4DB',   // Lavender
+            orange: '#FFAFCC',   // Carnation Pink (used as variety)
+            teal: '#43AA8B'      // Jungle Green
+        };
+        const colorKeys = Object.keys(colors);
+        const getRandomColor = () => colors[colorKeys[Math.floor(Math.random() * colorKeys.length)]];
+
+        // 1. Pencil
+        function createPencil(length, color) {
+            const w = 60; const h = length;
+            return `
+                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
+                    <rect x="10" y="40" width="40" height="${h - 40}" fill="${color}" stroke="#000" stroke-width="2" rx="4" />
+                    <!-- Tip -->
+                    <path d="M 10 40 L 30 0 L 50 40 Z" fill="#FDE68A" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M 23 26 L 30 12 L 37 26 Z" fill="#333" />
+                    <!-- Eraser -->
+                    <path d="M 10 ${h-15} L 10 ${h} Q 30 ${h+8} 50 ${h} L 50 ${h-15} Z" fill="#FCA5A5" stroke="#000" stroke-width="2"/>
+                    <!-- Metal Band -->
+                    <rect x="10" y="${h-25}" width="40" height="10" fill="#D1D5DB" stroke="#000" stroke-width="2"/>
+                </svg>
+            `;
+        }
+
+        // 2. Ballpoint Pen (Simplified & Prettier)
+        function createPen(length, color) {
+            const w = 50; const h = length;
+            return `
+                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
+                    <!-- Body -->
+                    <rect x="12" y="10" width="26" height="${h-20}" fill="${color}" rx="13" stroke="#000" stroke-width="2"/>
+                    <!-- Cap area -->
+                    <path d="M 12 50 L 38 50" stroke="#000" stroke-width="2" stroke-opacity="0.2"/>
+                    <!-- Clicker -->
+                    <rect x="18" y="0" width="14" height="12" fill="#fff" stroke="#000" stroke-width="2" rx="2"/>
+                    <!-- Clip -->
+                    <path d="M 30 20 L 30 60 Q 30 70 34 65" stroke="#000" stroke-width="2" fill="none"/>
+                    <!-- Tip -->
+                    <path d="M 15 ${h-15} L 25 ${h+5} L 35 ${h-15} Z" fill="#D1D5DB" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
+                    <circle cx="25" cy="${h+2}" r="1.5" fill="#333"/>
+                </svg>
+            `;
+        }
+
+        // 3. Ruler (Classic)
+        function createRuler(length, color) {
+            const w = 70; const h = length;
+            let ticks = '';
+            for(let i=10; i<h-10; i+=15) {
+                let text = (i % 30 === 10) ? `<text x="38" y="${i+4}" font-family="Fredoka" font-weight="bold" font-size="12" fill="#78350F" text-anchor="start">${Math.round((h-i)/15)}</text>` : '';
+                 ticks += `<line x1="10" y1="${i}" x2="${(i % 30 === 10) ? 32 : 22}" y2="${i}" stroke="#78350F" stroke-width="2" stroke-linecap="round"/> ${text}`;
+            }
+            return `
+                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
+                    <rect x="5" y="0" width="60" height="${h}" fill="#FDE047" rx="6" stroke="#B45309" stroke-width="3"/>
+                    <rect x="10" y="5" width="50" height="${h-10}" fill="#FEF08A" rx="4" opacity="0.5"/>
+                    ${ticks}
+                </svg>
+            `;
+        }
+
+        // 4. Paintbrush (New Item to replace Car)
+        function createPaintbrush(length, color) {
+            const w = 60; const h = length;
+            const handleH = h * 0.7;
+            const ferruleH = h * 0.15;
+            const bristleH = h * 0.15;
+            return `
+                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
+                    <!-- Handle -->
+                    <path d="M 20 ${h} L 20 ${bristleH + ferruleH} L 40 ${bristleH + ferruleH} L 40 ${h} Q 30 ${h+5} 20 ${h} Z" fill="${color}" stroke="#000" stroke-width="2"/>
+                    <!-- Ferrule (Metal part) -->
+                    <rect x="20" y="${bristleH}" width="20" height="${ferruleH}" fill="#9CA3AF" stroke="#000" stroke-width="2"/>
+                    <line x1="20" y1="${bristleH + 5}" x2="40" y2="${bristleH + 5}" stroke="#000" opacity="0.2"/>
+                    <line x1="20" y1="${bristleH + ferruleH - 5}" x2="40" y2="${bristleH + ferruleH - 5}" stroke="#000" opacity="0.2"/>
+                    <!-- Bristles -->
+                    <path d="M 20 ${bristleH} Q 20 0 30 0 Q 40 0 40 ${bristleH} Z" fill="#D97706" stroke="#000" stroke-width="2"/>
+                    <!-- Paint Dip -->
+                    <path d="M 20 ${bristleH/2} Q 20 0 30 0 Q 40 0 40 ${bristleH/2} Q 30 ${bristleH} 20 ${bristleH/2}" fill="${color}" opacity="0.8"/>
+                </svg>
+            `;
+        }
+
+        // 5. Cube Tower
+        function createCubeTower(length, color) {
+            const w = 50; const h = length;
+            const cubeSize = 40;
+            const numCubes = Math.floor(h / cubeSize);
+            let cubes = '';
+            for(let i=0; i<numCubes; i++) {
+                const y = h - (i+1)*cubeSize;
+                const c = i % 2 === 0 ? color : '#FCD34D'; // Alternating main color and yellow
+                cubes += `
+                    <rect x="5" y="${y}" width="${cubeSize}" height="${cubeSize}" fill="${c}" stroke="#000" stroke-width="2" rx="6"/>
+                    <circle cx="${5 + cubeSize/2}" cy="${y + cubeSize/2}" r="5" fill="rgba(0,0,0,0.1)"/>
+                `;
+            }
+            return `
+                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
+                    ${cubes}
+                </svg>
+            `;
+        }
+
+
+        // --- Main Game Logic ---
+        const generators = [createPencil, createPen, createRuler, createPaintbrush, createCubeTower];
+        
+        // Definitions for comparative vs superlative
+        const prompts = {
+            superlative: [
+                { type: 'longest', text: "Which one is the LONGEST?", compare: (a, b) => b.val - a.val },
+                { type: 'shortest', text: "Which one is the SHORTEST?", compare: (a, b) => a.val - b.val }
+            ],
+            comparative: [
+                { type: 'longer', text: "Which one is LONGER?", compare: (a, b) => b.val - a.val },
+                { type: 'shorter', text: "Which one is SHORTER?", compare: (a, b) => a.val - b.val }
+            ]
+        };
+
+        function generateLevel() {
+            const numObjects = score < 2 ? 2 : 3;
+            const isComparative = numObjects === 2;
+            
+            // Randomly select one item type for consistency
+            const objectTypeIdx = Math.floor(Math.random() * generators.length);
+            const generator = generators[objectTypeIdx];
+            
+            let items = [];
+            const baseUnit = 40; 
+            
+            for (let i = 0; i < numObjects; i++) {
+                let units;
+                let isUnique = false;
+                while (!isUnique) {
+                    units = Math.floor(Math.random() * 5) + 4; // 4 to 8 units
+                    const tooClose = items.some(item => Math.abs(item.units - units) < 1);
+                    if (!tooClose) isUnique = true;
+                }
+
+                items.push({
+                    id: i,
+                    units: units,
+                    height: units * baseUnit,
+                    color: getRandomColor(),
+                    svg: generator(units * baseUnit, getRandomColor())
+                });
+            }
+
+            // Select question based on number of items
+            const questionPool = isComparative ? prompts.comparative : prompts.superlative;
+            const question = questionPool[Math.floor(Math.random() * questionPool.length)];
+            
+            const sorted = [...items].sort((a, b) => question.compare({val: a.height}, {val: b.height}));
+            const correctId = sorted[0].id;
+
+            return { items, question, correctId };
+        }
+
+        function renderLevel() {
+            if(isMiniGameActive) return;
+            isProcessing = false;
+            currentLevelData = generateLevel();
+            const stage = document.getElementById('game-stage');
+            const promptText = document.getElementById('question-text');
+            
+            stage.innerHTML = '';
+            
+            let qText = currentLevelData.question.text;
+            // Stylize the keyword
+            const keyword = qText.split(' ').pop().replace('?', '');
+            const colorClass = (keyword.includes('LONG')) ? 'text-green-500' : 'text-red-500';
+            qText = qText.replace(keyword, `<span class="${colorClass}">${keyword}</span>`);
+            
+            promptText.innerHTML = qText;
+
+            currentLevelData.items.forEach(item => {
+                const container = document.createElement('div');
+                container.className = 'flex items-end gap-2 group game-object';
+                container.onclick = () => handleInput(item.id, container);
+                container.innerHTML = item.svg;
+                stage.appendChild(container);
+            });
+
+            setTimeout(speakCurrentPrompt, 600);
+        }
+
+        function speakCurrentPrompt() {
+            if(currentLevelData && !isMiniGameActive) {
+                speak(currentLevelData.question.text);
+            }
+        }
+
+        function handleInput(id, element) {
+            if (isProcessing || isMiniGameActive) return;
+
+            if (id === currentLevelData.correctId) {
+                // Correct
+                isProcessing = true;
+                playSuccessSound();
+                element.classList.add('animate-bounce-happy');
+                createConfetti(element);
+                
+                score++;
+                updateStars();
+
+                // Start mini-game after 1.5s
+                setTimeout(() => {
+                    startMiniGame();
+                }, 1500);
+
+            } else {
+                // Incorrect
+                playErrorSound();
+                element.classList.add('animate-wiggle');
+                speak("Try again!");
+                setTimeout(() => {
+                    element.classList.remove('animate-wiggle');
+                }, 500);
+            }
+        }
+
+        function updateStars() {
+            const container = document.getElementById('star-container');
+            container.innerHTML = '';
+            for(let i=0; i<maxScore; i++) {
+                if (i < score) {
+                    container.innerHTML += `<div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-white text-2xl shadow-lg border-2 border-white animate-pop star-icon">★</div>`;
+                } else {
+                    container.innerHTML += `<div class="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center text-white/50 text-xl border-2 border-transparent">★</div>`;
+                }
+            }
+        }
+
+        function createConfetti(target) {
+            const rect = target.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top;
+            for (let i = 0; i < 25; i++) {
+                const conf = document.createElement('div');
+                conf.classList.add('fixed', 'w-3', 'h-3', 'rounded-full');
+                conf.style.backgroundColor = getRandomColor();
+                conf.style.left = centerX + 'px';
+                conf.style.top = centerY + 'px';
+                conf.style.transition = 'all 0.8s ease-out';
+                conf.style.zIndex = 100;
+                document.body.appendChild(conf);
+                setTimeout(() => {
+                    const x = (Math.random() - 0.5) * 250;
+                    const y = (Math.random() - 1) * 250;
+                    conf.style.transform = `translate(${x}px, ${y}px) scale(0)`;
+                    conf.style.opacity = 0;
+                }, 10);
+                setTimeout(() => conf.remove(), 800);
+            }
+        }
+
+        // --- Mini-game Logic ---
+        let itemSpawnInterval;
+        let miniGameStartTime;
+        let basketPosition = 50; 
+        const basket = document.getElementById('basket');
+        const miniGameArea = document.getElementById('mini-game-area');
+        const fruitScoreEl = document.getElementById('fruit-score');
+
+        function startMiniGame() {
+            isMiniGameActive = true;
+            miniGameStartTime = Date.now();
+            
+            // UI Transition
+            document.getElementById('main-game-layer').classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('mini-game-layer').classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+            document.getElementById('mini-game-layer').classList.add('flex');
+            
+            speak("Fruit party! Catch apples!");
+
+            // Reset
+            basketPosition = 50;
+            updateBasketPosition();
+
+            // Initial Spawn
+            scheduleNextSpawn();
+
+            // Listen to inputs
+            setupMiniGameControls();
+        }
+
+        function scheduleNextSpawn() {
+            if(!isMiniGameActive) return;
+            
+            const elapsed = Date.now() - miniGameStartTime;
+            // Level 0 (0-5s), Level 1 (5-10s), Level 2 (10-15s)...
+            const level = Math.floor(elapsed / 5000); 
+
+            // Base delay decreases as level increases (faster spawning)
+            // L0: 700ms, L1: 600ms, L2: 500ms... Min 300ms
+            let delay = Math.max(300, 700 - (level * 100));
+
+            itemSpawnInterval = setTimeout(() => {
+                spawnItem();
+                scheduleNextSpawn();
+            }, delay);
+        }
+
+        function endMiniGame() {
+            clearTimeout(itemSpawnInterval);
+            document.querySelectorAll('.falling-item').forEach(el => el.remove());
+            teardownMiniGameControls();
+
+            isMiniGameActive = false;
+            
+            // Transition back
+            document.getElementById('mini-game-layer').classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                 document.getElementById('mini-game-layer').classList.add('hidden');
+                 document.getElementById('mini-game-layer').classList.remove('flex');
+                 document.getElementById('main-game-layer').classList.remove('opacity-0', 'pointer-events-none');
+            }, 500);
+           
+            if (score >= maxScore) {
+                setTimeout(() => {
+                    document.getElementById('final-fruit-score').innerText = fruitScore;
+                    document.getElementById('victory-modal').classList.remove('hidden');
+                    playTone(523.25, 'square', 0.1);
+                    playTone(698.46, 'square', 0.1); // F5
+                    playTone(880.00, 'square', 0.4); // A5
+                    speak("Congratulations! You are amazing!");
+                }, 1500);
+            } else {
+                speak("Oh no, a bomb! Next round.");
+                setTimeout(renderLevel, 1500);
+            }
+        }
+
+        function spawnItem() {
+            const elapsed = Date.now() - miniGameStartTime;
+            const level = Math.floor(elapsed / 5000); 
+
+            let items = ['🍎', '🍊', '🍇', '🍓', '🍎']; 
+            
+            // Speed increases with level
+            // L0: 4, L1: 5, L2: 6... Max 12
+            let speed = Math.min(12, 4 + level);
+
+            // Bomb count increases with level
+            // L0: 1 bomb, L1: 2 bombs, L2: 3 bombs...
+            const bombCount = 1 + level;
+            for(let i=0; i<bombCount; i++) {
+                items.push('💣');
+            }
+
+            const item = items[Math.floor(Math.random() * items.length)];
+            const el = document.createElement('div');
+            el.classList.add('falling-item');
+            el.innerText = item;
+            el.style.left = Math.random() * 85 + 5 + '%'; // Keep within bounds
+            miniGameArea.appendChild(el);
+
+            let posY = -60;
+            
+            const fallInterval = setInterval(() => {
+                if(!isMiniGameActive) {
+                    clearInterval(fallInterval);
+                    el.remove();
+                    return;
+                }
+
+                posY += speed;
+                el.style.top = posY + 'px';
+
+                // Collision
+                const basketRect = basket.getBoundingClientRect();
+                const itemRect = el.getBoundingClientRect();
+
+                // Improved Hitbox
+                const hitY = posY > miniGameArea.offsetHeight - 130; 
+                if(hitY && 
+                   itemRect.right > basketRect.left + 20 && 
+                   itemRect.left < basketRect.right - 20) {
+                    
+                    clearInterval(fallInterval);
+                    el.remove();
+
+                    if(item === '💣') {
+                        playBombSound();
+                        basket.classList.add('animate-wiggle');
+                        setTimeout(() => basket.classList.remove('animate-wiggle'), 500);
+                        endMiniGame();
+                    } else {
+                        playCatchSound();
+                        fruitScore++;
+                        // Visual Pop
+                        const plusOne = document.createElement('div');
+                        plusOne.innerText = '+1';
+                        plusOne.className = 'absolute text-yellow-500 font-bold text-3xl animate-pop';
+                        plusOne.style.left = basketRect.left + 40 + 'px';
+                        plusOne.style.top = basketRect.top - 40 + 'px';
+                        miniGameArea.appendChild(plusOne);
+                        setTimeout(()=>plusOne.remove(), 500);
+                        fruitScoreEl.innerText = fruitScore;
+                    }
+
+                } else if (posY > miniGameArea.offsetHeight) {
+                    clearInterval(fallInterval);
+                    el.remove();
+                }
+            }, 20);
+        }
+
+        function setupMiniGameControls() {
+            miniGameArea.addEventListener('touchmove', handleMove, {passive: false});
+            miniGameArea.addEventListener('mousemove', handleMove);
+        }
+
+        function teardownMiniGameControls() {
+            miniGameArea.removeEventListener('touchmove', handleMove);
+            miniGameArea.removeEventListener('mousemove', handleMove);
+        }
+
+        function handleMove(e) {
+            if(!isMiniGameActive) return;
+            e.preventDefault();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const rect = miniGameArea.getBoundingClientRect();
+            let relativeX = clientX - rect.left;
+            basketPosition = (relativeX / rect.width) * 100;
+            updateBasketPosition();
+        }
+
+        function updateBasketPosition() {
+            basketPosition = Math.max(10, Math.min(90, basketPosition)); 
+            basket.style.left = basketPosition + '%';
+        }
+
+        function restartGame() {
+            score = 0;
+            fruitScore = 0;
+            fruitScoreEl.innerText = '0';
+            document.getElementById('victory-modal').classList.add('hidden');
+            updateStars();
+            renderLevel();
+        }
+
+        // Initialize
+        window.onload = () => {
+            updateStars();
+            renderLevel();
+            document.body.addEventListener('click', function() {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }, {once:true});
+        };
+
+    </script>
+</body>
+</html>

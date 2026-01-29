@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Penalty Kicks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Import Font Poppins */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            touch-action: none;
+            background-color: #2c3e50;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 40%, #43e97b 40%, #38f9d7 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            perspective: 1200px;
+        }
+
+        /* --- Clouds --- */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50px;
+            animation: floatCloud linear infinite;
+            z-index: 5;
+            box-shadow: 0 0.5vmin 1.5vmin rgba(0,0,0,0.1);
+        }
+        
+        .cloud::after, .cloud::before {
+            content: '';
+            position: absolute;
+            background: inherit;
+            border-radius: 50%;
+        }
+
+        .cloud-1 { width: 14vmin; height: 5vmin; top: 10%; left: -20vmin; animation-duration: 28s; }
+        .cloud-1::after { width: 6vmin; height: 6vmin; top: -3vmin; left: 2.5vmin; }
+        .cloud-1::before { width: 5vmin; height: 5vmin; top: -2vmin; left: 7vmin; }
+
+        .cloud-2 { width: 10vmin; height: 4vmin; top: 20%; left: -15vmin; animation-duration: 35s; animation-delay: 5s; }
+        .cloud-2::after { width: 4.5vmin; height: 4.5vmin; top: -2.2vmin; left: 1.5vmin; }
+        .cloud-2::before { width: 4vmin; height: 4vmin; top: -1.5vmin; left: 5vmin; }
+
+        @keyframes floatCloud {
+            0% { transform: translateX(-20vmin); }
+            100% { transform: translateX(110vw); }
+        }
+
+        /* Khán đài */
+        .stand {
+            position: absolute;
+            top: 32%;
+            width: 100%;
+            height: 8vmin;
+            background-color: #34495e;
+            background-image: radial-gradient(#ecf0f1 15%, transparent 16%), radial-gradient(#ecf0f1 15%, transparent 16%);
+            background-size: 1.5vmin 1.5vmin;
+            background-position: 0 0, 0.75vmin 0.75vmin;
+            opacity: 0.8;
+            z-index: 1;
+            border-bottom: 0.5vmin solid #2c3e50;
+        }
+
+        /* Vạch vôi và sân cỏ */
+        .field-lines {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60%;
+            pointer-events: none;
+            transform-style: preserve-3d;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(255,255,255,0.05) 0px,
+                rgba(255,255,255,0.05) 5vmin,
+                transparent 5vmin,
+                transparent 10vmin
+            );
+        }
+        
+        .penalty-box {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) perspective(600px) rotateX(50deg);
+            width: 70%;
+            max-width: 90vmin;
+            height: 40vmin;
+            border: 0.8vmin solid rgba(255,255,255,0.8);
+            border-top: none;
+            border-radius: 0 0 1vmin 1vmin;
+        }
+
+        /* Khung thành responsive */
+        .goal-post {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 75vmin;
+            height: 25vmin; 
+            border-top: 1.5vmin solid #fff;
+            border-left: 1.5vmin solid #fff;
+            border-right: 1.5vmin solid #fff;
+            box-shadow: 0 2vmin 4vmin rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.15);
+            z-index: 10;
+            perspective: 800px;
+            border-radius: 1vmin 1vmin 0 0;
+        }
+
+        .net {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.5) 0.2vmin, transparent 0.2vmin),
+                linear-gradient(90deg, rgba(255,255,255,0.5) 0.2vmin, transparent 0.2vmin);
+            background-size: 2vmin 2vmin;
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        /* Đáp án responsive */
+        .targets-container {
+            position: absolute;
+            bottom: 22%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85vmin;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 30;
+        }
+
+        .target-zone {
+            position: relative;
+            width: 14vmin;
+            height: 14vmin;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            border: 0.6vmin solid #ff9f43;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 5vmin;
+            font-weight: 900;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1vmin 2vmin rgba(0,0,0,0.2), inset 0.2vmin 0.2vmin 0.5vmin rgba(255,255,255,1);
+        }
+
+        .target-zone:nth-child(1) { border-color: #ff6b6b; color: #ee5253; }
+        .target-zone:nth-child(2) { border-color: #feca57; color: #ff9f43; }
+        .target-zone:nth-child(3) { border-color: #48dbfb; color: #2e86de; }
+
+        .target-zone::after {
+            content: '';
+            position: absolute;
+            bottom: -1vmin;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            height: 1vmin;
+            background: rgba(0,0,0,0.2);
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(0.5vmin);
+        }
+
+        .target-zone:active, .target-zone.clicked {
+             transform: scale(0.95) translateY(0.5vmin);
+             filter: brightness(0.9);
+        }
+
+        /* Thủ môn ĐẸP - TOÀN THÂN */
+        .goalkeeper-container {
+            position: absolute;
+            bottom: -2vmin; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 22vmin;
+            height: 28vmin;
+            z-index: 20;
+            transition: left 0.5s ease-out, transform 0.5s ease-out;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            transform-origin: bottom center; 
+        }
+
+        .gk-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0.5vmin 0.8vmin rgba(0,0,0,0.4));
+        }
+
+        /* Bóng */
+        .ball-container {
+            position: absolute;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            pointer-events: none; 
+        }
+
+        .ball {
+            width: 12vmin;
+            height: 12vmin;
+            background: radial-gradient(circle at 35% 35%, #ffffff, #dcdcdc 60%, #7f8c8d 100%);
+            border-radius: 50%;
+            box-shadow: 0 1.5vmin 3vmin rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .ball::after {
+            content: '⚽';
+            font-size: 12.5vmin;
+            line-height: 12vmin;
+            color: #222;
+            opacity: 0.9;
+        }
+
+        .ball-flying {
+            transition: all 0.7s cubic-bezier(0.2, 0.6, 0.35, 1);
+        }
+
+        /* UI Panels */
+        .scoreboard {
+            position: absolute;
+            top: 2vmin;
+            left: 2vmin;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1vmin 2vmin;
+            border-radius: 3vmin;
+            color: #2c3e50;
+            font-size: 3vmin;
+            z-index: 50;
+            border: 0.5vmin solid #feca57;
+            font-weight: 900;
+            box-shadow: 0 0.5vmin 0 rgba(0,0,0,0.1);
+        }
+
+        .question-panel {
+            position: absolute;
+            top: 10%; 
+            width: 100%;
+            text-align: center;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .question-bg {
+            background: #ffffff;
+            color: #2c3e50;
+            padding: 1.5vmin 4vmin;
+            border-radius: 5vmin;
+            font-size: 6vmin;
+            font-weight: 900;
+            display: inline-block;
+            box-shadow: 0 1vmin 0 #bdc3c7, 0 1.5vmin 2vmin rgba(0,0,0,0.2);
+            border: 0.5vmin solid #3498db;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        .feedback-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .feedback-text {
+            font-size: 12vmin;
+            font-weight: 900;
+            text-shadow: 0.5vmin 0.5vmin 0 #000, 0 0 2vmin rgba(255,255,255,0.5);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            -webkit-text-stroke: 0.2vmin white;
+            text-align: center;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(44, 62, 80, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            padding: 2vmin;
+        }
+
+        /* Typography for Screens - using vmin */
+        .screen h1 { font-size: 8vmin; margin-bottom: 2vmin; }
+        .screen .info-box { font-size: 3vmin; padding: 3vmin; border-radius: 2vmin; max-width: 80vmin; margin-bottom: 4vmin; }
+        .screen .info-box p { margin-bottom: 1vmin; }
+        .screen .score-text { font-size: 5vmin; }
+        .screen .score-val { font-size: 10vmin; }
+
+        .btn {
+            background: linear-gradient(to bottom, #feca57, #ff9f43);
+            color: white;
+            border: none;
+            padding: 2vmin 6vmin;
+            font-size: 4vmin;
+            border-radius: 6vmin;
+            cursor: pointer;
+            margin-top: 2vmin;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 900;
+            box-shadow: 0 1vmin 0 #e67e22, 0 2vmin 2vmin rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+        
+        .btn:active {
+            transform: translateY(1vmin);
+            box-shadow: 0 0 0 #e67e22;
+        }
+
+        .hidden { display: none !important; }
+        
+        #fireworks { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            pointer-events: none; 
+            z-index: 1100;
+        }
+
+        /* --- Mystery Box Game Styles (ĐẸP HƠN & ANIMATION) --- */
+        .box-container {
+            display: flex;
+            justify-content: center;
+            gap: 5vmin;
+            margin-top: 5vmin;
+            position: relative;
+            height: 25vmin;
+            width: 100%;
+        }
+
+        .mystery-box {
+            width: 22vmin;
+            height: 22vmin;
+            /* Hộp quà màu đỏ rực rỡ */
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-radius: 2vmin;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 8vmin;
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            /* QUAN TRỌNG: Thêm transition left để tạo hiệu ứng di chuyển */
+            transition: left 0.5s ease-in-out, transform 0.3s, filter 0.2s;
+            box-shadow: 0 2vmin 3vmin rgba(0,0,0,0.4), inset 0 0 2vmin rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        /* Nơ ngang */
+        .mystery-box::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 4vmin;
+            background: #f1c40f; /* Vàng */
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            box-shadow: 0 0 1vmin rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+
+        /* Nơ dọc */
+        .mystery-box::after {
+            content: '';
+            position: absolute;
+            height: 100%;
+            width: 4vmin;
+            background: #f1c40f;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+            box-shadow: 0 0 1vmin rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+
+        /* Dấu hỏi trên nắp */
+        .box-lid-mark {
+            position: absolute;
+            color: rgba(255,255,255,0.9);
+            font-size: 8vmin;
+            font-weight: bold;
+            z-index: 2;
+            text-shadow: 0 0.5vmin 0 rgba(0,0,0,0.2);
+        }
+
+        .mystery-box:hover {
+            filter: brightness(1.1);
+            transform: scale(1.05); /* Hiệu ứng hover nhẹ */
+        }
+
+        /* Trạng thái mở hộp */
+        .mystery-box.open {
+            background: #fff;
+            border: 1vmin solid #f1c40f;
+        }
+        
+        .mystery-box.open::before, .mystery-box.open::after, .mystery-box.open .box-lid-mark {
+            display: none; /* Ẩn nơ khi mở */
+        }
+
+        .mystery-content {
+            opacity: 0;
+            transition: opacity 0.3s;
+            transform: scale(0);
+            z-index: 5;
+        }
+
+        .mystery-box.open .mystery-content {
+            opacity: 1;
+            transform: scale(1);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Hiệu ứng báo hiệu hộp thắng */
+        @keyframes winnerPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2) translateY(-2vmin); box-shadow: 0 0 5vmin gold; }
+            100% { transform: scale(1); }
+        }
+        .mystery-box.highlight {
+            animation: winnerPulse 0.8s ease-in-out infinite;
+            z-index: 20;
+        }
+
+        /* Vị trí cho các hộp khi xáo trộn - Tính toán để cân đối màn hình */
+        /* Giả sử Container 100%, Tâm là 50% */
+        /* Box rộng 22vmin. Khoảng cách 5vmin */
+        /* Box giữa (pos-1): left: calc(50% - 11vmin) */
+        /* Box trái (pos-0): left: calc(50% - 11vmin - 22vmin - 5vmin) = 50% - 38vmin */
+        /* Box phải (pos-2): left: calc(50% + 11vmin + 5vmin) = 50% + 16vmin */
+        
+        .pos-0 { left: calc(50% - 38vmin); } 
+        .pos-1 { left: calc(50% - 11vmin); } 
+        .pos-2 { left: calc(50% + 16vmin); } 
+
+    </style>
+</head>
+<body>
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <!-- Start Screen -->
+    <div id="startScreen" class="screen">
+        <h1 class="font-black text-yellow-400 drop-shadow-lg">MATH PENALTY</h1>
+        <div class="info-box bg-white text-gray-800 shadow-xl">
+            <p class="flex items-center justify-center gap-2">⚽ TAP the <b>CORRECT</b> answer!</p>
+            <p class="flex items-center justify-center gap-2">🧤 Score goals & beat the Keeper!</p>
+        </div>
+        <button class="btn" onclick="initGame()">PLAY NOW</button>
+    </div>
+
+    <!-- Mini Game Screen (Total Score & Box Picking) -->
+    <div id="miniGameScreen" class="screen hidden">
+        <h1 class="font-black text-yellow-400 text-[6vmin]">PICK A BOX!</h1>
+        <p class="text-white text-[3vmin] mb-2">Where is your prize?</p>
+        
+        <div class="box-container" id="boxContainer">
+            <!-- Boxes injected by JS -->
+        </div>
+
+        <div id="resultMessage" class="hidden flex flex-col items-center mt-[25vmin]">
+            <p class="text-[4vmin] text-white font-bold">YOUR SCORE: <span id="finalScoreDisplay" class="text-yellow-300">0</span>/10</p>
+            <button class="btn" onclick="resetGame()">PLAY AGAIN</button>
+        </div>
+    </div>
+
+    <div class="game-container" id="gameContainer">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <canvas id="fireworks"></canvas>
+
+        <div class="stand"></div>
+        <div class="field-lines">
+            <div class="penalty-box"></div>
+        </div>
+
+        <div class="scoreboard">
+            SCORE: <span id="scoreDisplay" class="text-blue-600">0</span>
+        </div>
+
+        <div class="question-panel">
+            <div id="questionText" class="question-bg">10 + 5 = ?</div>
+        </div>
+
+        <div class="feedback-overlay">
+            <div id="feedbackText" class="feedback-text text-yellow-400">GOAL!</div>
+        </div>
+
+        <div class="goal-post">
+            <div class="net"></div>
+            <!-- Thủ môn -->
+            <div class="goalkeeper-container" id="goalkeeper">
+                <svg class="gk-svg" viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="skinGrad" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0%" stop-color="#f5d0a9"/>
+                            <stop offset="100%" stop-color="#e0b080"/>
+                        </linearGradient>
+                        <linearGradient id="shirtGrad" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0%" stop-color="#43a047"/>
+                            <stop offset="100%" stop-color="#2e7d32"/>
+                        </linearGradient>
+                        <linearGradient id="shortsGrad" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0%" stop-color="#333"/>
+                            <stop offset="100%" stop-color="#000"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M75 170 L70 230" stroke="#f5d0a9" stroke-width="18" stroke-linecap="round"/>
+                    <path d="M125 170 L130 230" stroke="#f5d0a9" stroke-width="18" stroke-linecap="round"/>
+                    <path d="M55 230 Q55 245 75 250 L85 250 Q90 240 80 230 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+                    <path d="M115 230 Q115 245 135 250 L145 250 Q150 240 140 230 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+                    <rect x="62" y="200" width="16" height="30" fill="#fff"/>
+                    <rect x="122" y="200" width="16" height="30" fill="#fff"/>
+                    <path d="M62 205 H78 M62 215 H78 M122 205 H138 M122 215 H138" stroke="red" stroke-width="2"/>
+                    <path d="M60 150 Q55 180 80 180 H120 Q145 180 140 150 L135 130 H65 Z" fill="url(#shortsGrad)"/>
+                    <path d="M65 135 L60 80 Q60 70 80 70 H120 Q140 70 140 80 L135 135 Z" fill="url(#shirtGrad)"/>
+                    <text x="100" y="115" font-family="Arial" font-weight="bold" font-size="30" fill="white" text-anchor="middle">1</text>
+                    <path d="M60 85 Q30 100 35 125" fill="none" stroke="url(#shirtGrad)" stroke-width="16" stroke-linecap="round"/>
+                    <path d="M140 85 Q170 100 165 125" fill="none" stroke="url(#shirtGrad)" stroke-width="16" stroke-linecap="round"/>
+                    <circle cx="35" cy="130" r="18" fill="white" stroke="#333" stroke-width="2"/>
+                    <circle cx="165" cy="130" r="18" fill="white" stroke="#333" stroke-width="2"/>
+                    <circle cx="100" cy="50" r="28" fill="url(#skinGrad)"/>
+                    <path d="M75 40 Q100 10 125 40 Q130 55 125 50 Q100 20 75 50 Z" fill="#3e2723"/>
+                    <circle cx="90" cy="50" r="3" fill="#333"/>
+                    <circle cx="110" cy="50" r="3" fill="#333"/>
+                    <path d="M92 62 Q100 68 108 62" fill="none" stroke="#333" stroke-width="2"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="targets-container">
+            <div id="target0" class="target-zone" data-index="0">0</div>
+            <div id="target1" class="target-zone" data-index="1">0</div>
+            <div id="target2" class="target-zone" data-index="2">0</div>
+        </div>
+
+        <div class="ball-container" id="ballWrapper">
+            <div class="ball"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- Audio Logic ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        let ambienceNode;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            startAmbience();
+        }
+
+        function createNoiseBuffer() {
+            if(!audioCtx) return;
+            const bufferSize = audioCtx.sampleRate * 2;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
+            return buffer;
+        }
+
+        function startAmbience() {
+            if (!audioCtx) return;
+            if (ambienceNode) try{ ambienceNode.stop(); } catch(e){}
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = createNoiseBuffer();
+            noise.loop = true;
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 400; 
+            const gain = audioCtx.createGain();
+            gain.gain.value = 0.05; 
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+            noise.start();
+            ambienceNode = noise;
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const t = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'kick') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(100, t);
+                osc.frequency.exponentialRampToValueAtTime(0.01, t + 0.1);
+                gain.gain.setValueAtTime(0.8, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+                osc.start(t);
+                osc.stop(t + 0.1);
+            } else if (type === 'goal') {
+                playNote(523.25, t, 0.1, 'square'); 
+                playNote(659.25, t+0.1, 0.1, 'square'); 
+                playNote(783.99, t+0.2, 0.4, 'square'); 
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = createNoiseBuffer();
+                const noiseGain = audioCtx.createGain();
+                noiseGain.gain.setValueAtTime(0.1, t);
+                noiseGain.gain.linearRampToValueAtTime(0.4, t+0.2);
+                noiseGain.gain.exponentialRampToValueAtTime(0.01, t+1.5);
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(500, t);
+                filter.frequency.linearRampToValueAtTime(1500, t+0.5);
+                noise.connect(filter);
+                filter.connect(noiseGain);
+                noiseGain.connect(audioCtx.destination);
+                noise.start(t);
+                noise.stop(t+1.5);
+            } else if (type === 'miss') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, t);
+                osc.frequency.linearRampToValueAtTime(100, t + 0.5);
+                gain.gain.setValueAtTime(0.2, t);
+                gain.gain.linearRampToValueAtTime(0, t + 0.5);
+                osc.start(t);
+                osc.stop(t + 0.5);
+            }
+        }
+
+        function playNote(freq, t, dur, type='sine') {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.type = type;
+            o.frequency.value = freq;
+            g.gain.setValueAtTime(0.1, t);
+            g.gain.linearRampToValueAtTime(0, t+dur);
+            o.start(t);
+            o.stop(t+dur);
+        }
+
+        // --- Game Logic ---
+        const totalQuestions = 10;
+        let currentQuestion = 0;
+        let score = 0;
+        let correctAnswer = 0;
+        let canInteract = false;
+
+        const ballWrapper = document.getElementById('ballWrapper');
+        const questionText = document.getElementById('questionText');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const feedbackText = document.getElementById('feedbackText');
+        const goalkeeper = document.getElementById('goalkeeper');
+        const goalPost = document.querySelector('.goal-post'); 
+        const targets = [
+            document.getElementById('target0'),
+            document.getElementById('target1'),
+            document.getElementById('target2')
+        ];
+        const startScreen = document.getElementById('startScreen');
+        const miniGameScreen = document.getElementById('miniGameScreen');
+        const boxContainer = document.getElementById('boxContainer');
+        const resultMessage = document.getElementById('resultMessage');
+        const finalScoreDisplay = document.getElementById('finalScoreDisplay');
+
+        function initGame() {
+            initAudio();
+            startScreen.classList.add('hidden');
+            miniGameScreen.classList.add('hidden');
+            score = 0;
+            currentQuestion = 0;
+            scoreDisplay.innerText = score;
+            targets.forEach(t => {
+                t.removeEventListener('click', handleTargetClick);
+                t.addEventListener('click', handleTargetClick);
+                t.removeEventListener('touchstart', handleTargetClick);
+                t.addEventListener('touchstart', handleTargetClick, {passive: false});
+            });
+            nextTurn();
+        }
+
+        function resetGame() { 
+            // Clear boxes
+            boxContainer.innerHTML = '';
+            resultMessage.classList.add('hidden');
+            initGame(); 
+        }
+
+        function nextTurn() {
+            if (currentQuestion >= totalQuestions) {
+                endGame();
+                return;
+            }
+            feedbackText.style.opacity = 0;
+            feedbackText.style.transform = 'scale(0.5)';
+            resetBall();
+            resetGoalkeeper();
+            generateMath();
+            canInteract = true;
+            targets.forEach(t => t.classList.remove('clicked'));
+        }
+
+        function generateMath() {
+            const isPlus = Math.random() > 0.5;
+            let n1, n2;
+            if (isPlus) {
+                let sum = Math.floor(Math.random() * 11) + 10;
+                n1 = Math.floor(Math.random() * (sum - 2)) + 1;
+                n2 = sum - n1;
+                correctAnswer = sum;
+                questionText.innerText = `${n1} + ${n2} = ?`;
+            } else {
+                n1 = Math.floor(Math.random() * 11) + 10;
+                n2 = Math.floor(Math.random() * n1);
+                correctAnswer = n1 - n2;
+                questionText.innerText = `${n1} - ${n2} = ?`;
+            }
+            let answers = [correctAnswer];
+            while(answers.length < 3) {
+                let diff = Math.floor(Math.random() * 5) + 1;
+                let fake = Math.random() > 0.5 ? correctAnswer + diff : correctAnswer - diff;
+                if(fake >= 0 && !answers.includes(fake)) answers.push(fake);
+            }
+            answers.sort(() => Math.random() - 0.5);
+            targets.forEach((el, idx) => {
+                el.innerText = answers[idx];
+                el.dataset.val = answers[idx];
+            });
+        }
+
+        function resetBall() {
+            ballWrapper.className = 'ball-container'; 
+            ballWrapper.style.transform = 'translateX(-50%) translate(0,0) scale(1)';
+            ballWrapper.style.opacity = 1;
+        }
+
+        function resetGoalkeeper() {
+            goalkeeper.style.left = '50%';
+            goalkeeper.style.transform = 'translateX(-50%) rotate(0deg)';
+        }
+
+        function handleTargetClick(e) {
+            if (!canInteract) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const target = e.currentTarget;
+            const targetIdx = parseInt(target.dataset.index);
+            target.classList.add('clicked');
+            shootBall(targetIdx);
+        }
+
+        function shootBall(targetIdx) {
+            canInteract = false;
+            playSound('kick');
+
+            const targetEl = targets[targetIdx];
+            const val = parseInt(targetEl.dataset.val);
+            const isCorrect = (val === correctAnswer);
+
+            const targetRect = targetEl.getBoundingClientRect();
+            const ballStartRect = ballWrapper.getBoundingClientRect();
+            const goalRect = goalPost.getBoundingClientRect();
+            
+            const tx = targetRect.left + targetRect.width/2;
+            const ty = targetRect.top + targetRect.height/2;
+            const bx = ballStartRect.left + ballStartRect.width/2;
+            const by = ballStartRect.top + ballStartRect.height/2;
+            const goalCenterY = goalRect.top + goalRect.height / 2;
+            
+            const moveX = tx - bx;
+            const distToGoalY = goalCenterY - by; 
+
+            ballWrapper.classList.add('ball-flying');
+            
+            if (isCorrect) {
+                ballWrapper.style.transform = `translateX(-50%) translate(${moveX}px, ${distToGoalY}px) scale(0.6)`; 
+                const diveDir = (targetIdx === 0) ? 120 : (targetIdx === 2) ? -120 : (Math.random()>0.5?100:-100);
+                goalkeeper.style.transform = `translateX(-50%) translateX(${diveDir}px) rotate(${diveDir > 0 ? 40 : -40}deg)`;
+                setTimeout(() => showFeedback(true), 700);
+            } else {
+                ballWrapper.style.transform = `translateX(-50%) translate(${moveX}px, ${distToGoalY}px) scale(0.6)`;
+                
+                let gkMoveX = 0;
+                let gkRotate = 0;
+                let gkMoveY = 0; 
+
+                if (targetIdx === 0) { // Sút Trái
+                    gkMoveX = -100;
+                    gkRotate = -45;
+                    gkMoveY = -50;
+                } else if (targetIdx === 2) { // Sút Phải
+                    gkMoveX = 100;
+                    gkRotate = 45;
+                    gkMoveY = -50;
+                } else { // Sút Giữa
+                    gkMoveX = 0;
+                    gkMoveY = 0; 
+                    gkRotate = 0;
+                }
+                
+                goalkeeper.style.transform = `translateX(-50%) translate(${gkMoveX}px, ${gkMoveY}px) rotate(${gkRotate}deg)`;
+                
+                setTimeout(() => {
+                    ballWrapper.style.transition = "all 0.3s ease-out";
+                    ballWrapper.style.transform = `translateX(-50%) translate(${moveX + (Math.random()*50-25)}px, ${distToGoalY + 50}px) scale(0.6)`;
+                    playSound('miss');
+                    showFeedback(false, "BLOCKED!"); 
+                }, 500);
+            }
+        }
+
+        function showFeedback(success, textOverride) {
+            if (success) {
+                score++;
+                scoreDisplay.innerText = score;
+                feedbackText.innerText = "GOAL!!!";
+                feedbackText.className = "feedback-text text-yellow-300";
+                feedbackText.style.textShadow = "0.5vmin 0.5vmin 0 #e67e22";
+                playSound('goal');
+                createFireworkBurst();
+            } else {
+                feedbackText.innerText = textOverride || "OOPS!";
+                feedbackText.className = "feedback-text text-red-500";
+                feedbackText.style.textShadow = "0.5vmin 0.5vmin 0 #fff";
+                if (!textOverride) playSound('miss'); 
+            }
+            feedbackText.style.opacity = 1;
+            feedbackText.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                currentQuestion++;
+                nextTurn();
+            }, 2000);
+        }
+
+        // --- Mini Game Logic ---
+        function endGame() {
+            miniGameScreen.classList.remove('hidden');
+            startMiniGame();
+        }
+
+        function startMiniGame() {
+            boxContainer.innerHTML = '';
+            resultMessage.classList.add('hidden');
+            
+            // Determine prize based on score
+            let reward = "";
+            let rewardStyle = "";
+            if (score >= 8) {
+                reward = "🏆"; // Gold Cup
+                rewardStyle = "filter: drop-shadow(0 0 10px gold); font-size: 8vmin;";
+            } else if (score >= 5) {
+                reward = "🥈"; // Silver Cup
+                rewardStyle = "filter: grayscale(100%) brightness(120%) drop-shadow(0 0 10px silver); font-size: 8vmin;";
+            } else {
+                reward = "💐"; // Flowers
+                rewardStyle = "font-size: 8vmin;";
+            }
+
+            // Create 3 boxes
+            const boxes = [];
+            const winningIndex = Math.floor(Math.random() * 3);
+
+            for(let i=0; i<3; i++) {
+                const box = document.createElement('div');
+                box.className = `mystery-box pos-${i}`;
+                box.dataset.index = i;
+                
+                const lid = document.createElement('div');
+                lid.className = "box-lid-mark";
+                lid.innerText = "?";
+                box.appendChild(lid);
+
+                const content = document.createElement('div');
+                content.className = "mystery-content";
+                
+                if (i === winningIndex) {
+                    content.innerHTML = reward;
+                    content.style.cssText = rewardStyle;
+                    box.dataset.type = "win";
+                } else {
+                    // Empty boxes
+                    content.innerText = "💨";
+                    box.dataset.type = "lose";
+                }
+                
+                box.appendChild(content);
+                boxContainer.appendChild(box);
+                boxes.push(box);
+            }
+
+            // Sequence: Show prize -> Close -> Shuffle -> Pick
+            setTimeout(() => {
+                // 1. Reveal prize briefly & Highlight
+                const winBox = boxes[winningIndex];
+                winBox.classList.add('open');
+                winBox.classList.add('highlight'); 
+                playSound('goal');
+                
+                setTimeout(() => {
+                    // 2. Close prize
+                    winBox.classList.remove('open');
+                    winBox.classList.remove('highlight');
+                    
+                    setTimeout(() => {
+                        // 3. Shuffle
+                        shuffleBoxes(boxes);
+                    }, 500);
+                }, 2000); 
+            }, 500);
+        }
+
+        function shuffleBoxes(boxes) {
+            let shuffles = 0;
+            const maxShuffles = 10;
+            let currentPositions = [0, 1, 2];
+
+            const interval = setInterval(() => {
+                shuffles++;
+                currentPositions.sort(() => Math.random() - 0.5);
+                
+                boxes.forEach((box, index) => {
+                    box.classList.remove('pos-0', 'pos-1', 'pos-2');
+                    box.classList.add(`pos-${currentPositions[index]}`);
+                    
+                    // Add a slight scale effect during move
+                    box.style.transform = "scale(0.9)";
+                    setTimeout(() => box.style.transform = "scale(1)", 300);
+                });
+
+                if (shuffles >= maxShuffles) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        enableBoxPicking(boxes);
+                    }, 600); 
+                }
+            }, 600); 
+        }
+
+        function enableBoxPicking(boxes) {
+            boxes.forEach(box => {
+                box.onclick = () => {
+                    if (box.classList.contains('open')) return;
+                    
+                    // Disable all
+                    boxes.forEach(b => b.onclick = null);
+                    
+                    // Open clicked
+                    box.classList.add('open');
+                    
+                    // Show result
+                    setTimeout(() => {
+                        finalScoreDisplay.innerText = score;
+                        resultMessage.classList.remove('hidden');
+                        
+                        if (box.dataset.type === "win") {
+                            playSound('goal');
+                            startFireworks(true); 
+                        } else {
+                            playSound('miss');
+                            // Open the actual winning box to show what they missed
+                            const winBox = boxes.find(b => b.dataset.type === "win");
+                            if(winBox) winBox.classList.add('open');
+                            startFireworks(false); 
+                        }
+                    }, 500);
+                }
+            });
+        }
+
+        // --- Fireworks ---
+        const cvs = document.getElementById('fireworks');
+        const ctx = cvs.getContext('2d');
+        let particles = [];
+        let fwInterval;
+
+        function resizeCvs() {
+            cvs.width = window.innerWidth;
+            cvs.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCvs);
+        resizeCvs();
+
+        function createFireworkBurst() {
+            const x = cvs.width / 2 + (Math.random()*200 - 100);
+            const y = cvs.height / 3 + (Math.random()*100 - 50);
+            for(let i=0; i<50; i++) particles.push(new Particle(x, y));
+        }
+
+        function startFireworks(intense = false) {
+            if(fwInterval) clearInterval(fwInterval);
+            
+            const speed = intense ? 200 : 500;
+            
+            fwInterval = setInterval(() => {
+                const x = Math.random() * cvs.width;
+                const y = Math.random() * (cvs.height * 0.6);
+                
+                const colors = intense ? 
+                    ['#ffd700', '#ff0000', '#ffffff'] : 
+                    ['#00ff00', '#00ffff', '#ff00ff']; 
+
+                for(let i=0; i<40; i++) {
+                    particles.push(new Particle(x, y, colors[Math.floor(Math.random()*colors.length)]));
+                }
+                playSound('kick'); 
+            }, speed);
+            
+            loopFireworks();
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 6 + 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.life = 1;
+                this.color = color || `hsl(${Math.random()*360}, 100%, 60%)`;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.15; 
+                this.life -= 0.015; 
+            }
+            draw() {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 5, 0, Math.PI*2);
+                ctx.fill();
+            }
+        }
+
+        function loopFireworks() {
+            if(particles.length === 0 && miniGameScreen.classList.contains('hidden')) {
+                ctx.clearRect(0,0,cvs.width, cvs.height);
+                return; 
+            }
+            
+            ctx.clearRect(0,0,cvs.width, cvs.height);
+            for(let i=particles.length-1; i>=0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if(particles[i].life <= 0) particles.splice(i, 1);
+            }
+            requestAnimationFrame(loopFireworks);
+        }
+    </script>
+</body>
+</html>

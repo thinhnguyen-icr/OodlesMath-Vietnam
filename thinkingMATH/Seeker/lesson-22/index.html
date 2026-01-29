@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ocean Math Adventure - Counting & Fishing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+
+        :root {
+            --primary: #FF4757;
+            --secondary: #2ED573;
+            --accent: #FFA502;
+            --info: #1E90FF;
+            --bg-dots: #dfe4ea;
+            --pink-light: #FFB6C1;
+            --sea-blue: #00a8ff;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+            background-image: radial-gradient(var(--bg-dots) 15%, transparent 16%), radial-gradient(var(--bg-dots) 15%, transparent 16%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            touch-action: manipulation;
+            height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .game-card {
+            box-shadow: 0 12px 0px rgba(0,0,0,0.1);
+        }
+
+        .btn-bounce:active {
+            transform: scale(0.95);
+        }
+
+        /* Pink Balloon Style */
+        .balloon {
+            position: relative;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 12px solid currentColor;
+            filter: brightness(0.9);
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop { animation: pop 0.4s ease-out; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-2deg); }
+            75% { transform: translateX(5px) rotate(2deg); }
+        }
+        .animate-shake { animation: shake 0.3s ease-in-out; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Fishing Animation */
+        .ocean-entity {
+            position: absolute;
+            transition: transform 0.2s;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        #fishing-hook {
+            transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            width: 3px;
+            background: #4b4b4b;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        #fishing-hook::after {
+            content: '⚓';
+            position: absolute;
+            bottom: -20px;
+            left: -12px;
+            font-size: 28px;
+            color: #4b4b4b;
+            font-weight: bold;
+        }
+
+        .sea {
+            background: linear-gradient(180deg, #74b9ff 0%, #0984e3 100%);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timer-badge {
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <div id="game-container" class="w-full max-w-2xl bg-white sm:rounded-[50px] border-y-[6px] sm:border-[10px] border-orange-400 overflow-hidden relative flex flex-col h-full sm:h-[95dvh] game-card">
+        
+        <header class="bg-orange-400 p-3 sm:p-5 flex justify-between items-center text-white shrink-0">
+            <div id="level-indicator" class="font-bold text-base sm:text-xl uppercase">Level: 1</div>
+            <h1 class="font-extrabold text-lg sm:text-2xl tracking-wide">Ocean Math Adventure 🌊</h1>
+            <div id="score-board" class="bg-white text-orange-500 px-3 py-1 sm:px-5 sm:py-2 rounded-full font-bold shadow-inner text-sm sm:text-lg">
+                Score: 0
+            </div>
+        </header>
+
+        <main class="flex-grow relative p-4 sm:p-8 flex flex-col items-center justify-center overflow-hidden">
+            
+            <!-- START SCREEN -->
+            <section id="start-screen" class="screen space-y-4 sm:space-y-8">
+                <div class="text-7xl sm:text-9xl animate-bounce">🎣</div>
+                <h2 class="text-3xl sm:text-5xl font-extrabold text-red-500 leading-tight text-center uppercase">Number<br>World</h2>
+                <p class="text-gray-500 text-base sm:text-xl bg-gray-100 px-6 py-2 sm:px-8 sm:py-3 rounded-full font-semibold italic text-center">Counting, Sorting & Fishing!</p>
+                <button onclick="startLevel(1)" class="bg-red-500 hover:bg-red-600 text-white text-2xl sm:text-4xl font-bold py-3 px-10 sm:py-5 sm:px-16 rounded-full shadow-[0_6px_0_#c42b3a] btn-bounce transition-all">
+                    START ▶
+                </button>
+            </section>
+
+            <!-- LEVEL 1: COUNTING 11-20 -->
+            <section id="level-1" class="screen hidden">
+                <div class="flex items-center gap-3 mb-2 sm:mb-4">
+                    <h3 class="text-gray-600 text-lg sm:text-xl font-bold text-center">How many are there?</h3>
+                    <button id="l1-audio-btn" class="bg-yellow-400 p-2 rounded-full shadow-md btn-bounce text-sm">🔊</button>
+                </div>
+                <div class="bg-white w-full flex-grow rounded-3xl mb-4 p-2 flex flex-wrap content-center justify-center gap-1 sm:gap-2 border-2 border-dashed border-gray-200 overflow-y-auto no-scrollbar" id="l1-fruit-display">
+                    <!-- Fruits render -->
+                </div>
+                <div id="l1-grid" class="grid grid-cols-2 gap-3 sm:gap-4 w-full max-w-lg mb-2">
+                    <!-- Options render -->
+                </div>
+            </section>
+
+            <!-- LEVEL 2: SORTING DESCENDING -->
+            <section id="level-2" class="screen hidden">
+                <h3 class="text-gray-600 text-center mb-1 text-lg sm:text-xl font-bold">Sort: Large → Small 📉</h3>
+                <p class="text-center text-xs sm:text-sm text-gray-400 mb-2 italic">1st is Largest, 10th is Smallest</p>
+                
+                <div id="l2-slots" class="grid grid-cols-5 gap-2 w-full mb-4">
+                    <!-- Slots render -->
+                </div>
+
+                <div id="l2-numbers" class="flex flex-wrap justify-center gap-2 w-full p-3 bg-blue-50 rounded-2xl border-2 border-blue-100">
+                    <!-- Numbers render -->
+                </div>
+            </section>
+
+            <!-- LEVEL 3: FISHING (TIMED, TRASH & NUMBERS 10-20) -->
+            <section id="level-3" class="screen hidden space-y-3 sm:space-y-4">
+                <div class="flex justify-between w-full px-2">
+                    <div class="timer-badge" id="fishing-timer">Time: 02:00</div>
+                    <div class="timer-badge">Watch out for Trash! 🥤</div>
+                </div>
+                <div class="w-full sea h-48 sm:h-72 relative border-4 border-white shadow-inner" id="sea-area">
+                    <div id="fishing-hook" style="height: 0px;"></div>
+                    <!-- Entities swim here -->
+                </div>
+
+                <div class="w-full bg-white p-4 rounded-2xl border-2 border-blue-100 text-center">
+                    <p class="text-gray-400 text-sm italic mb-1 uppercase tracking-widest">Complete the Pattern</p>
+                    <div id="fishing-pattern-text" class="text-xl sm:text-3xl font-black text-blue-600 mb-4 h-10 flex items-center justify-center">?</div>
+                    <div id="fishing-options" class="grid grid-cols-2 gap-3 w-full">
+                        <!-- Pattern options -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- WIN SCREEN -->
+            <section id="win-screen" class="screen hidden space-y-4 sm:space-y-6 z-10">
+                <div class="text-7xl sm:text-9xl">👑</div>
+                <h2 class="text-4xl sm:text-6xl font-black text-red-500 text-center uppercase">Excellent!</h2>
+                <div id="final-score" class="text-2xl sm:text-4xl font-black text-orange-500 bg-orange-50 px-8 py-3 sm:px-12 sm:py-5 rounded-[20px] sm:rounded-[30px] border-4 sm:border-8 border-orange-200 shadow-lg">Score: 0</div>
+                <button onclick="resetGame()" class="bg-blue-500 text-white py-4 px-10 sm:py-5 sm:px-14 rounded-full text-2xl sm:text-3xl font-bold shadow-xl btn-bounce">PLAY AGAIN ↺</button>
+            </section>
+
+        </main>
+
+        <canvas id="confetti-canvas" class="absolute inset-0 pointer-events-none z-0"></canvas>
+    </div>
+
+    <script>
+        // --- DATA CONFIGURATION ---
+        const fruits = [
+            { emoji: "🍓", name: "Strawberry" }, { emoji: "🍎", name: "Apple" },
+            { emoji: "🍊", name: "Orange" }, { emoji: "🍌", name: "Banana" },
+            { emoji: "🍇", name: "Grapes" }, { emoji: "🍐", name: "Pear" },
+            { emoji: "🍑", name: "Peach" }, { emoji: "🍒", name: "Cherry" },
+            { emoji: "🥝", name: "Kiwi" }, { emoji: "🍍", name: "Pineapple" }
+        ];
+
+        let l1Data = []; 
+        let score = 0;
+        let currentQuestionIndex = 0;
+        let currentLevel = 0;
+        let l1FirstAttempt = true;
+        let l1Counts = []; 
+        let particles = [];
+        let animationFrameId;
+        let fishingInterval;
+        let timeLeft = 120;
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function playSound(type) {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now); osc.stop(now + 0.4);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(80, now + 0.2);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            } else if (type === 'pop') {
+                osc.frequency.setValueAtTime(400, now);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now); osc.stop(now + 0.05);
+            }
+        }
+
+        function speakText(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 1.0;
+            utterance.pitch = 1.1;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- UTILITIES ---
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function updateScore(points) {
+            score += points;
+            document.getElementById('score-board').textContent = `Score: ${score}`;
+        }
+
+        function updateHeader() {
+            const indicator = document.getElementById('level-indicator');
+            if (currentLevel > 0 && currentLevel < 4) {
+                indicator.textContent = currentLevel === 3 ? "Bonus: Fishing" : `Level: ${currentLevel}`;
+            } else {
+                indicator.textContent = "";
+            }
+        }
+
+        function startLevel(level) {
+            currentLevel = level;
+            currentQuestionIndex = 0;
+            updateHeader();
+            if (level === 1) initLevel1();
+            else if (level === 2) initLevel2();
+            else if (level === 3) initFishingGame();
+            else showWinScreen();
+        }
+
+        // --- LEVEL 1: COUNTING 11-20 ---
+        function initLevel1() {
+            score = 0;
+            updateScore(0);
+            l1Counts = [];
+            let counts = Array.from({length: 10}, (_, i) => i + 11);
+            let fruitList = [...fruits].sort(() => Math.random() - 0.5);
+            
+            l1Data = counts.map((c, i) => ({
+                count: c,
+                fruit: fruitList[i].emoji
+            })).sort(() => Math.random() - 0.5);
+
+            loadL1Question();
+            showScreen('level-1');
+        }
+
+        function loadL1Question() {
+            if (currentQuestionIndex >= 10) {
+                l1Counts = l1Data.map(d => d.count);
+                setTimeout(() => startLevel(2), 1000);
+                return;
+            }
+            l1FirstAttempt = true;
+            const q = l1Data[currentQuestionIndex];
+            
+            document.getElementById('l1-audio-btn').onclick = () => speakText("How many are there?");
+
+            const display = document.getElementById('l1-fruit-display');
+            display.innerHTML = '';
+            for (let i = 0; i < q.count; i++) {
+                const span = document.createElement('span');
+                span.className = 'text-3xl sm:text-4xl animate-pop';
+                span.textContent = q.fruit;
+                span.style.animationDelay = `${i * 0.03}s`;
+                display.appendChild(span);
+            }
+
+            const grid = document.getElementById('l1-grid');
+            grid.innerHTML = '';
+            let options = [q.count];
+            while(options.length < 4) {
+                let r = Math.floor(Math.random() * 11) + 10;
+                if(!options.includes(r)) options.push(r);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const b = document.createElement('button');
+                b.className = 'balloon h-20 sm:h-24 flex items-center justify-center text-white font-extrabold rounded-[40%] shadow-md text-2xl btn-bounce transition-all duration-300';
+                b.style.backgroundColor = '#FFB6C1';
+                b.style.color = '#FFB6C1';
+                b.innerHTML = `<span class="text-white">${opt}</span>`;
+                b.onclick = () => {
+                    if (opt === q.count) {
+                        playSound('correct');
+                        b.style.backgroundColor = '#2ED573';
+                        b.style.color = '#2ED573';
+                        b.innerHTML = `<span class="text-white">✓</span>`;
+                        if (l1FirstAttempt) updateScore(10);
+                        currentQuestionIndex++;
+                        document.querySelectorAll('#l1-grid button').forEach(btn => btn.disabled = true);
+                        setTimeout(loadL1Question, 1000);
+                    } else {
+                        playSound('wrong');
+                        l1FirstAttempt = false;
+                        b.classList.add('animate-shake');
+                        const oldHtml = b.innerHTML;
+                        b.style.backgroundColor = '#FF4757';
+                        b.style.color = '#FF4757';
+                        b.innerHTML = `<span class="text-white text-xs uppercase">WRONG</span>`;
+                        setTimeout(() => {
+                            b.classList.remove('animate-shake');
+                            b.style.backgroundColor = '#FFB6C1';
+                            b.style.color = '#FFB6C1';
+                            b.innerHTML = oldHtml;
+                        }, 800);
+                    }
+                };
+                grid.appendChild(b);
+            });
+        }
+
+        // --- LEVEL 2: SORTING ---
+        let l2SelectedValue = null;
+        let l2SelectedBtn = null;
+        let l2Matches = 0;
+
+        function initLevel2() {
+            l2Matches = 0;
+            l2SelectedValue = null;
+            showScreen('level-2');
+            const sorted = [...l1Counts].sort((a, b) => b - a);
+            const slots = document.getElementById('l2-slots');
+            slots.innerHTML = '';
+            for(let i = 0; i < 10; i++) {
+                const s = document.createElement('div');
+                const ord = getOrdinal(i+1);
+                s.className = 'h-12 border-2 border-dashed border-blue-200 rounded-xl flex flex-col items-center justify-center bg-white text-[10px] font-bold text-gray-400 cursor-pointer transition-all';
+                s.innerHTML = `<span>${ord}</span><div class="val text-blue-600 text-lg"></div>`;
+                s.onclick = () => {
+                    if (l2SelectedValue && !s.classList.contains('filled')) {
+                        if (l2SelectedValue === sorted[i]) {
+                            playSound('correct');
+                            s.classList.add('filled', 'bg-green-50', 'border-green-300');
+                            s.querySelector('.val').textContent = l2SelectedValue;
+                            l2SelectedBtn.style.opacity = '0';
+                            l2SelectedBtn.style.pointerEvents = 'none';
+                            l2Matches++;
+                            updateScore(15);
+                            l2SelectedValue = null;
+                            if (l2Matches === 10) setTimeout(() => startLevel(3), 1000);
+                        } else {
+                            playSound('wrong');
+                            s.classList.add('animate-shake', 'border-red-300');
+                            setTimeout(() => s.classList.remove('animate-shake', 'border-red-300'), 500);
+                        }
+                    }
+                };
+                slots.appendChild(s);
+            }
+
+            const nums = document.getElementById('l2-numbers');
+            nums.innerHTML = '';
+            const shuffled = [...l1Counts].sort(() => Math.random() - 0.5);
+            shuffled.forEach(n => {
+                const b = document.createElement('button');
+                b.className = 'w-10 h-10 bg-white border-2 border-blue-100 rounded-full shadow-sm font-bold text-blue-500 transition-all';
+                b.textContent = n;
+                b.onclick = () => {
+                    playSound('pop');
+                    document.querySelectorAll('#l2-numbers button').forEach(el => el.classList.remove('ring-4', 'ring-blue-400'));
+                    b.classList.add('ring-4', 'ring-blue-400');
+                    l2SelectedValue = n;
+                    l2SelectedBtn = b;
+                };
+                nums.appendChild(b);
+            });
+        }
+
+        function getOrdinal(n) {
+            const s = ["th", "st", "nd", "rd"], v = n % 100;
+            return n + (s[(v - 20) % 10] || s[v] || s[0]);
+        }
+
+        // --- LEVEL 3: FISHING (NUMBER PATTERN 10-20 & TRASH) ---
+        const patternTypes = [
+            { type: "ABAB", generate: () => {
+                const a = Math.floor(Math.random() * 6) + 10;
+                const b = Math.floor(Math.random() * 5) + 16;
+                return { seq: `${a}, ${b}, ${a}, ${b}, ${a}, ?`, ans: b, options: [a, b, a+1, b-2].sort(() => Math.random() - 0.5) };
+            }},
+            { type: "AABAAB", generate: () => {
+                const a = Math.floor(Math.random() * 6) + 10;
+                const b = Math.floor(Math.random() * 5) + 16;
+                return { seq: `${a}, ${a}, ${b}, ${a}, ${a}, ?`, ans: b, options: [a, b, a-1, b+1].sort(() => Math.random() - 0.5) };
+            }},
+            { type: "ABCABC", generate: () => {
+                const a = 10 + Math.floor(Math.random() * 3);
+                const b = a + 1; const c = a + 2;
+                return { seq: `${a}, ${b}, ${c}, ${a}, ${b}, ?`, ans: c, options: [a, b, c, c+1].sort(() => Math.random() - 0.5) };
+            }}
+        ];
+
+        let entityArray = [];
+        let isHookDropping = false;
+        let currentPatternQuestion = null;
+
+        function initFishingGame() {
+            showScreen('level-3');
+            timeLeft = 120;
+            isHookDropping = false;
+            
+            clearInterval(fishingInterval);
+            fishingInterval = setInterval(() => {
+                timeLeft--;
+                const m = Math.floor(timeLeft / 60);
+                const s = timeLeft % 60;
+                document.getElementById('fishing-timer').textContent = `Time: ${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                if (timeLeft <= 0) {
+                    clearInterval(fishingInterval);
+                    showWinScreen();
+                }
+            }, 1000);
+
+            const sea = document.getElementById('sea-area');
+            document.querySelectorAll('.ocean-entity').forEach(e => e.remove());
+            entityArray = [];
+            
+            const fishEmojis = ["🐠", "🐟", "🐡", "🐋", "🐙", "🦑", "🐬", "🦀"];
+            const trashEmojis = ["🥤", "🍾", "🥡", "🗑️"];
+
+            for (let i = 0; i < 15; i++) {
+                createOceanEntity(fishEmojis[i % fishEmojis.length], 'fish', i);
+            }
+            for (let i = 0; i < 6; i++) {
+                createOceanEntity(trashEmojis[i % trashEmojis.length], 'trash', i + 15);
+            }
+
+            function createOceanEntity(emoji, type, index) {
+                const el = document.createElement('div');
+                el.className = `ocean-entity text-3xl sm:text-4xl`;
+                el.textContent = emoji;
+                el.style.top = `${10 + (index * 12) % 180}px`;
+                el.style.left = `${Math.random() * 90}%`;
+                el.dataset.speed = 1.0 + Math.random() * 2.5;
+                el.dataset.dir = Math.random() > 0.5 ? 1 : -1;
+                el.dataset.type = type;
+                sea.appendChild(el);
+                entityArray.push(el);
+            }
+
+            function animateOcean() {
+                if (currentLevel !== 3) return;
+                entityArray.forEach(ent => {
+                    if (ent.classList.contains('caught')) return;
+                    let left = parseFloat(ent.style.left);
+                    let speed = parseFloat(ent.dataset.speed);
+                    let dir = parseInt(ent.dataset.dir);
+                    
+                    left += dir * (speed / 12);
+                    if (left > 92 || left < 0) {
+                        dir *= -1;
+                        ent.dataset.dir = dir;
+                        ent.style.transform = dir > 0 ? 'scaleX(1)' : 'scaleX(-1)';
+                    }
+                    ent.style.left = left + "%";
+                });
+                requestAnimationFrame(animateOcean);
+            }
+            animateOcean();
+            loadFishingQuestion();
+        }
+
+        function loadFishingQuestion() {
+            const pType = patternTypes[Math.floor(Math.random() * patternTypes.length)];
+            currentPatternQuestion = pType.generate();
+            document.getElementById('fishing-pattern-text').textContent = currentPatternQuestion.seq;
+            
+            const grid = document.getElementById('fishing-options');
+            grid.innerHTML = '';
+
+            currentPatternQuestion.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'bg-blue-500 text-white font-bold py-3 rounded-xl shadow-md btn-bounce text-xl';
+                btn.textContent = opt;
+                btn.onclick = () => {
+                    if (isHookDropping) return;
+                    if (opt === currentPatternQuestion.ans) {
+                        dropHook();
+                    } else {
+                        playSound('wrong');
+                        btn.classList.add('animate-shake', 'bg-red-500');
+                        setTimeout(() => btn.classList.remove('animate-shake', 'bg-red-500'), 500);
+                    }
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function dropHook() {
+            isHookDropping = true;
+            const hook = document.getElementById('fishing-hook');
+            const seaHeight = document.getElementById('sea-area').clientHeight;
+            
+            hook.style.height = `${seaHeight - 20}px`;
+
+            setTimeout(() => {
+                checkCatch();
+                hook.style.height = '0px';
+                setTimeout(() => {
+                    isHookDropping = false;
+                    loadFishingQuestion();
+                }, 600);
+            }, 600);
+        }
+
+        function checkCatch() {
+            let catchPosition = { x: 0, y: 0 };
+            let hitType = null;
+
+            entityArray.forEach(ent => {
+                if (ent.classList.contains('caught')) return;
+                const leftPercent = parseFloat(ent.style.left);
+                
+                if (leftPercent >= 42 && leftPercent <= 58) {
+                    ent.classList.add('caught');
+                    hitType = ent.dataset.type;
+                    
+                    catchPosition.x = leftPercent;
+                    catchPosition.y = parseFloat(ent.style.top);
+
+                    ent.style.transition = 'top 0.6s ease-in-out, opacity 0.4s';
+                    ent.style.top = '-60px';
+                    ent.style.opacity = '0';
+
+                    if (hitType === 'fish') {
+                        playSound('correct');
+                        updateScore(20);
+                        showFeedback('+20', '#2ED573', catchPosition);
+                    } else {
+                        playSound('wrong');
+                        updateScore(-10);
+                        showFeedback('-10', '#ff4757', catchPosition);
+                    }
+                }
+            });
+            if (!hitType) {
+                document.getElementById('fishing-hook').style.background = "#bdc3c7";
+                setTimeout(() => document.getElementById('fishing-hook').style.background = "#4b4b4b", 300);
+            }
+        }
+
+        function showFeedback(text, color, pos) {
+            const fb = document.createElement('div');
+            fb.className = 'absolute font-black text-2xl z-20 animate-pop pointer-events-none';
+            fb.style.color = color;
+            fb.style.left = pos.x + '%';
+            fb.style.top = pos.y + 'px';
+            fb.textContent = text;
+            document.getElementById('sea-area').appendChild(fb);
+            
+            // Animation bay lên
+            setTimeout(() => {
+                fb.style.transition = 'transform 0.8s ease-out, opacity 0.8s';
+                fb.style.transform = 'translateY(-40px)';
+                fb.style.opacity = '0';
+            }, 10);
+
+            setTimeout(() => fb.remove(), 1000);
+        }
+
+        // --- WIN & FIREWORKS ---
+        function showWinScreen() {
+            currentLevel = 4;
+            clearInterval(fishingInterval);
+            updateHeader();
+            showScreen('win-screen');
+            document.getElementById('final-score').textContent = `Final Score: ${score}`;
+            startFireworks();
+        }
+
+        function resetGame() {
+            score = 0;
+            currentLevel = 0;
+            particles = [];
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            cancelAnimationFrame(animationFrameId);
+            startLevel(1);
+        }
+
+        function startFireworks() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            particles = [];
+            const colors = ['#FF4757', '#2ED573', '#1E90FF', '#FFA502', '#FFFFFF', '#E84393'];
+
+            function createFirework() {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * (canvas.height / 2);
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                for (let i = 0; i < 45; i++) {
+                    particles.push({
+                        x: x, y: y,
+                        vx: (Math.random() - 0.5) * 10,
+                        vy: (Math.random() - 0.5) * 10,
+                        life: 1.0, color: color, size: Math.random() * 3 + 2
+                    });
+                }
+            }
+
+            let lastFirework = 0;
+            function animate() {
+                if (currentLevel !== 4) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (Date.now() - lastFirework > 500) { createFirework(); lastFirework = Date.now(); }
+                particles.forEach((p, i) => {
+                    p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.life -= 0.015;
+                    ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+                    if (p.life <= 0) particles.splice(i, 1);
+                });
+                animationFrameId = requestAnimationFrame(animate);
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>

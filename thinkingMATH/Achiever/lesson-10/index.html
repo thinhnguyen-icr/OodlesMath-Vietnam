@@ -1,0 +1,1072 @@
+<!doctype html>
+<html lang="en">
+ <head>
+   <link rel="stylesheet" href="../assets/brand.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Let's Count the Fruits!</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', cursive, sans-serif;
+      background: linear-gradient(135deg, #FFF9C4 0%, #C5E1A5 50%, #B3E5FC 100%);
+      overflow-x: hidden;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    .audio-btn {
+      background: #FF6B6B;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 2em;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: all 0.2s;
+      margin: 10px;
+    }
+
+    .audio-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    }
+
+    .audio-btn:active {
+      transform: scale(0.95);
+    }
+
+    .game-container {
+      width: 100%;
+      max-width: 1200px;
+      height: 100%;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .title {
+      font-size: 3em;
+      color: #FF6B6B;
+      text-shadow: 3px 3px 0px #FFE66D;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .instruction {
+      font-size: 1.5em;
+      color: #4A4A4A;
+      background: white;
+      padding: 15px 30px;
+      border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .fruits-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 30px;
+      max-width: 800px;
+    }
+
+    .fruit {
+      font-size: 3em;
+      cursor: pointer;
+      transition: transform 0.2s;
+      filter: brightness(1);
+    }
+
+    .fruit:hover {
+      transform: scale(1.2);
+    }
+
+    .fruit.counted {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .graph-container {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      margin-bottom: 30px;
+    }
+
+    .graph-title {
+      font-size: 1.8em;
+      color: #FF6B6B;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .graph-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
+
+    .fruit-label {
+      font-size: 2em;
+      width: 60px;
+    }
+
+    .boxes {
+      display: flex;
+      gap: 5px;
+    }
+
+    .box {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #ddd;
+      border-radius: 8px;
+      background: white;
+      transition: all 0.3s;
+    }
+
+    .box.filled {
+      animation: fillBox 0.3s ease-in;
+    }
+
+    @keyframes fillBox {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    .count-number {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #4A4A4A;
+      margin-left: 10px;
+      min-width: 30px;
+    }
+
+    .addition-section {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .question {
+      font-size: 1.8em;
+      color: #4A4A4A;
+      margin-bottom: 20px;
+    }
+
+    .number-bond {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 30px 0;
+      position: relative;
+    }
+
+    .bond-top {
+      margin-bottom: 60px;
+    }
+
+    .bond-bottom {
+      display: flex;
+      gap: 100px;
+      align-items: center;
+    }
+
+    .bond-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 4px solid #FF6B6B;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      font-weight: bold;
+      background: white;
+      color: #4A4A4A;
+      position: relative;
+    }
+
+    .bond-line {
+      position: absolute;
+      width: 3px;
+      height: 50px;
+      background: #FF6B6B;
+    }
+
+    .line-left {
+      top: 84px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-45deg);
+      transform-origin: top;
+    }
+
+    .line-right {
+      top: 84px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      transform-origin: top;
+    }
+
+    .answer-options {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .answer-btn {
+      font-size: 2em;
+      padding: 20px 40px;
+      border: none;
+      border-radius: 20px;
+      background: #4ECDC4;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .answer-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    }
+
+    .answer-btn.correct {
+      background: #51CF66;
+      animation: pulse 0.5s;
+    }
+
+    .answer-btn.wrong {
+      background: #FF6B6B;
+      animation: shake 0.5s;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .feedback {
+      font-size: 2em;
+      font-weight: bold;
+      margin-top: 20px;
+      min-height: 50px;
+    }
+
+    .feedback.correct {
+      color: #51CF66;
+    }
+
+    .feedback.wrong {
+      color: #FF6B6B;
+    }
+
+    .celebration {
+      text-align: center;
+    }
+
+    .celebration-title {
+      font-size: 3.5em;
+      color: #FF6B6B;
+      text-shadow: 3px 3px 0px #FFE66D;
+      margin-bottom: 30px;
+      animation: bounce 1s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .dancing-fruits {
+      display: flex;
+      gap: 30px;
+      font-size: 4em;
+      margin: 30px 0;
+      justify-content: center;
+    }
+
+    .dancing-fruit {
+      animation: dance 1s infinite;
+    }
+
+    .dancing-fruit:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .dancing-fruit:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    .dancing-fruit:nth-child(4) {
+      animation-delay: 0.6s;
+    }
+
+    @keyframes dance {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-15deg) scale(1.1); }
+      75% { transform: rotate(15deg) scale(1.1); }
+    }
+
+    .stars {
+      font-size: 3em;
+      margin-top: 20px;
+    }
+
+    .next-btn {
+      font-size: 1.5em;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 20px;
+      background: #FF6B6B;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: all 0.2s;
+      margin-top: 20px;
+      font-family: inherit;
+    }
+
+    .next-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    }
+
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: #FF6B6B;
+      position: absolute;
+      animation: confettiFall 3s linear;
+    }
+
+    @keyframes confettiFall {
+      to {
+        transform: translateY(100%) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .mystery-box {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 40px;
+      border-radius: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      z-index: 1000;
+      text-align: center;
+      animation: popIn 0.5s forwards;
+    }
+
+    @keyframes popIn {
+      to {
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    .mystery-content {
+      font-size: 4em;
+      margin: 20px 0;
+      animation: spin 1s ease-in-out;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg) scale(0); }
+      to { transform: rotate(360deg) scale(1); }
+    }
+
+    .mystery-text {
+      font-size: 2em;
+      color: white;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      display: none;
+    }
+
+    .overlay.active {
+      display: block;
+    }
+
+    .quiz-section {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .quiz-question {
+      font-size: 2em;
+      color: #4A4A4A;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .title {
+        font-size: 2em;
+      }
+
+      .instruction {
+        font-size: 1.2em;
+      }
+
+      .fruit {
+        font-size: 2.5em;
+      }
+
+      .graph-title {
+        font-size: 1.4em;
+      }
+
+      .answer-btn {
+        font-size: 1.5em;
+        padding: 15px 30px;
+      }
+
+      .celebration-title {
+        font-size: 2.5em;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+   <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+  <div class="game-container"><!-- Counting Screen -->
+   <div class="screen active" id="countingScreen">
+    <h1 class="title" id="gameTitle">Let's Count the Fruits!</h1>
+    <div class="instruction" id="instructionText">
+     Click on each fruit to count them!
+    </div>
+    <div class="fruits-area" id="fruitsArea"></div>
+    <div class="graph-container" id="graphContainer">
+     <div class="graph-title">
+      Fruit Graph
+     </div>
+     <div class="graph-row">
+      <div class="fruit-label">
+       🍎
+      </div>
+      <div class="boxes" id="appleBoxes"></div>
+      <div class="count-number" id="appleCount">
+       0
+      </div>
+     </div>
+     <div class="graph-row">
+      <div class="fruit-label">
+       🍌
+      </div>
+      <div class="boxes" id="bananaBoxes"></div>
+      <div class="count-number" id="bananaCount">
+       0
+      </div>
+     </div>
+     <div class="graph-row">
+      <div class="fruit-label">
+       🍇
+      </div>
+      <div class="boxes" id="grapeBoxes"></div>
+      <div class="count-number" id="grapeCount">
+       0
+      </div>
+     </div>
+     <div class="graph-row">
+      <div class="fruit-label">
+       🍊
+      </div>
+      <div class="boxes" id="orangeBoxes"></div>
+      <div class="count-number" id="orangeCount">
+       0
+      </div>
+     </div>
+    </div><button class="next-btn" id="nextToAddition" style="display: none;">Let's Add! →</button>
+   </div><!-- Quiz Screen -->
+   <div class="screen" id="quizScreen">
+    <h1 class="title">Quiz Time!</h1>
+    <div class="quiz-section">
+     <div class="quiz-question"><span id="quizQuestionText">How many apples are there?</span> <button class="audio-btn" id="quizAudioBtn" title="Listen to question">🔊</button>
+     </div>
+     <div class="fruits-area" id="quizFruitsArea" style="margin: 30px 0;"></div>
+     <div class="answer-options" id="quizAnswerOptions"></div>
+     <div class="feedback" id="quizFeedback"></div>
+    </div><button class="next-btn" id="nextToAdditionFromQuiz" style="display: none;">Continue to Addition! →</button>
+   </div><!-- Addition Screen -->
+   <div class="screen" id="additionScreen">
+    <h1 class="title">Addition Time!</h1>
+    <div class="addition-section">
+     <div class="quiz-question"><span id="questionText">How many fruits altogether?</span> <button class="audio-btn" id="additionAudioBtn" title="Listen to question">🔊</button>
+     </div>
+     <div class="number-bond">
+      <div class="bond-top">
+       <div class="bond-circle" id="whole">
+        ? 
+        <div class="bond-line line-left"></div>
+        <div class="bond-line line-right"></div>
+       </div>
+      </div>
+      <div class="bond-bottom">
+       <div class="bond-circle" id="part1">
+        ?
+       </div>
+       <div class="bond-circle" id="part2">
+        ?
+       </div>
+      </div>
+     </div>
+     <div class="answer-options" id="answerOptions"></div>
+     <div class="feedback" id="feedback"></div>
+    </div>
+   </div><!-- Celebration Screen -->
+   <div class="screen" id="celebrationScreen">
+    <div class="celebration">
+     <h1 class="celebration-title" id="celebrationText">Great job! You can count and add fruits!</h1>
+     <div class="dancing-fruits"><span class="dancing-fruit">🍎</span> <span class="dancing-fruit">🍌</span> <span class="dancing-fruit">🍇</span> <span class="dancing-fruit">🍊</span>
+     </div>
+     <div class="stars">
+      ⭐ ⭐ ⭐ ⭐ ⭐
+     </div>
+     <div style="margin-top: 30px; font-size: 1.5em; color: #4A4A4A;">
+      Round <span id="roundNumber">1</span> of 5 complete!
+     </div><button class="next-btn" id="nextRoundBtn" style="display: none;">Next Round →</button> <button class="next-btn" id="finishBtn" style="display: none; background: #51CF66;">🎉 Finish Game! 🎉</button>
+    </div>
+   </div>
+  </div><!-- Overlay and Mystery Box -->
+  <div class="overlay" id="overlay"></div>
+  <div class="mystery-box" id="mysteryBox" style="display: none;">
+   <div class="mystery-text">
+    🎁 Mystery Box! 🎁
+   </div>
+   <div class="mystery-content" id="mysteryContent">
+    🎉
+   </div>
+   <div class="mystery-text" id="mysteryMessage">
+    Tuyệt vời!
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "Let's Count the Fruits!",
+      instruction_text: "Click on each fruit to count them!",
+      question_text: "How many fruits altogether?",
+      celebration_text: "Great job! You can count and add fruits!"
+    };
+
+    const fruits = [
+      { emoji: '🍎', type: 'apple', color: '#FF6B6B' },
+      { emoji: '🍌', type: 'banana', color: '#FFE66D' },
+      { emoji: '🍇', type: 'grape', color: '#A29BFE' },
+      { emoji: '🍊', type: 'orange', color: '#FFA94D' }
+    ];
+
+    let counts = { apple: 0, banana: 0, grape: 0, orange: 0 };
+    let totalCounted = 0;
+    let totalFruits = 0;
+    let currentQuestion = null;
+    let currentQuizQuestion = null;
+    let currentRound = 1;
+    const totalRounds = 5;
+
+    // Audio Context for sound effects
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (type === 'pop') {
+        // Pop sound - short high beep
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.1);
+      } else if (type === 'correct') {
+        // Success sound - ascending notes
+        [523.25, 659.25, 783.99].forEach((freq, i) => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          oscillator.frequency.value = freq;
+          oscillator.type = 'sine';
+          const startTime = audioContext.currentTime + (i * 0.1);
+          gainNode.gain.setValueAtTime(0.3, startTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.3);
+          oscillator.start(startTime);
+          oscillator.stop(startTime + 0.3);
+        });
+        createConfetti();
+      } else if (type === 'wrong') {
+        // Wrong sound - descending buzz
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.3);
+        oscillator.type = 'sawtooth';
+        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+      }
+    }
+
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.9;
+        utterance.pitch = 1.2;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function createConfetti() {
+      const colors = ['#FF6B6B', '#FFE66D', '#4ECDC4', '#A29BFE', '#FFA94D'];
+      for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + '%';
+          confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDelay = Math.random() * 0.5 + 's';
+          document.body.appendChild(confetti);
+          setTimeout(() => confetti.remove(), 3000);
+        }, i * 30);
+      }
+    }
+
+    function showMysteryBox() {
+      const prizes = ['🏆', '⭐', '🎖️', '👑', '💎', '🌟', '✨', '🎪'];
+      const messages = ['Awesome!', 'Great job!', 'Excellent!', 'Well done!', 'Fantastic!'];
+      
+      const prize = prizes[Math.floor(Math.random() * prizes.length)];
+      const message = messages[Math.floor(Math.random() * messages.length)];
+      
+      document.getElementById('mysteryContent').textContent = prize;
+      document.getElementById('mysteryMessage').textContent = message;
+      document.getElementById('overlay').classList.add('active');
+      document.getElementById('mysteryBox').style.display = 'block';
+      
+      speak(message);
+      
+      setTimeout(() => {
+        document.getElementById('overlay').classList.remove('active');
+        document.getElementById('mysteryBox').style.display = 'none';
+      }, 3000);
+    }
+
+    function initGame() {
+      counts = { apple: 0, banana: 0, grape: 0, orange: 0 };
+      totalCounted = 0;
+      
+      // Generate random fruits (5-8 of each type)
+      const fruitsArea = document.getElementById('fruitsArea');
+      fruitsArea.innerHTML = '';
+      
+      const fruitElements = [];
+      fruits.forEach(fruit => {
+        const count = Math.floor(Math.random() * 4) + 5; // 5-8 fruits
+        totalFruits += count;
+        
+        for (let i = 0; i < count; i++) {
+          fruitElements.push({ ...fruit });
+        }
+      });
+      
+      // Shuffle fruits
+      fruitElements.sort(() => Math.random() - 0.5);
+      
+      // Create fruit elements
+      fruitElements.forEach((fruit, index) => {
+        const fruitEl = document.createElement('div');
+        fruitEl.className = 'fruit';
+        fruitEl.textContent = fruit.emoji;
+        fruitEl.dataset.type = fruit.type;
+        fruitEl.dataset.index = index;
+        fruitEl.onclick = () => countFruit(fruitEl);
+        fruitsArea.appendChild(fruitEl);
+      });
+      
+      // Create boxes for graph
+      ['apple', 'banana', 'grape', 'orange'].forEach(type => {
+        const boxesContainer = document.getElementById(`${type}Boxes`);
+        boxesContainer.innerHTML = '';
+        const maxCount = fruitElements.filter(f => f.type === type).length;
+        
+        for (let i = 0; i < maxCount; i++) {
+          const box = document.createElement('div');
+          box.className = 'box';
+          box.dataset.type = type;
+          box.dataset.index = i;
+          boxesContainer.appendChild(box);
+        }
+      });
+    }
+
+    function countFruit(fruitEl) {
+      if (fruitEl.classList.contains('counted')) return;
+      
+      const type = fruitEl.dataset.type;
+      fruitEl.classList.add('counted');
+      counts[type]++;
+      totalCounted++;
+      
+      playSound('pop');
+      
+      // Fill box in graph
+      const boxes = document.querySelectorAll(`#${type}Boxes .box`);
+      const box = boxes[counts[type] - 1];
+      if (box) {
+        const fruit = fruits.find(f => f.type === type);
+        box.style.background = fruit.color;
+        box.classList.add('filled');
+      }
+      
+      // Update count
+      document.getElementById(`${type}Count`).textContent = counts[type];
+      
+      // Check if all fruits counted
+      if (totalCounted === totalFruits) {
+        setTimeout(() => {
+          showQuizScreen();
+        }, 1000);
+      }
+    }
+
+    function showQuizScreen() {
+      document.getElementById('graphContainer').style.display = 'none';
+      document.getElementById('countingScreen').classList.remove('active');
+      document.getElementById('quizScreen').classList.add('active');
+      
+      // Pick a random fruit type
+      const fruitTypes = ['apple', 'banana', 'grape', 'orange'];
+      const fruitNames = { apple: 'apples', banana: 'bananas', grape: 'grapes', orange: 'oranges' };
+      const selectedType = fruitTypes[Math.floor(Math.random() * fruitTypes.length)];
+      const selectedFruit = fruits.find(f => f.type === selectedType);
+      const correctAnswer = counts[selectedType];
+      
+      currentQuizQuestion = {
+        type: selectedType,
+        fruit: selectedFruit,
+        answer: correctAnswer,
+        question: `How many ${fruitNames[selectedType]} are there?`
+      };
+      
+      // Display question
+      document.getElementById('quizQuestionText').textContent = currentQuizQuestion.question;
+      
+      // Display fruits
+      const quizFruitsArea = document.getElementById('quizFruitsArea');
+      quizFruitsArea.innerHTML = '';
+      for (let i = 0; i < correctAnswer; i++) {
+        const fruitEl = document.createElement('div');
+        fruitEl.className = 'fruit';
+        fruitEl.textContent = selectedFruit.emoji;
+        fruitEl.style.cursor = 'default';
+        quizFruitsArea.appendChild(fruitEl);
+      }
+      
+      // Generate answer options
+      const answers = [correctAnswer];
+      while (answers.length < 4) {
+        const wrong = correctAnswer + Math.floor(Math.random() * 5) - 2;
+        if (wrong > 0 && wrong !== correctAnswer && !answers.includes(wrong)) {
+          answers.push(wrong);
+        }
+      }
+      answers.sort(() => Math.random() - 0.5);
+      
+      const optionsContainer = document.getElementById('quizAnswerOptions');
+      optionsContainer.innerHTML = '';
+      
+      answers.forEach(answer => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = answer;
+        btn.onclick = () => checkQuizAnswer(answer, btn);
+        optionsContainer.appendChild(btn);
+      });
+      
+      document.getElementById('quizFeedback').textContent = '';
+    }
+
+    function checkQuizAnswer(answer, btn) {
+      const buttons = document.querySelectorAll('#quizAnswerOptions .answer-btn');
+      buttons.forEach(b => b.disabled = true);
+      
+      if (answer === currentQuizQuestion.answer) {
+        btn.classList.add('correct');
+        document.getElementById('quizFeedback').textContent = 'Correct! 🎉';
+        document.getElementById('quizFeedback').className = 'feedback correct';
+        playSound('correct');
+        showMysteryBox();
+        
+        setTimeout(() => {
+          showAdditionScreen();
+        }, 3500);
+      } else {
+        btn.classList.add('wrong');
+        document.getElementById('quizFeedback').textContent = 'Try again!';
+        document.getElementById('quizFeedback').className = 'feedback wrong';
+        playSound('wrong');
+        
+        setTimeout(() => {
+          btn.classList.remove('wrong');
+          buttons.forEach(b => b.disabled = false);
+          document.getElementById('quizFeedback').textContent = '';
+        }, 1500);
+      }
+    }
+
+    function showAdditionScreen() {
+      document.getElementById('quizScreen').classList.remove('active');
+      document.getElementById('additionScreen').classList.add('active');
+      
+      // Pick two random fruit types that have counts > 0
+      const availableTypes = Object.keys(counts).filter(type => counts[type] > 0);
+      const type1 = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+      let type2 = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+      while (type2 === type1 && availableTypes.length > 1) {
+        type2 = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+      }
+      
+      const part1 = counts[type1];
+      const part2 = counts[type2];
+      const whole = part1 + part2;
+      
+      currentQuestion = { part1, part2, whole };
+      
+      // Update number bond
+      document.getElementById('part1').textContent = part1;
+      document.getElementById('part2').textContent = part2;
+      document.getElementById('whole').textContent = '?';
+      
+      // Generate answer options
+      const answers = [whole];
+      while (answers.length < 3) {
+        const wrong = whole + Math.floor(Math.random() * 5) - 2;
+        if (wrong > 0 && wrong !== whole && !answers.includes(wrong)) {
+          answers.push(wrong);
+        }
+      }
+      answers.sort(() => Math.random() - 0.5);
+      
+      const optionsContainer = document.getElementById('answerOptions');
+      optionsContainer.innerHTML = '';
+      
+      answers.forEach(answer => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = answer;
+        btn.onclick = () => checkAnswer(answer, btn);
+        optionsContainer.appendChild(btn);
+      });
+      
+      document.getElementById('feedback').textContent = '';
+    }
+
+    function checkAnswer(answer, btn) {
+      const buttons = document.querySelectorAll('#answerOptions .answer-btn');
+      buttons.forEach(b => b.disabled = true);
+      
+      if (answer === currentQuestion.whole) {
+        btn.classList.add('correct');
+        document.getElementById('whole').textContent = currentQuestion.whole;
+        document.getElementById('feedback').textContent = 'Correct! 🎉';
+        document.getElementById('feedback').className = 'feedback correct';
+        playSound('correct');
+        showMysteryBox();
+        
+        setTimeout(() => {
+          showCelebrationScreen();
+        }, 3500);
+      } else {
+        btn.classList.add('wrong');
+        document.getElementById('feedback').textContent = 'Try again!';
+        document.getElementById('feedback').className = 'feedback wrong';
+        playSound('wrong');
+        
+        setTimeout(() => {
+          btn.classList.remove('wrong');
+          buttons.forEach(b => b.disabled = false);
+          document.getElementById('feedback').textContent = '';
+        }, 1500);
+      }
+    }
+
+    function showCelebrationScreen() {
+      document.getElementById('additionScreen').classList.remove('active');
+      document.getElementById('celebrationScreen').classList.add('active');
+      createConfetti();
+      
+      document.getElementById('roundNumber').textContent = currentRound;
+      
+      if (currentRound < totalRounds) {
+        document.getElementById('nextRoundBtn').style.display = 'block';
+        document.getElementById('finishBtn').style.display = 'none';
+      } else {
+        document.getElementById('nextRoundBtn').style.display = 'none';
+        document.getElementById('finishBtn').style.display = 'block';
+      }
+    }
+    
+    function startNextRound() {
+      currentRound++;
+      document.getElementById('celebrationScreen').classList.remove('active');
+      document.getElementById('countingScreen').classList.add('active');
+      document.getElementById('graphContainer').style.display = 'block';
+      
+      counts = { apple: 0, banana: 0, grape: 0, orange: 0 };
+      totalCounted = 0;
+      totalFruits = 0;
+      
+      initGame();
+    }
+    
+    function finishGame() {
+      document.getElementById('celebrationScreen').classList.remove('active');
+      document.getElementById('countingScreen').classList.add('active');
+      document.getElementById('graphContainer').style.display = 'block';
+      
+      currentRound = 1;
+      counts = { apple: 0, banana: 0, grape: 0, orange: 0 };
+      totalCounted = 0;
+      totalFruits = 0;
+      
+      initGame();
+    }
+
+    async function onConfigChange(config) {
+      document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
+      document.getElementById('instructionText').textContent = config.instruction_text || defaultConfig.instruction_text;
+      document.getElementById('questionText').textContent = config.question_text || defaultConfig.question_text;
+      document.getElementById('celebrationText').textContent = config.celebration_text || defaultConfig.celebration_text;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["game_title", config.game_title || defaultConfig.game_title],
+        ["instruction_text", config.instruction_text || defaultConfig.instruction_text],
+        ["question_text", config.question_text || defaultConfig.question_text],
+        ["celebration_text", config.celebration_text || defaultConfig.celebration_text]
+      ]);
+    }
+
+    // Initialize Element SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    // Event listeners
+    document.getElementById('quizAudioBtn').onclick = () => {
+      if (currentQuizQuestion) {
+        speak(currentQuizQuestion.question);
+      }
+    };
+    
+    document.getElementById('additionAudioBtn').onclick = () => {
+      const part1 = document.getElementById('part1').textContent;
+      const part2 = document.getElementById('part2').textContent;
+      const question = `What is ${part1} plus ${part2}?`;
+      speak(question);
+    };
+    
+    document.getElementById('nextRoundBtn').onclick = startNextRound;
+    document.getElementById('finishBtn').onclick = finishGame;
+
+    // Start game
+    initGame();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b5af55746a73bdd',t:'MTc2NzAyODcyNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

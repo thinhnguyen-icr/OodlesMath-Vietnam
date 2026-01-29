@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equation Adventure!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-sky: #87CEEB;
+            --font-main: 'Poppins', sans-serif;
+            --c-red: #FF6B6B;
+            --c-blue: #4ECDC4;
+            --c-green: #95E1D3;
+            --c-yellow: #FFE66D;
+            --c-orange: #FFA500;
+            --c-purple: #C39BD3;
+            --c-white: #FFFFFF;
+            --shadow-soft: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-sky);
+            background-image: 
+                radial-gradient(circle at 50% 50%, white 10px, transparent 11px),
+                radial-gradient(circle at 10% 20%, rgba(255,255,255,0.6) 20px, transparent 21px),
+                radial-gradient(circle at 90% 80%, rgba(255,255,255,0.6) 30px, transparent 31px);
+            background-size: 100px 100px, 200px 200px, 300px 300px;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- Header --- */
+        header {
+            width: 100%;
+            max-width: 850px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 25px;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .title-group h1 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .speaker-btn {
+            background: var(--c-yellow);
+            border: 3px solid #F1C40F;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+            box-shadow: 0 4px 0 #D4AC0D;
+        }
+
+        .speaker-btn:active { transform: scale(0.9); box-shadow: 0 2px 0 #D4AC0D; }
+
+        .score-board {
+            background: var(--c-blue);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            box-shadow: 0 4px 0 #2A9D8F;
+            text-align: center;
+        }
+
+        /* --- Main Stage --- */
+        #main-stage {
+            width: 100%;
+            max-width: 850px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 35px;
+            padding: 30px;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            min-height: 550px;
+        }
+
+        .screen {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .screen.active { display: flex; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .instruction-text {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 800;
+        }
+
+        /* --- Object Display Area --- */
+        .problem-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            background: rgba(255,255,255,0.4);
+            padding: 25px;
+            border-radius: 30px;
+            width: 100%;
+            max-width: 750px;
+        }
+
+        .object-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            max-width: 300px;
+            min-height: 80px;
+        }
+
+        .object-emoji {
+            font-size: 2.2rem;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.1));
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .plus-sign {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--c-orange);
+            margin: 0 5px;
+        }
+
+        /* --- Equations --- */
+        .choices-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .equation-btn {
+            background: white;
+            border: 3px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 6px 0 #cbd5e1;
+            text-align: center;
+        }
+
+        .equation-btn:hover { background: #f8fafc; transform: translateY(-2px); }
+        .equation-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #cbd5e1; }
+        .equation-btn.correct { background: var(--c-green); border-color: transparent; color: white; box-shadow: 0 6px 0 #6DBBAF; }
+        .equation-btn.wrong { background: var(--c-red); border-color: transparent; color: white; box-shadow: 0 6px 0 #d9534f; }
+
+        /* --- Gift Phase (Nâng cấp) --- */
+        .gift-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin: 40px 0;
+        }
+
+        .gift-box-wrapper {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            perspective: 1000px;
+        }
+
+        .gift-box {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible;
+        }
+
+        /* Ribbon ngang */
+        .gift-box::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 25px;
+            background: #FFD700;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Ribbon dọc */
+        .gift-box::after {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 100%;
+            background: #FFD700;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .gift-bow {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 30px;
+            background: #FFD700;
+            border-radius: 50px;
+            z-index: 10;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        .gift-bow::before, .gift-bow::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #FFD700;
+            border-radius: 50%;
+            top: -5px;
+        }
+        .gift-bow::before { left: -15px; }
+        .gift-bow::after { right: -15px; }
+
+        .gift-box:hover {
+            transform: translateY(-10px) rotate(3deg);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .gift-box.opened {
+            background: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 50px rgba(255,215,0,0.5);
+        }
+
+        .gift-box.opened .gift-lid, 
+        .gift-box.opened::before, 
+        .gift-box.opened::after,
+        .gift-box.opened .gift-bow {
+            display: none;
+        }
+
+        .reward-emoji {
+            font-size: 4rem;
+            z-index: 5;
+            opacity: 0;
+            transition: 0.3s;
+        }
+        .opened .reward-emoji { opacity: 1; transform: scale(1.2); }
+
+        .gift-lid-mask {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #d97706;
+            font-size: 2.5rem;
+            text-shadow: 1px 1px 0 white;
+        }
+
+        .gift-box.opened .gift-lid-mask { display: none; }
+
+        /* --- Feedback --- */
+        .feedback-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 15px 30px;
+            border-radius: 20px;
+            font-size: 2rem;
+            font-weight: 800;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: none;
+            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes bounceIn { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+
+        /* --- Victory --- */
+        #victory-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .victory-content {
+            background: white;
+            padding: 50px;
+            border-radius: 40px;
+            text-align: center;
+            max-width: 450px;
+            animation: bounceIn 0.6s;
+        }
+
+        .victory-content h2 { font-size: 2.5rem; color: var(--c-purple); margin-bottom: 10px; font-weight: 800; }
+        .btn-restart {
+            background: var(--c-green);
+            color: #2c3e50;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #6DBBAF;
+            margin-top: 25px;
+        }
+
+        #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 150; }
+
+        @media (max-width: 600px) {
+            .problem-container { padding: 15px; }
+            .object-emoji { font-size: 1.6rem; }
+            .plus-sign { font-size: 2.5rem; }
+            .equation-btn { font-size: 1.4rem; padding: 10px; }
+            .gift-grid { gap: 20px; }
+            .gift-box-wrapper { width: 100px; height: 100px; }
+            .reward-emoji { font-size: 2.5rem; }
+            .gift-bow { width: 40px; height: 20px; top: -15px; }
+        }
+    </style>
+</head>
+<body>
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <header>
+        <div class="title-group">
+            <h1>Equation Adventure! 📝</h1>
+        </div>
+        <div class="controls">
+            <button class="speaker-btn" onclick="speakQuestion()" title="Listen">🔊</button>
+            <div class="score-board">Round: <span id="round-val">1</span> / 10</div>
+        </div>
+    </header>
+
+    <main id="main-stage">
+        <!-- Worksheet Screen -->
+        <div id="worksheet-screen" class="screen active">
+            <div class="instruction-text">Choose the correct equation!</div>
+            <div class="problem-container">
+                <div id="group1" class="object-group"></div>
+                <div class="plus-sign">+</div>
+                <div id="group2" class="object-group"></div>
+            </div>
+            <div id="choices-grid" class="choices-grid"></div>
+        </div>
+
+        <!-- Gift Screen -->
+        <div id="gift-screen" class="screen">
+            <div class="instruction-text">Amazing Job! Pick a Reward! 🎁</div>
+            <div class="gift-grid">
+                <div class="gift-box-wrapper" onclick="openGift(this)">
+                    <div class="gift-box"><div class="gift-bow"></div><div class="gift-lid-mask">?</div><span class="reward-emoji"></span></div>
+                </div>
+                <div class="gift-box-wrapper" onclick="openGift(this)">
+                    <div class="gift-box"><div class="gift-bow"></div><div class="gift-lid-mask">?</div><span class="reward-emoji"></span></div>
+                </div>
+                <div class="gift-box-wrapper" onclick="openGift(this)">
+                    <div class="gift-box"><div class="gift-bow"></div><div class="gift-lid-mask">?</div><span class="reward-emoji"></span></div>
+                </div>
+            </div>
+            <div id="reward-text" class="instruction-text" style="color: var(--c-orange); opacity: 0;">You earned a sticker!</div>
+        </div>
+    </main>
+
+    <div id="feedback" class="feedback-label"></div>
+
+    <div id="victory-modal">
+        <div class="victory-content">
+            <div style="font-size: 5rem;">🏆</div>
+            <h2>Math Superstar!</h2>
+            <p>You solved all calculations (10-20) perfectly!</p>
+            <button class="btn-restart" onclick="location.reload()">Play Again</button>
+        </div>
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <script>
+        // Hết các hình ảnh và nội dung bài học được bảo lưu
+        const OBJECT_TYPES = [
+            { emoji: '🥪', name: 'sandwich' }, { emoji: '📚', name: 'book' },
+            { emoji: '🦆', name: 'duck' }, { emoji: '🍍', name: 'pineapple' },
+            { emoji: '🎈', name: 'balloon' }, { emoji: '🍎', name: 'apple' },
+            { emoji: '🚗', name: 'car' }, { emoji: '🌟', name: 'star' },
+            { emoji: '🐱', name: 'cat' }, { emoji: '🍓', name: 'strawberry' }
+        ];
+
+        const REWARDS = ['⭐', '💖', '🏆', '🎖️', '🌟', '💎', '🎊', '🎉', '🍦', '🍩', '🍔', '🍕'];
+
+        let state = {
+            round: 1,
+            totalRounds: 10,
+            correctAnswer: "",
+            isLocked: false,
+            hasMistake: false,
+            currentTask: ""
+        };
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSfx(freq, type = 'sine', duration = 0.2) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function speakQuestion() {
+            window.speechSynthesis.cancel();
+            const ut = new SpeechSynthesisUtterance(state.currentTask);
+            ut.lang = 'en-US';
+            ut.rate = 0.9;
+            window.speechSynthesis.speak(ut);
+        }
+
+        function showFeedback(text, color) {
+            const f = document.getElementById('feedback');
+            f.innerText = text;
+            f.style.color = color;
+            f.style.display = 'block';
+            setTimeout(() => { f.style.display = 'none'; }, 1000);
+        }
+
+        function initRound() {
+            state.isLocked = false;
+            state.hasMistake = false;
+            document.getElementById('round-val').innerText = state.round;
+            document.getElementById('worksheet-screen').classList.add('active');
+            document.getElementById('gift-screen').classList.remove('active');
+
+            const objType = OBJECT_TYPES[Math.floor(Math.random() * OBJECT_TYPES.length)];
+            
+            // CẬP NHẬT PHẠM VI 10 ĐẾN 20
+            const total = Math.floor(Math.random() * 11) + 10; // 10 to 20
+            const n1 = Math.floor(Math.random() * (total - 5)) + 3; // Đảm bảo n1, n2 đủ lớn để trông đẹp
+            const n2 = total - n1;
+            
+            state.correctAnswer = `${n1} + ${n2} = ${total}`;
+            state.currentTask = `Count the ${objType.name}s and find the matching equation.`;
+
+            // Render Objects
+            const g1 = document.getElementById('group1');
+            const g2 = document.getElementById('group2');
+            g1.innerHTML = ''; g2.innerHTML = '';
+            for(let i=0; i<n1; i++) g1.innerHTML += `<span class="object-emoji" style="animation-delay: ${i*0.04}s">${objType.emoji}</span>`;
+            for(let i=0; i<n2; i++) g2.innerHTML += `<span class="object-emoji" style="animation-delay: ${(n1+i)*0.04}s">${objType.emoji}</span>`;
+
+            // Generate Choices
+            const choices = [state.correctAnswer];
+            while(choices.length < 3) {
+                let wTotal = Math.floor(Math.random() * 11) + 10;
+                let w1 = Math.floor(Math.random() * (wTotal - 2)) + 1;
+                let w2 = wTotal - w1;
+                let eq = `${w1} + ${w2} = ${wTotal}`;
+                if(!choices.includes(eq)) choices.push(eq);
+            }
+            choices.sort(() => Math.random() - 0.5);
+
+            const grid = document.getElementById('choices-grid');
+            grid.innerHTML = '';
+            choices.forEach(c => {
+                const btn = document.createElement('button');
+                btn.className = 'equation-btn';
+                btn.innerText = c;
+                btn.onclick = () => handleChoice(btn, c);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleChoice(btn, val) {
+            if(state.isLocked) return;
+
+            if(val === state.correctAnswer) {
+                state.isLocked = true;
+                btn.classList.add('correct');
+                playSfx(600, 'sine', 0.2);
+                showFeedback("Correct! 🎉", "var(--c-green)");
+                
+                setTimeout(() => {
+                    if(!state.hasMistake) {
+                        showGiftPhase();
+                    } else {
+                        nextRound();
+                    }
+                }, 1200);
+            } else {
+                state.hasMistake = true;
+                btn.classList.add('wrong');
+                playSfx(150, 'sawtooth', 0.2);
+                showFeedback("Try Again! 💪", "var(--c-red)");
+                setTimeout(() => btn.classList.remove('wrong'), 800);
+            }
+        }
+
+        function showGiftPhase() {
+            document.getElementById('worksheet-screen').classList.remove('active');
+            document.getElementById('gift-screen').classList.add('active');
+            document.getElementById('reward-text').style.opacity = '0';
+            
+            const boxEls = document.querySelectorAll('.gift-box');
+            boxEls.forEach(box => {
+                box.classList.remove('opened');
+                box.querySelector('.reward-emoji').innerText = REWARDS[Math.floor(Math.random() * REWARDS.length)];
+                box.parentElement.style.pointerEvents = 'auto';
+                box.parentElement.style.opacity = '1';
+            });
+            state.currentTask = "Pick a pretty gift box!";
+        }
+
+        function openGift(wrapper) {
+            const box = wrapper.querySelector('.gift-box');
+            if(box.classList.contains('opened')) return;
+
+            box.classList.add('opened');
+            playSfx(800, 'sine', 0.4);
+            
+            const wrappers = document.querySelectorAll('.gift-box-wrapper');
+            wrappers.forEach(w => w.style.pointerEvents = 'none');
+            
+            const reward = box.querySelector('.reward-emoji').innerText;
+            const rText = document.getElementById('reward-text');
+            rText.innerText = `You earned a ${reward} sticker!`;
+            rText.style.opacity = '1';
+
+            setTimeout(nextRound, 2000);
+        }
+
+        function nextRound() {
+            if(state.round < state.totalRounds) {
+                state.round++;
+                initRound();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('victory-modal').style.display = 'flex';
+            startConfetti();
+            playSfx(500, 'triangle', 0.5);
+        }
+
+        function startConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            let particles = [];
+            for(let i=0; i<150; i++) {
+                particles.push({
+                    x: Math.random()*canvas.width, y: Math.random()*canvas.height - canvas.height,
+                    size: Math.random()*8+4, color: `hsl(${Math.random()*360}, 70%, 50%)`,
+                    speed: Math.random()*3+2, angle: Math.random()*6.2
+                });
+            }
+            function loop() {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speed; p.x += Math.sin(p.angle);
+                    if(p.y > canvas.height) p.y = -20;
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(p.x, p.y, p.size, p.size);
+                });
+                requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        window.onload = initRound;
+    </script>
+</body>
+</html>

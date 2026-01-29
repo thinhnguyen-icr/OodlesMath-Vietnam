@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picture Graph Challenge!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-sky: #87CEEB;
+            --font-main: 'Poppins', sans-serif;
+            --c-red: #FF6B6B;
+            --c-blue: #4ECDC4;
+            --c-green: #95E1D3;
+            --c-yellow: #FFE66D;
+            --c-orange: #FFA500;
+            --c-purple: #C39BD3;
+            --c-white: #FFFFFF;
+            --shadow-soft: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-sky);
+            background-image: 
+                radial-gradient(circle at 50% 50%, white 10px, transparent 11px),
+                radial-gradient(circle at 10% 20%, rgba(255,255,255,0.6) 20px, transparent 21px),
+                radial-gradient(circle at 90% 80%, rgba(255,255,255,0.6) 30px, transparent 31px);
+            background-size: 100px 100px, 200px 200px, 300px 300px;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- Header --- */
+        header {
+            width: 100%;
+            max-width: 850px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 25px;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .title-group h1 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .speaker-btn {
+            background: var(--c-yellow);
+            border: 3px solid #F1C40F;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+            box-shadow: 0 4px 0 #D4AC0D;
+        }
+
+        .speaker-btn:active { transform: scale(0.9); box-shadow: 0 2px 0 #D4AC0D; }
+
+        .score-board {
+            background: var(--c-blue);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            box-shadow: 0 4px 0 #2A9D8F;
+            text-align: center;
+        }
+
+        /* --- Game Container --- */
+        #main-stage {
+            width: 100%;
+            max-width: 850px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 35px;
+            padding: 30px;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            min-height: 500px;
+        }
+
+        .question-text {
+            font-size: 1.6rem;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        /* --- Graph Styling --- */
+        .graph-area {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 20px;
+            margin-bottom: 40px;
+            width: 100%;
+            padding: 20px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 25px;
+            border: 2px dashed rgba(0,0,0,0.1);
+        }
+
+        .graph-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            max-width: 100px;
+        }
+
+        .emoji-stack {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 5px;
+            margin-bottom: 10px;
+            min-height: 100px;
+        }
+
+        .emoji-item {
+            font-size: 2.5rem;
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .column-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #555;
+            text-transform: capitalize;
+            text-align: center;
+        }
+
+        /* --- Answer Buttons --- */
+        .answers-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .answer-btn {
+            background: white;
+            border: 3px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 15px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 6px 0 #cbd5e1;
+        }
+
+        .answer-btn:hover { background: #f8fafc; transform: translateY(-2px); }
+        .answer-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #cbd5e1; }
+
+        /* --- Feedback --- */
+        .feedback-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 15px 30px;
+            border-radius: 20px;
+            font-size: 2rem;
+            font-weight: 800;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: none;
+            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        /* --- Mini Game --- */
+        .mini-game-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            animation: fadeIn 0.5s;
+        }
+
+        .math-expr {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--c-blue);
+            margin-bottom: 40px;
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.05);
+        }
+
+        .mini-choices {
+            display: flex;
+            gap: 40px;
+        }
+
+        .choice-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+        }
+
+        .choice-circle {
+            width: 90px;
+            height: 90px;
+            background: white;
+            border: 4px solid var(--c-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            box-shadow: 0 8px 0 #2A9D8F;
+            transition: 0.2s;
+        }
+
+        .choice-card:hover .choice-circle { transform: translateY(-5px); }
+        .choice-card:active .choice-circle { transform: translateY(4px); box-shadow: 0 4px 0 #2A9D8F; }
+
+        .mini-char { font-size: 4rem; }
+
+        /* --- Victory --- */
+        #victory-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .victory-content {
+            background: white;
+            padding: 50px;
+            border-radius: 40px;
+            text-align: center;
+            max-width: 450px;
+            animation: bounceIn 0.6s;
+        }
+
+        .victory-content h2 { font-size: 2.5rem; color: var(--c-purple); margin-bottom: 10px; }
+        .play-again {
+            background: var(--c-green);
+            color: #2c3e50;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #6DBBAF;
+            margin-top: 20px;
+        }
+
+        #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 150; }
+
+        @media (max-width: 600px) {
+            .question-text { font-size: 1.2rem; }
+            .emoji-item { font-size: 1.8rem; }
+            .answers-grid { grid-template-columns: 1fr; }
+            .math-expr { font-size: 2.5rem; }
+            .choice-circle { width: 70px; height: 70px; font-size: 1.8rem; }
+            .mini-choices { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <header>
+        <div class="title-group">
+            <h1>Graph Challenge! 📊</h1>
+        </div>
+        <div class="controls">
+            <button class="speaker-btn" onclick="speakQuestion()" title="Listen">🔊</button>
+            <div class="score-board">Score: <span id="score-val">0</span> / 10</div>
+        </div>
+    </header>
+
+    <main id="main-stage">
+        <!-- Content injected here -->
+    </main>
+
+    <div id="feedback" class="feedback-label"></div>
+
+    <div id="victory-modal">
+        <div class="victory-content">
+            <div style="font-size: 5rem;">🏆</div>
+            <h2>Amazing Job!</h2>
+            <p>You're a Picture Graph Expert!</p>
+            <button class="play-again" onclick="location.reload()">Play Again</button>
+        </div>
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <script>
+        const fruitEmojis = { apple: '🍎', grape: '🍇', orange: '🍊', mango: '🥭', banana: '🍌', strawberry: '🍓', watermelon: '🍉', pineapple: '🍍' };
+        
+        const questions = [
+            { type: 'count', category: 'fruits', question: 'How many apples are there?', data: { apple: 7, grape: 3, orange: 5, mango: 2 }, correctAnswer: 7, answers: [5, 7, 3, 2] },
+            { type: 'count', category: 'fruits', question: 'How many grapes are there?', data: { apple: 4, grape: 9, orange: 6, mango: 3 }, correctAnswer: 9, answers: [9, 6, 4, 3] },
+            { type: 'count', category: 'fruits', question: 'How many oranges are there?', data: { apple: 5, grape: 2, orange: 8, mango: 4 }, correctAnswer: 8, answers: [5, 2, 8, 4] },
+            { type: 'count', category: 'fruits', question: 'How many mangos are there?', data: { apple: 6, grape: 8, orange: 3, mango: 5 }, correctAnswer: 5, answers: [6, 8, 3, 5] },
+            { type: 'count', category: 'fruits', question: 'How many bananas are there?', data: { banana: 10, strawberry: 4, watermelon: 6, pineapple: 3 }, correctAnswer: 10, answers: [10, 6, 4, 3] },
+            { type: 'count', category: 'fruits', question: 'How many strawberries are there?', data: { banana: 5, strawberry: 7, watermelon: 3, pineapple: 4 }, correctAnswer: 7, answers: [5, 7, 3, 4] },
+            { type: 'count', category: 'fruits', question: 'How many watermelons are there?', data: { banana: 4, strawberry: 6, watermelon: 9, pineapple: 2 }, correctAnswer: 9, answers: [4, 6, 9, 2] },
+            { type: 'count', category: 'fruits', question: 'How many pineapples are there?', data: { banana: 7, strawberry: 5, watermelon: 3, pineapple: 6 }, correctAnswer: 6, answers: [7, 5, 3, 6] },
+            { type: 'count', category: 'fruits', question: 'How many apples are there?', data: { apple: 8, grape: 4, orange: 6, mango: 5 }, correctAnswer: 8, answers: [8, 4, 6, 5] },
+            { type: 'count', category: 'fruits', question: 'How many grapes are there?', data: { apple: 3, grape: 6, orange: 7, mango: 4 }, correctAnswer: 6, answers: [3, 6, 7, 4] }
+        ];
+
+        let state = {
+            currentIdx: 0,
+            score: 0,
+            isLocked: false
+        };
+
+        const stage = document.getElementById('main-stage');
+        const feedback = document.getElementById('feedback');
+        const scoreVal = document.getElementById('score-val');
+
+        // Audio System
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(freq, type = 'sine', duration = 0.2) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function speakQuestion() {
+            window.speechSynthesis.cancel();
+            const text = questions[state.currentIdx].question;
+            const ut = new SpeechSynthesisUtterance(text);
+            ut.lang = 'en-US';
+            ut.rate = 0.9;
+            window.speechSynthesis.speak(ut);
+        }
+
+        function renderQuestion() {
+            state.isLocked = false;
+            const q = questions[state.currentIdx];
+            
+            let graphHtml = `<div class="graph-area">`;
+            for (const [key, count] of Object.entries(q.data)) {
+                graphHtml += `
+                    <div class="graph-column">
+                        <div class="emoji-stack">
+                            ${Array(count).fill(fruitEmojis[key]).map((emoji, i) => 
+                                `<div class="emoji-item" style="animation-delay: ${i * 0.05}s">${emoji}</div>`
+                            ).join('')}
+                        </div>
+                        <div class="column-label">${key}</div>
+                    </div>
+                `;
+            }
+            graphHtml += `</div>`;
+
+            let answersHtml = `<div class="answers-grid">`;
+            q.answers.sort(() => Math.random() - 0.5).forEach(ans => {
+                answersHtml += `<button class="answer-btn" onclick="checkAnswer(${ans})">${ans}</button>`;
+            });
+            answersHtml += `</div>`;
+
+            stage.innerHTML = `
+                <div class="question-text">${q.question}</div>
+                ${graphHtml}
+                ${answersHtml}
+            `;
+        }
+
+        function checkAnswer(ans) {
+            if (state.isLocked) return;
+            const q = questions[state.currentIdx];
+            
+            if (ans === q.correctAnswer) {
+                state.isLocked = true;
+                state.score++;
+                scoreVal.innerText = state.score;
+                showFeedback("Great Job! 🎉", "var(--c-green)");
+                playSound(600, 'sine');
+                setTimeout(renderMiniGame, 1500);
+            } else {
+                showFeedback("Try Again! 💪", "var(--c-red)");
+                playSound(150, 'sawtooth');
+            }
+        }
+
+        function showFeedback(text, color) {
+            feedback.innerText = text;
+            feedback.style.color = color;
+            feedback.style.display = 'block';
+            setTimeout(() => { feedback.style.display = 'none'; }, 1000);
+        }
+
+        function renderMiniGame() {
+            const num1 = Math.floor(Math.random() * 5) + 1;
+            const num2 = Math.floor(Math.random() * 5) + 1;
+            const correct = num1 + num2;
+            const wrong = correct + (Math.random() > 0.5 ? 1 : -1);
+            const choices = [correct, wrong].sort(() => Math.random() - 0.5);
+
+            stage.innerHTML = `
+                <div class="mini-game-view">
+                    <div class="question-text">Mini Math Challenge! 🧠</div>
+                    <div class="math-expr">${num1} + ${num2} = ?</div>
+                    <div class="mini-choices">
+                        <div class="choice-card" onclick="handleMini(${choices[0]}, ${correct})">
+                            <div class="choice-circle">${choices[0]}</div>
+                            <div class="mini-char">🐱</div>
+                        </div>
+                        <div class="choice-card" onclick="handleMini(${choices[1]}, ${correct})">
+                            <div class="choice-circle">${choices[1]}</div>
+                            <div class="mini-char">🤖</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleMini(ans, correct) {
+            if (ans === correct) {
+                playSound(800, 'sine', 0.4);
+                showFeedback("Correct! Next Question...", "var(--c-blue)");
+                setTimeout(() => {
+                    state.currentIdx++;
+                    if (state.currentIdx >= questions.length) {
+                        endGame();
+                    } else {
+                        renderQuestion();
+                    }
+                }, 1200);
+            } else {
+                playSound(150, 'sawtooth');
+                showFeedback("Oops! Try again.", "var(--c-red)");
+            }
+        }
+
+        function endGame() {
+            document.getElementById('victory-modal').style.display = 'flex';
+            startConfetti();
+        }
+
+        // --- Confetti ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.onresize = resize; resize();
+
+        function startConfetti() {
+            for(let i=0; i<150; i++) {
+                particles.push({
+                    x: Math.random()*canvas.width, y: Math.random()*canvas.height - canvas.height,
+                    size: Math.random()*8+4, color: `hsl(${Math.random()*360}, 70%, 50%)`,
+                    speed: Math.random()*3+2, angle: Math.random()*6.2
+                });
+            }
+            function loop() {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speed; p.x += Math.sin(p.angle);
+                    if(p.y > canvas.height) p.y = -20;
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(p.x, p.y, p.size, p.size);
+                });
+                requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

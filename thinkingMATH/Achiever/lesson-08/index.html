@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <link rel="stylesheet" href="../assets/brand.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fruit Math Adventure</title>
+  
+  <!-- FIX FONT: Font Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            /* Pastel rainbow background */
+            background: linear-gradient(180deg, #E0F7FA 0%, #E1F5FE 50%, #F3E5F5 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .screen {
+            display: none;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .title {
+            font-size: 2.2rem;
+            color: #FF6B6B;
+            text-shadow: 2px 2px 0px white, 4px 4px 0px rgba(0,0,0,0.1);
+            margin: 10px 0 20px 0;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        /* Cute Progress Bar */
+        .progress-container {
+            background: white;
+            padding: 8px;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 16px;
+            background: #F0F0F0;
+            border-radius: 10px;
+            overflow: hidden;
+            border: none;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF9A9E 0%, #FECFEF 99%, #FECFEF 100%);
+            border-radius: 10px;
+            transition: width 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            width: 0%;
+        }
+
+        /* Fruit Display Area */
+        .fruit-area {
+            background: white;
+            border-radius: 30px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 10px 25px rgba(100, 181, 246, 0.2);
+            border: 4px solid white;
+            position: relative;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .fruit-group {
+            display: inline-flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            margin: 5px;
+            background: #F8F9FA;
+            border-radius: 20px;
+            padding: 10px;
+        }
+
+        .fruit-emoji {
+            font-size: 3rem; 
+            margin: 3px;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.1));
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .fruit-emoji:hover {
+            transform: scale(1.2);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .plus-sign {
+            font-size: 3rem;
+            color: #4DB6AC;
+            margin: 0 10px;
+            font-weight: 800;
+        }
+
+        /* Number Bond */
+        .number-bond {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .bond-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        .bond-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+        }
+        .bond-part { background: #4FC3F7; }
+        .bond-whole { background: #FFB74D; width: 80px; height: 80px; font-size: 2.2rem; }
+        .bond-lines {
+            width: 4px;
+            height: 20px;
+            background: #B0BEC5;
+            border-radius: 2px;
+        }
+        
+        /* Question & Audio */
+        .question-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            color: #455A64;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            flex: 1;
+            font-weight: 700;
+        }
+
+        .audio-icon {
+            background: #FFD54F;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #FFCA28;
+            transition: transform 0.1s;
+        }
+        .audio-icon:active { transform: translateY(4px); box-shadow: none; }
+
+        /* Answer Buttons */
+        .answer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .answer-btn {
+            background: white;
+            color: #455A64;
+            border: 2px solid #ECEFF1;
+            padding: 15px 30px;
+            border-radius: 20px;
+            font-size: 2rem;
+            font-weight: 800;
+            cursor: pointer;
+            min-width: 90px;
+            box-shadow: 0 6px 0 #CFD8DC;
+            transition: all 0.1s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .answer-btn:active {
+            transform: translateY(6px);
+            box-shadow: none;
+        }
+
+        .answer-btn.correct {
+            background: #66BB6A;
+            color: white;
+            border-color: #66BB6A;
+            box-shadow: 0 6px 0 #43A047;
+        }
+        
+        .answer-btn.incorrect {
+            background: #EF5350;
+            color: white;
+            border-color: #EF5350;
+            box-shadow: 0 6px 0 #E53935;
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .feedback {
+            font-size: 1.3rem;
+            font-weight: 700;
+            min-height: 40px;
+            margin-top: 10px;
+            color: #66BB6A;
+        }
+
+        .next-btn {
+            background: #29B6F6;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #0288D1;
+            transition: all 0.1s;
+            display: none;
+            margin-top: 10px;
+            font-family: 'Poppins', sans-serif;
+        }
+        .next-btn:active { transform: translateY(6px); box-shadow: none; }
+
+        /* --- BUTTERFLY GAME --- */
+        .butterfly-game-container {
+            background: linear-gradient(180deg, #81D4FA 0%, #B3E5FC 80%, #C8E6C9 80%, #A5D6A7 100%); /* Sky to Grass */
+            border-radius: 20px;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #4FC3F7;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+            /* Custom cursor to look like a net target */
+            cursor: crosshair; 
+        }
+        
+        /* Clouds */
+        .cloud {
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.8;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: moveCloud 20s linear infinite;
+            z-index: 1;
+        }
+        @keyframes moveCloud {
+            from { left: -100px; }
+            to { left: 100%; }
+        }
+
+        /* Flowers at the bottom */
+        .flower-bed {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            display: flex;
+            justify-content: space-around;
+            font-size: 1.5rem;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Flying Butterfly */
+        .butterfly {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            cursor: pointer;
+            user-select: none;
+            z-index: 10;
+            /* Smooth movement */
+            transition: top 1.5s ease-in-out, left 1.5s ease-in-out;
+        }
+
+        .butterfly-inner {
+            display: block;
+            animation: flutter 0.3s infinite alternate;
+        }
+
+        @keyframes flutter {
+            0% { transform: scaleX(1) rotate(0deg); }
+            100% { transform: scaleX(0.6) rotate(10deg); }
+        }
+
+        .butterfly:active { transform: scale(0.9); }
+        
+        .butterfly.caught {
+            pointer-events: none;
+            transition: none;
+            animation: netCatch 0.4s forwards;
+        }
+        @keyframes netCatch {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(0.5) rotate(180deg); opacity: 0.8; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 20px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #0277BD;
+        }
+
+        .start-game-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            border-radius: 16px;
+        }
+        
+        .start-btn {
+            background: #FF7043;
+            color: white;
+            font-size: 1.5rem;
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 800;
+            box-shadow: 0 6px 0 #D84315;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+        .start-btn:active { transform: translateY(6px); box-shadow: none; }
+
+        /* --- FIREWORKS --- */
+        .firework {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: firework-explode 1s ease-out forwards;
+        }
+        @keyframes firework-explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) scale(0.5); opacity: 0; }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .title { font-size: 1.8rem; }
+            .fruit-emoji { font-size: 2.5rem; }
+            .plus-sign { font-size: 2rem; }
+            .butterfly-game-container { height: 300px; }
+        }
+    </style>
+ </head>
+ <body>
+  <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+  <div class="container">
+   
+   <!-- Question Screen -->
+   <div id="questionScreen" class="screen active">
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+        </div>
+    </div>
+    
+    <h1 id="gameTitle" class="title">Fruit Math Adventure</h1>
+    
+    <div class="fruit-area">
+     <div id="fruitDisplay"></div>
+     
+     <div id="numberBond" class="number-bond" style="display: none;">
+      <div class="bond-row">
+       <div class="bond-circle bond-part" id="bondPart1">?</div>
+       <div class="bond-lines"></div>
+       <div class="bond-circle bond-part" id="bondPart2">?</div>
+      </div>
+      <div class="bond-lines" style="height: 10px; width: 40px; margin: -5px 0;"></div>
+      <div class="bond-row">
+       <div class="bond-circle bond-whole" id="bondWhole">?</div>
+      </div>
+     </div>
+    </div>
+
+    <div class="question-container">
+     <button class="audio-icon" onclick="playAudio()">🔊</button>
+     <div id="questionText" class="question-text">
+      How many apples?
+     </div>
+    </div>
+
+    <div id="answerButtons" class="answer-buttons"></div>
+    <div id="feedback" class="feedback"></div>
+    <button id="nextBtn" class="next-btn" onclick="nextStep()">Next Step ➜</button>
+   </div>
+
+   <!-- Butterfly Game Screen -->
+   <div id="butterflyGameScreen" class="screen">
+    <h1 class="title">Break Time: Catch Butterflies! 🦋</h1>
+    
+    <div class="game-stats">
+        <span id="gameTimer">Time: 20s</span>
+        <span id="gameScore">Score: 0</span>
+    </div>
+
+    <div class="butterfly-game-container" id="butterflyGameArea">
+        <div class="cloud" style="top: 20px; animation-duration: 25s;">☁️</div>
+        <div class="cloud" style="top: 100px; left: 50%; animation-duration: 30s;">☁️</div>
+        
+        <!-- Flowers for garden vibe -->
+        <div class="flower-bed">
+            <span>🌸</span><span>🌻</span><span>🌷</span><span>🌹</span><span>🌼</span><span>🌺</span>
+        </div>
+
+        <div id="startOverlay" class="start-game-overlay">
+            <h2 style="color: white; margin-bottom: 20px; font-size: 1.5rem; text-align: center;">Use your net to<br>catch them! 🕸️</h2>
+            <button class="start-btn" onclick="startButterflyGameLogic()">Play Now! ▶️</button>
+        </div>
+    </div>
+
+    <div id="gameResult" style="display: none; margin-top: 20px;">
+        <h2 style="color: #0277BD;">Time's up! You caught <span id="finalScore" style="color: #FF7043; font-size: 2rem;">0</span> butterflies!</h2>
+        <button class="next-btn" onclick="continueMainGame()" style="display: inline-block;">Continue Learning ➜</button>
+    </div>
+   </div>
+
+   <!-- Celebration Screen -->
+   <div id="celebrationScreen" class="screen" style="position: relative; overflow: hidden;">
+    <h1 class="title" style="color: #FFCA28; font-size: 3rem;">Mission Complete! 🏆</h1>
+    
+    <div style="font-size: 2rem; margin: 30px 0;">🎉 🎊 🎈</div>
+    
+    <div style="font-size: 1.5rem; color: #455A64; margin: 20px 0; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); z-index: 10; position: relative;">
+     You answered all questions correctly!<br>
+     <b>You are a Math Master!</b>
+    </div>
+    
+    <button class="next-btn" onclick="restartGame()" style="display: inline-block; background: #66BB6A; border-bottom-color: #43A047; z-index: 10; position: relative;">Play Again ↺</button>
+   </div>
+
+  </div>
+
+  <script>
+        // --- CONFIG ---
+        const fruits = ['🍎', '🍌', '🍊', '🍇', '🍓', '🍑', '🍐', '🥭'];
+        const fruitNames = {
+            '🍎': 'apples', '🍌': 'bananas', '🍊': 'oranges', 
+            '🍇': 'grapes', '🍓': 'strawberries', '🍑': 'peaches', 
+            '🍐': 'pears', '🥭': 'mangoes'
+        };
+
+        // Math Game State
+        let currentQuestion = 0;
+        let currentStep = 0; 
+        let totalQuestions = 3; 
+        let questions = [];
+        
+        // Butterfly Game State
+        let butterflyScore = 0;
+        let timeLeft = 20; 
+        let gameInterval;
+        let spawnInterval;
+        let isGameRunning = false;
+
+        // Butterfly Emojis & Friends (Butterflies, Bee, Ladybug)
+        const butterflies = ['🦋', '🐝', '🐞']; 
+        // We will rotate hues for '🦋' to make different colored butterflies
+
+        // --- MATH GAME INIT ---
+        function initGame() {
+            generateQuestions();
+            showQuestion();
+        }
+
+        function generateQuestions() {
+            questions = [];
+            for (let i = 0; i < totalQuestions; i++) {
+                const fruit1 = fruits[Math.floor(Math.random() * fruits.length)];
+                let fruit2 = fruits[Math.floor(Math.random() * fruits.length)];
+                while (fruit2 === fruit1) fruit2 = fruits[Math.floor(Math.random() * fruits.length)];
+                
+                // Range 10-20
+                let count1 = Math.floor(Math.random() * 6) + 5; 
+                let count2 = Math.floor(Math.random() * 6) + 5;
+                
+                questions.push({
+                    fruit1, fruit2, count1, count2,
+                    total: count1 + count2
+                });
+            }
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            const progress = (currentQuestion / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Reset UI
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('numberBond').style.display = 'none';
+            
+            showStep();
+        }
+
+        function showStep() {
+            const q = questions[currentQuestion];
+            const display = document.getElementById('fruitDisplay');
+            const text = document.getElementById('questionText');
+            
+            let html = '';
+            let targetCount = 0;
+            let targetName = '';
+
+            if (currentStep === 0) {
+                // Step 1
+                for(let i=0; i<q.count1; i++) html += `<span class="fruit-emoji" onclick="speak('${fruitNames[q.fruit1]}')">${q.fruit1}</span>`;
+                display.innerHTML = `<div class="fruit-group">${html}</div>`;
+                targetCount = q.count1;
+                targetName = fruitNames[q.fruit1];
+                text.textContent = `How many ${targetName}?`;
+
+            } else if (currentStep === 1) {
+                // Step 2
+                for(let i=0; i<q.count2; i++) html += `<span class="fruit-emoji" onclick="speak('${fruitNames[q.fruit2]}')">${q.fruit2}</span>`;
+                display.innerHTML = `<div class="fruit-group">${html}</div>`;
+                targetCount = q.count2;
+                targetName = fruitNames[q.fruit2];
+                text.textContent = `How many ${targetName}?`;
+
+            } else if (currentStep === 2) {
+                // Step 3
+                let h1 = '', h2 = '';
+                for(let i=0; i<q.count1; i++) h1 += `<span class="fruit-emoji">${q.fruit1}</span>`;
+                for(let i=0; i<q.count2; i++) h2 += `<span class="fruit-emoji">${q.fruit2}</span>`;
+                
+                display.innerHTML = `
+                    <div class="fruit-group">${h1}</div>
+                    <div class="plus-sign">+</div>
+                    <div class="fruit-group">${h2}</div>
+                `;
+                
+                document.getElementById('numberBond').style.display = 'flex';
+                document.getElementById('bondPart1').textContent = q.count1;
+                document.getElementById('bondPart2').textContent = q.count2;
+                document.getElementById('bondWhole').textContent = '?';
+                
+                targetCount = q.total;
+                text.textContent = 'How many fruits altogether?';
+            }
+            
+            generateButtons(targetCount);
+        }
+
+        function generateButtons(correct) {
+            const container = document.getElementById('answerButtons');
+            container.innerHTML = '';
+            
+            let opts = [correct];
+            while(opts.length < 3) {
+                let r = Math.floor(Math.random() * 20) + 5; 
+                if(!opts.includes(r) && r !== correct) opts.push(r);
+            }
+            opts.sort(() => Math.random() - 0.5);
+            
+            opts.forEach(num => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = num;
+                btn.onclick = () => checkAnswer(num, correct, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct, btn) {
+            const feedback = document.getElementById('feedback');
+            const btns = document.querySelectorAll('.answer-btn');
+            
+            if(selected === correct) {
+                playSound('success');
+                btn.classList.add('correct');
+                btns.forEach(b => b.disabled = true);
+                feedback.textContent = 'Correct! You are amazing! 🎉';
+                
+                if(currentStep === 2) document.getElementById('bondWhole').textContent = correct;
+                
+                setTimeout(() => {
+                    if(currentStep < 2) {
+                        currentStep++;
+                        showStep();
+                    } else {
+                        document.getElementById('nextBtn').style.display = 'inline-block';
+                    }
+                }, 1000);
+            } else {
+                playSound('error');
+                btn.classList.add('incorrect');
+                feedback.textContent = 'Oops, try again!';
+                feedback.style.color = '#EF5350';
+                setTimeout(() => {
+                    btn.classList.remove('incorrect');
+                    feedback.textContent = '';
+                }, 1000);
+            }
+        }
+
+        function nextStep() {
+            currentQuestion++;
+            currentStep = 0;
+            
+            if(currentQuestion <= totalQuestions) {
+                // Switch to Butterfly Game
+                showScreen('butterflyGameScreen');
+                prepareButterflyGame();
+            } else {
+                showCelebration();
+            }
+        }
+
+        function continueMainGame() {
+            if(currentQuestion < totalQuestions) {
+                showScreen('questionScreen');
+                showQuestion();
+            } else {
+                showCelebration();
+            }
+        }
+
+        // --- BUTTERFLY GAME LOGIC ---
+        
+        function prepareButterflyGame() {
+            document.getElementById('startOverlay').style.display = 'flex';
+            document.getElementById('gameResult').style.display = 'none';
+            document.getElementById('gameTimer').textContent = "Time: 20s"; 
+            document.getElementById('gameScore').textContent = "Score: 0";
+            
+            const area = document.getElementById('butterflyGameArea');
+            const oldButterflies = area.querySelectorAll('.butterfly');
+            oldButterflies.forEach(b => b.remove());
+        }
+
+        function startButterflyGameLogic() {
+            document.getElementById('startOverlay').style.display = 'none';
+            butterflyScore = 0;
+            timeLeft = 20; 
+            isGameRunning = true;
+            document.getElementById('gameScore').textContent = "Score: 0";
+            
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('gameTimer').textContent = `Time: ${timeLeft}s`;
+                if(timeLeft <= 0) endGame();
+            }, 1000);
+
+            spawnInterval = setInterval(spawnButterfly, 800); 
+        }
+
+        function spawnButterfly() {
+            if(!isGameRunning) return;
+            
+            const area = document.getElementById('butterflyGameArea');
+            const bDiv = document.createElement('div');
+            bDiv.className = 'butterfly';
+            
+            const span = document.createElement('span');
+            span.className = 'butterfly-inner';
+            
+            // Random type
+            const type = butterflies[Math.floor(Math.random() * butterflies.length)];
+            span.textContent = type;
+            
+            // Random color for butterfly type
+            if(type === '🦋') {
+                const hue = Math.floor(Math.random() * 360);
+                span.style.filter = `hue-rotate(${hue}deg)`;
+            }
+            
+            bDiv.appendChild(span);
+            
+            const maxLeft = area.offsetWidth - 70;
+            const maxTop = area.offsetHeight - 70; // Stay above flowers mostly
+            
+            bDiv.style.left = Math.random() * maxLeft + 'px';
+            bDiv.style.top = Math.random() * (maxTop - 40) + 'px';
+            
+            bDiv.onclick = (e) => catchButterfly(e, bDiv);
+            area.appendChild(bDiv);
+
+            // Move logic
+            const moveInterval = setInterval(() => {
+                if(!isGameRunning || bDiv.classList.contains('caught')) {
+                    clearInterval(moveInterval);
+                    return;
+                }
+                const newLeft = Math.random() * maxLeft;
+                const newTop = Math.random() * (maxTop - 40);
+                bDiv.style.left = newLeft + 'px';
+                bDiv.style.top = newTop + 'px';
+            }, 1000);
+            
+            // Disappear logic
+            setTimeout(() => {
+                if(bDiv.parentNode && !bDiv.classList.contains('caught')) {
+                    bDiv.style.opacity = '0';
+                    setTimeout(() => { 
+                        bDiv.remove(); 
+                        clearInterval(moveInterval);
+                    }, 500);
+                }
+            }, 3000);
+        }
+
+        function catchButterfly(e, el) {
+            if(!isGameRunning || el.classList.contains('caught')) return;
+            e.stopPropagation();
+            
+            // Net swish sound
+            playSound('swish');
+            
+            butterflyScore++;
+            document.getElementById('gameScore').textContent = `Score: ${butterflyScore}`;
+            
+            el.classList.add('caught');
+            setTimeout(() => el.remove(), 400);
+        }
+
+        function endGame() {
+            isGameRunning = false;
+            clearInterval(gameInterval);
+            clearInterval(spawnInterval);
+            
+            document.getElementById('finalScore').textContent = butterflyScore;
+            document.getElementById('gameResult').style.display = 'block';
+            playSound('success');
+        }
+
+        // --- FIREWORKS ---
+        
+        function showCelebration() {
+            showScreen('celebrationScreen');
+            startFireworks();
+        }
+
+        function startFireworks() {
+            const colors = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#F473B9'];
+            const container = document.getElementById('celebrationScreen');
+            
+            const fireworkInterval = setInterval(() => {
+                if(!container.classList.contains('active')) {
+                    clearInterval(fireworkInterval);
+                    return;
+                }
+                
+                const x = Math.random() * 100 + '%';
+                const y = Math.random() * 60 + 10 + '%';
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                createExplosion(container, x, y, color);
+            }, 500);
+        }
+
+        function createExplosion(container, x, y, color) {
+            const particles = 20;
+            for(let i=0; i<particles; i++) {
+                const p = document.createElement('div');
+                p.className = 'firework';
+                p.style.left = x;
+                p.style.top = y;
+                p.style.backgroundColor = color;
+                
+                const angle = (Math.PI * 2 * i) / particles;
+                const velocity = 100 + Math.random() * 100;
+                const dx = Math.cos(angle) * velocity + 'px';
+                const dy = Math.sin(angle) * velocity + 'px';
+                
+                p.style.setProperty('--dx', dx);
+                p.style.setProperty('--dy', dy);
+                
+                container.appendChild(p);
+                setTimeout(() => p.remove(), 1000);
+            }
+            playSound('pop'); 
+        }
+
+
+        // --- COMMON SYSTEM ---
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => {
+                s.classList.remove('active');
+            });
+            document.getElementById(id).classList.add('active');
+        }
+
+        function restartGame() {
+            currentQuestion = 0;
+            currentStep = 0;
+            showScreen('questionScreen');
+            initGame();
+        }
+
+        // Audio
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if(type === 'success') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            } else if(type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if(type === 'pop') {
+                // Short pop
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'swish') {
+                // Net swish effect (noise-like)
+                // Web Audio noise is complex, using simple low sine swipe
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.15);
+            }
+        }
+
+        function playAudio() {
+            const text = document.getElementById('questionText').textContent;
+            speak(text);
+        }
+
+        function speak(text) {
+            if('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = 'en-US'; 
+                u.rate = 0.9;
+                window.speechSynthesis.speak(u);
+            }
+        }
+
+        // Start
+        initGame();
+  </script>
+ </body>
+</html>

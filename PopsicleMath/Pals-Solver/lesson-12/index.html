@@ -1,0 +1,1132 @@
+<!doctype html>
+<html lang="en">
+ <head>
+   <link rel="stylesheet" href="../assets/brand.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roll &amp; Subtract!</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      box-sizing: border-box;
+      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive, sans-serif;
+      background: linear-gradient(135deg, #FF6B9D 0%, #FFA07A 50%, #FFD93D 100%);
+      overflow-x: hidden;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .game-wrapper {
+      width: 100%;
+      min-height: 100%;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .game-header {
+      text-align: center;
+      margin-bottom: 15px;
+      width: 100%;
+    }
+
+    .game-title {
+      font-size: 40px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+      margin: 0 0 10px 0;
+    }
+
+    .round-counter {
+      font-size: 20px;
+      color: #ffd700;
+      font-weight: bold;
+      text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+    }
+
+    .game-container {
+      background: white;
+      border-radius: 25px;
+      padding: 20px;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+
+    .instruction-box {
+      background: linear-gradient(135deg, #A8E6CF 0%, #6BCF7F 100%);
+      padding: 15px;
+      border-radius: 15px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .instruction-text {
+      font-size: 20px;
+      color: white;
+      font-weight: bold;
+      margin: 0;
+      text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+    }
+
+    .dice-container {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      min-height: 100px;
+    }
+
+    .dice {
+      width: 90px;
+      height: 90px;
+      background: white;
+      border: 5px solid #333;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: bold;
+      color: #ff6b6b;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .dice:hover {
+      transform: scale(1.05);
+    }
+
+    .dice.rolling {
+      animation: diceRoll 0.5s ease-in-out;
+    }
+
+    @keyframes diceRoll {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(90deg) scale(1.1); }
+      50% { transform: rotate(180deg) scale(0.9); }
+      75% { transform: rotate(270deg) scale(1.1); }
+    }
+
+    .equation-box {
+      background: linear-gradient(135deg, #C7CEEA 0%, #FFB6D9 100%);
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      margin: 20px 0;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .equation {
+      font-size: 36px;
+      font-weight: bold;
+      color: #333;
+      margin: 0;
+    }
+
+    .speaker-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      font-size: 18px;
+      cursor: pointer;
+      margin: 0;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .speaker-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+
+    .speaker-button:active {
+      transform: scale(0.95);
+    }
+
+    .tens-frame-container {
+      margin: 25px auto;
+      max-width: 600px;
+    }
+
+    .tens-frame-title {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #666;
+      margin-bottom: 15px;
+    }
+
+    .tens-frame {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 5px;
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 15px;
+      margin-bottom: 15px;
+    }
+
+    .tens-cell {
+      aspect-ratio: 1;
+      background: white;
+      border: 3px solid #333;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .tens-cell.filled {
+      background: #4CAF50;
+      transform: scale(1.1);
+    }
+
+    .tens-cell.crossed {
+      background: #ffebee;
+      position: relative;
+    }
+
+    .tens-cell.crossed::before,
+    .tens-cell.crossed::after {
+      content: '';
+      position: absolute;
+      width: 80%;
+      height: 3px;
+      background: #ff6b6b;
+      top: 50%;
+      left: 50%;
+    }
+
+    .tens-cell.crossed::before {
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .tens-cell.crossed::after {
+      transform: translate(-50%, -50%) rotate(-45deg);
+    }
+
+
+
+    .answer-options {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 25px 0;
+      flex-wrap: wrap;
+    }
+
+    .answer-btn {
+      width: 85px;
+      height: 85px;
+      font-size: 36px;
+      font-weight: bold;
+      color: white;
+      background: linear-gradient(135deg, #FF6BCF 0%, #9D50FF 100%);
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+
+    .answer-btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    }
+
+    .answer-btn.selected {
+      border: 5px solid #ffd700;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    }
+
+    .answer-btn.correct {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      animation: correctPulse 0.5s ease;
+    }
+
+    .answer-btn.wrong {
+      background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes correctPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .action-button {
+      padding: 18px 35px;
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+      background: linear-gradient(135deg, #FFB347 0%, #FF6B6B 100%);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      display: block;
+      margin: 20px auto;
+    }
+
+    .action-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    }
+
+    .action-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .feedback-box {
+      text-align: center;
+      padding: 18px;
+      border-radius: 15px;
+      margin: 20px 0;
+      font-size: 24px;
+      font-weight: bold;
+      display: none;
+    }
+
+    .feedback-box.show {
+      display: block;
+    }
+
+    .feedback-box.correct {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      color: white;
+      animation: celebration 0.6s ease;
+    }
+
+    .feedback-box.wrong {
+      background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+      color: white;
+    }
+
+    @keyframes celebration {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1) rotate(2deg); }
+    }
+
+    .gift-selection {
+      text-align: center;
+      margin: 30px 0;
+      display: none;
+    }
+
+    .gift-selection.show {
+      display: block;
+    }
+
+    .gift-selection-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .gift-boxes {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .gift-box {
+      width: 100px;
+      height: 100px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+
+    .gift-box:hover {
+      transform: scale(1.1) translateY(-5px);
+    }
+
+    .gift-box.opening {
+      animation: giftOpen 0.8s ease;
+    }
+
+    @keyframes giftOpen {
+      0% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.3) rotate(180deg); }
+      100% { transform: scale(0); }
+    }
+
+    .sticker-reveal {
+      font-size: 70px;
+      text-align: center;
+      margin: 20px 0;
+      display: none;
+      animation: stickerPop 0.5s ease;
+    }
+
+    .sticker-reveal.show {
+      display: block;
+    }
+
+    @keyframes stickerPop {
+      0% { transform: scale(0) rotate(0deg); }
+      50% { transform: scale(1.3) rotate(180deg); }
+      100% { transform: scale(1) rotate(360deg); }
+    }
+
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: #f0f;
+      position: absolute;
+      animation: confettiFall 3s linear;
+    }
+
+    @keyframes confettiFall {
+      to {
+        transform: translateY(100%) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .game-complete {
+      text-align: center;
+      padding: 40px 20px;
+      display: none;
+    }
+
+    .game-complete.show {
+      display: block;
+    }
+
+    .complete-title {
+      font-size: 48px;
+      color: #ffd700;
+      font-weight: bold;
+      text-shadow: 3px 3px 0px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+    }
+
+    .complete-message {
+      font-size: 28px;
+      color: white;
+      font-weight: bold;
+      text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 600px) {
+      .game-wrapper {
+        padding: 10px;
+      }
+
+      .game-title {
+        font-size: 32px;
+      }
+
+      .round-counter {
+        font-size: 18px;
+      }
+
+      .equation {
+        font-size: 28px;
+      }
+
+      .instruction-text {
+        font-size: 18px;
+      }
+
+      .instruction-box {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+
+      .speaker-button {
+        width: 30px;
+        height: 30px;
+        font-size: 16px;
+      }
+
+      .tens-frame {
+        gap: 3px;
+        padding: 10px;
+      }
+
+      .tens-cell {
+        font-size: 18px;
+        border: 2px solid #333;
+      }
+
+
+
+      .answer-btn {
+        width: 70px;
+        height: 70px;
+        font-size: 28px;
+      }
+
+      .action-button {
+        font-size: 18px;
+        padding: 15px 28px;
+      }
+
+      .gift-box {
+        width: 85px;
+        height: 85px;
+      }
+
+      .complete-title {
+        font-size: 36px;
+      }
+
+      .complete-message {
+        font-size: 22px;
+      }
+    }
+
+    @media (min-width: 601px) and (max-width: 900px) {
+      .game-title {
+        font-size: 36px;
+      }
+
+      .equation {
+        font-size: 32px;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+   <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+  <div class="game-wrapper">
+   <div class="game-header">
+    <h1 class="game-title" id="gameTitle">Roll &amp; Subtract!</h1>
+    <div class="round-counter" id="roundCounter">
+     Round 1 of 10
+    </div>
+   </div>
+   <div class="game-container">
+    <div class="instruction-box">
+     <p class="instruction-text" id="instructionText">Count backward to find the answer!</p><button class="speaker-button" id="speakerButton" onclick="speakInstruction()" title="Listen to the instruction">🔊</button>
+    </div>
+    <div id="gameArea">
+     <div class="dice-container">
+      <div class="dice" id="dice">
+       🎲
+      </div>
+     </div><button class="action-button" id="rollButton">Roll the Dice!</button>
+     <div class="equation-box" id="equationBox" style="display: none;">
+      <p class="equation" id="equation">20 - ? = ?</p>
+     </div>
+     <div class="tens-frame-container" id="tensFrameContainer" style="display: none;">
+      <div class="tens-frame-title">
+       👇 Click the circles backward from 20! 👇
+      </div>
+      <div class="tens-frame" id="tensFrame1"></div>
+      <div class="tens-frame" id="tensFrame2"></div><button class="action-button" id="undoButton" style="display: none; margin-top: 15px; padding: 12px 25px; font-size: 16px;">↩️ Undo Last Click</button>
+     </div>
+     <div class="answer-options" id="answerOptions"></div>
+     <div class="feedback-box" id="feedbackBox"></div>
+     <div class="gift-selection" id="giftSelection">
+      <div class="gift-selection-title" id="chooseGiftText">
+       Choose your mystery gift!
+      </div>
+      <div class="gift-boxes" id="giftBoxes">
+       <div class="gift-box" onclick="openGiftBox(0)">
+        <svg viewbox="0 0 100 100" width="100%" height="100%"><rect x="10" y="40" width="80" height="50" fill="#ff6b6b" stroke="#333" stroke-width="2" /> <rect x="10" y="30" width="80" height="15" fill="#ffd700" stroke="#333" stroke-width="2" /> <rect x="45" y="30" width="10" height="60" fill="#ffd700" stroke="#333" stroke-width="2" /> <path d="M50 30 Q30 10 20 30" fill="none" stroke="#ffd700" stroke-width="4" /> <path d="M50 30 Q70 10 80 30" fill="none" stroke="#ffd700" stroke-width="4" />
+        </svg>
+       </div>
+       <div class="gift-box" onclick="openGiftBox(1)">
+        <svg viewbox="0 0 100 100" width="100%" height="100%"><rect x="10" y="40" width="80" height="50" fill="#4CAF50" stroke="#333" stroke-width="2" /> <rect x="10" y="30" width="80" height="15" fill="#FFD700" stroke="#333" stroke-width="2" /> <rect x="45" y="30" width="10" height="60" fill="#FFD700" stroke="#333" stroke-width="2" /> <path d="M50 30 Q30 10 20 30" fill="none" stroke="#FFD700" stroke-width="4" /> <path d="M50 30 Q70 10 80 30" fill="none" stroke="#FFD700" stroke-width="4" />
+        </svg>
+       </div>
+       <div class="gift-box" onclick="openGiftBox(2)">
+        <svg viewbox="0 0 100 100" width="100%" height="100%"><rect x="10" y="40" width="80" height="50" fill="#667eea" stroke="#333" stroke-width="2" /> <rect x="10" y="30" width="80" height="15" fill="#FFD700" stroke="#333" stroke-width="2" /> <rect x="45" y="30" width="10" height="60" fill="#FFD700" stroke="#333" stroke-width="2" /> <path d="M50 30 Q30 10 20 30" fill="none" stroke="#FFD700" stroke-width="4" /> <path d="M50 30 Q70 10 80 30" fill="none" stroke="#FFD700" stroke-width="4" />
+        </svg>
+       </div>
+      </div>
+     </div>
+     <div class="sticker-reveal" id="stickerReveal"></div><button class="action-button" id="nextButton" style="display: none;">Next Round!</button>
+    </div>
+    <div class="game-complete" id="gameComplete">
+     <div class="complete-title">
+      🎉 Game Complete! 🎉
+     </div>
+     <div class="complete-message" id="finalScore">
+      Score: 0/100
+     </div>
+     <div class="complete-message" style="margin-top: 20px; font-size: 20px;">
+      Your Collected Items:
+     </div>
+     <div class="sticker-reveal show" id="collectedItems"></div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "Roll & Subtract!",
+      instruction_text: "Count backward to find the answer!",
+      roll_button_text: "Roll the Dice!",
+      choose_gift_text: "Choose your mystery gift!",
+      background_color: "#FF6B9D",
+      surface_color: "#ffffff",
+      text_color: "#333333",
+      primary_action_color: "#FFB347",
+      secondary_action_color: "#FF6B6B",
+      font_family: "Comic Sans MS",
+      font_size: 16
+    };
+
+    let currentRound = 1;
+    let diceValue = 0;
+    let correctAnswer = 0;
+    let selectedAnswer = null;
+    const totalRounds = 10;
+    let score = 0;
+    let collectedStickers = [];
+    const stickers = ["🌟", "⭐", "✨", "🎉", "🎊", "🏆", "🏆", "🌈", "🚀", "🎈", "🍭", "🎪", "🎨", "🚀", "🎯"];
+
+    async function onConfigChange(config) {
+      const fontFamily = config.font_family || defaultConfig.font_family;
+      const fontSize = config.font_size || defaultConfig.font_size;
+      const baseFontStack = 'cursive, sans-serif';
+
+      document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
+      document.getElementById('instructionText').textContent = config.instruction_text || defaultConfig.instruction_text;
+      document.getElementById('rollButton').textContent = config.roll_button_text || defaultConfig.roll_button_text;
+      document.getElementById('chooseGiftText').textContent = config.choose_gift_text || defaultConfig.choose_gift_text;
+
+      document.getElementById('gameTitle').style.fontFamily = `${fontFamily}, ${baseFontStack}`;
+      document.getElementById('instructionText').style.fontFamily = `${fontFamily}, ${baseFontStack}`;
+      document.querySelector('.equation').style.fontFamily = `${fontFamily}, ${baseFontStack}`;
+
+      document.getElementById('gameTitle').style.fontSize = `${fontSize * 2.5}px`;
+      document.getElementById('instructionText').style.fontSize = `${fontSize * 1.25}px`;
+      document.querySelector('.equation').style.fontSize = `${fontSize * 2.25}px`;
+      document.querySelector('.round-counter').style.fontSize = `${fontSize * 1.25}px`;
+
+      const backgroundColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryActionColor = config.primary_action_color || defaultConfig.primary_action_color;
+      const secondaryActionColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+
+      document.body.style.background = `linear-gradient(135deg, ${backgroundColor} 0%, ${secondaryActionColor} 100%)`;
+      document.querySelector('.game-container').style.background = surfaceColor;
+      document.querySelector('.equation').style.color = textColor;
+
+      const actionButtons = document.querySelectorAll('.action-button');
+      actionButtons.forEach(btn => {
+        btn.style.background = `linear-gradient(135deg, ${primaryActionColor} 0%, ${secondaryActionColor} 100%)`;
+      });
+    }
+
+    let clickedCells = 0;
+    let clickHistory = [];
+
+    function createTensFrame() {
+      const frame1 = document.getElementById('tensFrame1');
+      const frame2 = document.getElementById('tensFrame2');
+      frame1.innerHTML = '';
+      frame2.innerHTML = '';
+
+      for (let i = 0; i < 10; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'tens-cell';
+        cell.id = `cell-${i}`;
+        cell.textContent = '⭕';
+        cell.style.cursor = 'pointer';
+        cell.onclick = () => handleCellClick(i);
+        frame1.appendChild(cell);
+      }
+
+      for (let i = 10; i < 20; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'tens-cell';
+        cell.id = `cell-${i}`;
+        cell.textContent = '⭕';
+        cell.style.cursor = 'pointer';
+        cell.onclick = () => handleCellClick(i);
+        frame2.appendChild(cell);
+      }
+    }
+
+    function handleCellClick(cellIndex) {
+      const cell = document.getElementById(`cell-${cellIndex}`);
+      
+      if (cell.classList.contains('crossed')) {
+        return;
+      }
+
+      if (cellIndex !== 19 - clickedCells) {
+        const feedbackBox = document.getElementById('feedbackBox');
+        feedbackBox.textContent = '💡 Count backward from 20! Click the circles in order!';
+        feedbackBox.className = 'feedback-box wrong show';
+        playWrongSound();
+        setTimeout(() => feedbackBox.classList.remove('show'), 2000);
+        return;
+      }
+
+      playClickSound();
+      cell.classList.add('crossed');
+      cell.textContent = '❌';
+      clickedCells++;
+      clickHistory.push(cellIndex);
+
+      const undoButton = document.getElementById('undoButton');
+      undoButton.style.display = 'block';
+
+      if (clickedCells === diceValue) {
+        setTimeout(() => {
+          document.getElementById('answerOptions').style.display = 'flex';
+          undoButton.style.display = 'none';
+        }, 500);
+      }
+    }
+
+    function undoLastClick() {
+      if (clickHistory.length === 0) {
+        return;
+      }
+
+      const lastCellIndex = clickHistory.pop();
+      const cell = document.getElementById(`cell-${lastCellIndex}`);
+      
+      cell.classList.remove('crossed');
+      cell.textContent = '⭕';
+      clickedCells--;
+
+      if (clickHistory.length === 0) {
+        document.getElementById('undoButton').style.display = 'none';
+      }
+    }
+
+
+
+    // Audio context for sound effects
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(frequency, duration, type = 'sine', volume = 0.3) {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = frequency;
+      oscillator.type = type;
+      
+      gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration);
+    }
+
+    function playClickSound() {
+      playSound(1200, 0.08, 'sine', 0.2);
+      setTimeout(() => playSound(1400, 0.05, 'sine', 0.15), 40);
+    }
+
+    function playCorrectSound() {
+      // Happy celebration melody
+      playSound(523.25, 0.15, 'sine', 0.4); // C5
+      setTimeout(() => playSound(659.25, 0.15, 'sine', 0.4), 120); // E5
+      setTimeout(() => playSound(783.99, 0.15, 'sine', 0.4), 240); // G5
+      setTimeout(() => playSound(1046.50, 0.25, 'sine', 0.5), 360); // C6
+    }
+
+    function playWrongSound() {
+      playSound(250, 0.15, 'sawtooth', 0.3);
+      setTimeout(() => playSound(200, 0.2, 'sawtooth', 0.3), 100);
+    }
+
+    function playDiceRollSound() {
+      // More realistic dice rolling sound
+      for (let i = 0; i < 12; i++) {
+        setTimeout(() => {
+          const freq = 150 + Math.random() * 300;
+          playSound(freq, 0.04, 'square', 0.15 + Math.random() * 0.15);
+        }, i * 40);
+      }
+    }
+
+    function playGiftSound() {
+      // Magical gift opening sound
+      playSound(800, 0.12, 'sine', 0.3);
+      setTimeout(() => playSound(1000, 0.12, 'sine', 0.3), 80);
+      setTimeout(() => playSound(1200, 0.12, 'sine', 0.35), 160);
+      setTimeout(() => playSound(1600, 0.2, 'sine', 0.4), 240);
+    }
+
+    function speakInstruction() {
+      const instructionText = document.getElementById('instructionText').textContent;
+      
+      const utterance = new SpeechSynthesisUtterance();
+      utterance.text = instructionText;
+      utterance.lang = 'en-US';
+      utterance.rate = 0.8;
+      utterance.pitch = 1.2;
+      
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function rollDice() {
+      const dice = document.getElementById('dice');
+      const rollButton = document.getElementById('rollButton');
+      
+      dice.classList.add('rolling');
+      rollButton.disabled = true;
+      playDiceRollSound();
+
+      let rollCount = 0;
+      const rollInterval = setInterval(() => {
+        dice.textContent = Math.floor(Math.random() * 21);
+        rollCount++;
+
+        if (rollCount >= 10) {
+          clearInterval(rollInterval);
+          diceValue = Math.floor(Math.random() * 20) + 1;
+          dice.textContent = diceValue;
+          dice.classList.remove('rolling');
+          playSound(400, 0.2, 'sine');
+          
+          setTimeout(() => {
+            document.querySelector('.dice-container').style.display = 'none';
+            showEquation();
+          }, 500);
+        }
+      }, 100);
+    }
+
+    function showEquation() {
+      correctAnswer = 20 - diceValue;
+      clickedCells = 0;
+      clickHistory = [];
+      
+      document.getElementById('equationBox').style.display = 'block';
+      document.getElementById('equation').textContent = `20 - ${diceValue} = ?`;
+      document.getElementById('tensFrameContainer').style.display = 'block';
+      document.getElementById('undoButton').style.display = 'none';
+      
+      prepareTensFrame();
+      showAnswerOptions();
+      
+      document.getElementById('answerOptions').style.display = 'none';
+    }
+
+    function prepareTensFrame() {
+      for (let i = 0; i < 20; i++) {
+        const cell = document.getElementById(`cell-${i}`);
+        cell.classList.remove('crossed');
+        cell.classList.add('filled');
+        cell.textContent = '⭕';
+        cell.style.pointerEvents = 'auto';
+      }
+    }
+
+
+
+    function showAnswerOptions() {
+      const optionsContainer = document.getElementById('answerOptions');
+      optionsContainer.innerHTML = '';
+
+      const answers = [correctAnswer];
+      
+      while (answers.length < 3) {
+        const wrongAnswer = Math.floor(Math.random() * 21);
+        if (!answers.includes(wrongAnswer)) {
+          answers.push(wrongAnswer);
+        }
+      }
+
+      answers.sort(() => Math.random() - 0.5);
+
+      answers.forEach(answer => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = answer;
+        btn.onclick = () => selectAnswer(answer, btn);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(answer, btn) {
+      const allButtons = document.querySelectorAll('.answer-btn');
+      allButtons.forEach(b => {
+        b.classList.remove('selected');
+        b.disabled = true;
+      });
+
+      btn.classList.add('selected');
+      selectedAnswer = answer;
+      
+      checkAnswer();
+    }
+
+    const praises = [
+      '🎉 Excellent! You got it right! 🎉',
+      '⭐ Amazing! Perfect answer! ⭐',
+      '🌟 Wonderful! You are so smart! 🌟',
+      '🏆 Fantastic! Great job! 🏆',
+      '💫 Awesome! You are brilliant! 💫'
+    ];
+
+    function checkAnswer() {
+      if (selectedAnswer === null) {
+        return;
+      }
+
+      const feedbackBox = document.getElementById('feedbackBox');
+      const allButtons = document.querySelectorAll('.answer-btn');
+      
+      if (selectedAnswer === correctAnswer) {
+        score += 10;
+        playCorrectSound();
+
+        allButtons.forEach(btn => {
+          if (parseInt(btn.textContent) === correctAnswer) {
+            btn.classList.add('correct');
+          }
+        });
+
+        const randomPraise = praises[Math.floor(Math.random() * praises.length)];
+        feedbackBox.textContent = randomPraise;
+        feedbackBox.className = 'feedback-box correct show';
+        createConfetti();
+        
+        setTimeout(() => {
+          feedbackBox.classList.remove('show');
+          document.getElementById('giftSelection').classList.add('show');
+        }, 1500);
+      } else {
+        playWrongSound();
+        
+        allButtons.forEach(btn => {
+          if (parseInt(btn.textContent) === selectedAnswer) {
+            btn.classList.add('wrong');
+          } else {
+            btn.disabled = false;
+          }
+        });
+
+        feedbackBox.textContent = '💭 Try again! Count backward carefully! 💭';
+        feedbackBox.className = 'feedback-box wrong show';
+        
+        setTimeout(() => {
+          feedbackBox.classList.remove('show');
+          
+          allButtons.forEach(btn => {
+            btn.classList.remove('wrong');
+            btn.classList.remove('selected');
+            btn.disabled = false;
+          });
+          
+          selectedAnswer = null;
+        }, 2000);
+      }
+    }
+
+    function openGiftBox(boxIndex) {
+      const giftBoxes = document.querySelectorAll('.gift-box');
+      const selectedBox = giftBoxes[boxIndex];
+      
+      selectedBox.classList.add('opening');
+      playGiftSound();
+      
+      giftBoxes.forEach((box, index) => {
+        if (index !== boxIndex) {
+          box.style.opacity = '0.3';
+          box.style.pointerEvents = 'none';
+        }
+      });
+
+      setTimeout(() => {
+        document.getElementById('giftSelection').classList.remove('show');
+        
+        const randomSticker = stickers[Math.floor(Math.random() * stickers.length)];
+        collectedStickers.push(randomSticker);
+        const stickerReveal = document.getElementById('stickerReveal');
+        stickerReveal.textContent = randomSticker;
+        stickerReveal.classList.add('show');
+        
+        setTimeout(() => {
+          stickerReveal.classList.remove('show');
+          nextRound();
+        }, 1500);
+      }, 800);
+    }
+
+    function createConfetti() {
+      const colors = ['#ff6b6b', '#ffd700', '#4CAF50', '#667eea', '#f093fb'];
+      
+      for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + '%';
+          confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDelay = Math.random() * 0.5 + 's';
+          document.body.appendChild(confetti);
+          
+          setTimeout(() => confetti.remove(), 3000);
+        }, i * 30);
+      }
+    }
+
+    function nextRound() {
+      currentRound++;
+      
+      if (currentRound > totalRounds) {
+        document.getElementById('gameArea').style.display = 'none';
+        document.getElementById('finalScore').textContent = `Score: ${score}/${totalRounds * 10}`;
+        document.getElementById('collectedItems').textContent = collectedStickers.join(' ');
+        document.getElementById('gameComplete').classList.add('show');
+        createConfetti();
+        return;
+      }
+
+      document.getElementById('roundCounter').textContent = `Round ${currentRound} of ${totalRounds}`;
+      
+      document.getElementById('dice').textContent = '🎲';
+      document.querySelector('.dice-container').style.display = 'flex';
+      document.getElementById('equationBox').style.display = 'none';
+      document.getElementById('tensFrameContainer').style.display = 'none';
+      document.getElementById('undoButton').style.display = 'none';
+      document.getElementById('answerOptions').innerHTML = '';
+      document.getElementById('answerOptions').style.display = 'flex';
+      document.getElementById('feedbackBox').classList.remove('show');
+      document.getElementById('giftSelection').classList.remove('show');
+      document.getElementById('stickerReveal').classList.remove('show');
+      document.getElementById('nextButton').style.display = 'none';
+      document.getElementById('rollButton').style.display = 'block';
+      document.getElementById('rollButton').disabled = false;
+
+      const giftBoxes = document.querySelectorAll('.gift-box');
+      giftBoxes.forEach(box => {
+        box.classList.remove('opening');
+        box.style.opacity = '1';
+        box.style.pointerEvents = 'auto';
+      });
+      
+      selectedAnswer = null;
+      clickedCells = 0;
+      clickHistory = [];
+    }
+
+    document.getElementById('rollButton').addEventListener('click', function() {
+      this.style.display = 'none';
+      rollDice();
+    });
+
+    document.getElementById('undoButton').addEventListener('click', undoLastClick);
+    document.getElementById('nextButton').addEventListener('click', nextRound);
+
+    createTensFrame();
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.surface_color || defaultConfig.surface_color,
+              set: (value) => {
+                config.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => {
+                config.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            },
+            {
+              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+              set: (value) => {
+                config.secondary_action_color = value;
+                window.elementSdk.setConfig({ secondary_action_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["game_title", config.game_title || defaultConfig.game_title],
+          ["instruction_text", config.instruction_text || defaultConfig.instruction_text],
+          ["roll_button_text", config.roll_button_text || defaultConfig.roll_button_text],
+          ["choose_gift_text", config.choose_gift_text || defaultConfig.choose_gift_text]
+        ])
+      });
+
+      onConfigChange(window.elementSdk.config);
+    } else {
+      onConfigChange(defaultConfig);
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b5e79e4f57e4625',t:'MTc2NzA2NTYxMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -1,0 +1,1264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="../assets/brand.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lesson 15 • First semester review</title>
+  <!-- Font Nunito: Rounded and Friendly -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* --- VIBRANT THEME FOR KIDS (3-6YO) --- */
+    :root{
+      --bg-color: #fff9e6; /* Creamy yellow */
+      --card-bg: #ffffff;
+      --text: #4a4a4a;
+      
+      /* Kid Palette */
+      --c-blue: #4CC9F0;
+      --c-pink: #F72585;
+      --c-yellow: #FFD166;
+      --c-green: #06D6A0;
+      --c-purple: #7209B7;
+      
+      --shadow-color: rgba(0,0,0,0.15);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
+    
+    body{
+      font-family: "Nunito", sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      /* Playful background pattern */
+      background-color: var(--bg-color);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(247, 37, 133, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(76, 201, 240, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 50% 50%, rgba(255, 209, 102, 0.15) 0%, transparent 30%);
+      overflow-x: hidden;
+    }
+
+    /* Floating Header Logo */
+    .oodles-logo-container {
+        position: fixed; top: 12px; left: 16px; z-index: 10;
+        background: #fff; padding: 8px 16px; border-radius: 99px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        display: flex; align-items: center; gap: 8px;
+        border: 2px solid var(--c-blue);
+    }
+    .oodles-logo-icon { font-size: 24px; animation: bounce 2s infinite; }
+    .oodles-logo-text { font-size: 20px; font-weight: 900; color: var(--c-blue); letter-spacing: 1px; }
+    
+    @keyframes bounce { 0%, 100% {transform: translateY(0);} 50% {transform: translateY(-5px);} }
+
+    .wrap{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 20px 20px; /* Top padding for logo */
+      display:grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+      min-height: 100vh;
+    }
+
+    /* --- CARDS & PANELS --- */
+    .card{
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 25px var(--shadow-color);
+      border: 3px solid #fff;
+      overflow: hidden;
+      position: relative;
+      display: flex; flex-direction: column;
+    }
+
+    /* Header styling */
+    header{
+      padding: 16px 20px;
+      background: #fdfdfd;
+      border-bottom: 2px dashed #eee;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo {
+      width: 48px; height: 48px; border-radius: 16px;
+      background: #e0f7fa; color: var(--c-blue);
+      display: grid; place-items: center; font-size: 24px;
+      border: 2px solid var(--c-blue);
+    }
+    .t b { display: block; font-size: 16px; color: var(--c-purple); }
+    .t span { display: block; font-size: 13px; color: #888; font-weight: 700; }
+
+    /* Chips (Score pills) */
+    .chips { display: flex; gap: 8px; }
+    .chip {
+      background: var(--c-yellow); color: #7a5c00;
+      border: 2px solid #f0b429;
+      border-radius: 99px; padding: 6px 12px;
+      font-size: 14px; font-weight: 800;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+    }
+
+    /* --- LEFT PANEL --- */
+    .left .body { padding: 20px; background: linear-gradient(to bottom, #fff, #f9f9f9); flex: 1; }
+    .big { font-size: 20px; color: var(--c-pink); margin-bottom: 8px; font-weight: 900; }
+    .sub { font-size: 14px; color: #666; font-weight: 600; line-height: 1.5; }
+
+    /* Buttons - 3D Style */
+    .btnrow { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+    .btn {
+      border: none; border-radius: 16px;
+      padding: 12px 20px; font-size: 16px; font-weight: 800;
+      cursor: pointer; transition: transform 0.1s;
+      display: inline-flex; align-items: center; gap: 8px;
+      position: relative;
+    }
+    .btn:active { transform: translateY(4px); box-shadow: none !important; }
+    
+    .btn.primary {
+      background: var(--c-blue); color: white;
+      box-shadow: 0 6px 0 #2a9ec2;
+    }
+    .btn.ghost {
+      background: #f1f5f9; color: #64748b;
+      box-shadow: 0 6px 0 #cbd5e1;
+    }
+    .btn.info {
+      background: var(--c-purple); color: white;
+      box-shadow: 0 6px 0 #560bad;
+    }
+
+    /* Progress Bar - Candy Stripe */
+    .progress {
+      margin-top: 20px; background: #fff;
+      border: 2px solid #eee; border-radius: 20px; padding: 16px;
+    }
+    .meter {
+      height: 16px; background: #eee; border-radius: 99px; overflow: hidden;
+      border: 2px solid #e2e8f0;
+    }
+    .bar {
+      height: 100%; width: 0%;
+      background: repeating-linear-gradient(
+        45deg,
+        var(--c-green),
+        var(--c-green) 10px,
+        #4ade80 10px,
+        #4ade80 20px
+      );
+      transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .small { font-size: 13px; color: #64748b; font-weight: 700; }
+
+    /* Skills Grid */
+    .skills { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .skill {
+      background: #fff; border: 2px solid #e2e8f0; border-radius: 18px;
+      padding: 8px 10px; display: flex; align-items: center; gap: 10px;
+      cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 4px 0 #e2e8f0;
+      /* Ensure fit */
+      min-width: 0;
+    }
+    .skill:hover { transform: translateY(-3px); border-color: var(--c-blue); }
+    .skill:active { transform: translateY(2px); box-shadow: none; }
+    
+    /* Styles for completed skills - Dimmed and 'Done' look */
+    .skill.done {
+        border-color: rgba(203, 213, 225, 0.5);
+        cursor: not-allowed;
+        opacity: 0.6; /* Mờ đi */
+        filter: grayscale(0.6); /* Xám đi */
+        background: rgba(241, 245, 249, 0.5);
+        box-shadow: none;
+        transform: none;
+    }
+    
+    .sico {
+      width: 36px; height: 36px; border-radius: 12px;
+      background: #fff0f6; color: var(--c-pink);
+      display: grid; place-items: center; font-size: 18px;
+      border: 2px solid #fcc2d7;
+      flex-shrink: 0;
+    }
+    /* Text layout fixes for skills */
+    .skill div:last-child { flex: 1; min-width: 0; display:flex; flex-direction:column; justify-content:center; }
+    .skill b { font-size: 13px; color: #334155; display:block; line-height: 1.2; margin-bottom: 2px; }
+    .skill span { font-size: 11px; font-weight: 700; color: #94a3b8; display:block; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* --- RIGHT PANEL --- */
+    .right .stage { padding: 20px; background: #ecfeff; flex: 1; display: flex; flex-direction: column;}
+    .panel {
+      background: #fff; border-radius: 24px; border: 4px solid var(--c-blue);
+      padding: 20px; flex: 1; position: relative;
+      box-shadow: 0 12px 0 rgba(76, 201, 240, 0.3);
+      overflow-y: auto;
+    }
+
+    .qtop { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .qtitle { font-size: 18px; color: var(--c-blue); font-weight: 800; }
+    .tag {
+      background: var(--c-yellow); color: #854d0e;
+      padding: 6px 12px; border-radius: 20px; font-weight: 800; font-size: 13px;
+    }
+
+    /* Question Box */
+    .question {
+      background: #fff; border: 3px dashed #cbd5e1; border-radius: 20px;
+      padding: 20px; margin-bottom: 20px;
+    }
+    .prompt { font-size: 24px; color: #1e293b; margin: 0; line-height: 1.3; font-weight: 800; }
+    .hint { margin-top: 10px; color: #64748b; font-style: italic; font-weight: 600; display: block; }
+    
+    .speak-btn {
+      width: 44px; height: 44px; background: var(--c-blue); color: white;
+      border-radius: 50%; display: grid; place-items: center; font-size: 20px;
+      cursor: pointer; box-shadow: 0 4px 0 #2a9ec2; transition: 0.2s;
+      flex-shrink: 0;
+    }
+    .speak-btn:active { transform: translateY(4px); box-shadow: none; }
+
+    /* Choices */
+    .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .choice {
+      background: #fff; border: 3px solid #e2e8f0; border-radius: 20px;
+      padding: 16px; font-size: 24px; color: #334155; font-weight: 900;
+      min-height: 80px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 6px 0 #cbd5e1; transition: 0.1s;
+    }
+    .choice:hover { transform: translateY(-4px); border-color: var(--c-blue); }
+    .choice:active { transform: translateY(4px); box-shadow: 0 0 0; }
+
+    .choice.correct {
+      background: #dcfce7; border-color: var(--c-green); color: var(--c-green);
+      box-shadow: 0 6px 0 #16a34a;
+    }
+    .choice.wrong {
+      background: #fee2e2; border-color: var(--c-pink); color: var(--c-pink);
+      box-shadow: 0 6px 0 #d90429;
+    }
+
+    /* Feedback */
+    .feedback {
+      margin-top: 20px; padding: 16px; border-radius: 16px;
+      background: #fff; border: 4px solid; display: flex; flex-direction: column; gap: 12px;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .feedback.good { border-color: var(--c-green); background: #f0fdf4; }
+    .feedback.bad { border-color: var(--c-pink); background: #fff1f2; }
+    .msg { font-size: 20px; font-weight: 900; }
+
+    /* Explain Box */
+    .explain-box {
+      background: #fff; border: 2px dashed var(--c-blue); border-radius: 16px;
+      padding: 14px; font-size: 16px; color: #334155; line-height: 1.5;
+    }
+
+    /* Visual Components (Count, Clock, Graph) - ADJUSTED FOR RICH CONTENT */
+    .count-grid {
+      background: #fffbeb; border: 3px solid #fcd34d; border-radius: 20px;
+      padding: 15px; gap: 8px; margin-top: 10px;
+      display: flex; flex-wrap: wrap; justify-content: center;
+    }
+    .count-item { 
+      font-size: 36px; /* Adjusted size for more items */
+      filter: drop-shadow(0 3px 0 rgba(0,0,0,0.1)); 
+      animation: popIn 0.4s backwards;
+    }
+
+    .two-cols{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items:center; }
+
+    .clock {
+      width: 220px; height: 220px; border: 12px solid var(--c-blue);
+      background: #fff; box-shadow: 0 10px 0 rgba(76, 201, 240, 0.3);
+      border-radius: 50%; position: relative; margin: 0 auto;
+    }
+    .clock .center {
+      width:16px; height:16px; border-radius:50%; background:#334155;
+      position:absolute; left:50%; top:50%; transform: translate(-50%,-50%); z-index: 5;
+    }
+    .hand { position:absolute; left:50%; top:50%; transform-origin: bottom center; border-radius: 99px; z-index: 4; }
+    .hand.hour { background: var(--c-pink); width: 10px; height: 60px; }
+    .hand.minute { background: var(--c-blue); width: 6px; height: 85px; }
+    .tick { position:absolute; left:50%; top:50%; width:4px; height:10px; background: #cbd5e1; border-radius: 2px; }
+    .num { font-size: 20px; color: #334155; font-weight: 900; position:absolute; left:50%; top:50%; transform: translate(-50%,-50%); }
+
+    .tenframe {
+      border: 4px solid #94a3b8; background: #e2e8f0; gap: 8px; padding: 10px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(5, 1fr); border-radius: 12px;
+    }
+    .cell { 
+      background: #fff; border: none; border-radius: 8px; 
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); aspect-ratio: 1/1; 
+      display: grid; place-items: center;
+    }
+    .dot { width: 24px; height: 24px; border-radius: 50%; background: var(--c-green); box-shadow: inset -2px -4px rgba(0,0,0,0.2); }
+    .dot.blue { background: var(--c-blue); }
+
+    /* Graph */
+    .graph { width: 100%; padding: 10px; border-radius: 16px; background: #fff; border: 2px solid #e2e8f0; }
+    .gline { 
+        display: flex; 
+        align-items: center; 
+        gap: 12px; 
+        padding: 8px; 
+        border-bottom: 1px solid #f1f5f9; 
+    }
+    .gline:last-child { border-bottom: none; }
+    
+    .gleft { flex-shrink: 0; font-weight:bold; min-width:80px; }
+    
+    .icons { 
+        display: flex; 
+        gap: 4px; 
+        /* Ensure single line */
+        flex-wrap: nowrap; 
+        overflow-x: auto; 
+        flex: 1;
+        justify-content: flex-start;
+        padding-bottom: 4px;
+        /* Hide scrollbar for cleaner look generally, but keep functionality */
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+    
+    .miniIcon {
+      width: 24px; height: 24px; border-radius: 6px;
+      background: #e0f2fe; color: var(--c-blue);
+      display: grid; place-items: center; font-size: 14px;
+      flex-shrink: 0; /* Prevent icons from squishing */
+    }
+
+    /* Summary Table */
+    .summary-container {
+      background: #fff; border: 3px solid var(--c-purple); border-radius: 16px;
+      max-height: 300px; margin-top: 20px; width: 100%; overflow-y: auto;
+    }
+    .sum-table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
+    .sum-table th { background: #f3e8ff; color: var(--c-purple); font-size: 15px; padding: 10px; position: sticky; top: 0; }
+    .sum-table td { padding: 10px; border-bottom: 1px solid #f3f4f6; }
+    .st-status { font-size: 20px; text-align: center; }
+    
+    /* Bonus Game */
+    #bonusGame {
+      position: absolute; top:0; left:0; width:100%; height:100%;
+      background: rgba(255,255,255,0.98); z-index: 20; display:none; flex-direction:column;
+    }
+    .timer-badge {
+      background: var(--c-pink); box-shadow: 0 4px 0 #a61e4d; font-size: 18px; padding: 6px 14px;
+      color: white; border-radius: 99px; font-weight: bold;
+    }
+
+    /* Animations */
+    @keyframes popIn { from{transform:scale(0.8); opacity:0;} to{transform:scale(1); opacity:1;} }
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .wrap{ grid-template-columns: 1fr; padding-top: 70px;}
+      .choices { grid-template-columns: 1fr 1fr; }
+      .left { min-height: auto; }
+      .two-cols { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+  <div class="oodles-logo-container">
+    <div class="oodles-logo-icon">🍭</div>
+    <div class="oodles-logo-text">OODLES MATH</div>
+  </div>
+  
+  <div class="wrap">
+    <!-- LEFT SIDEBAR -->
+    <section class="card left">
+      <header>
+        <div class="brand">
+          <div class="logo">📚</div>
+          <div class="t">
+            <b>Review Game</b>
+            <span>Semester 1</span>
+          </div>
+        </div>
+        <div class="chips">
+          <div class="chip" id="chipScore">⭐ 0</div>
+          <div class="chip" id="chipQ">🧩 0/9</div>
+        </div>
+      </header>
+
+      <div class="body">
+        <div class="big">Let's Play! 🎮</div>
+        <div class="sub">
+          Finish 9 fun games to get a prize!
+        </div>
+
+        <div class="btnrow">
+          <button class="btn primary" id="startBtn">▶ Play</button>
+          <button class="btn ghost" id="resetBtn">🔄 Reset</button>
+        </div>
+
+        <div class="progress">
+          <div class="row">
+            <div class="small"><b>Your Progress</b></div>
+            <div class="small" id="mini">Ready?</div>
+          </div>
+          <div class="meter"><div class="bar" id="bar"></div></div>
+        </div>
+
+        <div class="skills" id="skillGrid"></div>
+      </div>
+    </section>
+
+    <!-- MAIN GAME AREA -->
+    <section class="card right">
+      <div class="stage">
+        <div class="panel">
+          <!-- Welcome Screen -->
+          <div class="end" id="welcome">
+            <div style="text-align:center;">
+              <div style="font-size:80px; margin-bottom:10px; filter: drop-shadow(0 8px 0 rgba(0,0,0,0.1));">🌈</div>
+              <h2 style="font-size: 32px; color: var(--c-purple); margin: 10px 0;">Are you ready?</h2>
+              <p style="font-size: 18px; color: #666;">Press the <b>Play</b> button to start!</p>
+            </div>
+          </div>
+
+          <!-- Quiz Screen -->
+          <div id="quiz" style="display:none;">
+            <div class="qtop">
+              <div class="qtitle" id="qTitle">Question 1</div>
+              <div class="tag" id="qTag">Counting</div>
+            </div>
+
+            <div class="question" id="qBox"></div>
+            
+            <div class="choices" id="choices"></div>
+
+            <div class="feedback" id="feedback" style="display:none;">
+              <div class="feedback-row">
+                <div class="msg" id="msg">Correct! 🎉</div>
+                <div id="feedBtns" style="display:flex; gap:12px;"></div>
+              </div>
+              <div class="explain-box" id="explainBox"></div>
+            </div>
+          </div>
+
+          <!-- Finish Screen -->
+          <div class="end" id="finish" style="display:none;">
+            <div style="width:100%; max-width:400px; text-align:center;">
+              <div style="font-size:80px; animation: bounce 2s infinite;">🏆</div>
+              <h2 id="finalTitle" style="font-size:36px; color: var(--c-blue); margin: 10px 0;">You did it!</h2>
+              <p id="finalText" style="font-size:18px; color:#555;">Great job reviewing!</p>
+              
+              <!-- Summary Table -->
+              <div id="summary" class="summary-container"></div>
+
+              <div class="btnrow" style="justify-content:center; margin-top:20px;">
+                <button class="btn primary" id="bonusBtn">🎈 Pop Bubbles!</button>
+                <button class="btn ghost" id="playAgain">🔄 Play Again</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bonus Game Overlay -->
+          <div id="bonusGame" style="display:none;">
+            <div class="bonus-header" style="justify-content:space-between; display:flex;">
+               <div style="display:flex; align-items:center; gap:8px;">
+                 <b style="font-size:20px; color:var(--c-blue);">🎈 Pop the Bubbles!</b>
+                 <span id="bonusScoreDisplay" style="font-size:16px; color:#666; font-weight:bold; margin-left:10px;">Score: 0</span>
+               </div>
+               <div class="timer-badge" id="bonusTimer">20s</div>
+            </div>
+            <canvas id="bonusCanvas"></canvas>
+            <div style="text-align:center; padding:10px; font-weight:bold; color:var(--c-pink);">Tap the bubbles fast!</div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+<script>
+  // --- Audio System ---
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  
+  function playTone(freq, type, duration) {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  }
+
+  function sfxCorrect() {
+    playTone(600, 'sine', 0.1);
+    setTimeout(() => playTone(800, 'sine', 0.2), 100);
+    setTimeout(() => playTone(1200, 'sine', 0.4), 200); 
+  }
+
+  function sfxWrong() {
+    playTone(200, 'sawtooth', 0.2);
+    setTimeout(() => playTone(150, 'sawtooth', 0.4), 150);
+  }
+
+  function sfxPop() {
+    playTone(500 + Math.random()*300, 'triangle', 0.1);
+  }
+
+  function speak(text) {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.9;
+      window.speechSynthesis.speak(utterance);
+    }
+  }
+
+  // --- Skills & Logic ---
+  const skills = [
+    { key:"count",  icon:"🔢", name:"Counting", sub:"Count to 20" },
+    { key:"ord",    icon:"🥇", name:"Ordinal", sub:"Order" },
+    { key:"pat",    icon:"🧩", name:"Patterns", sub:"Shapes" },
+    { key:"ten",    icon:"🧮", name:"Tens Frame", sub:"Tens & Ones" },
+    { key:"numPat", icon:"📈", name:"Num Patterns", sub:"Repeating" },
+    { key:"add",    icon:"➕", name:"Addition", sub:"Range 10–20" },
+    { key:"graph",  icon:"📊", name:"Graph", sub:"Read data" },
+    { key:"sub",    icon:"➖", name:"Subtraction", sub:"Range 10–20" },
+    { key:"time",   icon:"🕒", name:"Time", sub:"O’clock" },
+  ];
+
+  const skillGrid = document.getElementById("skillGrid");
+  const skillState = {}; 
+
+  function renderSkills(){
+    skillGrid.innerHTML = "";
+    skills.forEach((s, i) => {
+      const div = document.createElement("div");
+      // If completed, add 'done' class
+      const isDone = skillState[s.key] === true;
+      div.className = "skill" + (isDone ? " done" : "");
+      div.innerHTML = `
+        <div class="sico">${s.icon}</div>
+        <div><b>${s.name}</b><span>${s.sub}</span></div>
+      `;
+      // Only allow clicking if NOT done
+      div.onclick = () => {
+          if(!isDone) jumpToSkill(i);
+      };
+      skillGrid.appendChild(div);
+    });
+  }
+
+  const rand = (a,b)=> Math.floor(Math.random()*(b-a+1))+a;
+  const shuffle = (arr)=> arr.map(v=>({v, r:Math.random()})).sort((a,b)=>a.r-b.r).map(x=>x.v);
+
+  function getUniqueChoices(correct, wrongPool) {
+    const s = new Set([correct]);
+    for(let w of wrongPool) {
+      if(s.size >= 3) break;
+      s.add(w);
+    }
+    return shuffle(Array.from(s)).map(String);
+  }
+
+  // --- Question Builders (Restored Rich Content) ---
+
+  // 1. Counting: Show items with dynamic naming
+  function qCounting(){
+    const n = rand(1, 15); 
+    const pool = [
+      {e:"🍎", n:"apples"},
+      {e:"⭐", n:"stars"},
+      {e:"🎈", n:"balloons"},
+      {e:"🍄", n:"mushrooms"},
+      {e:"🍪", n:"cookies"}
+    ];
+    const picked = pool[rand(0, pool.length-1)];
+    const items = picked.e;
+    const name = picked.n;
+    
+    let itemHtml = "";
+    for(let i=0; i<n; i++) itemHtml += `<div class="count-item" style="animation-delay:${i*0.05}s">${items}</div>`;
+
+    const s = new Set([n]);
+    while(s.size < 3) s.add(rand(1, 15));
+    
+    return {
+      skill:"count", tag:"🔢 Counting",
+      text: `How many ${name} are there?`,
+      explanation: `Count one by one: 1, 2, 3... until you reach <b>${n}</b>.`,
+      html:`<div class="prompt-row">
+              <div class="prompt">How many ${name} are there?</div>
+              <div class="speak-btn" onclick="speak('How many ${name} are there?')">🔊</div>
+            </div>
+            <div class="count-grid">${itemHtml}</div>
+            <div class="hint">Count them one by one!</div>`,
+      choices: shuffle(Array.from(s)).map(String),
+      answer:String(n)
+    };
+  }
+
+  // 2. Ordinal: 10 animals (Rich Content)
+  function qOrdinal(){
+    const pool = ["🐶","🐱","🐰","🦊","🐼","🐯","🐸","🐨","🦁","🐮"];
+    const count = 10;
+    const rowAnimals = shuffle(pool).slice(0, count); 
+    const pos = rand(1,count);
+    const targetAnimal = rowAnimals[pos-1];
+    
+    const ordMap = {
+      1:"1st",2:"2nd",3:"3rd",4:"4th",5:"5th",
+      6:"6th",7:"7th",8:"8th",9:"9th",10:"10th"
+    };
+    const targetOrd = ordMap[pos];
+
+    const rowHtml = rowAnimals.map(a => `<span style="font-size:32px;margin:0 2px">${a}</span>`).join("");
+    
+    const choices = getUniqueChoices(targetAnimal, shuffle(rowAnimals.filter(x=>x!==targetAnimal)));
+    
+    return {
+      skill:"ord", tag:"🥇 Ordinal",
+      text: `Which animal is ${targetOrd}?`,
+      explanation: `Count from the left: 1st, 2nd, 3rd... The <b>${targetOrd}</b> animal is the ${targetAnimal}.`,
+      html:`<div class="prompt-row">
+              <div class="prompt">Which animal is <span style="color:var(--c-pink)">${targetOrd}</span>?</div>
+              <div class="speak-btn" onclick="speak('Which animal is ${targetOrd}?')">🔊</div>
+            </div>
+            <div style="display:flex; justify-content:center; gap:5px; flex-wrap:nowrap; overflow-x:auto; padding:15px 0; background:#f0f9ff; border-radius:12px;">${rowHtml}</div>
+            <div class="hint">Count from left to right →</div>`,
+      choices, answer: targetAnimal
+    };
+  }
+
+  // 3. Patterns: Shapes
+  function qPatterns(){
+    const patterns = [
+      {seq:["🔴","🔵","🔴","🔵","?"], ans:"🔴", wrong:["🔵","🟢"]},
+      {seq:["⭐","⭐","🌙","⭐","⭐","?"], ans:"🌙", wrong:["⭐","☀️"]},
+      {seq:["🟩","🟨","🟧","🟩","🟨","?"], ans:"🟧", wrong:["🟩","🟨"]},
+    ];
+    const p = patterns[rand(0,patterns.length-1)];
+    return {
+      skill:"pat", tag:"🧩 Pattern",
+      text: "What comes next?",
+      explanation: `The pattern repeats: ${p.seq.slice(0,2).join(" ")}. So the next shape is <b>${p.ans}</b>.`,
+      html:`<div class="prompt-row">
+              <div class="prompt">What comes next?</div>
+              <div class="speak-btn" onclick="speak('What comes next?')">🔊</div>
+            </div>
+            <div style="text-align:center;font-size:44px;padding:20px 0;letter-spacing:4px; white-space:nowrap; overflow-x:auto;">
+              ${p.seq.join("")}
+            </div>`,
+      choices: getUniqueChoices(p.ans, p.wrong),
+      answer: p.ans
+    };
+  }
+
+  // 4. Tens & Ones
+  function qTensOnes(){
+    const n = rand(11,19);
+    const ones = n - 10;
+    const cells = [];
+    for(let i=0;i<10;i++) cells.push(`<div class="cell"><div class="dot"></div></div>`);
+    for(let i=0;i<ones;i++) cells.push(`<div class="cell"><div class="dot blue"></div></div>`);
+    while(cells.length < 20) cells.push(`<div class="cell"></div>`);
+
+    const s = new Set([n]);
+    while(s.size < 3) { let w = n + rand(-5, 5); if(w>9 && w<21) s.add(w); }
+
+    return {
+      skill:"ten", tag:"🧮 Tens & Ones",
+      text: "How many dots?",
+      explanation: `10 green dots (one ten) + ${ones} blue dots (ones) = <b>${n}</b>.`,
+      html:`<div class="two-cols">
+              <div>
+                <div class="prompt-row"><div class="prompt">How many?</div><div class="speak-btn" onclick="speak('How many dots?')">🔊</div></div>
+                <div class="hint">Green = 10. Blue = Ones.</div>
+              </div>
+              <div class="tenframe">${cells.join("")}</div>
+            </div>`,
+      choices: shuffle(Array.from(s)).map(String),
+      answer: String(n)
+    };
+  }
+
+  // 5. Number Patterns: REPEATING
+  function qNumberPattern(){
+    const type = rand(0,1); // 0: ABAB, 1: AABAAB
+    const A = rand(1,9);
+    let B = rand(1,9);
+    while(B===A) B = rand(1,9);
+
+    let seq = [];
+    let nextVal = 0;
+
+    if(type === 0) { // 5, 2, 5, 2, 5, ?
+      seq = [A, B, A, B, A];
+      nextVal = B;
+    } else { // 5, 5, 2, 5, 5, ?
+      seq = [A, A, B, A, A];
+      nextVal = B;
+    }
+
+    const seqStr = seq.join(" , ") + " , <span style='color:var(--c-pink)'>?</span>";
+    
+    // Wrong answers
+    const wrongs = [A, B, rand(1,9)].filter(x => x !== nextVal);
+    
+    return {
+      skill:"numPat", tag:"Num Patterns",
+      text: "What number comes next?",
+      explanation: `The numbers repeat in a pattern. The next number is <b>${nextVal}</b>.`,
+      html:`<div class="prompt-row">
+              <div class="prompt">What number comes next?</div>
+              <div class="speak-btn" onclick="speak('What number comes next?')">🔊</div>
+            </div>
+            <div style="text-align:center;font-size:36px;font-weight:950;padding:15px 0; color:#334155;">
+              ${seqStr}
+            </div>
+            <div class="hint">Look for the repeating pattern!</div>`,
+      choices: getUniqueChoices(String(nextVal), wrongs.map(String)),
+      answer: String(nextVal)
+    };
+  }
+
+  // 6. Addition Story: HARDER (Sum 10-20)
+  function qAdditionStory(){
+    const a = rand(5,9);
+    const b = rand(5,9);
+    const ans = a + b;
+    const s = new Set([ans]);
+    while(s.size < 3) s.add(ans + rand(-2,3));
+    
+    return {
+      skill:"add", tag:"Addition",
+      text: `${a} apples plus ${b} apples. How many in total?`,
+      explanation: `Start with ${a}, and count on ${b} more. ${a} + ${b} = <b>${ans}</b>.`,
+      html:`<div class="prompt-row">
+              <div class="prompt">Story Time!</div>
+              <div class="speak-btn" onclick="speak('There are ${a} apples, and ${b} more. How many in total?')">🔊</div>
+            </div>
+            <div style="font-size:20px;font-weight:900;line-height:1.4; margin-bottom:10px; color:#334155;">
+              There are <span style="color:var(--c-pink)">${a}</span> apples 🍎.<br>
+              Mom buys <span style="color:var(--c-blue)">${b}</span> more apples 🍎.<br>
+              How many apples in total?
+            </div>
+            <div class="hint">${a} + ${b} = ?</div>`,
+      choices: shuffle(Array.from(s).filter(x=>x>0)).map(String),
+      answer: String(ans)
+    };
+  }
+
+  // 7. Graph
+  function qPictureGraph(){
+    const cats = [{name:"Cats", icon:"🐱"}, {name:"Dogs", icon:"🐶"}, {name:"Fish", icon:"🐠"}];
+    let counts = shuffle([2,3,4,5]).slice(0,3);
+    const data = cats.map((c,i)=>({ ...c, n: counts[i] }));
+    const maxItem = data.reduce((m,x)=> x.n>m.n?x:m, data[0]);
+
+    const graphHtml = data.map(d=>{
+      const icons = Array.from({length:d.n}, ()=>`<span class="miniIcon">${d.icon}</span>`).join("");
+      return `<div class="gline"><div class="gleft" style="font-weight:bold; min-width:80px;">${d.icon} ${d.name}</div><div class="icons">${icons}</div></div>`;
+    }).join("");
+
+    const wrongs = shuffle(data.filter(d=>d.name!==maxItem.name)).slice(0,2).map(d=>d.name);
+    
+    return {
+      skill:"graph", tag:"Graph",
+      text: "Which group has the most?",
+      explanation: `Look at the rows. <b>${maxItem.name}</b> has ${maxItem.n}, which is the most.`,
+      html:`<div class="two-cols">
+              <div>
+                <div class="prompt-row"><div class="prompt">Which has the most?</div><div class="speak-btn" onclick="speak('Which group has the most?')">🔊</div></div>
+                <div class="hint">Look at the rows.</div>
+              </div>
+              <div class="graph">${graphHtml}</div>
+            </div>`,
+      choices: shuffle([maxItem.name, ...wrongs]),
+      answer: maxItem.name,
+      choiceLabels: {"Cats":"🐱 Cats","Dogs":"🐶 Dogs","Fish":"🐠 Fish"}
+    };
+  }
+
+  // 8. Subtraction: HARDER (Total 12-20)
+  function qSubtraction(){
+    const total = rand(12,20);
+    const take = rand(3, 9);
+    const ans = total - take;
+    const s = new Set([ans]);
+    while(s.size < 3) s.add(ans + rand(-2,3));
+
+    return {
+      skill:"sub", tag:"Subtraction",
+      text: `${total} balloons. ${take} pop. How many left?`,
+      explanation: `You have ${total}, and ${take} go away. ${total} - ${take} = <b>${ans}</b>.`,
+      html:`<div class="prompt-row">
+              <div class="prompt">How many left?</div>
+              <div class="speak-btn" onclick="speak('You have ${total} balloons. ${take} fly away. How many left?')">🔊</div>
+            </div>
+            <div style="font-size:20px;font-weight:900;line-height:1.4; color:#334155;">
+              You have <span style="color:var(--c-pink)">${total}</span> balloons 🎈.<br>
+              <span style="color:var(--c-blue)">${take}</span> fly away 💨.<br>
+              How many left?
+            </div>
+            <div class="hint">${total} − ${take} = ?</div>`,
+      choices: shuffle(Array.from(s).filter(x=>x>=0)).map(String),
+      answer: String(ans)
+    };
+  }
+
+  // 9. Time
+  function qTimeOclock(){
+    const hour = rand(1,12);
+    const s = new Set([hour]);
+    while(s.size < 3) s.add(rand(1,12));
+    
+    // Updated Ticks logic: Rotate then translate to rim
+    const ticks = Array.from({length:12}, (_,i)=> {
+        const deg = i * 30;
+        return `<div class="tick" style="transform: translate(-50%, -50%) rotate(${deg}deg) translateY(-88px)"></div>`;
+    }).join("");
+
+    // Updated Nums logic: Slightly smaller radius
+    const nums = Array.from({length:12}, (_,i)=>{
+      const deg = (i+1)*30, r = 68;
+      const x = Math.sin(deg*Math.PI/180)*r, y = -Math.cos(deg*Math.PI/180)*r;
+      return `<div class="num" style="transform: translate(${x}px, ${y}px) translate(-50%,-50%);">${i+1}</div>`;
+    }).join("");
+
+    return {
+      skill:"time", tag:"Time",
+      text: "What time is it?",
+      explanation: `The big hand is on 12. The small hand is on ${hour}. It is <b>${hour}:00</b>.`,
+      html:`<div class="two-cols">
+              <div>
+                  <div class="prompt-row"><div class="prompt">What time is it?</div><div class="speak-btn" onclick="speak('What time is it?')">🔊</div></div>
+                  <div class="hint">The big hand is on 12.</div>
+              </div>
+              <div class="clock">
+                ${ticks}${nums}
+                <div class="hand hour" style="transform: translate(-50%,-100%) rotate(${hour*30}deg);"></div>
+                <div class="hand minute" style="transform: translate(-50%,-100%) rotate(0deg);"></div>
+                <div class="center"></div>
+              </div>
+            </div>`,
+      choices: shuffle(Array.from(s)).map(h=>`${h}:00`),
+      answer: `${hour}:00`
+    };
+  }
+
+  const builders = [
+    qCounting, qOrdinal, qPatterns, qTensOnes, qNumberPattern,
+    qAdditionStory, qPictureGraph, qSubtraction, qTimeOclock
+  ];
+
+  // --- Game Engine ---
+  let order = [], idx = 0, score = 0, locked = false;
+  let currentQuestionFailed = false; // Track if current question was missed
+  let currentQData = null; // Store current question data for explanation
+  
+  // History Tracking
+  let historyLog = []; // Stores { tag, questionText, isCorrect, answer, userAnswer }
+  let historyRecordedForThisQuestion = false;
+
+  const els = {
+    start: document.getElementById("startBtn"),
+    reset: document.getElementById("resetBtn"),
+    welcome: document.getElementById("welcome"),
+    quiz: document.getElementById("quiz"),
+    finish: document.getElementById("finish"),
+    qTitle: document.getElementById("qTitle"),
+    qTag: document.getElementById("qTag"),
+    qBox: document.getElementById("qBox"),
+    choices: document.getElementById("choices"),
+    feedback: document.getElementById("feedback"),
+    feedBtns: document.getElementById("feedBtns"),
+    msg: document.getElementById("msg"),
+    explainBox: document.getElementById("explainBox"),
+    score: document.getElementById("chipScore"),
+    qNum: document.getElementById("chipQ"),
+    playAgain: document.getElementById("playAgain"),
+    bonusBtn: document.getElementById("bonusBtn"),
+    bonusGame: document.getElementById("bonusGame"),
+    bar: document.getElementById("bar"),
+    mini: document.getElementById("mini"),
+    summary: document.getElementById("summary")
+  };
+
+  function init(){
+    renderSkills();
+    reset();
+  }
+
+  function start(){
+    score = 0; idx = 0; locked = false;
+    historyLog = [];
+    order = shuffle(builders.map((_,i)=>i));
+    for(const k in skillState) skillState[k] = false;
+    renderSkills();
+    
+    els.welcome.style.display = "none";
+    els.finish.style.display = "none";
+    els.quiz.style.display = "block";
+    
+    updateUI();
+    loadQuestion();
+    
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function reset(){
+    score = 0; idx = 0; 
+    els.welcome.style.display = "grid";
+    els.quiz.style.display = "none";
+    els.finish.style.display = "none";
+    els.score.textContent = "⭐ 0";
+    els.qNum.textContent = "🧩 0/9";
+    els.bar.style.width = "0%";
+    els.mini.textContent = "Ready?";
+  }
+
+  function updateUI(){
+    els.score.textContent = `⭐ ${score}`;
+    els.qNum.textContent = `🧩 ${Math.min(idx+1, 9)}/9`;
+    els.bar.style.width = `${Math.round((idx/9)*100)}%`;
+  }
+  
+  // New function to jump to a specific skill
+  function jumpToSkill(targetSkillIndex) {
+      // 1. Check if we are already finished with the game
+      if (els.finish.style.display === "grid") return;
+      if (els.welcome.style.display === "grid") return;
+
+      const currentPos = order.indexOf(targetSkillIndex);
+
+      // 2. Check if the target skill is already done (located before current index)
+      if (currentPos < idx) {
+          return; 
+      }
+
+      // 3. Logic for switching
+      if (locked) {
+          // User finished current question.
+          
+          // If clicking the SAME skill that was just finished (currentPos === idx)
+          if (currentPos === idx) {
+              return; // Do nothing. Prevent re-playing.
+          }
+
+          // Case: User wants to jump to a NEW skill from the "Correct" screen
+          // Move to next slot
+          idx++;
+          locked = false;
+          if(idx >= 9) {
+              finishGame();
+              return;
+          }
+          
+          // Swap the target skill into the new current position
+          const newPos = order.indexOf(targetSkillIndex); // Re-find index
+          const temp = order[idx];
+          order[idx] = order[newPos];
+          order[newPos] = temp;
+
+          // Reload
+          updateUI();
+          loadQuestion();
+      } else {
+          // User hasn't answered yet, just switching active question
+          // If clicking the current active skill, do nothing
+          if (currentPos === idx) return;
+
+          // Swap current active with target
+          const temp = order[idx];
+          order[idx] = order[currentPos];
+          order[currentPos] = temp;
+
+          updateUI();
+          loadQuestion();
+      }
+  }
+
+  function loadQuestion(){
+    els.feedback.style.display = "none";
+    els.explainBox.style.display = "none";
+    currentQuestionFailed = false; 
+    historyRecordedForThisQuestion = false;
+    
+    currentQData = builders[order[idx]]();
+    const q = currentQData;
+    
+    els.qTitle.textContent = `Question ${idx+1}`;
+    els.qTag.textContent = q.tag;
+    els.qBox.innerHTML = q.html;
+    
+    els.choices.innerHTML = "";
+    const labels = q.choiceLabels || {};
+    q.choices.forEach(c=>{
+      const btn = document.createElement("div");
+      btn.className = "choice";
+      btn.textContent = labels[c] || c;
+      btn.onclick = ()=> checkAnswer(btn, c, q.answer, q.skill);
+      els.choices.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(btn, choice, ans, skill){
+    if(locked) return;
+    
+    // Log history ONLY on the very first attempt for this question
+    if(!historyRecordedForThisQuestion) {
+        historyLog.push({
+            tag: currentQData.tag,
+            text: currentQData.text,
+            userCorrect: (choice === ans),
+            correctAnswer: ans
+        });
+        historyRecordedForThisQuestion = true;
+    }
+    
+    if(choice === ans){
+      // CORRECT
+      locked = true;
+      btn.classList.add("correct");
+      sfxCorrect();
+      
+      if(!currentQuestionFailed) {
+        score++;
+      }
+      
+      skillState[skill] = true;
+      renderSkills();
+      showFeedback(true, "✅ Correct!");
+    } else {
+      // WRONG
+      currentQuestionFailed = true; 
+      btn.classList.add("wrong");
+      sfxWrong();
+      showFeedback(false, "❌ Try again!");
+    }
+  }
+
+  function showFeedback(isGood, text){
+    els.feedback.style.display = "flex";
+    els.feedback.className = "feedback " + (isGood ? "good" : "bad");
+    els.msg.textContent = text;
+    els.feedBtns.innerHTML = ""; // Clear buttons
+
+    if(isGood){
+      // Show "Explain" and "Next" buttons
+      const explainBtn = document.createElement("button");
+      explainBtn.className = "btn info";
+      explainBtn.innerHTML = "💡 Explain";
+      explainBtn.onclick = toggleExplanation;
+      
+      const nextBtn = document.createElement("button");
+      nextBtn.className = "btn primary";
+      nextBtn.innerHTML = (idx === 8) ? "Finish 🏁" : "Next ➜";
+      nextBtn.onclick = nextQuestion;
+
+      els.feedBtns.appendChild(explainBtn);
+      els.feedBtns.appendChild(nextBtn);
+    } else {
+      // Show "Try Again" button
+      const tryBtn = document.createElement("button");
+      tryBtn.className = "btn primary";
+      tryBtn.innerHTML = "Try Again ↺";
+      tryBtn.onclick = () => {
+         // Reset UI for retry
+         document.querySelectorAll(".choice.wrong").forEach(el => el.classList.remove("wrong"));
+         els.feedback.style.display = "none";
+      };
+      els.feedBtns.appendChild(tryBtn);
+    }
+  }
+
+  function toggleExplanation(){
+     if(els.explainBox.style.display === "block"){
+         els.explainBox.style.display = "none";
+     } else {
+         els.explainBox.style.display = "block";
+         els.explainBox.innerHTML = currentQData.explanation || "No explanation available.";
+     }
+  }
+
+  function nextQuestion(){
+    if(!locked) return;
+    locked = false;
+    idx++;
+    if(idx >= 9) finishGame();
+    else {
+      updateUI();
+      loadQuestion();
+    }
+  }
+
+  function finishGame(){
+    els.quiz.style.display = "none";
+    els.finish.style.display = "grid";
+    
+    document.getElementById("finalTitle").textContent = (score>=7) ? "Super Star! 🌟" : "Good Job! 👍";
+    document.getElementById("finalText").innerHTML = `You got <b>${score}/9</b> correct!<br>Let's play a bonus game now!`;
+    
+    els.bar.style.width = "100%";
+    els.mini.textContent = "Completed";
+
+    // Build Summary Table
+    let tableHtml = `
+      <table class="sum-table">
+        <thead>
+          <tr>
+            <th width="50">Result</th>
+            <th>Question & Answer</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    historyLog.forEach(log => {
+       const statusIcon = log.userCorrect ? "✅" : "❌";
+       tableHtml += `
+         <tr>
+           <td class="st-status">${statusIcon}</td>
+           <td>
+             <div class="st-q">${log.text}</div>
+             <div class="st-ans">Correct Answer: <b>${log.correctAnswer}</b></div>
+           </td>
+         </tr>
+       `;
+    });
+
+    tableHtml += `</tbody></table>`;
+    els.summary.innerHTML = tableHtml;
+  }
+
+  // --- Bonus Game: Bubble Pop ---
+  let bonusLoop;
+  let bonusTimerInterval;
+  let bonusTime = 20; // 20 seconds
+  let bonusScore = 0;
+  let bubbles = [];
+  const cvs = document.getElementById("bonusCanvas");
+  const ctx = cvs.getContext("2d");
+  const bonusTimerEl = document.getElementById("bonusTimer");
+  const bonusScoreEl = document.getElementById("bonusScoreDisplay");
+
+  function startBonus(){
+    els.bonusGame.style.display = "flex";
+    
+    const rect = els.bonusGame.getBoundingClientRect();
+    cvs.width = rect.width;
+    cvs.height = rect.height - 50; 
+    
+    bonusTime = 20;
+    bonusScore = 0;
+    bonusTimerEl.textContent = bonusTime + "s";
+    bonusScoreEl.textContent = "Score: " + bonusScore;
+    
+    bubbles = [];
+    for(let i=0; i<15; i++) spawnBubble();
+    
+    if(bonusLoop) cancelAnimationFrame(bonusLoop);
+    if(bonusTimerInterval) clearInterval(bonusTimerInterval);
+    
+    updateBonus();
+    
+    bonusTimerInterval = setInterval(() => {
+      bonusTime--;
+      bonusTimerEl.textContent = bonusTime + "s";
+      if(bonusTime <= 0){
+        endBonusGame();
+      }
+    }, 1000);
+  }
+  
+  function endBonusGame(){
+    clearInterval(bonusTimerInterval);
+    cancelAnimationFrame(bonusLoop);
+    alert(`Time's up! ⏰\nYou popped ${bonusScore} bubbles!`);
+    els.bonusGame.style.display = "none";
+  }
+
+  function spawnBubble(){
+    const r = rand(30, 50);
+    bubbles.push({
+      x: rand(r, cvs.width-r),
+      y: cvs.height + r + rand(0, 100),
+      r: r,
+      dy: rand(2, 5) * 0.5,
+      color: `hsl(${rand(0,360)}, 80%, 60%)`,
+      txt: ["⭐","❤️","🎈"][rand(0,2)]
+    });
+  }
+
+  function updateBonus(){
+    ctx.clearRect(0,0, cvs.width, cvs.height);
+    
+    for(let i=0; i<bubbles.length; i++){
+      let b = bubbles[i];
+      b.y -= b.dy;
+      
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+      ctx.fillStyle = b.color;
+      ctx.fill();
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      
+      ctx.fillStyle = "white";
+      ctx.font = `${b.r}px Arial`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(b.txt, b.x, b.y);
+
+      if(b.y < -b.r) {
+        bubbles[i] = { ...b, y: cvs.height + b.r, x: rand(b.r, cvs.width-b.r) };
+      }
+    }
+    bonusLoop = requestAnimationFrame(updateBonus);
+  }
+
+  cvs.addEventListener("pointerdown", (e)=>{
+    if(bonusTime <= 0) return;
+    const rect = cvs.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    
+    for(let i=0; i<bubbles.length; i++){
+      let b = bubbles[i];
+      const dist = Math.sqrt((mx-b.x)**2 + (my-b.y)**2);
+      if(dist < b.r){
+        sfxPop();
+        bonusScore++;
+        bonusScoreEl.textContent = "Score: " + bonusScore;
+        
+        bubbles[i].y = cvs.height + 100;
+        bubbles[i].x = rand(20, cvs.width-20);
+        bubbles[i].color = `hsl(${rand(0,360)}, 80%, 60%)`;
+        break; 
+      }
+    }
+  });
+
+  els.start.onclick = start;
+  els.reset.onclick = reset;
+  els.playAgain.onclick = start;
+  els.bonusBtn.onclick = startBonus;
+  
+  init();
+
+</script>
+</body>
+</html>

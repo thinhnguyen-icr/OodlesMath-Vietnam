@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Number Circle Race</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #FF9F43;
+            --secondary-color: #54a0ff;
+            --accent-color: #ff6b6b;
+            --bg-gradient: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --shadow: 0 10px 25px rgba(0,0,0,0.15);
+            --btn-shadow: 0 8px 0 rgba(0,0,0,0.15);
+        }
+
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        /* Fireworks Canvas */
+        #fireworksCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+        }
+
+        .app-container {
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 1000px;
+            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Typography & Header */
+        .main-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #ffffff;
+            text-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #5f27cd;
+            margin-bottom: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Menu Container */
+        .menu-container {
+            background: var(--glass-bg);
+            border-radius: 40px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 8px solid #ffffff;
+        }
+
+        .menu-section {
+            margin-bottom: 30px;
+            background: #f1f2f6;
+            padding: 20px;
+            border-radius: 25px;
+        }
+
+        /* Chunky Buttons */
+        .option-grid {
+            display: grid;
+            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .option-btn {
+            background: #ffffff;
+            color: #576574;
+            border: 3px solid #c8d6e5;
+            padding: 15px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            top: 0;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+        }
+
+        .option-btn.selected {
+            background: var(--secondary-color);
+            color: white;
+            border-color: #2e86de;
+            box-shadow: 0 4px 0 #2e86de;
+            top: -2px;
+            transform: scale(1.02);
+        }
+
+        .option-btn:active {
+            top: 2px;
+            box-shadow: none;
+        }
+
+        .start-btn {
+            background: #1dd1a1;
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 50px;
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto 0;
+            display: block;
+            box-shadow: 0 8px 0 #10ac84;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .start-btn:hover:not(:disabled) {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 0 #10ac84;
+        }
+
+        .start-btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #10ac84;
+        }
+
+        .start-btn:disabled {
+            background: #bdc3c7;
+            box-shadow: 0 8px 0 #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Game Board */
+        .game-container {
+            background: var(--glass-bg);
+            border-radius: 40px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 8px solid white;
+            width: 100%;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #fff;
+            padding: 15px 25px;
+            border-radius: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .timer-display {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #ff6b6b;
+            background: #fff0f0;
+            padding: 8px 20px;
+            border-radius: 50px;
+        }
+
+        .player-turn-indicator {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #f1f2f6;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            color: #576574;
+        }
+
+        .turn-countdown {
+            width: 40px;
+            height: 40px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        /* Grid & Numbers */
+        .number-grid {
+            display: grid;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px auto;
+            padding: 10px;
+        }
+
+        .grid-level1 { grid-template-columns: repeat(4, 1fr); max-width: 500px; }
+        .grid-level2 { grid-template-columns: repeat(5, 1fr); max-width: 700px; }
+        .grid-level3 { grid-template-columns: repeat(10, 1fr); max-width: 900px; }
+
+        @media (max-width: 600px) {
+            .grid-level3 { grid-template-columns: repeat(5, 1fr); }
+            .number-circle { font-size: 1.5rem !important; }
+        }
+
+        .number-circle {
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            cursor: pointer;
+            color: #576574;
+            box-shadow: 0 6px 0 #dfe6e9;
+            border: 2px solid #dfe6e9;
+            transition: all 0.1s;
+            position: relative;
+            top: 0;
+        }
+
+        .number-circle:active {
+            top: 6px;
+            box-shadow: none;
+        }
+
+        .number-circle.correct {
+            background: #1dd1a1;
+            color: white;
+            border-color: #10ac84;
+            box-shadow: 0 0 0 transparent;
+            top: 6px;
+            animation: popSuccess 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .number-circle.wrong {
+            background: #ff6b6b;
+            color: white;
+            border-color: #ee5253;
+            animation: shake 0.4s;
+        }
+
+        /* Result Screen */
+        .result-container {
+            background: white;
+            border-radius: 40px;
+            padding: 50px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 8px solid #ff9ff3;
+        }
+
+        .result-stats {
+            background: #f8f9fa;
+            border-radius: 30px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .big-stat {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #5f27cd;
+            line-height: 1;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .control-btn {
+            background: #fff;
+            color: #576574;
+            border: 2px solid #c8d6e5;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .control-btn:hover {
+            background: #f1f2f6;
+            transform: translateY(-2px);
+        }
+
+        @keyframes popSuccess {
+            0% { transform: scale(0.5); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
+        }
+    </style>
+</head>
+<body>
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <canvas id="fireworksCanvas"></canvas>
+    
+    <div class="app-container">
+        
+        <!-- Menu Screen -->
+        <div id="menuScreen" class="screen active">
+            <h1 class="main-title">
+                🌈 Number<br>Circle Race
+            </h1>
+            <div class="menu-container">
+                <div class="menu-section">
+                    <div class="section-title">🐣 Choose Level</div>
+                    <div class="option-grid">
+                        <button class="option-btn" data-option="level" data-value="1">Level 1 (1-20)</button>
+                        <button class="option-btn" data-option="level" data-value="2">Level 2 (1-50)</button>
+                        <button class="option-btn" data-option="level" data-value="3">Level 3 (1-100)</button>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="section-title">👫 Players</div>
+                    <div class="option-grid">
+                        <button class="option-btn" data-option="players" data-value="1">1 Player</button>
+                        <button class="option-btn" data-option="players" data-value="2">2 Players</button>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="section-title">🚀 Direction</div>
+                    <div class="option-grid">
+                        <button class="option-btn" data-option="direction" data-value="forward">Count Up ⬆️</button>
+                        <button class="option-btn" data-option="direction" data-value="backward">Count Down ⬇️</button>
+                    </div>
+                </div>
+
+                <button class="start-btn" id="startGameBtn" disabled>Play Now! ▶</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen">
+            <div class="game-container">
+                <div class="game-header">
+                    <div class="timer-display" id="timer">⏱️ 00:00</div>
+                    <div class="player-turn-indicator" id="playerTurn" style="display:none;">
+                        <span id="playerTurnText" style="font-size: 1.2rem;">Player 1</span>
+                        <div class="turn-countdown" id="turnTimer">5</div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-bottom: 20px; font-weight: 600; color: #576574; font-size: 1.5rem;" id="instructionText">
+                    Find number 1
+                </div>
+
+                <div class="number-grid" id="numberGrid"></div>
+
+                <div class="controls">
+                    <button class="control-btn" id="backToMenuBtn">🏠 Home</button>
+                    <button class="control-btn" id="resetGameBtn">🔄 Restart</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="resultScreen" class="screen">
+            <div class="result-container">
+                <div class="result-title" style="font-size: 3rem; color: #1dd1a1; font-weight: 800;">🎉 Amazing!</div>
+                <div class="result-stats" id="resultStats"></div>
+                <div class="controls">
+                    <button class="start-btn" id="playAgainBtn" style="font-size: 1.5rem; padding: 15px;">Play Again 🔄</button>
+                </div>
+                <div style="margin-top: 20px;">
+                     <button class="control-btn" id="backToMenuBtn2">🏠 Home Menu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Game Configuration & State ---
+        let gameSettings = {
+            level: null,
+            players: null,
+            direction: null
+        };
+
+        let gameState = {
+            currentNumber: 1,
+            startTime: null,
+            timerInterval: null,
+            turnTimerInterval: null,
+            turnTimeLeft: 5,
+            player1Correct: 0,
+            player2Correct: 0,
+            currentPlayer: 1,
+            maxNumber: 20,
+            isGameOver: false
+        };
+
+        const levelMaxNumbers = { 1: 20, 2: 50, 3: 100 };
+        const playerColors = { 1: '#ff9f43', 2: '#54a0ff' };
+        
+        // --- Audio System ---
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioContext.state === 'suspended') audioContext.resume();
+            
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+
+            const now = audioContext.currentTime;
+
+            if (type === 'correct') {
+                // Happy "Ding"
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.1);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'wrong') {
+                // Dull "Thud"
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.1);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'complete') {
+                // Victory Fanfare
+                [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, i) => {
+                    const o = audioContext.createOscillator();
+                    const g = audioContext.createGain();
+                    o.connect(g);
+                    g.connect(audioContext.destination);
+                    o.type = 'triangle';
+                    o.frequency.value = freq;
+                    g.gain.setValueAtTime(0.2, now + i*0.1);
+                    g.gain.exponentialRampToValueAtTime(0.01, now + i*0.1 + 0.5);
+                    o.start(now + i*0.1);
+                    o.stop(now + i*0.1 + 0.5);
+                });
+            }
+        }
+
+        // --- Menu Logic ---
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const option = this.dataset.option;
+                const value = this.dataset.value;
+                
+                // Select visual
+                document.querySelectorAll(`[data-option="${option}"]`).forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                // Update settings
+                gameSettings[option] = (option === 'level' || option === 'players') ? parseInt(value) : value;
+                
+                // Check if ready
+                const ready = gameSettings.level && gameSettings.players && gameSettings.direction;
+                document.getElementById('startGameBtn').disabled = !ready;
+            });
+        });
+
+        // --- Navigation ---
+        document.getElementById('startGameBtn').addEventListener('click', () => {
+            showScreen('gameScreen');
+            initGame();
+        });
+        document.getElementById('backToMenuBtn').addEventListener('click', goToMenu);
+        document.getElementById('backToMenuBtn2').addEventListener('click', goToMenu);
+        document.getElementById('resetGameBtn').addEventListener('click', () => {
+            resetGameState();
+            initGame();
+        });
+        document.getElementById('playAgainBtn').addEventListener('click', () => {
+            resetGameState();
+            initGame();
+            showScreen('gameScreen');
+        });
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            
+            // Stop fireworks if leaving result screen
+            if(id !== 'resultScreen') stopFireworks();
+        }
+
+        function goToMenu() {
+            showScreen('menuScreen');
+            resetGameState();
+        }
+
+        // --- Game Logic ---
+        function initGame() {
+            const { level, players, direction } = gameSettings;
+            gameState.maxNumber = levelMaxNumbers[level];
+            gameState.currentNumber = direction === 'forward' ? 1 : gameState.maxNumber;
+            gameState.currentPlayer = 1;
+            gameState.isGameOver = false;
+
+            // Update Instructions
+            updateInstructionText();
+
+            // Setup Players UI
+            const playerTurnUI = document.getElementById('playerTurn');
+            if (players === 2) {
+                playerTurnUI.style.display = 'flex';
+                updatePlayerTurnUI();
+            } else {
+                playerTurnUI.style.display = 'none';
+            }
+
+            generateGrid();
+            if (players === 1) startTimer();
+        }
+
+        function updateInstructionText() {
+            document.getElementById('instructionText').innerHTML = 
+                `Find number <span style="font-size: 2.2rem; color: #ff6b6b; font-weight: 800;">${gameState.currentNumber}</span>`;
+        }
+
+        function generateGrid() {
+            const grid = document.getElementById('numberGrid');
+            grid.innerHTML = '';
+            grid.className = `number-grid grid-level${gameSettings.level}`;
+
+            const numbers = Array.from({length: gameState.maxNumber}, (_, i) => i + 1);
+            // Shuffle
+            for (let i = numbers.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+            }
+
+            numbers.forEach(num => {
+                const circle = document.createElement('div');
+                circle.className = 'number-circle';
+                circle.textContent = num;
+                
+                // Interaction
+                const handleTap = (e) => {
+                    e.preventDefault();
+                    if(gameState.isGameOver) return;
+                    
+                    if (num === gameState.currentNumber) {
+                        // Correct
+                        playSound('correct');
+                        circle.classList.add('correct');
+                        
+                        // Style for 2 players
+                        if (gameSettings.players === 2) {
+                            circle.style.backgroundColor = playerColors[gameState.currentPlayer];
+                            circle.style.borderColor = playerColors[gameState.currentPlayer];
+                            if(gameState.currentPlayer === 1) gameState.player1Correct++;
+                            else gameState.player2Correct++;
+                            switchPlayer();
+                        }
+
+                        // Next number
+                        if (gameSettings.direction === 'forward') gameState.currentNumber++;
+                        else gameState.currentNumber--;
+                        
+                        updateInstructionText();
+                        checkWin();
+                    } else {
+                        // Wrong
+                        if (!circle.classList.contains('correct')) {
+                            playSound('wrong');
+                            circle.classList.add('wrong');
+                            setTimeout(() => circle.classList.remove('wrong'), 400);
+                        }
+                    }
+                };
+
+                circle.addEventListener('mousedown', handleTap);
+                circle.addEventListener('touchstart', handleTap);
+                grid.appendChild(circle);
+            });
+        }
+
+        function checkWin() {
+            const done = gameSettings.direction === 'forward' 
+                ? gameState.currentNumber > gameState.maxNumber 
+                : gameState.currentNumber < 1;
+            
+            if (done) {
+                gameState.isGameOver = true;
+                playSound('complete');
+                stopTimer();
+                clearInterval(gameState.turnTimerInterval);
+                setTimeout(showResults, 800);
+            }
+        }
+
+        function switchPlayer() {
+            gameState.currentPlayer = gameState.currentPlayer === 1 ? 2 : 1;
+            updatePlayerTurnUI();
+        }
+
+        function updatePlayerTurnUI() {
+            const txt = document.getElementById('playerTurnText');
+            const timer = document.getElementById('turnTimer');
+            const box = document.getElementById('playerTurn');
+            
+            txt.textContent = gameState.currentPlayer === 1 ? "🔴 Player 1" : "🔵 Player 2";
+            txt.style.color = playerColors[gameState.currentPlayer];
+            timer.style.backgroundColor = playerColors[gameState.currentPlayer];
+            
+            // Reset Turn Timer
+            clearInterval(gameState.turnTimerInterval);
+            gameState.turnTimeLeft = 5;
+            timer.textContent = 5;
+            
+            gameState.turnTimerInterval = setInterval(() => {
+                gameState.turnTimeLeft--;
+                timer.textContent = gameState.turnTimeLeft;
+                if(gameState.turnTimeLeft <= 0) {
+                    switchPlayer();
+                }
+            }, 1000);
+        }
+
+        // --- Timer Logic ---
+        function startTimer() {
+            gameState.startTime = Date.now();
+            gameState.timerInterval = setInterval(() => {
+                const delta = Math.floor((Date.now() - gameState.startTime) / 1000);
+                const m = Math.floor(delta / 60).toString().padStart(2, '0');
+                const s = (delta % 60).toString().padStart(2, '0');
+                document.getElementById('timer').textContent = `⏱️ ${m}:${s}`;
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(gameState.timerInterval);
+        }
+
+        function resetGameState() {
+            stopTimer();
+            clearInterval(gameState.turnTimerInterval);
+            document.getElementById('timer').textContent = "⏱️ 00:00";
+            gameState.player1Correct = 0;
+            gameState.player2Correct = 0;
+        }
+
+        // --- Results & Fireworks ---
+        function showResults() {
+            showScreen('resultScreen');
+            startFireworks();
+            
+            const content = document.getElementById('resultStats');
+            if (gameSettings.players === 1) {
+                const time = document.getElementById('timer').textContent;
+                content.innerHTML = `
+                    <div style="font-size: 1.5rem; color: #576574;">You finished in</div>
+                    <div class="big-stat">${time.replace('⏱️', '')}</div>
+                    <div style="color: #ff9f43; font-weight: 600;">Great Job! 🌟</div>
+                `;
+            } else {
+                const p1 = gameState.player1Correct;
+                const p2 = gameState.player2Correct;
+                let winner = p1 > p2 ? "Player 1 Wins! 🔴" : (p2 > p1 ? "Player 2 Wins! 🔵" : "It's a Tie! 🤝");
+                
+                content.innerHTML = `
+                    <div style="font-size: 2rem; font-weight: 800; color: #5f27cd; margin-bottom: 20px;">${winner}</div>
+                    <div style="display:flex; justify-content:space-around; font-size: 1.5rem; font-weight: 700;">
+                        <div style="color: ${playerColors[1]}">P1: ${p1}</div>
+                        <div style="color: ${playerColors[2]}">P2: ${p2}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // --- Fireworks System ---
+        let fireworksActive = false;
+        let particles = [];
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function createParticle(x, y) {
+            const count = 30;
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 6 + 2;
+                particles.push({
+                    x: x, 
+                    y: y,
+                    vx: Math.cos(angle) * velocity,
+                    vy: Math.sin(angle) * velocity,
+                    life: 1,
+                    color: `hsl(${Math.random() * 360}, 100%, 60%)`
+                });
+            }
+        }
+
+        function animateFireworks() {
+            if (!fireworksActive) return;
+            
+            // Semi-transparent clear for trails
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; 
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // actually clear to be safe with transparent bg
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.1; // gravity
+                p.life -= 0.02;
+
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            ctx.globalAlpha = 1;
+
+            // Random explosions
+            if (Math.random() < 0.05) {
+                createParticle(
+                    Math.random() * canvas.width, 
+                    Math.random() * canvas.height * 0.6
+                );
+            }
+
+            requestAnimationFrame(animateFireworks);
+        }
+
+        function startFireworks() {
+            fireworksActive = true;
+            canvas.style.display = 'block';
+            particles = [];
+            // Initial blast
+            createParticle(canvas.width/2, canvas.height/2);
+            animateFireworks();
+        }
+
+        function stopFireworks() {
+            fireworksActive = false;
+            canvas.style.display = 'none';
+        }
+
+    </script>
+</body>
+</html>

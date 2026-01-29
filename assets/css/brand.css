@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+  --navy: #1F2A44;
+  --blue: #EAF6FF;
+  --yellow: #FFF3C4;
+  --pink: #FFE8EC;
+  --mint: #E9F9F1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(180deg, #ffffff, #f7fbff);
+  color: var(--navy);
+}
+
+/* ===== Header ===== */
+.header {
+  padding: 64px 24px 40px;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.header p {
+  font-size: 18px;
+  opacity: 0.85;
+}
+
+/* ===== Cards Layout ===== */
+.programs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+  padding: 40px 60px;
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* ===== Program Card ===== */
+.card {
+  background: white;
+  border-radius: 28px;
+  padding: 36px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 28px 50px rgba(0,0,0,0.12);
+}
+
+/* Tag */
+.tag {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+.play {
+  background: var(--yellow);
+}
+
+.thinking {
+  background: var(--mint);
+}
+
+/* Card title */
+.card h2 {
+  font-size: 28px;
+  margin: 8px 0 12px;
+}
+
+/* Card description */
+.card p {
+  font-size: 16px;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+
+/* ===== Footer ===== */
+.footer {
+  text-align: center;
+  padding: 32px;
+  font-size: 14px;
+  opacity: 0.6;
+}

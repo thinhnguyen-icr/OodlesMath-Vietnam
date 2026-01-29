@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Place Value Party!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* === CẤU HÌNH CHUNG === */
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: #87CEEB;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 20%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+        }
+
+        #game-container:not(.hidden) { display: flex; }
+        #game-container {
+            width: 98%;
+            max-width: 1000px;
+            height: 98vh;
+            flex-direction: column;
+            padding: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 0px #3b82f6;
+            border: 4px solid #3b82f6;
+            position: relative;
+        }
+
+        .grid-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-height: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .grid-area {
+                flex-direction: row;
+                gap: 1rem;
+                padding: 1rem;
+            }
+        }
+
+        .panel {
+            background-color: #f0f9ff;
+            border-radius: 1rem;
+            border: 3px solid #bfdbfe;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .source-panel {
+            flex: 1;
+            background-color: #fff7ed;
+            border-color: #fed7aa;
+            z-index: 20;
+        }
+
+        #item-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: flex-start;
+            gap: 10px;
+            overflow-y: auto;
+            flex: 1;
+            padding: 10px;
+        }
+
+        .target-panel {
+            flex: 1.5;
+            background-color: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            height: 100%;
+        }
+
+        .drop-column {
+            background-color: rgba(255, 255, 255, 0.6);
+            border: 3px dashed #cbd5e1;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .drop-column.highlight {
+            background-color: #fffbeb;
+            border-color: #fbbf24;
+            transform: scale(1.02);
+        }
+
+        .drop-area {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            justify-content: center;
+            gap: 5px;
+            padding-top: 5px;
+        }
+
+        .draggable-item {
+            touch-action: none;
+            cursor: grab;
+            transition: transform 0.1s;
+        }
+        
+        .dragging {
+            opacity: 0.8;
+            transform: scale(1.1) rotate(5deg);
+            z-index: 1000 !important;
+            cursor: grabbing;
+            pointer-events: none;
+        }
+
+        .tens-bundle {
+            background-color: #fffbeb;
+            border: 3px solid #f59e0b;
+            box-shadow: 0 4px 0 #d97706;
+            border-radius: 0.8rem;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 2px;
+            padding: 4px;
+            width: auto; 
+            max-width: 100%;
+            align-items: center;
+            justify-items: center;
+        }
+
+        .tens-bundle span {
+            font-size: 1.2rem;
+            line-height: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ones-item {
+            background-color: #f0fdf4;
+            border: 2px solid #22c55e;
+            box-shadow: 0 3px 0 #15803d;
+            border-radius: 0.5rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4rem;
+        }
+
+        .placeholder {
+            background-color: rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+
+        .btn-game {
+            border: none;
+            color: white;
+            font-weight: 700;
+            padding: 0.8rem 1.2rem;
+            border-radius: 1rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            top: 0;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.2);
+            margin: 0.3rem;
+            min-width: 70px;
+        }
+        
+        .btn-game:active { top: 4px; box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
+        .btn-blue { background-color: #3b82f6; }
+        .btn-pink { background-color: #ec4899; }
+        .btn-purple { background-color: #a855f7; }
+
+        .btn-game.locked {
+            background-color: #d1d5db;
+            color: #9ca3af;
+            box-shadow: none;
+            cursor: not-allowed;
+            top: 4px;
+        }
+
+        .btn-wrong {
+            background-color: #ef4444 !important;
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: scale(0.9);
+        }
+
+        #dino-overlay:not(.hidden), #start-overlay:not(.hidden), #completion-overlay:not(.hidden) {
+            display: flex;
+        }
+
+        #dino-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(255, 255, 255, 0.98);
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #dino-canvas {
+            border-bottom: 6px solid #8b5cf6;
+            background-color: #87CEEB; /* Bầu trời xanh */
+            width: 100%;
+            max-width: 600px;
+            height: 250px;
+            border-radius: 1rem;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .dino-info {
+            font-size: 1.5rem;
+            color: #555;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        #start-overlay {
+            background: rgba(255, 255, 255, 0.98);
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .start-btn-large {
+            background: linear-gradient(to bottom, #facc15, #ca8a04);
+            border: 4px solid #fff;
+            padding: 1rem 3rem;
+            font-size: 2rem;
+            border-radius: 99px;
+            color: white;
+            font-weight: 900;
+            box-shadow: 0 8px 0 #a16207;
+            cursor: pointer;
+        }
+        .start-btn-large:active { transform: translateY(4px); box-shadow: 0 4px 0 #a16207; }
+
+        /* Canvas for fireworks */
+        #fireworks-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+    </style>
+</head>
+<body class="text-gray-700">
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <div id="start-overlay">
+        <h1 class="text-5xl md:text-6xl font-black mb-6 text-center text-blue-500 tracking-wider">
+            Place Value<br><span class="text-yellow-400">Party!</span>
+        </h1>
+        <div class="text-6xl mb-8">🦖🦕</div>
+        <button id="start-btn" class="start-btn-large">PLAY GAME ▶</button>
+    </div>
+
+    <div id="game-container" class="hidden">
+        <div class="flex justify-between items-center mb-1 px-2">
+            <h1 class="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                🌟 Tens & Ones
+            </h1>
+            <div class="bg-yellow-100 border-2 border-yellow-400 rounded-full px-3 py-1 text-lg font-bold text-yellow-600">
+                Score: <span id="score-display">0</span>
+            </div>
+        </div>
+
+        <p id="instruction" class="text-center text-lg sm:text-xl text-blue-600 font-bold mb-1 h-8">
+            Drag ALL blocks to the chart! 👇
+        </p>
+
+        <div class="grid-area">
+            <div class="panel source-panel">
+                <h2 class="text-center text-lg font-bold text-orange-500 mb-1">My Blocks 📦</h2>
+                <div id="item-container"></div>
+                <div class="mt-auto pt-2 border-t-2 border-orange-200">
+                    <h2 class="text-center text-base font-bold text-purple-500 mb-1">How many? (Drag first!)</h2>
+                    <div id="options-container" class="flex justify-center flex-wrap gap-2"></div>
+                </div>
+            </div>
+
+            <div class="panel target-panel">
+                <h2 class="text-center text-lg font-bold text-green-600 mb-1">Place Value Chart 🎯</h2>
+                <div class="chart-grid">
+                    <div id="tens-column" class="drop-column">
+                        <div class="text-xl font-black text-yellow-500">Tens</div>
+                        <div id="tens-drop-area" class="drop-area"></div>
+                    </div>
+                    <div id="ones-column" class="drop-column">
+                        <div class="text-xl font-black text-green-500">Ones</div>
+                        <div id="ones-drop-area" class="drop-area"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center h-8 flex justify-center items-center">
+            <div id="feedback" class="text-xl font-bold animate-bounce"></div>
+        </div>
+    </div>
+
+    <div id="dino-overlay" class="hidden">
+        <h2 class="text-4xl font-black text-green-600 mb-2">GO DINO GO!</h2>
+        <p class="dino-info">Jump over obstacles! 🌲🥚<br><span class="text-sm">(Tap or Space to Jump)</span></p>
+        <div class="text-2xl font-bold text-blue-600 mb-2">Time Left: <span id="dino-timer">15</span>s</div>
+        <canvas id="dino-canvas" width="600" height="250"></canvas>
+        <div id="dino-score" class="text-3xl font-black mt-4 text-orange-500">Score: 0</div>
+        <button id="start-dino-btn" class="mt-6 start-btn-large text-xl px-8 py-3">START RUNNING!</button>
+    </div>
+
+    <div id="completion-overlay" class="hidden fixed inset-0 bg-white/95 z-50 flex flex-col justify-center items-center p-4 text-center">
+        <canvas id="fireworks-canvas"></canvas>
+        <div class="text-8xl mb-4 relative z-20">🏆</div>
+        <h1 class="text-5xl font-black text-yellow-500 mb-4 relative z-20">YOU WON!</h1>
+        <div class="text-4xl font-bold text-blue-600 mb-8 relative z-20">Final Score: <span id="final-score">0</span></div>
+        <button id="play-again-btn" class="start-btn-large text-2xl px-12 py-4 relative z-20">Play Again ↺</button>
+    </div>
+
+    <script>
+        const questions = [
+            { num: 12, item: '🍎', options: [12, 11, 21] },
+            { num: 15, item: '⭐', options: [15, 14, 51] },
+            { num: 13, item: '🚗', options: [13, 31, 14] },
+            { num: 21, item: '🍪', options: [21, 12, 20] },
+            { num: 24, item: '🎈', options: [24, 42, 25] },
+            { num: 11, item: '🐱', options: [11, 10, 12] },
+            { num: 22, item: '🐶', options: [22, 21, 23] },
+            { num: 23, item: '🌸', options: [23, 32, 24] },
+            { num: 25, item: '⚽', options: [25, 24, 26] },
+            { num: 30, item: '🍔', options: [30, 3, 13] }
+        ];
+
+        let currentQIndex = 0;
+        let score = 0;
+        let totalItemsToDrag = 0;
+        let droppedItemsCount = 0;
+        let soundStarted = false;
+
+        const els = {
+            game: document.getElementById('game-container'),
+            itemContainer: document.getElementById('item-container'),
+            tensDrop: document.getElementById('tens-drop-area'),
+            onesDrop: document.getElementById('ones-drop-area'),
+            options: document.getElementById('options-container'),
+            feedback: document.getElementById('feedback'),
+            score: document.getElementById('score-display'),
+            instruction: document.getElementById('instruction'),
+            dinoOverlay: document.getElementById('dino-overlay'),
+            completionOverlay: document.getElementById('completion-overlay'),
+            finalScore: document.getElementById('final-score'),
+            startOverlay: document.getElementById('start-overlay'),
+            dinoTimer: document.getElementById('dino-timer')
+        };
+
+        const sounds = {
+            pop: new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.1 } }).toDestination(),
+            correct: new Tone.PolySynth(Tone.Synth).toDestination(),
+            wrong: new Tone.Synth({ oscillator: { type: 'sawtooth' } }).toDestination(),
+            jump: new Tone.Synth({ oscillator: { type: 'square' } }).toDestination(),
+            crash: new Tone.NoiseSynth({ noise: { type: 'brown' }, envelope: { decay: 0.3 } }).toDestination(),
+            win: new Tone.PolySynth(Tone.Synth).toDestination()
+        };
+        const play = (s) => { if(soundStarted) try { 
+            if(s==='correct') sounds.correct.triggerAttackRelease(['C5','E5','G5'], '8n');
+            else if(s==='wrong') sounds.wrong.triggerAttackRelease('A2', '8n');
+            else if(s==='jump') sounds.jump.triggerAttackRelease('C4', '16n');
+            else if(s==='crash') sounds.crash.triggerAttackRelease('8n');
+            else sounds.pop.triggerAttackRelease('E5', '32n');
+        } catch(e){} };
+
+        // === GAME FLOW ===
+        function resetGame() {
+            currentQIndex = 0;
+            score = 0;
+            els.score.innerText = '0';
+            els.completionOverlay.classList.add('hidden');
+            els.dinoOverlay.classList.add('hidden');
+            els.game.classList.remove('hidden');
+            
+            // Stop fireworks
+            if(fireworksAnimationId) cancelAnimationFrame(fireworksAnimationId);
+
+            questions.sort(() => Math.random() - 0.5);
+            loadQuestion(0);
+        }
+
+        function initGame() {
+            questions.sort(() => Math.random() - 0.5);
+            loadQuestion(0);
+        }
+
+        function loadQuestion(idx) {
+            const q = questions[idx];
+            const tens = Math.floor(q.num / 10);
+            const ones = q.num % 10;
+            
+            droppedItemsCount = 0;
+            totalItemsToDrag = tens + ones;
+            
+            els.itemContainer.innerHTML = '';
+            els.tensDrop.innerHTML = '';
+            els.onesDrop.innerHTML = '';
+            els.options.innerHTML = '';
+            els.feedback.innerText = '';
+            
+            for(let i=0; i<tens; i++) els.itemContainer.appendChild(createItem('tens', q.item));
+            for(let i=0; i<ones; i++) els.itemContainer.appendChild(createItem('ones', q.item));
+
+            const opts = [...q.options].sort(() => Math.random() - 0.5);
+            const colors = ['btn-blue', 'btn-pink', 'btn-purple'];
+            opts.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = `btn-game locked ${colors[i%3]}`;
+                btn.innerText = opt;
+                btn.disabled = true;
+                btn.onclick = () => checkAnswer(opt, q.num, btn);
+                els.options.appendChild(btn);
+            });
+            
+            els.instruction.innerText = "Drag ALL blocks first! 👇";
+            els.instruction.className = "text-center text-lg sm:text-xl text-blue-600 font-bold mb-1 h-8";
+        }
+
+        function createItem(type, emoji) {
+            const div = document.createElement('div');
+            div.className = `draggable-item ${type==='tens'?'tens-bundle':'ones-item'}`;
+            div.dataset.type = type;
+            if(type==='tens') {
+                let html = '';
+                for(let i=0; i<10; i++) html += `<span>${emoji}</span>`;
+                div.innerHTML = html;
+            } else {
+                div.innerHTML = emoji;
+            }
+            div.onpointerdown = handlePointerDown;
+            return div;
+        }
+
+        function updateGameState() {
+            if(droppedItemsCount === totalItemsToDrag) {
+                const btns = els.options.querySelectorAll('button');
+                btns.forEach(b => {
+                    b.disabled = false;
+                    b.classList.remove('locked');
+                });
+                els.instruction.innerText = "Now choose the answer! 🤔";
+                els.instruction.className = "text-center text-lg sm:text-xl text-green-600 font-bold mb-1 h-8 animate-pulse";
+                play('pop');
+            }
+        }
+
+        function checkAnswer(val, correct, btn) {
+            if(val === correct) {
+                btn.style.backgroundColor = '#22c55e';
+                els.feedback.innerHTML = '<span class="text-green-500">CORRECT! DINO TIME! 🦖</span>';
+                play('correct');
+                
+                // === FIX: RE-ASSIGN CLICK HANDLER TO ENSURE IT WORKS ===
+                setTimeout(() => {
+                    const dinoBtn = document.getElementById('start-dino-btn');
+                    dinoBtn.classList.remove('hidden');
+                    dinoBtn.innerText = "START RUNNING!";
+                    dinoBtn.style.pointerEvents = 'auto'; // Ensure clickable
+                    dinoBtn.onclick = function() {
+                        this.classList.add('hidden');
+                        startDinoGame();
+                    };
+                    els.dinoOverlay.classList.remove('hidden');
+                }, 1000);
+            } else {
+                btn.classList.add('btn-wrong');
+                btn.disabled = true;
+                els.feedback.innerHTML = '<span class="text-red-400">Try again!</span>';
+                play('wrong');
+            }
+        }
+
+        // === DRAG & DROP ===
+        let currentDrag = null;
+        let placeholder = null;
+        let startX, startY;
+
+        function handlePointerDown(e) {
+            e.preventDefault();
+            if(e.currentTarget.parentElement.id.includes('drop-area')) return;
+
+            const item = e.currentTarget;
+            currentDrag = item;
+            
+            const rect = item.getBoundingClientRect();
+            placeholder = item.cloneNode(true);
+            placeholder.className = 'placeholder ' + (item.dataset.type === 'tens' ? 'tens-bundle' : 'ones-item');
+            placeholder.innerHTML = ''; 
+            placeholder.style.width = rect.width + 'px';
+            placeholder.style.height = rect.height + 'px';
+            item.parentNode.insertBefore(placeholder, item);
+
+            item.style.position = 'fixed';
+            item.style.width = rect.width + 'px';
+            item.style.height = rect.height + 'px';
+            item.style.left = rect.left + 'px';
+            item.style.top = rect.top + 'px';
+            item.classList.add('dragging');
+            
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+
+            item.setPointerCapture(e.pointerId);
+            item.onpointermove = handlePointerMove;
+            item.onpointerup = handlePointerUp;
+            play('pop');
+        }
+
+        function handlePointerMove(e) {
+            if(!currentDrag) return;
+            currentDrag.style.left = (e.clientX - startX) + 'px';
+            currentDrag.style.top = (e.clientY - startY) + 'px';
+            
+            const tensCol = document.getElementById('tens-column');
+            const onesCol = document.getElementById('ones-column');
+            const tRect = tensCol.getBoundingClientRect();
+            const oRect = onesCol.getBoundingClientRect();
+            
+            tensCol.classList.remove('highlight');
+            onesCol.classList.remove('highlight');
+
+            if(e.clientX > tRect.left && e.clientX < tRect.right && e.clientY > tRect.top && e.clientY < tRect.bottom) 
+                tensCol.classList.add('highlight');
+            else if(e.clientX > oRect.left && e.clientX < oRect.right && e.clientY > oRect.top && e.clientY < oRect.bottom) 
+                onesCol.classList.add('highlight');
+        }
+
+        function handlePointerUp(e) {
+            if(!currentDrag) return;
+            currentDrag.releasePointerCapture(e.pointerId);
+            
+            const tensCol = document.getElementById('tens-column');
+            const onesCol = document.getElementById('ones-column');
+            tensCol.classList.remove('highlight');
+            onesCol.classList.remove('highlight');
+
+            const type = currentDrag.dataset.type;
+            const tRect = tensCol.getBoundingClientRect();
+            const oRect = onesCol.getBoundingClientRect();
+            const x = e.clientX, y = e.clientY;
+            let success = false;
+
+            if(type === 'tens' && x > tRect.left && x < tRect.right && y > tRect.top && y < tRect.bottom) {
+                els.tensDrop.appendChild(currentDrag);
+                success = true;
+            } else if(type === 'ones' && x > oRect.left && x < oRect.right && y > oRect.top && y < oRect.bottom) {
+                els.onesDrop.appendChild(currentDrag);
+                success = true;
+            }
+
+            if(success) {
+                resetDragStyle(currentDrag);
+                currentDrag.onpointerdown = null; 
+                currentDrag.style.cursor = 'default';
+                droppedItemsCount++;
+                updateGameState();
+                play('pop');
+            } else {
+                resetDragStyle(currentDrag);
+                placeholder.replaceWith(currentDrag);
+                play('wrong');
+            }
+
+            if(placeholder && document.body.contains(placeholder)) placeholder.remove();
+            currentDrag.classList.remove('dragging');
+            currentDrag = null;
+        }
+
+        function resetDragStyle(item) {
+            item.style.position = '';
+            item.style.width = '';
+            item.style.height = '';
+            item.style.left = '';
+            item.style.top = '';
+            item.style.zIndex = '';
+        }
+
+        // === DINO MINI GAME ===
+        const canvas = document.getElementById('dino-canvas');
+        const ctx = canvas.getContext('2d');
+        let dinoGameId;
+        let dino = { x: 50, y: 170, w: 40, h: 40, dy: 0, jumpPower: -12, grounded: true, legFrame: 0 };
+        let obstacles = [];
+        let dinoScore = 0;
+        let gameSpeed = 5;
+        let frameCount = 0;
+        let clouds = [];
+        let gameStartTime = 0;
+        let isGameRunning = false;
+        
+        const obstacleTypes = ['🌵', '🌲', '🍄', '🥚'];
+
+        // Initial Click Assignment
+        document.getElementById('start-dino-btn').onclick = function() {
+            this.classList.add('hidden');
+            startDinoGame();
+        };
+
+        function startDinoGame() {
+            if (dinoGameId) cancelAnimationFrame(dinoGameId);
+            dinoScore = 0;
+            gameSpeed = 5;
+            obstacles = [];
+            clouds = [];
+            frameCount = 0;
+            gameStartTime = Date.now();
+            isGameRunning = true;
+
+            // Generate some initial clouds
+            for(let i=0; i<3; i++) {
+                clouds.push({x: Math.random() * canvas.width, y: Math.random() * 100, scale: 0.5 + Math.random() * 0.5});
+            }
+
+            dino.y = 170;
+            dino.dy = 0;
+            dino.grounded = true;
+            document.getElementById('dino-score').innerText = "Score: 0";
+            els.dinoTimer.innerText = "15";
+            canvas.addEventListener('pointerdown', dinoJump);
+            document.addEventListener('keydown', handleKeyJump);
+            updateDinoGame();
+        }
+
+        function handleKeyJump(e) { if(e.code==='Space') dinoJump(); }
+
+        function dinoJump() {
+            if(dino.grounded && isGameRunning) {
+                dino.dy = dino.jumpPower;
+                dino.grounded = false;
+                play('jump');
+            }
+        }
+
+        // --- DRAWING FUNCTIONS ---
+
+        function drawBackground() {
+            // Sky is handled by CSS background-color
+
+            // Mountains (Parallax-ish)
+            ctx.fillStyle = "#a5b4fc"; // Light purple/blue mountains
+            ctx.beginPath();
+            ctx.moveTo(0, 215);
+            ctx.lineTo(100, 100);
+            ctx.lineTo(250, 215);
+            ctx.fill();
+
+            ctx.fillStyle = "#818cf8"; // Darker mountain
+            ctx.beginPath();
+            ctx.moveTo(200, 215);
+            ctx.lineTo(350, 80);
+            ctx.lineTo(550, 215);
+            ctx.fill();
+
+            ctx.fillStyle = "#c7d2fe"; // Far mountain
+            ctx.beginPath();
+            ctx.moveTo(450, 215);
+            ctx.lineTo(600, 120);
+            ctx.lineTo(750, 215);
+            ctx.fill();
+
+            // Clouds
+            ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+            for(let cloud of clouds) {
+                cloud.x -= gameSpeed * 0.2;
+                if(cloud.x < -100) cloud.x = canvas.width + 100;
+                
+                ctx.beginPath();
+                ctx.arc(cloud.x, cloud.y, 20 * cloud.scale, 0, Math.PI * 2);
+                ctx.arc(cloud.x + 15 * cloud.scale, cloud.y - 10 * cloud.scale, 25 * cloud.scale, 0, Math.PI * 2);
+                ctx.arc(cloud.x + 35 * cloud.scale, cloud.y, 20 * cloud.scale, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawDino(x, y) {
+            dino.legFrame += 0.2;
+            const legOffset = Math.sin(dino.legFrame) * 5;
+
+            // --- DRAW CUTE DINO (Improved) ---
+            
+            // Body
+            ctx.fillStyle = "#4ade80"; // Bright Green
+            ctx.beginPath();
+            ctx.ellipse(x + 25, y + 28, 22, 16, 0, 0, Math.PI * 2); 
+            ctx.fill();
+
+            // Belly
+            ctx.fillStyle = "#ecfdf5";
+            ctx.beginPath();
+            ctx.ellipse(x + 25, y + 34, 12, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Head
+            ctx.fillStyle = "#4ade80";
+            ctx.beginPath();
+            ctx.arc(x + 40, y + 15, 16, 0, Math.PI * 2); 
+            ctx.fill();
+
+            // Eye
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(x + 44, y + 10, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "black";
+            ctx.beginPath();
+            ctx.arc(x + 46, y + 10, 3, 0, Math.PI * 2);
+            ctx.fill();
+            // Cheek (Pink)
+            ctx.fillStyle = "#f472b6";
+            ctx.beginPath();
+            ctx.arc(x + 38, y + 18, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Smile
+            ctx.beginPath();
+            ctx.arc(x + 46, y + 18, 4, 0.2, Math.PI - 0.2); 
+            ctx.strokeStyle = "#333";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Spikes (Yellow)
+            ctx.fillStyle = "#facc15"; 
+            for(let i=0; i<3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(x + 5 + (i*9), y + 18);
+                ctx.lineTo(x + 10 + (i*9), y + 5);
+                ctx.lineTo(x + 15 + (i*9), y + 20);
+                ctx.fill();
+            }
+
+            // Legs (Moving)
+            ctx.strokeStyle = "#16a34a";
+            ctx.lineWidth = 5;
+            ctx.lineCap = "round";
+            
+            ctx.beginPath();
+            ctx.moveTo(x + 20, y + 38);
+            ctx.lineTo(x + 20, y + 48 + (dino.grounded ? legOffset : 0));
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(x + 32, y + 38);
+            ctx.lineTo(x + 32, y + 48 - (dino.grounded ? legOffset : 0));
+            ctx.stroke();
+
+            // Tail
+            ctx.fillStyle = "#4ade80";
+            ctx.beginPath();
+            ctx.moveTo(x + 5, y + 25);
+            ctx.lineTo(x - 8, y + 15);
+            ctx.lineTo(x + 8, y + 35);
+            ctx.fill();
+        }
+
+        function updateDinoGame() {
+            if (!isGameRunning) return;
+
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            frameCount++;
+            
+            // Timer Logic
+            const elapsed = Date.now() - gameStartTime;
+            const timeLeft = Math.max(0, 15 - Math.floor(elapsed / 1000));
+            els.dinoTimer.innerText = timeLeft;
+
+            if (timeLeft <= 0) {
+                endDinoRun("TIME'S UP!");
+                return;
+            }
+
+            // Draw Scenery First
+            drawBackground();
+
+            // Speed Up logic
+            if(frameCount % 300 === 0) gameSpeed += 0.5;
+
+            // Ground
+            ctx.fillStyle = '#86efac'; // Light Grass
+            ctx.fillRect(0, 215, canvas.width, 35);
+            ctx.fillStyle = '#16a34a'; // Dark Grass Line
+            ctx.fillRect(0, 215, canvas.width, 5);
+
+            // Gravity
+            dino.dy += 0.6; 
+            dino.y += dino.dy;
+            if(dino.y > 170) { dino.y = 170; dino.dy = 0; dino.grounded = true; }
+            
+            drawDino(dino.x, dino.y);
+
+            // Obstacles Spawn
+            if(frameCount % Math.max(60, 120 - Math.floor(gameSpeed*5)) === 0 && Math.random() > 0.4) {
+                const type = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+                obstacles.push({ x: canvas.width, w: 20, h: 30, type: type, passed: false });
+            }
+
+            for(let i=0; i<obstacles.length; i++) {
+                let ob = obstacles[i];
+                ob.x -= gameSpeed;
+                
+                // Draw Obstacle
+                ctx.font = "30px Arial";
+                ctx.fillText(ob.type, ob.x, 215);
+
+                // Collision
+                if(
+                    dino.x + 40 > ob.x + 5 && 
+                    dino.x + 10 < ob.x + 25 && 
+                    dino.y + 45 > 190
+                ) {
+                    endDinoRun("CRASH!");
+                    return;
+                }
+
+                if(ob.x < -30) {
+                    obstacles.splice(i, 1);
+                    i--;
+                    dinoScore++;
+                    document.getElementById('dino-score').innerText = `Score: ${dinoScore}`;
+                }
+            }
+            
+            dinoGameId = requestAnimationFrame(updateDinoGame);
+        }
+
+        function endDinoRun(reason) {
+            isGameRunning = false;
+            cancelAnimationFrame(dinoGameId);
+            play(reason === 'CRASH!' ? 'crash' : 'correct');
+            
+            const btn = document.getElementById('start-dino-btn');
+            btn.innerText = `${reason} NEXT LEVEL >>`;
+            btn.classList.remove('hidden');
+            btn.style.pointerEvents = 'none'; 
+            
+            setTimeout(() => {
+                els.dinoOverlay.classList.add('hidden');
+                score += dinoScore;
+                els.score.innerText = score;
+                canvas.removeEventListener('pointerdown', dinoJump);
+                document.removeEventListener('keydown', handleKeyJump);
+                
+                btn.style.pointerEvents = 'auto';
+
+                currentQIndex++;
+                if(currentQIndex < questions.length) loadQuestion(currentQIndex);
+                else {
+                    els.finalScore.innerText = score;
+                    els.completionOverlay.classList.remove('hidden');
+                    startFireworks();
+                }
+            }, 1500);
+        }
+
+        // === FIREWORKS ===
+        let fireworksCanvas = document.getElementById('fireworks-canvas');
+        let fwCtx = fireworksCanvas.getContext('2d');
+        let fireworks = [];
+        let particles = [];
+        let fireworksAnimationId;
+
+        function resizeFireworksCanvas() {
+            fireworksCanvas.width = window.innerWidth;
+            fireworksCanvas.height = window.innerHeight;
+        }
+
+        function createFirework() {
+            const x = Math.random() * fireworksCanvas.width;
+            const y = fireworksCanvas.height;
+            const targetY = Math.random() * (fireworksCanvas.height / 2);
+            const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            fireworks.push({ x, y, targetY, color, speed: 5 + Math.random() * 5, radius: 3 });
+        }
+
+        function createParticles(x, y, color) {
+            for (let i = 0; i < 30; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 5 + 1;
+                particles.push({
+                    x, y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    color,
+                    alpha: 1,
+                    decay: 0.01 + Math.random() * 0.02
+                });
+            }
+        }
+
+        function animateFireworks() {
+            fwCtx.fillStyle = 'rgba(255, 255, 255, 0.1)'; // Trail effect
+            fwCtx.fillRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+
+            if (Math.random() < 0.05) createFirework();
+
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                let f = fireworks[i];
+                f.y -= f.speed;
+                
+                fwCtx.beginPath();
+                fwCtx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+                fwCtx.fillStyle = f.color;
+                fwCtx.fill();
+
+                if (f.y <= f.targetY) {
+                    createParticles(f.x, f.y, f.color);
+                    fireworks.splice(i, 1);
+                    play('pop'); // Reuse pop sound for explosion
+                }
+            }
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.1; // Gravity
+                p.alpha -= p.decay;
+
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                fwCtx.save();
+                fwCtx.globalAlpha = p.alpha;
+                fwCtx.beginPath();
+                fwCtx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+                fwCtx.fillStyle = p.color;
+                fwCtx.fill();
+                fwCtx.restore();
+            }
+
+            fireworksAnimationId = requestAnimationFrame(animateFireworks);
+        }
+
+        function startFireworks() {
+            resizeFireworksCanvas();
+            animateFireworks();
+            window.addEventListener('resize', resizeFireworksCanvas);
+        }
+
+        // === START & RESTART LOGIC ===
+        document.getElementById('start-btn').onclick = () => {
+            Tone.start();
+            soundStarted = true;
+            els.startOverlay.style.display = 'none';
+            els.game.classList.remove('hidden');
+            initGame();
+        };
+
+        document.getElementById('play-again-btn').onclick = () => {
+            resetGame();
+        };
+
+    </script>
+</body>
+</html>

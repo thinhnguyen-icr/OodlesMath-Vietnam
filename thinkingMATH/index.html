@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>thinkingMATH | Oodles Math</title>
+
+  <!-- Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --ink:#1F2A44;
+      --muted: rgba(31,42,68,.70);
+
+      --bg1:#F7F6FF;
+      --bg2:#FFF7FA;
+
+      --card:#ffffff;
+      --border: rgba(31,42,68,.10);
+      --shadow: 0 18px 40px rgba(31,42,68,.12);
+      --shadowHover: 0 26px 60px rgba(31,42,68,.18);
+
+      --mint:#E9F9F1;
+      --blue:#EAF6FF;
+      --pink:#FFE8EC;
+      --yellow:#FFF3C4;
+      --purple:#F2E8FF;
+
+      --btn:#1F2A44;
+      --btnText:#ffffff;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:"Poppins", sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(900px 420px at 12% 12%, var(--purple), transparent 60%),
+        radial-gradient(720px 380px at 92% 18%, var(--blue), transparent 58%),
+        radial-gradient(860px 460px at 50% 96%, var(--pink), transparent 62%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+    }
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:28px 20px 40px;
+    }
+
+    /* Top */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      user-select:none;
+    }
+
+    .logo{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      background: linear-gradient(135deg, var(--purple), var(--mint));
+      box-shadow: 0 10px 20px rgba(31,42,68,.10);
+      display:grid;
+      place-items:center;
+      font-size:22px;
+    }
+
+    .brandTitle{
+      margin:0;
+      font-size:16px;
+      font-weight:800;
+      letter-spacing:.2px;
+      line-height:1.1;
+    }
+    .brandSub{
+      font-size:12px;
+      font-weight:700;
+      opacity:.70;
+      margin-top:3px;
+    }
+
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background: rgba(255,255,255,.75);
+      border:1px solid rgba(31,42,68,.10);
+      backdrop-filter: blur(10px);
+      font-size:12px;
+      font-weight:800;
+      color: rgba(31,42,68,.85);
+      white-space:nowrap;
+    }
+
+    /* Hero */
+    .hero{
+      border-radius:28px;
+      background: rgba(255,255,255,.72);
+      border:1px solid rgba(31,42,68,.08);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 16px 35px rgba(31,42,68,.08);
+      padding:22px 22px 18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(160px 160px at 14% 18%, rgba(242,232,255,.95), transparent 62%),
+        radial-gradient(200px 200px at 88% 10%, rgba(234,246,255,.95), transparent 62%),
+        radial-gradient(260px 260px at 70% 120%, rgba(233,249,241,.95), transparent 62%);
+      pointer-events:none;
+      opacity:.95;
+    }
+    .hero > *{ position:relative; }
+
+    h1{
+      margin:0 0 8px 0;
+      font-size:40px;
+      font-weight:800;
+      letter-spacing:-0.6px;
+      line-height:1.1;
+    }
+
+    .subtitle{
+      margin:0;
+      font-size:15px;
+      font-weight:700;
+      color:var(--muted);
+      line-height:1.6;
+      max-width:760px;
+    }
+
+    .actions{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-top:14px;
+      flex-wrap:wrap;
+    }
+
+    .back{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:14px;
+      text-decoration:none;
+      font-weight:800;
+      color:var(--ink);
+      background: rgba(255,255,255,.75);
+      border:1px solid rgba(31,42,68,.10);
+      box-shadow: 0 12px 22px rgba(31,42,68,.10);
+    }
+    .back:active{ transform: translateY(1px); }
+
+    .helper{
+      font-size:12px;
+      font-weight:700;
+      opacity:.70;
+    }
+
+    /* Grid */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap:18px;
+      margin-top:18px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:26px;
+      padding:18px;
+      box-shadow: var(--shadow);
+      transition: transform .22s ease, box-shadow .22s ease;
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+      min-height:176px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+    .card:hover{
+      transform: translateY(-6px);
+      box-shadow: var(--shadowHover);
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      border:1px solid rgba(31,42,68,.08);
+      width:max-content;
+      margin-bottom:12px;
+    }
+
+    .b-seeker{ background: var(--yellow); }
+    .b-starter{ background: var(--mint); }
+    .b-solver{ background: var(--blue); }
+    .b-builder{ background: var(--pink); }
+    .b-achiever{ background: var(--purple); }
+
+    .card h2{
+      margin:0 0 8px 0;
+      font-size:24px;
+      font-weight:800;
+      letter-spacing:-0.3px;
+    }
+
+    .desc{
+      margin:0 0 14px 0;
+      color:var(--muted);
+      font-weight:700;
+      line-height:1.5;
+      font-size:13px;
+    }
+
+    .ctaRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:11px 13px;
+      border-radius:14px;
+      background:var(--btn);
+      color:var(--btnText);
+      text-decoration:none;
+      font-weight:800;
+      font-size:13px;
+      box-shadow: 0 12px 22px rgba(31,42,68,.18);
+      border:1px solid rgba(255,255,255,.16);
+      width:max-content;
+    }
+
+    .tiny{
+      font-size:12px;
+      font-weight:700;
+      opacity:.65;
+    }
+
+    footer{
+      text-align:center;
+      margin-top:22px;
+      font-size:12px;
+      font-weight:700;
+      opacity:.65;
+    }
+
+    @media (max-width:480px){
+      h1{ font-size:32px; }
+      .subtitle{ font-size:14px; }
+      .card h2{ font-size:22px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">🧠</div>
+        <div>
+          <div class="brandTitle">Oodles Math</div>
+          <div class="brandSub">thinkingMATH</div>
+        </div>
+      </div>
+      <div class="pill">Ages 8–13 • Thinking & Logic</div>
+    </div>
+
+    <section class="hero">
+      <h1>thinkingMATH</h1>
+      <p class="subtitle">
+        Choose a level to practice problem solving, patterns, and logical thinking — with kid-friendly games and activities.
+      </p>
+
+      <div class="actions">
+        <a class="back" href="../">← Back Home</a>
+        <div class="helper">Tip: Let kids tap the big cards 👆</div>
+      </div>
+    </section>
+
+    <section class="grid">
+
+      <!-- Seeker -->
+      <article class="card" onclick="location.href='./Seeker/'" role="link" aria-label="Open Seeker">
+        <div>
+          <div class="badge b-seeker">🔎 Seeker</div>
+          <h2>Seeker</h2>
+          <p class="desc">Explore shapes, patterns, matching, and simple logic.</p>
+        </div>
+        <div class="ctaRow">
+          <a class="btn" href="./Seeker/" onclick="event.stopPropagation();">Open →</a>
+          <div class="tiny">Easy start</div>
+        </div>
+      </article>
+
+      <!-- Starter -->
+      <article class="card" onclick="location.href='./Starter/'" role="link" aria-label="Open Starter">
+        <div>
+          <div class="badge b-starter">🌱 Starter</div>
+          <h2>Starter</h2>
+          <p class="desc">Warm-up puzzles that build focus and smart thinking.</p>
+        </div>
+        <div class="ctaRow">
+          <a class="btn" href="./Starter/" onclick="event.stopPropagation();">Open →</a>
+          <div class="tiny">Try it</div>
+        </div>
+      </article>
+
+      <!-- Solver -->
+      <article class="card" onclick="location.href='./Solver/'" role="link" aria-label="Open Solver">
+        <div>
+          <div class="badge b-solver">🧩 Solver</div>
+          <h2>Solver</h2>
+          <p class="desc">More challenge: sequencing, reasoning, and quick choices.</p>
+        </div>
+        <div class="ctaRow">
+          <a class="btn" href="./Solver/" onclick="event.stopPropagation();">Open →</a>
+          <div class="tiny">Level up</div>
+        </div>
+      </article>
+
+      <!-- Builder -->
+      <article class="card" onclick="location.href='./Builder/'" role="link" aria-label="Open Builder">
+        <div>
+          <div class="badge b-builder">🧱 Builder</div>
+          <h2>Builder</h2>
+          <p class="desc">Construct solutions: classify, compare, and spot rules.</p>
+        </div>
+        <div class="ctaRow">
+          <a class="btn" href="./Builder/" onclick="event.stopPropagation();">Open →</a>
+          <div class="tiny">Think deeper</div>
+        </div>
+      </article>
+
+      <!-- Achiever -->
+      <article class="card" onclick="location.href='./Achiever/'" role="link" aria-label="Open Achiever">
+        <div>
+          <div class="badge b-achiever">🏆 Achiever</div>
+          <h2>Achiever</h2>
+          <p class="desc">For confident learners: bigger puzzles and stronger logic.</p>
+        </div>
+        <div class="ctaRow">
+          <a class="btn" href="./Achiever/" onclick="event.stopPropagation();">Open →</a>
+          <div class="tiny">Challenge</div>
+        </div>
+      </article>
+
+    </section>
+
+    <footer>© Oodles Math</footer>
+  </div>
+</body>
+</html>
