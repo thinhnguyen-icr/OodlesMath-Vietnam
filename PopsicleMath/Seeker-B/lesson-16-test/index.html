@@ -5,10 +5,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Lesson 16 • Mid-Module Assessment</title>
-  <!-- Font Nunito: Rounded and Friendly -->
+  <!-- Font Poppins: Clean and Modern -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     /* --- VIBRANT THEME FOR KIDS (3-6YO) --- */
     :root{
@@ -32,10 +32,9 @@
     html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
     
     body{
-      font-family: "Nunito", sans-serif;
+      font-family: "Poppins", sans-serif;
       color: var(--text);
       min-height: 100vh;
-      /* Playful background pattern */
       background-color: var(--bg-color);
       background-image: 
         radial-gradient(circle at 10% 20%, rgba(247, 37, 133, 0.1) 0%, transparent 20%),
@@ -60,14 +59,13 @@
     .wrap{
       max-width: 1100px;
       margin: 0 auto;
-      padding: 80px 20px 20px; /* Top padding for logo */
+      padding: 80px 20px 20px;
       display:grid;
       grid-template-columns: 380px 1fr;
       gap: 24px;
       min-height: 100vh;
     }
 
-    /* --- CARDS & PANELS --- */
     .card{
       background: var(--card-bg);
       border-radius: var(--radius);
@@ -79,7 +77,6 @@
       z-index: 1;
     }
 
-    /* Header styling */
     header{
       padding: 16px 20px;
       background: #fdfdfd;
@@ -96,7 +93,6 @@
     .t b { display: block; font-size: 16px; color: var(--c-purple); }
     .t span { display: block; font-size: 13px; color: #888; font-weight: 700; }
 
-    /* Chips (Score pills) */
     .chips { display: flex; gap: 8px; }
     .chip {
       background: var(--c-yellow); color: #7a5c00;
@@ -107,12 +103,10 @@
       display: flex; align-items: center; gap: 6px;
     }
 
-    /* --- LEFT PANEL --- */
     .left .body { padding: 20px; background: linear-gradient(to bottom, #fff, #f9f9f9); flex: 1; }
     .big { font-size: 20px; color: var(--c-pink); margin-bottom: 8px; font-weight: 900; }
     .sub { font-size: 14px; color: #666; font-weight: 600; line-height: 1.5; }
 
-    /* Buttons - 3D Style */
     .btnrow { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
     .btn {
       border: none; border-radius: 16px;
@@ -120,6 +114,7 @@
       cursor: pointer; transition: transform 0.1s;
       display: inline-flex; align-items: center; gap: 8px;
       position: relative;
+      font-family: inherit;
     }
     .btn:active { transform: translateY(4px); box-shadow: none !important; }
     
@@ -140,7 +135,6 @@
       box-shadow: 0 4px 0 #f59e0b;
     }
 
-    /* Progress Bar */
     .progress {
       margin-top: 20px; background: #fff;
       border: 2px solid #eee; border-radius: 20px; padding: 16px;
@@ -163,7 +157,6 @@
     .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
     .small { font-size: 13px; color: #64748b; font-weight: 700; }
 
-    /* Skill Breakdown Box */
     .skillbox { margin-top: 12px; display: grid; gap: 8px; }
     .skill {
       border: 2px solid #e2e8f0; border-radius: 12px;
@@ -179,7 +172,6 @@
     .pill.bad { background: #fee2e2; color: #991b1b; }
     .pill.mid { background: #fef3c7; color: #92400e; }
 
-    /* --- RIGHT PANEL --- */
     .right .stage { padding: 20px; background: #ecfeff; flex: 1; display: flex; flex-direction: column;}
     .panel {
       background: #fff; border-radius: 24px; border: 4px solid var(--c-blue);
@@ -195,7 +187,6 @@
       padding: 6px 12px; border-radius: 20px; font-weight: 800; font-size: 13px;
     }
 
-    /* Question Box */
     .question {
       background: #fff; border: 3px dashed #cbd5e1; border-radius: 20px;
       padding: 20px; margin-bottom: 20px;
@@ -211,13 +202,13 @@
     }
     .speak-btn:active { transform: translateY(4px); box-shadow: none; }
 
-    /* Choices */
     .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: auto; }
     .choice {
       background: #fff; border: 3px solid #e2e8f0; border-radius: 20px;
       padding: 16px; font-size: 24px; color: #334155; font-weight: 900;
       min-height: 80px; display: flex; align-items: center; justify-content: center;
       cursor: pointer; box-shadow: 0 6px 0 #cbd5e1; transition: 0.1s;
+      font-family: inherit;
     }
     .choice:hover:not(:disabled) { transform: translateY(-4px); border-color: var(--c-blue); }
     .choice:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0; }
@@ -230,31 +221,29 @@
     .choice.correct { background: #dcfce7; border-color: var(--c-green); color: var(--c-green); }
     .choice.wrong { background: #fee2e2; border-color: var(--c-pink); color: var(--c-pink); opacity: 0.7; }
 
-    /* Navigation Bar */
     .nav { margin-top: 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     
-    /* Grid Navigation (1-12 Dots) */
     .gridNav {
-      margin-top: 20px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;
+      margin-top: 20px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
       padding: 12px; background: #f8fafc; border-radius: 16px; border: 2px solid #e2e8f0;
     }
     .nav-item {
       border: 2px solid #e2e8f0; background: #fff; border-radius: 12px;
       padding: 8px 0; font-weight: 800; cursor: pointer; font-size: 14px;
       color: #64748b; transition: .2s;
+      font-family: inherit;
     }
     .nav-item:hover { border-color: var(--c-blue); color: var(--c-blue); }
     .nav-item.cur { border-color: var(--c-blue); background: #e0f2fe; color: var(--c-blue); transform: scale(1.1); }
     .nav-item.answered { background: var(--c-green); border-color: var(--c-green); color: white; }
     .nav-item.flag { border-color: var(--c-orange); background: #fff7ed; color: var(--c-orange); }
 
-    /* Visual Components (Count, Clock, Graph) */
     .count-grid {
       background: #fffbeb; border: 3px solid #fcd34d; border-radius: 20px;
       padding: 15px; gap: 8px; margin-top: 10px;
       display: flex; flex-wrap: wrap; justify-content: center;
     }
-    .count-item { font-size: 36px; animation: popIn 0.4s backwards; }
+    .count-item { font-size: 36px; animation: popIn 0.4s backwards; cursor: pointer; transition: 0.2s; }
 
     .two-cols{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items:center; }
 
@@ -273,11 +262,9 @@
     .tick { position:absolute; left:50%; top:50%; width:4px; height:10px; background: #cbd5e1; border-radius: 2px; }
     .num { font-size: 20px; color: #334155; font-weight: 900; position:absolute; left:50%; top:50%; transform: translate(-50%,-50%); }
 
-    /* Ten Frame Fix */
     .tenframe {
       border: 4px solid #94a3b8; background: #e2e8f0; gap: 8px; padding: 10px; margin: 0 auto;
       display: grid; grid-template-columns: repeat(5, 1fr); border-radius: 12px;
-      /* Ensure it doesn't collapse */
       min-height: 100px; 
     }
     .cell { 
@@ -285,11 +272,9 @@
       box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); aspect-ratio: 1/1; 
       display: grid; place-items: center;
     }
-    /* Renamed .dot to .t-dot to avoid conflicts */
     .t-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--c-green); box-shadow: inset -2px -4px rgba(0,0,0,0.2); }
     .t-dot.blue { background: var(--c-blue); }
 
-    /* Graph (Single Line Fix) */
     .graph { width: 100%; padding: 10px; border-radius: 16px; background: #fff; border: 2px solid #e2e8f0; }
     .gline { display: flex; align-items: center; gap: 12px; padding: 8px; border-bottom: 1px solid #f1f5f9; }
     .gline:last-child { border-bottom: none; }
@@ -305,7 +290,6 @@
       display: grid; place-items: center; font-size: 14px; flex-shrink: 0;
     }
 
-    /* Review Box */
     .reviewBox {
       width: 100%; text-align: left;
       border: 3px solid var(--c-purple); background: #f8fafc;
@@ -322,7 +306,6 @@
     .okTxt { color: var(--c-green); }
     .badTxt { color: var(--c-pink); }
 
-    /* End Screen */
     .end {
       display: grid; place-items: center; text-align: center; height: 100%;
       padding: 20px; position: relative; z-index: 5;
@@ -361,14 +344,14 @@
         </div>
         <div class="chips">
           <div class="chip" id="chipTimer">⏱ 08:00</div>
-          <div class="chip" id="chipStatus">🧩 0/12</div>
+          <div class="chip" id="chipStatus">🧩 0/10</div>
         </div>
       </header>
 
       <div class="body">
         <div class="big">Mid-Module Assessment</div>
         <div class="sub">
-          12 Questions • 8 Minutes.<br>
+          10 Questions • 8 Minutes.<br>
           Select one answer. Auto-submit when time is up. Good luck!
         </div>
 
@@ -418,7 +401,7 @@
           <div class="end" id="welcome">
             <div style="text-align:center;">
               <div style="font-size:80px; margin-bottom:10px; filter: drop-shadow(0 8px 0 rgba(0,0,0,0.1));">🧠</div>
-              <h2 style="font-size: 32px; color: var(--c-purple); margin: 10px 0;">First Semester Exam</h2>
+              <h2 style="font-size: 32px; color: var(--c-purple); margin: 10px 0;">Mid-Module Assessment</h2>
               <p style="font-size: 18px; color: #666;">Press <b>Start</b> to begin. You have <b>08:00</b> minutes.</p>
             </div>
           </div>
@@ -442,7 +425,7 @@
               </div>
             </div>
 
-            <!-- Question Grid (1-12) -->
+            <!-- Question Grid (1-10) -->
             <div class="gridNav" id="gridNav"></div>
 
             <div class="nav" style="margin-top:10px; justify-content: flex-end;">
@@ -601,18 +584,14 @@
   const rand = (a,b)=> Math.floor(Math.random()*(b-a+1))+a;
   const shuffle = (arr)=> arr.map(v=>({v, r:Math.random()})).sort((a,b)=>a.r-b.r).map(x=>x.v);
 
-  // ===== Question Builders (12 questions) =====
+  // ===== Question Builders (10 balanced questions) =====
 
-  // 1. Counting: Show items to count (10-20)
   function qCounting(){
     const n = rand(10, 20); 
     const item = ["🍎","⭐","🎈","🍄","🍪"][rand(0,4)];
-    
     let itemsHtml = "";
     for(let i=0; i<n; i++) itemsHtml += `<div class="count-item">${item}</div>`;
-
     const wrongs = shuffle([n+1, n-1, n+2].filter(x=>x>0)).slice(0,2);
-    
     const text = `How many ${item} are there?`;
     return {
       skill:"count", tag:"🔢 Counting",
@@ -625,28 +604,27 @@
     };
   }
 
-  // 2. Counting: Compare (10-20)
   function qCounting2(){
-    const a = rand(12,20);
-    const b = a - rand(1,5);
-    const ask = `Which number is bigger?`;
-    const right = a;
-    const wrong = b;
+    let n1 = rand(1, 20);
+    let n2 = rand(1, 20); while(n2 === n1) n2 = rand(1, 20);
+    let n3 = rand(1, 20); while(n3 === n1 || n3 === n2) n3 = rand(1, 20);
+    const ans = Math.max(n1, n2, n3);
+    const ask = `Which number is the largest?`;
     return {
       skill:"count", tag:"🔢 Counting",
-      prompt:ask,
+      prompt: ask,
       html:`<div class="prompt">${ask}<span class="speak-btn" onclick="speak('${ask}')">🔊</span></div>
             <div style="display:flex;gap:12px;justify-content:center;margin-top:10px">
-              <div style="font-size:44px;font-weight:950;border:3px solid #cbd5e1;background:#fff;padding:10px 16px;border-radius:18px; color:#475569">${a}</div>
-              <div style="font-size:44px;font-weight:950;border:3px solid #cbd5e1;background:#fff;padding:10px 16px;border-radius:18px; color:#475569">${b}</div>
+              <div style="font-size:44px;font-weight:950;border:3px solid #cbd5e1;background:#fff;padding:10px 16px;border-radius:18px; color:#475569">${n1}</div>
+              <div style="font-size:44px;font-weight:950;border:3px solid #cbd5e1;background:#fff;padding:10px 16px;border-radius:18px; color:#475569">${n2}</div>
+              <div style="font-size:44px;font-weight:950;border:3px solid #cbd5e1;background:#fff;padding:10px 16px;border-radius:18px; color:#475569">${n3}</div>
             </div>
-            <div class="hint">Choose the bigger number.</div>`,
-      choices: shuffle([String(right), String(wrong), String(right+1)]),
-      answer: String(right)
+            <div class="hint">Choose the biggest number.</div>`,
+      choices: shuffle([String(n1), String(n2), String(n3)]),
+      answer: String(ans)
     };
   }
 
-  // 3. Ordinal: 10 different animals (Fixed: Single Line)
   function qOrdinal(){
     const pool = ["🐶","🐱","🐰","🦊","🐼","🐯","🐸","🦁","🐮","🐨"];
     const rowAnimals = shuffle(pool).slice(0,10);
@@ -654,13 +632,9 @@
     const ordMap = {1:"1st",2:"2nd",3:"3rd",4:"4th",5:"5th", 6:"6th",7:"7th",8:"8th",9:"9th",10:"10th"};
     const ordStr = ordMap[pos];
     const targetAnimal = rowAnimals[pos-1];
-
-    // Reduced font-size slightly to 28px to fit easier without scrolling if possible, but scroll remains
     const rowHtml = rowAnimals.map(a => `<span style="font-size:28px;margin:0 4px">${a}</span>`).join("");
-    
     const wrongs = shuffle(rowAnimals.filter(x=>x!==targetAnimal)).slice(0,2);
     const text = `Which animal is ${ordStr}?`;
-
     return {
       skill:"ord", tag:"🥇 Ordinal",
       prompt: text,
@@ -672,68 +646,45 @@
     };
   }
 
-  // 4. Patterns: Shapes (Fixed: Single Line)
   function qPatterns(){
-    const type = rand(0,2);
+    const type = rand(0,1);
     const circle = `<svg width="40" height="40" viewBox="0 0 40 40" style="vertical-align:middle"><circle cx="20" cy="20" r="16" fill="#ef4444" /></svg>`;
     const square = `<svg width="40" height="40" viewBox="0 0 40 40" style="vertical-align:middle"><rect x="6" y="6" width="28" height="28" fill="#3b82f6" rx="4" /></svg>`;
     const triangle = `<svg width="40" height="40" viewBox="0 0 40 40" style="vertical-align:middle"><polygon points="20,6 34,34 6,34" fill="#f59e0b" stroke-linejoin="round" stroke-width="4" stroke="#f59e0b"/></svg>`;
     const rect = `<svg width="40" height="40" viewBox="0 0 40 40" style="vertical-align:middle"><rect x="4" y="10" width="32" height="20" fill="#10b981" rx="4" /></svg>`;
-    
     const shapes = [circle, square, triangle, rect];
-    
-    let A = shapes[rand(0,3)];
-    let B = shapes[rand(0,3)];
+    let A = shapes[rand(0,3)], B = shapes[rand(0,3)];
     while(B===A) B = shapes[rand(0,3)];
-    let C = shapes[rand(0,3)];
-    while(C===A || C===B) C = shapes[rand(0,3)];
-
-    let seq = [];
-    let ans = "";
-    
-    if(type===0) { seq = [A,B,A,B,A]; ans = B; }
-    else if(type===1) { seq = [A,B,C,A,B]; ans = C; }
-    else { seq = [A,A,B,A,A]; ans = B; }
-
-    const wrongs = shapes.filter(x=>x!==ans).slice(0,2);
+    let seq = [], ans = "";
+    if(type===0) { seq = [A,B,A,B,A,B]; ans = A; }
+    else { seq = [A,A,B,A,A,B]; ans = A; }
     const text = "What comes next?";
-
     return {
       skill:"pat", tag:"🧩 Pattern",
       prompt: text,
       html:`<div class="prompt">${text}<span class="speak-btn" onclick="speak('${text}')">🔊</span></div>
             <div style="text-align:center;padding:20px 0; display:flex; justify-content:center; gap:8px; align-items:center; white-space:nowrap; overflow-x:auto;">
-              ${seq.join("")}
+              ${seq.join("")} <span style="font-size:36px; font-weight:900; color:var(--c-pink); margin-left:10px">?</span>
             </div>
             <div class="hint">Look at the repeating pattern.</div>`,
-      choices: shuffle([ans, ...wrongs]),
+      choices: shuffle([ans, ...shapes.filter(x=>x!==ans).slice(0,2)]),
       answer: ans
     };
   }
 
-  // FIXED: Renamed inner classes to avoid conflicts
   function qTensOnes(){
-    const n = rand(11,19);
-    const ones = n - 10;
-    const cells = [];
-    // Using t-dot instead of dot to avoid conflict with gridNav if any
+    const n = rand(11,19), ones = n - 10, cells = [];
     for(let i=0;i<10;i++) cells.push(`<div class="cell"><div class="t-dot"></div></div>`);
     for(let i=0;i<ones;i++) cells.push(`<div class="cell"><div class="t-dot blue"></div></div>`);
     while(cells.length < 20) cells.push(`<div class="cell"></div>`);
-
     const wrongs = shuffle([n+1, n-1, n+2].filter(x=>x>=10 && x<=20)).slice(0,2);
     const text = "How many dots?";
     return {
       skill:"ten", tag:"🧮 Tens & Ones",
       prompt: text,
       html:`<div class="two-cols">
-              <div>
-                <div class="prompt">How many?<span class="speak-btn" onclick="speak('${text}')">🔊</span></div>
-                <div class="hint">Green = 10, Blue = Ones.</div>
-              </div>
-              <div class="tenframe" style="max-width:300px;">
-                ${cells.join("")}
-              </div>
+              <div><div class="prompt">How many?<span class="speak-btn" onclick="speak('${text}')">🔊</span></div><div class="hint">Green = 10, Blue = Ones.</div></div>
+              <div class="tenframe" style="max-width:300px;">${cells.join("")}</div>
             </div>`,
       choices: shuffle([String(n), ...wrongs.map(String)]),
       answer: String(n)
@@ -741,530 +692,203 @@
   }
 
   function qNumberPattern(){
-    const type = rand(0, 2);
-    const A = rand(1, 9);
-    let B = rand(1, 9); while(B===A) B = rand(1,9);
-    let C = rand(1, 9); while(C===A || C===B) C = rand(1,9);
-    
-    let seq = [];
-    let ans = 0;
-    
-    if(type === 0) { seq = [A, B, A, B, A]; ans = B; }
-    else if (type === 1) { seq = [A, B, C, A, B, C, A]; ans = B; }
-    else { seq = [A, A, B, A, A, B, A]; ans = A; }
-
-    const wrongs = shuffle([ans+1, ans-1, ans+2].filter(x=>x>0)).slice(0,2);
+    const A = rand(1, 6), B = A + 1, C = B + 1;
+    const seq = [A, B, C, A, B, C, A, B];
+    const ans = C;
     const text = "What number comes next?";
-    
     return {
       skill:"numPat", tag:"📈 Number pattern",
       prompt: text,
       html:`<div class="prompt">${text}<span class="speak-btn" onclick="speak('${text}')">🔊</span></div>
-            <div style="text-align:center;font-size:40px;font-weight:950;padding:10px 0; color:#334155">
-              ${seq.join(" , ")} , <span style="color:var(--c-pink)">?</span>
-            </div>
-            <div class="hint">Look for the repeating pattern.</div>`,
-      choices: shuffle([String(ans), ...wrongs.map(String)]),
+            <div style="text-align:center;font-size:40px;font-weight:950;padding:10px 0; color:#334155">${seq.join(" , ")} , <span style="color:var(--c-pink)">?</span></div>
+            <div class="hint">A , B , C , A , B , C ...</div>`,
+      choices: shuffle([String(ans), String(ans+1), String(ans-1)]),
       answer: String(ans)
     };
   }
 
   function qAddition(){
-    const a = rand(6,10), b = rand(6,10);
-    const ans = a + b; 
-    const wrongs = shuffle([ans+1, ans-1, ans+2].filter(x=>x!==ans)).slice(0,2);
-    const text = `There are ${a} apples and ${b} more apples. How many in total?`;
+    const a = rand(6,10), b = rand(6,10), ans = a + b; 
+    const text = `There are ${a} apples and ${b} more. How many in total?`;
     return {
       skill:"add", tag:"➕ Addition",
-      prompt:`Story addition`,
+      prompt:`Addition Story`,
       html:`<div class="prompt">Story time!<span class="speak-btn" onclick="speak('${text}')">🔊</span></div>
             <div style="font-size:20px;font-weight:900;line-height:1.4; color:#334155">
-              There are <span style="color:var(--c-pink)">${a}</span> apples 🍎 and <span style="color:var(--c-blue)">${b}</span> more apples 🍎.<br>
-              How many apples in total?
+              There are <span style="color:var(--c-pink)">${a}</span> apples 🍎 and <span style="color:var(--c-blue)">${b}</span> more.<br>How many in total?
             </div>
             <div class="hint">${a} + ${b} = ?</div>`,
-      choices: shuffle([String(ans), ...wrongs.map(String)]),
+      choices: shuffle([String(ans), String(ans+1), String(ans-1)]),
       answer: String(ans)
     };
   }
 
-  function qAddition2(){
-    const a = rand(10,15), b = rand(1,5);
-    const ans = a + b;
-    const wrongs = shuffle([ans+1, ans-1, ans+2].filter(x=>x!==ans)).slice(0,2);
-    const text = `${a} plus ${b} equals what?`;
-    return {
-      skill:"add", tag:"➕ Addition",
-      prompt:`Addition`,
-      html:`<div class="prompt">Add<span class="speak-btn" onclick="speak('${text}')">🔊</span></div>
-            <div style="text-align:center;font-size:52px;font-weight:950;margin:8px 0; color:var(--c-blue)">${a} + ${b} = ?</div>`,
-      choices: shuffle([String(ans), ...wrongs.map(String)]),
-      answer: String(ans)
-    };
-  }
-
-  // 7. Graph (Fixed: Single Line Rows)
   function qGraph(){
-    const items = [
-      {name:"Cats", icon:"🐱"},
-      {name:"Dogs", icon:"🐶"},
-      {name:"Fish", icon:"🐠"},
-    ];
-    let counts = shuffle([2,3,4,5]).slice(0,3);
+    const items = [{name:"Cats", icon:"🐱"}, {name:"Dogs", icon:"🐶"}, {name:"Fish", icon:"🐠"}];
+    let counts = shuffle([2,4,6]).slice(0,3);
     const data = items.map((it,i)=>({ ...it, n: counts[i] }));
     const maxItem = data.reduce((m,x)=> x.n>m.n?x:m, data[0]);
-
     const graphHtml = data.map(d=>{
       const icons = Array.from({length:d.n}, ()=>`<span class="miniIcon">${d.icon}</span>`).join("");
-      return `
-        <div class="gline">
-          <div class="gleft" style="font-size:18px;">${d.icon} ${d.name}</div>
-          <div class="icons">${icons}</div>
-        </div>
-      `;
+      return `<div class="gline"><div class="gleft" style="font-size:18px;">${d.icon} ${d.name}</div><div class="icons">${icons}</div></div>`;
     }).join("");
-
-    const wrongs = shuffle(data.filter(d=>d.name!==maxItem.name)).slice(0,2).map(d=>d.name);
     const text = "Which group has the most?";
-
     return {
       skill:"graph", tag:"📊 Picture graph",
       prompt: text,
       html:`<div class="two-cols">
-              <div>
-                <div class="prompt">Which has the most?<span class="speak-btn" onclick="speak('${text}')">🔊</span></div>
-                <div class="hint">Count the icons.</div>
-              </div>
-              <div class="graph">
-                ${graphHtml}
-              </div>
+              <div><div class="prompt">Which has the most?<span class="speak-btn" onclick="speak('${text}')">🔊</span></div><div class="hint">Count the icons.</div></div>
+              <div class="graph">${graphHtml}</div>
             </div>`,
-      choices: shuffle([maxItem.name, ...wrongs]),
-      answer: maxItem.name
+      choices: shuffle(data.map(d => d.icon)),
+      answer: maxItem.icon
     };
   }
 
   function qSub(){
-    const total = rand(12,20);
-    const take = rand(2, 5);
-    const ans = total - take;
-    const wrongs = shuffle([ans+1, ans-1, ans+2].filter(x=>x>=0 && x!==ans)).slice(0,2);
+    const total = rand(12, 18), take = rand(3, 6), ans = total - take;
     const text = `You have ${total} balloons. ${take} fly away. How many left?`;
+    let iconsHtml = "";
+    for(let i=0; i<total; i++) {
+        iconsHtml += `<span class="count-item" onclick="this.style.opacity = this.style.opacity == '0.2' ? '1' : '0.2'; sfxClick();" style="font-size:32px">🎈</span>`;
+    }
     return {
       skill:"sub", tag:"➖ Subtraction",
-      prompt:`Story subtraction`,
+      prompt:`Subtraction Story`,
       html:`<div class="prompt">How many left?<span class="speak-btn" onclick="speak('${text}')">🔊</span></div>
-            <div style="font-size:20px;font-weight:900;line-height:1.4; color:#334155">
-              You have <span style="color:var(--c-pink)">${total}</span> balloons 🎈.<br>
-              <span style="color:var(--c-blue)">${take}</span> balloons fly away 💨.<br>
-              How many balloons left?
+            <div style="font-size:18px;font-weight:700;line-height:1.4; color:#334155; margin-bottom:10px">
+              Total: <span style="color:var(--c-pink)">${total}</span>. Fly away: <span style="color:var(--c-blue)">${take}</span>.<br>
+              <span style="font-size:14px; font-weight:500; color:#64748b">(Tip: Tap a balloon to dim it!)</span>
             </div>
+            <div class="count-grid" style="background:#f1f5f9; border-color:#cbd5e1">${iconsHtml}</div>
             <div class="hint">${total} − ${take} = ?</div>`,
-      choices: shuffle([String(ans), ...wrongs.map(String)]),
+      choices: shuffle([String(ans), String(ans+1), String(ans-1)]),
       answer: String(ans)
     };
   }
 
-  function qSub2(){
-    const a = rand(15,20);
-    const b = rand(1,9);
-    const ans = a - b;
-    const wrongs = shuffle([ans+1, ans-1, ans+2].filter(x=>x>=0 && x!==ans)).slice(0,2);
-    const text = `${a} minus ${b} equals what?`;
-    return {
-      skill:"sub", tag:"➖ Subtraction",
-      prompt:`Subtract`,
-      html:`<div class="prompt">Subtract<span class="speak-btn" onclick="speak('${text}')">🔊</span></div>
-            <div style="text-align:center;font-size:52px;font-weight:950;margin:8px 0; color:var(--c-pink)">${a} − ${b} = ?</div>`,
-      choices: shuffle([String(ans), ...wrongs.map(String)]),
-      answer: String(ans)
-    };
-  }
-
-  // 9. Time (Fixed: Minute hand locked to 12)
   function qTime(){
-    const hour = rand(1,12);
-    const answer = `${hour}:00`;
-    const wrongs = shuffle([((hour%12)+1), (hour===1?12:hour-1), (hour+2>12?hour-10:hour+2)])
-      .slice(0,2).map(h=>`${h}:00`);
-
+    const hour = rand(1,12), answer = `${hour}:00`;
     const hourDeg = hour * 30;
-
-    const ticks = Array.from({length:12}, (_,i)=>{
-      const deg = (i*30);
-      return `<div class="tick" style="transform: translate(-50%,-50%) rotate(${deg}deg) translate(0,-95px);"></div>`;
-    }).join("");
-    
+    const ticks = Array.from({length:12}, (_,i)=>`<div class="tick" style="transform: translate(-50%,-50%) rotate(${i*30}deg) translate(0,-95px);"></div>`).join("");
     const nums = Array.from({length:12}, (_,i)=>{
-      const n = i+1;
-      const deg = n*30;
-      const r = 75;
-      const x = Math.sin((deg*Math.PI)/180)*r;
-      const y = -Math.cos((deg*Math.PI)/180)*r;
+      const n = i+1, deg = n*30, r = 75;
+      const x = Math.sin((deg*Math.PI)/180)*r, y = -Math.cos((deg*Math.PI)/180)*r;
       return `<div class="num" style="transform: translate(${x}px, ${y}px) translate(-50%,-50%);">${n}</div>`;
     }).join("");
-
     const text = "What time is it?";
     return {
-      skill:"time", tag:"🕒 Time (o’clock)",
+      skill:"time", tag:"🕒 Time",
       prompt: text,
       html:`<div class="two-cols">
-              <div>
-                <div class="prompt">What time is it?<span class="speak-btn" onclick="speak('${text}')">🔊</span></div>
-                <div class="hint">Minute hand is on 12.</div>
-              </div>
-              <div class="clock">
-                ${ticks}
-                ${nums}
-                <div class="hand hour" style="transform: translateX(-50%) translateY(-100%) rotate(${hourDeg}deg);"></div>
-                <div class="hand minute" style="transform: translateX(-50%) translateY(-100%) rotate(0deg);"></div>
-                <div class="center"></div>
-              </div>
+              <div><div class="prompt">${text}<span class="speak-btn" onclick="speak('${text}')">🔊</span></div><div class="hint">Check the hour hand.</div></div>
+              <div class="clock">${ticks}${nums}<div class="hand hour" style="transform: translateX(-50%) translateY(-100%) rotate(${hourDeg}deg);"></div><div class="hand minute" style="transform: translateX(-50%) translateY(-100%) rotate(0deg);"></div><div class="center"></div></div>
             </div>`,
-      choices: shuffle([answer, ...wrongs]),
+      choices: shuffle([answer, `${hour === 12 ? 1 : hour+1}:00`, `${hour === 1 ? 12 : hour-1}:00`]),
       answer
     };
   }
 
-  // Build 12 questions (balanced)
   function buildQuestions(){
-    const qs = [
-      qCounting(), qCounting2(),
-      qOrdinal(),
-      qPatterns(),
-      qTensOnes(),
-      qNumberPattern(),
-      qAddition(), qAddition2(),
-      qGraph(),
-      qSub(), qSub2(),
-      qTime(),
-    ];
-    return qs;
+    // Return exactly 10 questions
+    return [qCounting(), qCounting2(), qOrdinal(), qPatterns(), qTensOnes(), qNumberPattern(), qAddition(), qGraph(), qSub(), qTime()];
   }
 
-  // ===== State =====
-  let QUESTIONS = [];
-  let current = 0;
-  let answers = []; 
-  let flagged = new Set();
-  let started = false;
-  let submitted = false;
+  // ===== State & Logic =====
+  let QUESTIONS = [], current = 0, answers = [], flagged = new Set(), started = false, submitted = false;
+  const TOTAL_SECONDS = 8 * 60;
+  let leftSec = TOTAL_SECONDS, timerId = null;
 
-  const TOTAL_SECONDS = 8 * 60; // 08:00
-  let leftSec = TOTAL_SECONDS;
-  let timerId = null;
+  const elements = ["startBtn", "resetBtn", "welcome", "quiz", "finish", "qTitle", "qTag", "qBox", "choices", "prevBtn", "nextBtn", "flagBtn", "submitBtn", "gridNav", "chipTimer", "chipStatus", "chipScore", "chipLevel", "mini", "bar", "skillBox", "breakHint", "finalTitle", "finalText", "reviewBtn", "newBtn", "reviewBox"];
+  const dom = {}; elements.forEach(id => dom[id] = document.getElementById(id));
 
-  // ===== DOM =====
-  const startBtn = document.getElementById("startBtn");
-  const resetBtn = document.getElementById("resetBtn");
-  const welcome = document.getElementById("welcome");
-  const quiz = document.getElementById("quiz");
-  const finish = document.getElementById("finish");
-
-  const qTitle = document.getElementById("qTitle");
-  const qTag = document.getElementById("qTag");
-  const qBox = document.getElementById("qBox");
-  const choicesEl = document.getElementById("choices");
-
-  const prevBtn = document.getElementById("prevBtn");
-  const nextBtn = document.getElementById("nextBtn");
-  const flagBtn = document.getElementById("flagBtn");
-  const submitBtn = document.getElementById("submitBtn");
-
-  const gridNav = document.getElementById("gridNav");
-
-  const chipTimer = document.getElementById("chipTimer");
-  const chipStatus = document.getElementById("chipStatus");
-  const chipScore = document.getElementById("chipScore");
-  const chipLevel = document.getElementById("chipLevel");
-
-  const mini = document.getElementById("mini");
-  const bar = document.getElementById("bar");
-
-  const skillBox = document.getElementById("skillBox");
-  const breakHint = document.getElementById("breakHint");
-
-  const finalTitle = document.getElementById("finalTitle");
-  const finalText = document.getElementById("finalText");
-  const reviewBtn = document.getElementById("reviewBtn");
-  const newBtn = document.getElementById("newBtn");
-  const reviewBox = document.getElementById("reviewBox");
-
-  function fmtTime(s){
-    const m = String(Math.floor(s/60)).padStart(2,"0");
-    const sec = String(s%60).padStart(2,"0");
-    return `${m}:${sec}`;
-  }
-
-  function setBar(pct){ bar.style.width = `${pct}%`; }
-
+  function fmtTime(s){ return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`; }
   function setStatus(){
     const done = answers.filter(x=>x && x.choice!=null).length;
-    chipStatus.textContent = `🧩 ${done} / ${QUESTIONS.length}`;
+    dom.chipStatus.textContent = `🧩 ${done} / ${QUESTIONS.length}`;
     const pct = Math.round((done/QUESTIONS.length)*100);
-    setBar(pct);
-    mini.textContent = started ? `In Progress... (${done}/${QUESTIONS.length})` : "Not started";
+    dom.bar.style.width = `${pct}%`;
+    dom.mini.textContent = started ? `Progress: ${done}/${QUESTIONS.length}` : "Not started";
   }
 
   function renderGrid(){
-    gridNav.innerHTML = "";
-    for(let i=0;i<QUESTIONS.length;i++){
+    dom.gridNav.innerHTML = "";
+    for(let i=0; i<QUESTIONS.length; i++){
       const b = document.createElement("button");
-      b.className = "nav-item";
-      if(i===current) b.classList.add("cur");
-      if(answers[i] && answers[i].choice!=null) b.classList.add("answered");
-      if(flagged.has(i)) b.classList.add("flag");
+      b.className = `nav-item ${i===current?'cur':''} ${answers[i]?.choice?'answered':''} ${flagged.has(i)?'flag':''}`;
       b.textContent = i+1;
-      b.onclick = ()=> { 
-        if(!submitted){ 
-          sfxNav();
-          current=i; renderQuestion(); 
-        } 
-      };
-      gridNav.appendChild(b);
+      b.onclick = ()=> { if(!submitted){ sfxNav(); current=i; renderQuestion(); } };
+      dom.gridNav.appendChild(b);
     }
   }
 
   function renderQuestion(){
     const q = QUESTIONS[current];
-    qTitle.textContent = `Question ${current+1}`;
-    qTag.textContent = q.tag;
-    qBox.innerHTML = q.html;
-
-    choicesEl.innerHTML = "";
+    dom.qTitle.textContent = `Question ${current+1}`;
+    dom.qTag.textContent = q.tag;
+    dom.qBox.innerHTML = q.html;
+    dom.choices.innerHTML = "";
     q.choices.forEach(c=>{
       const btn = document.createElement("button");
-      btn.className = "choice";
-      btn.type = "button";
+      btn.className = `choice ${!submitted && answers[current]?.choice === c ? 'selected' : ''} ${submitted && c === q.answer ? 'correct' : ''} ${submitted && answers[current]?.choice === c && c !== q.answer ? 'wrong' : ''}`;
       btn.innerHTML = c;
-
-      if(submitted){
-        btn.disabled = true;
-        if(c === q.answer) btn.classList.add("correct");
-        const a = answers[current];
-        if(a && a.choice === c && c !== q.answer) btn.classList.add("wrong");
-      }else{
-        const a = answers[current];
-        if(a && a.choice === c) btn.classList.add("selected");
-        btn.onclick = ()=> {
-          sfxSelect();
-          selectChoice(c);
-        };
-      }
-
-      choicesEl.appendChild(btn);
+      btn.disabled = submitted;
+      if(!submitted) btn.onclick = ()=> { sfxSelect(); answers[current] = {choice:c, correct:c===q.answer, skill:q.skill}; renderQuestion(); };
+      dom.choices.appendChild(btn);
     });
-
-    flagBtn.textContent = flagged.has(current) ? "🚩 Unflag" : "🚩 Flag";
-    renderGrid();
-    setStatus();
-  }
-
-  function selectChoice(choice){
-    const q = QUESTIONS[current];
-    answers[current] = {
-      choice,
-      correct: choice === q.answer,
-      skill: q.skill
-    };
-    renderQuestion();
-  }
-
-  function toggleFlag(){
-    sfxClick();
-    if(flagged.has(current)) flagged.delete(current);
-    else flagged.add(current);
-    renderQuestion();
-  }
-
-  function tick(){
-    leftSec -= 1;
-    if(leftSec < 0) leftSec = 0;
-    chipTimer.textContent = `⏱ ${fmtTime(leftSec)}`;
-    if(leftSec === 0){
-      submit(true);
-    }
+    dom.flagBtn.textContent = flagged.has(current) ? "🚩 Unflag" : "🚩 Flag";
+    renderGrid(); setStatus();
   }
 
   function start(){
-    sfxClick();
-    QUESTIONS = buildQuestions();
+    sfxClick(); QUESTIONS = buildQuestions(); 
     answers = Array.from({length:QUESTIONS.length}, ()=> ({choice:null, correct:false, skill:null}));
-    flagged = new Set();
-    current = 0;
-    submitted = false;
-    started = true;
-
-    leftSec = TOTAL_SECONDS;
-    chipTimer.textContent = `⏱ ${fmtTime(leftSec)}`;
-
-    if(timerId) clearInterval(timerId);
-    timerId = setInterval(tick, 1000);
-
-    chipScore.textContent = "⭐ Score: —";
-    chipLevel.textContent = "🏷 Level: —";
-    breakHint.textContent = "Shown after submission";
-    skillBox.innerHTML = "";
-
-    welcome.style.display = "none";
-    finish.style.display = "none";
-    quiz.style.display = "block";
-    reviewBox.style.display = "none";
-
-    setBar(0);
-    mini.textContent = "In Progress...";
+    flagged = new Set(); current = 0; submitted = false; started = true; leftSec = TOTAL_SECONDS;
+    if(timerId) clearInterval(timerId); timerId = setInterval(()=>{ 
+        leftSec--; dom.chipTimer.textContent = `⏱ ${fmtTime(leftSec)}`; 
+        if(leftSec <= 0) submit(true); 
+    }, 1000);
+    dom.welcome.style.display = dom.finish.style.display = "none"; dom.quiz.style.display = "block";
     renderQuestion();
   }
 
-  function reset(){
-    sfxClick();
-    if(timerId) clearInterval(timerId);
-    timerId = null;
-    stopFireworks();
-
-    started = false;
-    submitted = false;
-    QUESTIONS = [];
-    answers = [];
-    flagged = new Set();
-    current = 0;
-    leftSec = TOTAL_SECONDS;
-
-    chipTimer.textContent = `⏱ ${fmtTime(leftSec)}`;
-    chipStatus.textContent = "🧩 0/12";
-    chipScore.textContent = "⭐ —";
-    chipLevel.textContent = "🏷 —";
-    mini.textContent = "Not started";
-    setBar(0);
-
-    breakHint.textContent = "Shown after submission";
-    skillBox.innerHTML = "";
-
-    quiz.style.display = "none";
-    finish.style.display = "none";
-    welcome.style.display = "grid";
-    reviewBox.style.display = "none";
-  }
-
-  function classify(pct){
-    if(pct >= 85) return {level:"Excellent", pill:"ok"};
-    if(pct >= 70) return {level:"Good", pill:"mid"};
-    if(pct >= 50) return {level:"Developing", pill:"mid"};
-    return {level:"Needs Practice", pill:"bad"};
-  }
-
-  function renderSkillBreakdown(){
-    const map = new Map(SKILLS.map(s=>[s.key,{name:s.name, correct:0, total:0}]));
-    answers.forEach((a,i)=>{
-      const sk = QUESTIONS[i].skill;
-      const obj = map.get(sk);
-      if(obj){
-        obj.total += 1;
-        if(a && a.correct) obj.correct += 1;
-      }
-    });
-
-    skillBox.innerHTML = "";
-    for(const s of SKILLS){
-      const o = map.get(s.key);
-      if(!o || o.total===0) continue;
-      const pct = Math.round((o.correct/o.total)*100);
-      let pillClass = "bad";
-      if(pct === 100) pillClass = "ok";
-      else if(pct >= 50) pillClass = "mid";
-
-      const div = document.createElement("div");
-      div.className = "skill";
-      div.innerHTML = `
-        <div>
-          <b>${o.name}</b>
-          <span>${o.correct}/${o.total} correct</span>
-        </div>
-        <div class="pill ${pillClass}">${pct}%</div>
-      `;
-      skillBox.appendChild(div);
-    }
-    breakHint.textContent = "Results by Skill";
-  }
-
   function submit(fromTimer=false){
-    if(submitted || !started) return;
-    sfxSubmit();
-    
-    submitted = true;
-
+    if(submitted || !started) return; sfxSubmit(); submitted = true;
     if(timerId) clearInterval(timerId);
-    timerId = null;
-
-    const correct = answers.filter(a=>a && a.correct).length;
-    const total = QUESTIONS.length;
-    const pct = Math.round((correct/total)*100);
-    const cls = classify(pct);
-
-    chipScore.textContent = `⭐ Score: ${correct}/${total}`;
-    chipLevel.textContent = `🏷 Level: ${cls.level}`;
-
-    renderSkillBreakdown();
-
-    quiz.style.display = "none";
-    finish.style.display = "grid"; 
-
-    startFireworks();
-
-    finalTitle.textContent = fromTimer ? "Time's up!" : "Test Submitted!";
-    finalText.innerHTML = `
-      Score: <b>${correct}/${total}</b> (${pct}%)<br>
-      Level: <b>${cls.level}</b><br>
-      ${fromTimer ? "<span style='color:var(--c-orange)'>⏱ Auto-submitted (Time's up)</span>" : "<span style='color:var(--c-green)'>✅ Completed</span>"}
-    `;
-
-    reviewBtn.disabled = false;
-  }
-
-  function buildReview(){
-    sfxClick();
-    reviewBox.innerHTML = "";
-    QUESTIONS.forEach((q,i)=>{
-      const a = answers[i];
-      const ok = a && a.correct;
-      const div = document.createElement("div");
-      div.className = "reviewItem";
-      div.innerHTML = `
-        <b>Q${i+1} • ${q.tag}</b>
-        <div class="m">${q.prompt}</div>
-        <div class="a">
-          Your answer: <span class="${ok ? "okTxt":"badTxt"}">${a.choice ?? "—"}</span><br>
-          Correct answer: <span class="okTxt">${q.answer}</span>
-        </div>
-      `;
-      reviewBox.appendChild(div);
+    const score = answers.filter(a=>a.correct).length, pct = Math.round((score/QUESTIONS.length)*100);
+    const lv = pct>=85?"Excellent":pct>=70?"Good":pct>=50?"Developing":"Needs Practice";
+    dom.chipScore.textContent = `⭐ Score: ${score}/10`; dom.chipLevel.textContent = `🏷 Level: ${lv}`;
+    
+    dom.skillBox.innerHTML = "";
+    SKILLS.forEach(s => {
+        const qList = QUESTIONS.filter((q,i) => q.skill === s.key);
+        if(qList.length === 0) return;
+        const correct = qList.filter((q,i) => answers[QUESTIONS.indexOf(q)].correct).length;
+        const p = Math.round((correct/qList.length)*100);
+        dom.skillBox.innerHTML += `<div class="skill"><div><b>${s.name}</b><span>${correct}/${qList.length}</span></div><div class="pill ${p>=100?'ok':p>=50?'mid':'bad'}">${p}%</div></div>`;
     });
+
+    dom.quiz.style.display = "none"; dom.finish.style.display = "grid"; startFireworks();
+    dom.finalTitle.textContent = fromTimer ? "Time's up!" : "Test Submitted!";
+    dom.finalText.innerHTML = `Score: <b>${score}/10</b> (${pct}%)<br>Level: <b>${lv}</b>`;
   }
 
-  // ===== Events =====
-  startBtn.onclick = start;
-  resetBtn.onclick = reset;
-
-  prevBtn.onclick = ()=> { if(!submitted){ sfxNav(); current = Math.max(0, current-1); renderQuestion(); } };
-  nextBtn.onclick = ()=> { if(!submitted){ sfxNav(); current = Math.min(QUESTIONS.length-1, current+1); renderQuestion(); } };
-  flagBtn.onclick = ()=> { if(!submitted) toggleFlag(); };
-
-  submitBtn.onclick = ()=> { sfxClick(); submit(false); };
-
-  reviewBtn.onclick = ()=>{
-    if(reviewBox.style.display === "none"){
-      buildReview();
-      reviewBox.style.display = "block";
-      reviewBtn.textContent = "🙈 Hide Review";
-    }else{
-      reviewBox.style.display = "none";
-      reviewBtn.textContent = "👀 Review Answers";
-    }
+  dom.startBtn.onclick = start;
+  dom.resetBtn.onclick = ()=> { sfxClick(); if(timerId) clearInterval(timerId); started = submitted = false; dom.welcome.style.display = "grid"; dom.quiz.style.display = dom.finish.style.display = "none"; stopFireworks(); setStatus(); };
+  dom.prevBtn.onclick = ()=> { if(current>0){ sfxNav(); current--; renderQuestion(); } };
+  dom.nextBtn.onclick = ()=> { if(current<QUESTIONS.length-1){ sfxNav(); current++; renderQuestion(); } };
+  dom.flagBtn.onclick = ()=> { sfxClick(); if(flagged.has(current)) flagged.delete(current); else flagged.add(current); renderQuestion(); };
+  dom.submitBtn.onclick = ()=> submit(false);
+  dom.newBtn.onclick = start;
+  dom.reviewBtn.onclick = ()=> {
+    if(dom.reviewBox.style.display === "none") {
+        dom.reviewBox.innerHTML = QUESTIONS.map((q,i) => `<div class="reviewItem"><b>Q${i+1} • ${q.tag}</b><div class="m">${q.prompt}</div><div class="a">You: <span class="${answers[i].correct?'okTxt':'badTxt'}">${answers[i].choice||'—'}</span> | Correct: <span class="okTxt">${q.answer}</span></div></div>`).join("");
+        dom.reviewBox.style.display = "block"; dom.reviewBtn.textContent = "Hide Review";
+    } else { dom.reviewBox.style.display = "none"; dom.reviewBtn.textContent = "Review Answers"; }
   };
 
-  newBtn.onclick = start;
-
-  reset();
+  window.onload = () => { if(window.innerWidth > 0) resizeCanvas(); dom.chipStatus.textContent = "🧩 0/10"; };
+  window.onresize = resizeCanvas;
 </script>
 </body>
 </html>
