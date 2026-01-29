@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
-  // Kiểm tra xem đã đăng nhập chưa
-  const isLoggedIn = localStorage.getItem('isLoggedIn');
-  
-  // Nếu chưa đăng nhập, chuyển hướng về trang login.html
-  if (!isLoggedIn) {
-    window.location.href = 'login.html';
-  }
-</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Oodles Math | Kids Adventure</title>
@@ -186,38 +177,20 @@
       <div class="self-start md:self-center bg-white/60 border-2 border-white px-8 py-4 rounded-[30px] shadow-sm">
         <span class="text-lg font-black text-[#3D3B8E]">🌈 Fun • Safe • Smart</span>
       </div>
-    </header>
-<header class="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
-  <div class="flex items-center gap-6">
-    <img src="./assets/images/logo-oodles-math.png" class="oodles-logo icon-bounce" alt="Oodles Math Logo" />
-    <div>
-      <h1 class="text-3xl md:text-5xl font-black text-[#1F2A44] tracking-tight">Oodles Math</h1>
-      <p class="text-sm font-extrabold text-[#1F2A44]/40 uppercase tracking-[0.2em] mt-1">Magical Learning</p>
-    </div>
-  </div>
-
-  <div class="flex items-center gap-4">
-    <div class="hidden md:block bg-white/60 border-2 border-white px-8 py-4 rounded-[30px] shadow-sm">
-      <span class="text-lg font-black text-[#3D3B8E]">🌈 Fun • Safe • Smart</span>
-    </div>
-
-    <button onclick="logout()" class="bg-red-400 hover:bg-red-500 text-white font-bold py-3 px-6 rounded-2xl transition-all shadow-md">
-      Thoát 🚪
-    </button>
-  </div>
-</header>
+      <button onclick="logout()" class="bg-red-400 hover:bg-red-500 text-white font-bold py-3 px-6 rounded-2xl transition-all shadow-md ml-4">
+  Logout 🚪
+</button>
 
 <script>
   function logout() {
-    // Xóa trạng thái đăng nhập
+    // Clear login session
     localStorage.removeItem('isLoggedIn');
-    // Chuyển về trang login
+    // Redirect back to login page
     window.location.href = 'login.html';
   }
-
-  // (Giữ nguyên phần script parallax cũ của bạn ở đây)
-  document.addEventListener('mousemove', (e) => { ... });
 </script>
+    </header>
+
     <!-- Hero -->
     <section class="glass-card rounded-[50px] p-12 md:p-24 mb-16 relative overflow-hidden group">
       <div class="relative z-10 max-w-3xl">
@@ -332,4 +305,13 @@
     });
   </script>
 </body>
+<script>
+  // Check if user is logged in
+  const isLoggedIn = localStorage.getItem('isLoggedIn');
+  
+  // If not logged in, redirect to login page immediately
+  if (!isLoggedIn) {
+    window.location.href = 'login.html';
+  }
+</script>
 </html>
