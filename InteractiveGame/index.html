@@ -1,44 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interactive Games | Oodles Math</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dino Adventure - Oodles Math</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../assets/brand.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Poppins', sans-serif; background: #E0F2F1; }
-    .game-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+    body { font-family: 'Poppins', sans-serif; }
+    .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 3px solid #E0F2F1; }
+    .game-frame-container {
+      width: 100%; height: calc(100vh - 100px);
+      background: #333; border-radius: 24px; overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.15); border: 6px solid white;
+    }
+    iframe { width: 100%; height: 100%; border: none; }
   </style>
 </head>
-<body class="p-6 md:p-12 min-h-screen">
+<body class="bg-[#E0F2F1] h-screen flex flex-col overflow-hidden">
 
-  <header class="max-w-6xl mx-auto mb-12 flex flex-col md:flex-row justify-between items-center gap-6">
-    <div class="flex items-center gap-4">
-      <a href="../index.html" class="bg-white p-3 rounded-2xl shadow-sm hover:scale-105 transition">🏠 Home</a>
-      <h1 class="text-4xl md:text-5xl font-black text-[#004D40]">Góc Game Tương Tác 🎮</h1>
+  <nav class="glass-nav px-6 py-4 flex justify-between items-center z-50">
+    <div class="flex items-center gap-6">
+      <a href="../" class="bg-white text-[#00695C] border-2 border-[#B2DFDB] px-5 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-[#E0F2F1] transition">
+        <span>⬅</span> Back
+      </a>
+      <h1 class="text-2xl font-black text-[#004D40] hidden md:block">
+        🦖 Dino Adventure
+      </h1>
     </div>
-  </header>
 
-  <main class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="flex gap-3">
+      <button onclick="reloadGame()" class="bg-white text-[#00695C] border-2 border-[#B2DFDB] p-3 rounded-xl hover:rotate-180 transition duration-500" title="Restart">
+        🔄
+      </button>
+      <button onclick="toggleFullscreen()" class="bg-[#009688] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-[#00796B] transition flex items-center gap-2">
+        <span>⛶</span> Fullscreen
+      </button>
+    </div>
+  </nav>
 
-    <a href="./Crocodiledentist/" class="block">
-      <div class="game-card bg-white rounded-[30px] p-6 border-4 border-[#B2DFDB] transition-all cursor-pointer h-full flex flex-col">
-        <div class="h-48 bg-gray-200 rounded-2xl mb-4 overflow-hidden relative">
-            <iframe src="https://scratch.mit.edu/projects/322534282/embed" class="w-full h-full pointer-events-none opacity-80"></iframe>
-            <div class="absolute inset-0 flex items-center justify-center bg-black/10">
-                <span class="text-5xl">▶️</span>
-            </div>
-        </div>
-        <h3 class="text-2xl font-black text-[#00695C] mb-2">Phiêu lưu cùng Scratch</h3>
-        <p class="text-gray-500 font-bold mb-4 flex-grow">Trò chơi chạy nhảy vui nhộn. Giúp nhân vật vượt qua chướng ngại vật!</p>
-        <button class="w-full bg-[#009688] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-[#00796B]">
-          Mở Game 🚀
-        </button>
-      </div>
-    </a>
+  <main class="flex-1 p-4 md:p-6 flex justify-center items-center">
+    <div class="game-frame-container" id="gameContainer">
+      <iframe src="game.html" id="gameFrame" allowtransparency="true"></iframe>
+    </div>
+  </main>
 
-    </main>
+  <script>
+    const gameContainer = document.getElementById('gameContainer');
+    const gameFrame = document.getElementById('gameFrame');
+
+    function reloadGame() { gameFrame.src = gameFrame.src; }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        if (gameContainer.requestFullscreen) gameContainer.requestFullscreen();
+        else if (gameContainer.webkitRequestFullscreen) gameContainer.webkitRequestFullscreen();
+        gameContainer.style.borderRadius = "0"; gameContainer.style.border = "none";
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) {
+        gameContainer.style.borderRadius = "24px"; gameContainer.style.border = "6px solid white";
+      }
+    });
+  </script>
 </body>
 </html>
