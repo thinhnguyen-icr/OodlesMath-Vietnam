@@ -1,72 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dino Adventure - Oodles Math</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Games | Oodles Math</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/brand.css" />
   <style>
-    body { font-family: 'Poppins', sans-serif; }
-    .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 3px solid #E0F2F1; }
-    .game-frame-container {
-      width: 100%; height: calc(100vh - 100px);
-      background: #333; border-radius: 24px; overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.15); border: 6px solid white;
-    }
-    iframe { width: 100%; height: 100%; border: none; }
+    body { font-family: 'Poppins', sans-serif; background: #E0F2F1; }
+    .game-card { transition: all 0.3s ease; }
+    .game-card:hover { transform: translateY(-8px); box-shadow: 0 20px 30px -10px rgba(0, 150, 136, 0.3); }
   </style>
 </head>
-<body class="bg-[#E0F2F1] h-screen flex flex-col overflow-hidden">
+<body class="bg-[#E0F2F1] min-h-screen p-6 md:p-12">
 
-  <nav class="glass-nav px-6 py-4 flex justify-between items-center z-50">
-    <div class="flex items-center gap-6">
-      <a href="../" class="bg-white text-[#00695C] border-2 border-[#B2DFDB] px-5 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-[#E0F2F1] transition">
-        <span>⬅</span> Back
+  <header class="max-w-6xl mx-auto mb-16 flex flex-col md:flex-row justify-between items-center gap-6">
+    <div class="flex items-center gap-4">
+      <a href="../index.html" class="bg-white text-[#00695C] px-6 py-3 rounded-2xl font-bold shadow-sm hover:scale-105 transition flex items-center gap-2">
+        <span>🏡</span> Home
       </a>
-      <h1 class="text-2xl font-black text-[#004D40] hidden md:block">
-        🦖 Dino Adventure
-      </h1>
     </div>
-
-    <div class="flex gap-3">
-      <button onclick="reloadGame()" class="bg-white text-[#00695C] border-2 border-[#B2DFDB] p-3 rounded-xl hover:rotate-180 transition duration-500" title="Restart">
-        🔄
-      </button>
-      <button onclick="toggleFullscreen()" class="bg-[#009688] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-[#00796B] transition flex items-center gap-2">
-        <span>⛶</span> Fullscreen
-      </button>
+    <div class="text-center md:text-right">
+      <h1 class="text-4xl md:text-5xl font-black text-[#004D40]">Game Zone 🎮</h1>
+      <p class="text-[#00695C] font-bold opacity-60 mt-1 uppercase tracking-widest">Fun & Creative</p>
     </div>
-  </nav>
+  </header>
 
-  <main class="flex-1 p-4 md:p-6 flex justify-center items-center">
-    <div class="game-frame-container" id="gameContainer">
-      <iframe src="game.html" id="gameFrame" allowtransparency="true"></iframe>
-    </div>
-  </main>
+  <main class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
 
-  <script>
-    const gameContainer = document.getElementById('gameContainer');
-    const gameFrame = document.getElementById('gameFrame');
+    <a href="./game-01/" class="block h-full">
+      <div class="game-card bg-white rounded-[35px] p-6 border-4 border-[#B2DFDB] h-full flex flex-col cursor-pointer relative overflow-hidden group">
+        
+        <div class="h-52 bg-[#009688] rounded-[25px] mb-6 overflow-hidden relative flex items-center justify-center">
+            <span class="text-8xl group-hover:scale-125 transition-transform duration-500">🦖</span>
+            <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>
+        </div>
 
-    function reloadGame() { gameFrame.src = gameFrame.src; }
+        <h3 class="text-2xl font-black text-[#00695C] mb-3">Dino Adventure</h3>
+        <p class="text-gray-500 font-bold mb-8 flex-grow leading-relaxed">
+          Run and jump! Help the dinosaur cross the finish line in this classic Scratch game.
+        </p>
 
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        if (gameContainer.requestFullscreen) gameContainer.requestFullscreen();
-        else if (gameContainer.webkitRequestFullscreen) gameContainer.webkitRequestFullscreen();
-        gameContainer.style.borderRadius = "0"; gameContainer.style.border = "none";
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-      }
-    }
+        <button class="w-full bg-[#009688] text-white font-black text-lg py-4 rounded-2xl shadow-lg group-hover:bg-[#00796B] transition-colors flex justify-center items-center gap-2">
+          Play Now 🚀
+        </button>
+      </div>
+    </a>
 
-    document.addEventListener('fullscreenchange', () => {
-      if (!document.fullscreenElement) {
-        gameContainer.style.borderRadius = "24px"; gameContainer.style.border = "6px solid white";
-      }
-    });
-  </script>
+    </main>
 </body>
 </html>
