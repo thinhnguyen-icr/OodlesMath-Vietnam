@@ -213,7 +213,7 @@
     </section>
 
     <!-- Cards -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
 
       <!-- PopsicleMath (WHOLE CARD CLICKABLE) -->
       <a href="./PopsicleMath/" class="focus-ring">
@@ -280,39 +280,108 @@
           </div>
         </div>
       </a>
-<a href="./InteractiveGame/" class="focus-ring">
+
+    </section>
+<section class="w-full mt-12 md:mt-16">
+      <a href="./InteractiveGame/" class="focus-ring block">
         <div
-          class="group glass-card click-card rounded-[50px] p-12 flex flex-col h-full overflow-hidden"
+          class="group glass-card click-card rounded-[50px] p-10 md:p-14 relative overflow-hidden flex flex-col md:flex-row items-center gap-10"
           role="link"
           aria-label="Interactive Games"
         >
-          <div class="mb-10 flex justify-between items-start">
-            <span class="tag-bubble bg-[#E0F7FA] text-[#006064]">
-              🎮 GAME ZONE
+          <div class="flex-1 z-10">
+            <div class="flex items-center gap-4 mb-6">
+              <span class="tag-bubble bg-[#E0F7FA] text-[#006064] px-4 py-2 rounded-full">
+                🎮 GAME ZONE
+              </span>
+              <span class="text-4xl animate-pulse">🕹️</span>
+            </div>
+
+            <h3 class="text-4xl md:text-5xl font-black text-[#1F2A44] mb-4">
+              Interactive Games
+            </h3>
+            <p class="text-xl font-bold text-gray-500 leading-relaxed mb-8">
+              Take a break! Relax and spark your creativity with our collection of fun Scratch games.
+            </p>
+
+            <span class="btn-kids px-10 py-5 text-white font-black text-lg inline-flex items-center gap-3">
+              Enter Arcade
+              <span class="text-xl">➔</span>
             </span>
-            <span class="text-5xl group-hover:rotate-12 transition-transform">🕹️</span>
           </div>
 
-          <h3 class="text-5xl font-black mb-6 text-[#1F2A44]">Interactive<br>Game</h3>
-          <p class="text-xl font-bold text-gray-500 mb-14 flex-grow leading-relaxed">
-            Thư giãn và sáng tạo với các trò chơi Scratch tương tác thú vị!
-          </p>
-
-          <div class="flex items-center justify-between mt-auto">
-            <span class="btn-kids px-12 py-6 text-white font-black text-xl flex items-center gap-4">
-              Chơi Ngay!
-              <span class="text-2xl">➔</span>
-            </span>
-
-            <div class="text-right">
-              <span class="text-4xl">👾</span>
-              <p class="text-xs font-black opacity-20 uppercase mt-1">Fun Mode</p>
-            </div>
+          <div class="relative w-full md:w-1/3 h-48 md:h-auto flex justify-center items-center">
+             <div class="absolute top-0 right-10 text-7xl icon-bounce" style="animation-delay: 0.2s">👾</div>
+             <div class="absolute bottom-5 left-10 text-6xl icon-bounce" style="animation-delay: 1.5s">🚀</div>
+             <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[120px] opacity-10">
+               🎲
+             </div>
           </div>
         </div>
       </a>
     </section>
+    ```
 
+---
+
+### 2. Create the Game Menu (`InteractiveGame/index.html`)
+
+Create a folder named **`InteractiveGame`**. Inside, create a file named **`index.html`**:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Games | Oodles Math</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/brand.css" />
+  <style>
+    body { font-family: 'Poppins', sans-serif; background: #E0F2F1; }
+    .game-card { transition: all 0.3s ease; }
+    .game-card:hover { transform: translateY(-8px); box-shadow: 0 20px 30px -10px rgba(0, 150, 136, 0.3); }
+  </style>
+</head>
+<body class="bg-[#E0F2F1] min-h-screen p-6 md:p-12">
+
+  <header class="max-w-6xl mx-auto mb-16 flex flex-col md:flex-row justify-between items-center gap-6">
+    <div class="flex items-center gap-4">
+      <a href="../index.html" class="bg-white text-[#00695C] px-6 py-3 rounded-2xl font-bold shadow-sm hover:scale-105 transition flex items-center gap-2">
+        <span>🏡</span> Home
+      </a>
+    </div>
+    <div class="text-center md:text-right">
+      <h1 class="text-4xl md:text-5xl font-black text-[#004D40]">Game Zone 🎮</h1>
+      <p class="text-[#00695C] font-bold opacity-60 mt-1 uppercase tracking-widest">Fun & Creative</p>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+
+    <a href="./game-01/" class="block h-full">
+      <div class="game-card bg-white rounded-[35px] p-6 border-4 border-[#B2DFDB] h-full flex flex-col cursor-pointer relative overflow-hidden group">
+        
+        <div class="h-52 bg-[#009688] rounded-[25px] mb-6 overflow-hidden relative flex items-center justify-center">
+            <span class="text-8xl group-hover:scale-125 transition-transform duration-500">🦖</span>
+            <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>
+        </div>
+
+        <h3 class="text-2xl font-black text-[#00695C] mb-3">Dino Adventure</h3>
+        <p class="text-gray-500 font-bold mb-8 flex-grow leading-relaxed">
+          Run and jump! Help the dinosaur cross the finish line in this classic Scratch game.
+        </p>
+
+        <button class="w-full bg-[#009688] text-white font-black text-lg py-4 rounded-2xl shadow-lg group-hover:bg-[#00796B] transition-colors flex justify-center items-center gap-2">
+          Play Now 🚀
+        </button>
+      </div>
+    </a>
+
+    </main>
+</body>
+</html>
     <!-- Footer -->
     <footer class="mt-32 py-20 text-center">
       <div class="flex justify-center gap-8 mb-8 text-4xl opacity-20">
