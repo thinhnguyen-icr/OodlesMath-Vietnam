@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Games | Oodles Math</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/brand.css" />
+  <style>
+    body { font-family: 'Poppins', sans-serif; background: #E0F2F1; }
+    .game-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+  </style>
+</head>
+<body class="p-6 md:p-12 min-h-screen">
+
+  <header class="max-w-6xl mx-auto mb-12 flex flex-col md:flex-row justify-between items-center gap-6">
+    <div class="flex items-center gap-4">
+      <a href="../index.html" class="bg-white p-3 rounded-2xl shadow-sm hover:scale-105 transition">🏠 Home</a>
+      <h1 class="text-4xl md:text-5xl font-black text-[#004D40]">Góc Game Tương Tác 🎮</h1>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+    <a href="./Crocodiledentist/" class="block">
+      <div class="game-card bg-white rounded-[30px] p-6 border-4 border-[#B2DFDB] transition-all cursor-pointer h-full flex flex-col">
+        <div class="h-48 bg-gray-200 rounded-2xl mb-4 overflow-hidden relative">
+            <iframe src="https://scratch.mit.edu/projects/322534282/embed" class="w-full h-full pointer-events-none opacity-80"></iframe>
+            <div class="absolute inset-0 flex items-center justify-center bg-black/10">
+                <span class="text-5xl">▶️</span>
+            </div>
+        </div>
+        <h3 class="text-2xl font-black text-[#00695C] mb-2">Phiêu lưu cùng Scratch</h3>
+        <p class="text-gray-500 font-bold mb-4 flex-grow">Trò chơi chạy nhảy vui nhộn. Giúp nhân vật vượt qua chướng ngại vật!</p>
+        <button class="w-full bg-[#009688] text-white font-bold py-3 rounded-xl shadow-lg hover:bg-[#00796B]">
+          Mở Game 🚀
+        </button>
+      </div>
+    </a>
+
+    </main>
+</body>
+</html>
