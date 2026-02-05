@@ -673,8 +673,28 @@
       icon: "🟦",
       items: [
         // Semester 1 (Lessons 01–16)
-        { id:"lesson-01", title:"Lesson 01", desc:"Seeker B • Lesson 01", icon:"🐸", url:"lesson-01/" },
-        { id:"lesson-02", title:"Lesson 02", desc:"Seeker B • Lesson 02", icon:"🐼", url:"lesson-02/" },
+         {
+          id:"lesson-1",
+          title:"Lesson 1",
+          desc:"Seeker B • Lesson 1 (3 games)",
+          icon:"🎯",
+          children: [
+            { id:"lesson-1-a", title:"Lesson 1 – Game A", desc:"Seeker B • Lesson 1", icon:"🅰️", url:"lesson-01-game-1/" },
+            { id:"lesson-1-b", title:"Lesson 1 – Game B", desc:"Seeker B • Lesson 1", icon:"🅱️", url:"lesson-01-game-2/" },
+            { id:"lesson-1-c", title:"Lesson 1 – Game C", desc:"Seeker B • Lesson 1", icon:"🅱️", url:"lesson-01-game-3/" },
+          ]
+        },
+        {
+          id:"lesson-2",
+          title:"Lesson 2",
+          desc:"Seeker B • Lesson 2 (3 games)",
+          icon:"🎯",
+          children: [
+            { id:"lesson-2-a", title:"Lesson 2 – Game A", desc:"Seeker B • Lesson 2", icon:"🅰️", url:"lesson-02-game-1/" },
+            { id:"lesson-2-b", title:"Lesson 2 – Game B", desc:"Seeker B • Lesson 2", icon:"🅱️", url:"lesson-02-game-2/" },
+            { id:"lesson-2-c", title:"Lesson 2 – Game C", desc:"Seeker B • Lesson 2", icon:"🅱️", url:"lesson-02-game-3/" },
+          ]
+        },
         { id:"lesson-03", title:"Lesson 03", desc:"Seeker B • Lesson 03", icon:"🦊", url:"lesson-03/" },
         { id:"lesson-04", title:"Lesson 04", desc:"Seeker B • Lesson 04", icon:"🍒", url:"lesson-04/" },
 

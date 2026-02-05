@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="../assets/brand.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Division Master - Hundred Chart</title>
+    <title>Division Master</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -21,6 +21,8 @@
             --c-white: #FFFFFF;
             --c-dark: #2c3e50;
             
+            --col-quotient: #4ECDC4; 
+            --col-dividend: #FFA500;
             --block-one-border: #d35400;
             --block-ten-border: #2a9d8f;
             --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
@@ -50,7 +52,7 @@
         }
 
         header {
-            width: 100%; max-width: 800px;
+            width: 100%; max-width: 900px;
             background: rgba(255, 255, 255, 0.95);
             padding: 10px 20px; border-radius: 20px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.05);
@@ -69,7 +71,7 @@
         }
 
         #game-area {
-            flex: 1; width: 100%; max-width: 800px;
+            flex: 1; width: 100%; max-width: 900px;
             display: flex; flex-direction: column; position: relative;
             overflow: hidden;
         }
@@ -78,12 +80,10 @@
             background: white; border-radius: 18px; padding: 10px 15px;
             margin-bottom: 8px; display: flex; justify-content: center;
             align-items: center; gap: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            flex-shrink: 0; min-height: 50px;
+            flex-shrink: 0; min-height: 60px;
             border: 2px solid #f1f5f9;
         }
         .eq-text { font-size: 2.2rem; font-weight: 900; transition: all 0.3s; }
-        @media (max-width: 600px) { .eq-text { font-size: 1.6rem; } }
-
         .eq-hl { color: var(--c-blue); transform: scale(1.1); }
         .eq-hl-2 { color: var(--c-orange); transform: scale(1.1); }
 
@@ -97,66 +97,78 @@
             border: 1px solid white;
         }
 
-        /* --- Hundred Chart Stylings --- */
-        .chart-container {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 10px;
-            box-shadow: var(--shadow-soft);
-            border: 3px solid white;
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            grid-template-rows: repeat(10, 1fr);
-            gap: 4px;
+        .board-container {
+            flex: 2; display: flex; gap: 10px; overflow: hidden;
+            background: rgba(255,255,255,0.2); border-radius: 24px; padding: 10px;
+            min-height: 0;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .column {
+            flex: 1; background: rgba(255,255,255,0.95);
+            border-radius: 20px; border: 3px solid white;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 10px; position: relative; 
+            overflow-y: auto; overflow-x: hidden;
+            box-shadow: var(--shadow-soft), inset 0 0 0 1px rgba(0,0,0,0.02);
+        }
+        .col-header {
+            font-size: 0.95rem; font-weight: 900; text-transform: uppercase;
+            margin-bottom: 12px; width: 100%; text-align: center;
+            border-bottom: 2px solid #f0f4f8; padding-bottom: 8px;
+            flex-shrink: 0;
+        }
+        .col-header.quotient { color: var(--col-quotient); }
+        .col-header.dividend { color: var(--col-dividend); }
+
+        .quotient-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 8px; 
+            width: 100%; 
+            padding-bottom: 40px; 
+            align-items: start;
+            justify-items: center;
+        }
+        
+        .dividend-grid { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(26px, 1fr)); 
+            gap: 4px; padding: 5px; width: 100%;
+            min-height: 100px; padding-bottom: 40px;
+            align-content: start; justify-items: center;
+        }
+
+        /* 3D Block Visuals */
+        .group-rod {
+            display: flex; gap: 2px; padding: 4px;
+            background: #b2ebf2; 
+            border: 2.5px solid var(--block-ten-border); 
+            border-radius: 10px;
+            flex-wrap: wrap; justify-content: center;
             width: 100%;
-            max-width: 450px;
-            margin: 0 auto;
-            aspect-ratio: 1 / 1;
+            box-shadow: 2px 3px 0 rgba(0,0,0,0.1), inset 1px 1px 0 rgba(255,255,255,0.5);
+        }
+        .rod-unit { 
+            width: 14px; height: 14px; 
+            background: var(--col-quotient); 
+            border-radius: 2px;
+            box-shadow: inset -2px -2px 0 rgba(0,0,0,0.1), inset 2px 2px 0 rgba(255,255,255,0.3);
         }
 
-        .chart-cell {
-            background: #f1f5f9;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: #94a3b8;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid #e2e8f0;
-            position: relative;
+        .one-cube {
+            width: 26px; height: 26px;
+            background: var(--col-dividend); 
+            border: 2.5px solid var(--block-one-border); 
+            border-radius: 6px;
+            box-shadow: 
+                2px 3px 0 rgba(0,0,0,0.15), 
+                inset -3px -3px 0 rgba(0,0,0,0.2), 
+                inset 3px 3px 0 rgba(255,255,255,0.4);
+            transition: transform 0.1s, box-shadow 0.1s;
         }
+        .one-cube.group-mode { width: 18px; height: 18px; margin: 1px; border-width: 1.5px; box-shadow: 1px 1px 0 rgba(0,0,0,0.1); }
 
-        .chart-cell.active {
-            background: #fffbeb;
-            color: var(--c-dark);
-            border-color: #fef3c7;
-            box-shadow: inset 0 0 10px rgba(255, 165, 0, 0.05);
-        }
-
-        .chart-cell.dimmed {
-            opacity: 0.3;
-            filter: grayscale(1);
-        }
-
-        .chart-cell.filled {
-            background: var(--fill-color, var(--c-blue));
-            color: white;
-            border-color: rgba(0,0,0,0.1);
-            transform: scale(1.05);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1), inset 1px 1px 0 rgba(255,255,255,0.4);
-            z-index: 2;
-        }
-
-        /* Responsive adjustments for mobile chart */
-        @media (max-width: 500px) {
-            .chart-container { gap: 2px; padding: 5px; }
-            .chart-cell { font-size: 0.6rem; }
-        }
-
-        /* --- UI Builder Area --- */
+        /* Controls / Builder */
         .builder-area {
             background: white; border-radius: 30px 30px 0 0;
             padding: 15px; box-shadow: 0 -10px 40px rgba(0,0,0,0.08);
@@ -166,63 +178,65 @@
         }
         
         .input-phase-ui {
-            display: flex; gap: 15px; justify-content: center; align-items: center; height: 70px;
+            display: flex; gap: 15px; justify-content: center; align-items: center; height: 80px;
         }
         .num-input {
-            width: 100px; height: 45px; border: 3px solid var(--c-blue);
-            border-radius: 12px; text-align: center; font-size: 1.4rem;
+            width: 110px; height: 50px; border: 3px solid var(--col-dividend);
+            border-radius: 15px; text-align: center; font-size: 1.6rem;
             font-weight: 800; color: var(--c-dark); outline: none;
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
         }
         
-        .btn-action {
-            background: var(--c-green); color: white; border: none; padding: 12px 30px; 
-            border-radius: 50px; font-weight: 800; font-size: 1rem; box-shadow: 0 5px 0 #27ae60; 
-            cursor: pointer; transition: all 0.1s;
-        }
-        .btn-action:active { transform: translateY(3px); box-shadow: 0 2px 0 #27ae60; }
-
-        /* Group Cube for Placement */
-        .placement-ui {
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
+        .builder-stage {
+            display: flex; gap: 25px; align-items: center; justify-content: center;
+            min-height: 85px;
         }
 
-        .group-display {
-            background: #f8fafc;
-            border: 2.5px dashed #94A3B8;
-            border-radius: 15px;
-            padding: 10px;
-            display: flex;
-            gap: 4px;
-            justify-content: center;
-            align-items: center;
-            min-height: 60px;
-            cursor: pointer;
-            transition: transform 0.2s;
+        .source-box {
+            background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 20px;
+            padding: 12px; min-width: 90px; display: flex; flex-direction: column;
+            align-items: center; cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 5px 0 #e2e8f0;
         }
-        .group-display.ready {
-            border-style: solid;
-            border-color: var(--c-green);
-            background: #f0fdf4;
-            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.15);
+        .source-box:active { transform: translateY(3px); box-shadow: 0 2px 0 #e2e8f0; }
+
+        .group-slot {
+            border: 2.5px dashed #94A3B8; border-radius: 20px;
+            padding: 10px; min-width: 130px; min-height: 70px;
+            display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; align-items: center;
+            background: #f8fafc; transition: all 0.3s;
+        }
+        .group-slot.ready { 
+            border-color: var(--c-green); 
+            background: #f0fdf4; 
+            border-style: solid; 
+            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.15); 
+            cursor: pointer; 
             animation: bounce-anim 1s infinite;
         }
-        .group-display.ready:active { transform: scale(0.95); animation: none; }
+        .group-slot.ready:active { animation: none; transform: translateY(3px); box-shadow: 0 2px 0 #27ae60; }
 
-        .one-cube {
-            width: 26px; height: 26px;
-            background: var(--c-orange); 
-            border: 2.5px solid var(--block-one-border); 
-            border-radius: 6px;
-            box-shadow: 2px 3px 0 rgba(0,0,0,0.15), inset -3px -3px 0 rgba(0,0,0,0.2), inset 3px 3px 0 rgba(255,255,255,0.4);
-            flex-shrink: 0;
+        .btn-action {
+            background: var(--c-green); color: white; border: none; padding: 14px 40px; 
+            border-radius: 50px; font-weight: 800; font-size: 1.1rem; box-shadow: 0 6px 0 #27ae60; 
+            cursor: pointer; transition: all 0.1s;
         }
+        .btn-action:active { transform: translateY(3px); box-shadow: 0 3px 0 #27ae60; }
 
-        /* Options */
+        .btn-undo {
+            background: #f1f5f9; color: #64748b; border: none;
+            width: 45px; height: 45px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 4px 0 #cbd5e1;
+            transition: all 0.1s;
+        }
+        .btn-undo:active { transform: translateY(2px); box-shadow: 0 1px 0 #cbd5e1; }
+        .btn-undo svg { width: 24px; height: 24px; stroke-width: 3; }
+
         #options-ui { flex-shrink: 0; background: white; padding: 20px; border-radius: 30px 30px 0 0; }
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .opt-btn {
-            background: #f8f9fa; border: 2.5px solid #e9ecef; padding: 18px;
+            background: #f8f9fa; border: 2px solid #e9ecef; padding: 18px;
             border-radius: 20px; font-size: 1.8rem; font-weight: 800;
             color: var(--c-dark); cursor: pointer;
             box-shadow: 0 6px 0 #e9ecef;
@@ -232,7 +246,6 @@
         .opt-btn.correct { background: var(--c-green); color: white; border-color: #27ae60; box-shadow: 0 6px 0 #27ae60; }
         .opt-btn.wrong { background: var(--c-red); color: white; border-color: #c0392b; box-shadow: 0 6px 0 #c0392b; }
 
-        /* Screens */
         #start-screen, #finished-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #87CEEB 0%, #E0F2FE 100%); z-index: 50;
@@ -246,7 +259,6 @@
 
         #fireworks-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
 
-        /* Mini Game Overlay */
         #minigame-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 100;
             display: none; flex-direction: column;
@@ -258,6 +270,7 @@
         .hidden { display: none !important; }
         @keyframes popIn { 0% { transform: scale(0); } 80% { transform: scale(1.1); } 100% { transform: scale(1); } }
         @keyframes bounce-anim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @keyframes pulse-anim { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -270,9 +283,9 @@
 
         <!-- Start Screen -->
         <div id="start-screen">
-            <h1 style="font-size: 3rem; color: white; text-shadow: 4px 4px 0 rgba(0,0,0,0.1); font-weight: 900; text-align: center; margin-bottom: 5px;">Division Challenge!</h1>
-            <p style="color: white; font-weight: 600; margin-bottom: 40px; font-size: 1.2rem;">Use the Hundred Chart to Divide</p>
-            <button class="btn-primary" onclick="startGame()">Start Play ▶</button>
+            <h1 style="font-size: 3rem; color: white; text-shadow: 4px 4px 0 rgba(0,0,0,0.1); font-weight: 900; text-align: center; margin-bottom: 5px;">Let's Learn Math!</h1>
+            <p style="color: white; font-weight: 600; margin-bottom: 40px; font-size: 1.2rem;">Input, Group & Divide</p>
+            <button class="btn-primary" onclick="startGame()">Start ▶</button>
         </div>
 
         <!-- Finish Screen -->
@@ -294,31 +307,52 @@
                 <span id="eq-res" class="eq-text eq-hl">?</span>
             </div>
 
-            <div class="instruction" id="instruction">Step 1: Set the Dividend (Total)</div>
+            <div class="instruction" id="instruction">Step 1: Enter the Dividend (Total)</div>
 
-            <div class="chart-container" id="hundred-chart">
-                <!-- Cells generated by JS -->
+            <div class="board-container">
+                <!-- Quotient Column (Left) -->
+                <div class="column">
+                    <div class="col-header quotient">Quotient (<span id="quotient-count">0</span>)</div>
+                    <div class="quotient-grid" id="quotient-col"></div>
+                </div>
+
+                <!-- Dividend Column (Right) -->
+                <div class="column">
+                    <div class="col-header dividend">Dividend (<span id="dividend-count">0</span>)</div>
+                    <div class="dividend-grid" id="dividend-col"></div>
+                </div>
             </div>
 
             <div class="builder-area" id="builder-ui">
-                <!-- PHASE 1: SET DIVIDEND -->
-                <div id="ui-dividend" class="input-phase-ui">
+                <!-- PHASE 1: INPUT -->
+                <div id="ui-input" class="input-phase-ui">
                     <input type="number" id="input-dividend" class="num-input" placeholder="?" min="1" max="100">
-                    <button class="btn-action" onclick="setDividend()">SET DIVIDEND</button>
+                    <button class="btn-action" onclick="setDividend()">SET</button>
                 </div>
 
-                <!-- PHASE 2: SET DIVISOR -->
-                <div id="ui-divisor" class="input-phase-ui hidden">
-                    <input type="number" id="input-divisor" class="num-input" placeholder="?" min="1" max="20">
-                    <button class="btn-action" onclick="setDivisor()">SET DIVISOR</button>
-                </div>
+                <!-- PHASE 2 & 3: BUILD & DIVIDE -->
+                <div id="ui-build" class="hidden">
+                    <div class="builder-stage">
+                        <div class="source-box" onmousedown="addCubeToGroup()" ontouchstart="addCubeToGroup()">
+                            <div class="one-cube"></div>
+                            <span style="font-size:0.7rem; font-weight:800; margin-top:8px; color:#64748B;">TAP</span>
+                        </div>
+                        
+                        <div style="font-size: 1.8rem; color: #CBD5E1; font-weight: 900;">➜</div>
+                        
+                        <div id="group-slot" class="group-slot" onclick="transferGroup()">
+                            <span style="width:100%; text-align:center; font-size:0.8rem; color:#94A3B8; pointer-events:none;" id="group-hint">Build Divisor</span>
+                        </div>
 
-                <!-- PHASE 3: DISTRIBUTE GROUPS -->
-                <div id="ui-place" class="placement-ui hidden">
-                    <div id="group-slot" class="group-display ready" onclick="placeNextGroup()">
-                        <!-- Group cubes generated here -->
+                        <button class="btn-undo" onclick="undoGroupBuild()" title="Undo">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                                <path d="M3 3v5h5"/>
+                            </svg>
+                        </button>
                     </div>
-                    <span style="font-size: 0.8rem; font-weight: 700; color: #64748b;">TAP TO PLACE GROUP</span>
+                    <!-- 'Done' Button will only show when division is complete -->
+                    <button id="btn-done-dividing" class="btn-action hidden" style="margin: 5px auto; width: 100%; animation: pulse-anim 1s infinite;" onclick="finishDividing()">I'm Done!</button>
                 </div>
             </div>
 
@@ -332,23 +366,18 @@
         <div id="minigame-overlay">
             <div class="mg-ui">
                 <div class="mg-title">ANGRY CUBES!</div>
-                <p style="font-size: 1.1rem; font-weight: 600; color: white;">Drag bird to hit pigs!</p>
+                <p style="font-size: 1.2rem; font-weight: 600; color: white;">Drag bird to hit pigs!</p>
             </div>
             <canvas id="game-canvas"></canvas>
-            <button style="position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.25); border: 2px solid white; color: white; padding: 12px 30px; border-radius: 30px; cursor: pointer; font-weight: 800; font-size: 0.9rem;" onclick="closeMiniGame()">Skip Mini-Game</button>
+            <button style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.2); border: 2px solid white; color: white; padding: 12px 30px; border-radius: 40px; cursor: pointer; font-weight: 800; font-size: 1rem;" onclick="closeMiniGame()">Skip Mini-Game</button>
         </div>
     </div>
 
     <script>
         const STATE = {
-            dividend: 0,
-            divisor: 0,
-            quotient: 0,
-            groupsPlaced: 0,
-            cellsFilled: 0,
-            score: 0,
-            phase: 'dividend', // dividend, divisor, place, answer
-            groupColors: ['#4ECDC4', '#FF6B6B', '#9b59b6', '#2ecc71', '#FFA500', '#3498db', '#f1c40f', '#e67e22', '#1abc9c', '#95a5a6']
+            dividend: 0, divisor: 0, quotient: 0,
+            currentGroupSize: 0, currentDividendCount: 0,
+            score: 0, phase: 'input'
         };
 
         const AUDIO = new (window.AudioContext || window.webkitAudioContext)();
@@ -370,130 +399,104 @@
             STATE.score = 0; updateScore(); resetRound();
         }
 
-        function initChart() {
-            const chart = document.getElementById('hundred-chart');
-            chart.innerHTML = '';
-            for (let i = 1; i <= 100; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'chart-cell';
-                cell.id = `cell-${i}`;
-                cell.innerText = i;
-                chart.appendChild(cell);
-            }
-        }
-
         function resetRound() {
             STATE.dividend = 0; STATE.divisor = 0; STATE.quotient = 0;
-            STATE.groupsPlaced = 0; STATE.cellsFilled = 0;
-            STATE.phase = 'dividend';
-            
+            STATE.currentGroupSize = 0; STATE.currentDividendCount = 0;
+            STATE.phase = 'input';
             document.getElementById('input-dividend').value = '';
-            document.getElementById('input-divisor').value = '';
             document.getElementById('options-grid').innerHTML = '';
+            document.getElementById('dividend-col').innerHTML = '';
+            document.getElementById('quotient-col').innerHTML = '';
             document.getElementById('eq-n1').innerText = "?";
             document.getElementById('eq-n2').innerText = "?";
             document.getElementById('eq-res').innerText = "?";
-            
-            initChart();
-            updateUI();
+            resetBuilder(); updateUI();
         }
 
-        // --- Step 1: Set Dividend ---
         function setDividend() {
-            const val = parseInt(document.getElementById('input-dividend').value);
+            const input = document.getElementById('input-dividend');
+            const val = parseInt(input.value);
             if (!val || val < 1 || val > 100) return;
-            
-            STATE.dividend = val;
-            STATE.phase = 'divisor';
-            
-            // Highlight cells on chart
-            for(let i=1; i<=100; i++) {
-                const cell = document.getElementById(`cell-${i}`);
-                if (i <= val) {
-                    cell.classList.add('active');
-                    cell.classList.remove('dimmed');
-                } else {
-                    cell.classList.add('dimmed');
-                    cell.classList.remove('active');
-                }
-            }
-            
-            playTone(500, 'sine', 0.2);
-            updateUI();
-        }
-
-        // --- Step 2: Set Divisor ---
-        function setDivisor() {
-            const val = parseInt(document.getElementById('input-divisor').value);
-            if (!val || val < 1 || val > 50) return;
-            
-            STATE.divisor = val;
-            STATE.phase = 'place';
-            
-            // Render group blocks in the builder area
-            const slot = document.getElementById('group-slot');
-            slot.innerHTML = '';
+            STATE.dividend = val; STATE.currentDividendCount = val;
+            STATE.phase = 'build';
+            const container = document.getElementById('dividend-col');
+            container.innerHTML = '';
             for(let i=0; i<val; i++) {
                 const cube = document.createElement('div');
                 cube.className = 'one-cube';
-                slot.appendChild(cube);
+                cube.style.animation = 'popIn 0.3s forwards';
+                cube.style.animationDelay = (i * 0.01) + 's';
+                container.appendChild(cube);
             }
-            
-            playTone(600, 'sine', 0.2);
-            updateUI();
+            playTone(600, 'sine', 0.2); updateUI();
         }
 
-        // --- Step 3: Placement ---
-        function placeNextGroup() {
-            if (STATE.phase !== 'place') return;
-
-            // Check if there's enough space for a full group
-            if (STATE.cellsFilled + STATE.divisor > STATE.dividend) {
-                // Not enough for a full group - automatic finish
-                finishPlacement();
-                return;
-            }
-
-            const color = STATE.groupColors[STATE.groupsPlaced % STATE.groupColors.length];
-            
-            // Fill cells on chart
-            for (let i = 1; i <= STATE.divisor; i++) {
-                STATE.cellsFilled++;
-                const cell = document.getElementById(`cell-${STATE.cellsFilled}`);
-                cell.classList.add('filled');
-                cell.style.setProperty('--fill-color', color);
-            }
-
-            STATE.groupsPlaced++;
-            playTone(700 + STATE.groupsPlaced * 50, 'triangle', 0.2);
-
-            // Check if finished
-            if (STATE.cellsFilled + STATE.divisor > STATE.dividend) {
-                setTimeout(finishPlacement, 600);
+        function addCubeToGroup() {
+            if (STATE.quotient > 0) return;
+            if (STATE.currentGroupSize < 10) {
+                STATE.currentGroupSize++;
+                playTone(400 + (STATE.currentGroupSize*40), 'sine', 0.1);
+                renderBuilder(); updateUI();
             }
         }
 
-        function finishPlacement() {
-            STATE.phase = 'answer';
-            STATE.quotient = Math.floor(STATE.dividend / STATE.divisor);
-            
-            updateUI();
-            generateOptions();
+        function undoGroupBuild() {
+            if (STATE.quotient > 0) return;
+            if (STATE.currentGroupSize > 0) {
+                STATE.currentGroupSize--;
+                playTone(200, 'sine', 0.1);
+                renderBuilder(); updateUI();
+            }
         }
 
-        // --- Step 4: Answer ---
+        function renderBuilder() {
+            const slot = document.getElementById('group-slot');
+            slot.innerHTML = '';
+            if (STATE.currentGroupSize === 0) {
+                slot.innerHTML = '<span style="width:100%; text-align:center; font-size:0.8rem; color:#94A3B8; pointer-events:none;" id="group-hint">Build Divisor</span>';
+                slot.classList.remove('ready');
+            } else {
+                for(let i=0; i<STATE.currentGroupSize; i++) {
+                    const c = document.createElement('div'); c.className = 'one-cube'; slot.appendChild(c);
+                }
+                slot.classList.add('ready');
+            }
+        }
+
+        function resetBuilder() { STATE.currentGroupSize = 0; renderBuilder(); }
+
+        function transferGroup() {
+            if (STATE.currentGroupSize === 0) return;
+            if (STATE.currentDividendCount < STATE.currentGroupSize) return;
+            if (STATE.quotient === 0) {
+                STATE.divisor = STATE.currentGroupSize; STATE.phase = 'divide';
+            }
+            STATE.quotient++; STATE.currentDividendCount -= STATE.divisor;
+            const divCol = document.getElementById('dividend-col');
+            for(let i=0; i<STATE.divisor; i++) if(divCol.lastChild) divCol.removeChild(divCol.lastChild);
+            const quoCol = document.getElementById('quotient-col');
+            const groupRod = document.createElement('div');
+            groupRod.className = 'group-rod'; groupRod.style.animation = 'popIn 0.3s forwards';
+            for(let i=0; i<STATE.divisor; i++) {
+                const u = document.createElement('div'); u.className = 'rod-unit'; groupRod.appendChild(u);
+            }
+            quoCol.appendChild(groupRod);
+            playTone(600, 'triangle', 0.2); updateUI();
+        }
+
+        function finishDividing() {
+            STATE.phase = 'answer'; updateUI(); generateOptions();
+        }
+
         function generateOptions() {
-            const grid = document.getElementById('options-grid');
-            grid.innerHTML = '';
+            const grid = document.getElementById('options-grid'); grid.innerHTML = '';
             const correct = STATE.quotient;
-            
             let opts = [correct];
             while (opts.length < 4) {
                 let r = correct + Math.floor(Math.random() * 6) - 3;
                 if (r >= 0 && !opts.includes(r)) opts.push(r);
             }
             opts.sort(() => Math.random() - 0.5);
-            
             opts.forEach(val => {
                 const btn = document.createElement('button');
                 btn.className = 'opt-btn'; btn.innerText = val;
@@ -507,52 +510,44 @@
                 btn.classList.add('correct'); STATE.score += 100; updateScore();
                 document.getElementById('eq-res').innerText = STATE.quotient;
                 playTone(1000, 'sine', 0.1); playTone(1200, 'sine', 0.1);
-                setTimeout(startMiniGame, 800);
+                setTimeout(startMiniGame, 600);
             } else {
                 btn.classList.add('wrong'); playTone(200, 'sawtooth', 0.3);
             }
         }
 
         function updateUI() {
-            const inst = document.getElementById('instruction');
-            const divUI = document.getElementById('ui-dividend');
-            const disUI = document.getElementById('ui-divisor');
-            const plaUI = document.getElementById('ui-place');
-            const optUI = document.getElementById('options-ui');
-            
+            const inst = document.getElementById('instruction'), inUI = document.getElementById('ui-input'), buildUI = document.getElementById('ui-build'), optUI = document.getElementById('options-ui'), btnD = document.getElementById('btn-done-dividing');
             document.getElementById('eq-n1').innerText = STATE.dividend > 0 ? STATE.dividend : "?";
             document.getElementById('eq-n2').innerText = STATE.divisor > 0 ? STATE.divisor : "?";
-
-            divUI.classList.add('hidden');
-            disUI.classList.add('hidden');
-            plaUI.classList.add('hidden');
-            optUI.classList.add('hidden');
-
-            if (STATE.phase === 'dividend') {
-                divUI.classList.remove('hidden');
-                inst.innerText = "Step 1: Set the Dividend (Total number of cells)";
-            } else if (STATE.phase === 'divisor') {
-                disUI.classList.remove('hidden');
-                inst.innerText = "Step 2: Set the Divisor (Number of cubes per group)";
-            } else if (STATE.phase === 'place') {
-                plaUI.classList.remove('hidden');
-                inst.innerText = `Step 3: Click the cubes to fit groups of ${STATE.divisor} into the chart!`;
+            document.getElementById('dividend-count').innerText = STATE.currentDividendCount;
+            document.getElementById('quotient-count').innerText = STATE.quotient;
+            
+            if (STATE.phase === 'input') {
+                inUI.classList.remove('hidden'); buildUI.classList.add('hidden'); optUI.classList.add('hidden');
+                inst.innerText = "Step 1: Enter the Dividend (1-100)";
+            } else if (STATE.phase === 'build') {
+                inUI.classList.add('hidden'); buildUI.classList.remove('hidden'); btnD.classList.add('hidden');
+                inst.innerText = "Step 2: Create the Divisor (Group Size)";
+            } else if (STATE.phase === 'divide') {
+                buildUI.classList.remove('hidden');
+                // Nút "Done" chỉ hiện khi không thể tạo thêm nhóm hoàn chỉnh nữa
+                if (STATE.currentDividendCount < STATE.divisor) {
+                    btnD.classList.remove('hidden');
+                    inst.innerText = "Division complete! Click 'I'm Done!'";
+                } else {
+                    btnD.classList.add('hidden');
+                    inst.innerText = "Step 3: Tap the group to Divide!";
+                }
             } else if (STATE.phase === 'answer') {
-                optUI.classList.remove('hidden');
-                inst.innerText = "Step 4: Count the groups on the chart. How many are there?";
+                buildUI.classList.add('hidden'); optUI.classList.remove('hidden');
+                inst.innerText = `Result: ${STATE.dividend} ÷ ${STATE.divisor} = ?`;
             }
         }
 
         function updateScore() { document.getElementById('score').innerText = STATE.score; }
 
-        function endGame() {
-            document.getElementById('game-area').classList.add('hidden');
-            document.getElementById('finished-screen').classList.remove('hidden');
-            document.getElementById('final-score').innerText = STATE.score;
-            startFireworks();
-        }
-
-        // --- Mini Game Logic ---
+        // --- Mini Game ---
         let canvas, ctx, rafId;
         let bird = { x: 100, y: 300, isDragging: false, isFired: false, vx: 0, vy: 0 };
         let targets = [], sling = { x: 100, y: 300 }, particles = [];
@@ -567,9 +562,20 @@
             canvas.addEventListener('mouseup', mgEnd); canvas.addEventListener('touchend', mgEnd);
             loop();
         }
+
         function closeMiniGame() { cancelAnimationFrame(rafId); document.getElementById('minigame-overlay').style.display = 'none'; resetRound(); }
-        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; sling.x = canvas.width * 0.15; sling.y = canvas.height - 240; if(!bird.isFired) { bird.x = sling.x; bird.y = sling.y; } }
-        function createTargets() { targets = []; for(let i=0; i<5; i++) targets.push({x: canvas.width * 0.75 + (Math.random()*50), y: canvas.height - 100 - (i * 80), active: true}); }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            sling.x = canvas.width * 0.15; sling.y = canvas.height - 240;
+            if(!bird.isFired) { bird.x = sling.x; bird.y = sling.y; }
+        }
+
+        function createTargets() {
+            targets = [];
+            for(let i=0; i<5; i++) targets.push({x: canvas.width * 0.75 + (Math.random()*50), y: canvas.height - 100 - (i * 80), active: true});
+        }
+
         function resetBird() { bird.x = sling.x; bird.y = sling.y; bird.vx = 0; bird.vy = 0; bird.isFired = false; bird.isDragging = false; }
         function getPos(e) { const t = e.touches ? e.touches[0] : e, r = canvas.getBoundingClientRect(); return { x: t.clientX - r.left, y: t.clientY - r.top }; }
         function mgStart(e) { const p = getPos(e); if (Math.hypot(p.x - bird.x, p.y - bird.y) < 60 && !bird.isFired) bird.isDragging = true; }
@@ -577,11 +583,12 @@
         function mgEnd() { if (!bird.isDragging) return; bird.isDragging = false; bird.isFired = true; bird.vx = (sling.x - bird.x) * 0.22; bird.vy = (sling.y - bird.y) * 0.22; playTone(400, 'triangle', 0.1); }
 
         function drawSky(w, h) {
-            const skyGrd = ctx.createLinearGradient(0, 0, 0, h); skyGrd.addColorStop(0, '#35a2ff'); skyGrd.addColorStop(1, '#90caf9'); ctx.fillStyle = skyGrd; ctx.fillRect(0, 0, w, h);
+            const grd = ctx.createLinearGradient(0, 0, 0, h); grd.addColorStop(0, '#35a2ff'); grd.addColorStop(1, '#90caf9'); ctx.fillStyle = grd; ctx.fillRect(0, 0, w, h);
             const sunX = w - 100, sunY = 80;
-            const glow = ctx.createRadialGradient(sunX, sunY, 30, sunX, sunY, 120); glow.addColorStop(0, 'rgba(255, 253, 200, 0.4)'); glow.addColorStop(1, 'rgba(255, 255, 255, 0)'); ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(sunX, sunY, 120, 0, Math.PI*2); ctx.fill();
+            const glow = ctx.createRadialGradient(sunX, sunY, 30, sunX, sunY, 120); glow.addColorStop(0, 'rgba(255, 253, 200, 0.4)'); glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(sunX, sunY, 120, 0, Math.PI*2); ctx.fill();
             const core = ctx.createRadialGradient(sunX, sunY, 5, sunX, sunY, 40); core.addColorStop(0, '#FFFDE7'); core.addColorStop(1, '#FFD54F'); ctx.fillStyle = core; ctx.beginPath(); ctx.arc(sunX, sunY, 40, 0, Math.PI*2); ctx.fill();
-            drawCloud(150, 120, 0.9); drawCloud(w/2+50, 180, 0.7); drawCloud(w - 300, 100, 0.85);
+            drawCloud(150, 120, 0.9); drawCloud(w/2+50, 180, 0.7); drawCloud(w-300, 100, 0.85);
             function drawCloud(cx, cy, s) { ctx.save(); ctx.translate(cx, cy); ctx.scale(s, s); ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'; [{x:-40,y:0,r:30},{x:-15,y:-20,r:35},{x:15,y:-15,r:40},{x:45,y:0,r:35},{x:0,y:15,r:35}].forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill(); }); ctx.restore(); }
             ctx.fillStyle = '#66bb6a'; ctx.beginPath(); ctx.moveTo(0, h); ctx.quadraticCurveTo(w/4, h-120, w/2, h-60); ctx.quadraticCurveTo(w*0.8, h-20, w, h-100); ctx.lineTo(w, h); ctx.fill();
         }
