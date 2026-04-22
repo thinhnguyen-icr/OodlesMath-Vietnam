@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Subtract from 10</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* DUOLINGO STYLE + KIDS THEME COLOR PALETTE */
+        :root {
+            /* Sweet candy gradient background */
+            --bg-gradient: linear-gradient(135deg, #FFD1FF 0%, #FAEBFF 30%, #DDF4FF 100%);
+            --surface-color: #FFFFFF;
+            
+            --blue-base: #1CB0F6;
+            --blue-dark: #1899D6;
+            
+            --green-base: #58CC02;
+            --green-dark: #58A700;
+            --green-light: #D7FFB8;
+            
+            --yellow-base: #FFC800;
+            --yellow-dark: #E5B400;
+            
+            --red-base: #FF4B4B;
+            --red-dark: #EA1515;
+            
+            --purple-base: #CE82FF;
+            --purple-dark: #A568CC;
+
+            --gray-light: #E5E5E5;
+            --gray-mid: #AFAFAF;
+            --text-main: #4B4B4B;
+
+            --frame-bg: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+
+        /* Floating Card Header */
+        header {
+            width: 90%;
+            max-width: 900px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            margin-top: 20px;
+            background: var(--surface-color);
+            border-radius: 24px;
+            border: 2px solid var(--gray-light);
+            border-bottom: 6px solid var(--gray-light);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            z-index: 10;
+            gap: 15px;
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--blue-base);
+            letter-spacing: 0.5px;
+        }
+
+        /* Mode Switcher Tabs */
+        .mode-switcher {
+            display: flex;
+            background: var(--gray-light);
+            padding: 5px;
+            border-radius: 18px;
+            gap: 5px;
+        }
+
+        .mode-tab {
+            padding: 10px 20px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            border-radius: 14px;
+            border: none;
+            background: transparent;
+            color: #888;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+
+        .mode-tab.active {
+            background: var(--surface-color);
+            color: var(--purple-base);
+            box-shadow: 0 4px 0 rgba(0,0,0,0.05);
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--gray-mid);
+        }
+
+        .stats span {
+            color: var(--blue-base);
+        }
+
+        /* Main Game Area */
+        main {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
+            width: 100%;
+            max-width: 900px;
+            padding: 30px 20px;
+            flex-grow: 1;
+        }
+
+        /* Ten Frame (Duolingo Style) */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .ten-frame {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 8px;
+            background: var(--gray-light);
+            padding: 12px;
+            border-radius: 20px;
+            border-bottom: 8px solid var(--gray-mid);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.1);
+        }
+
+        .cell {
+            width: 65px;
+            height: 65px;
+            background: var(--surface-color);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border: 2px dashed #D0D0D0;
+        }
+
+        @media (min-width: 600px) {
+            .cell { width: 85px; height: 85px; }
+        }
+
+        /* Duolingo Chunky Counters */
+        .counter {
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+            position: relative;
+            border: 2px solid rgba(0,0,0,0.1);
+        }
+
+        .counter.red { 
+            background-color: var(--red-base);
+            box-shadow: 0 6px 0 var(--red-dark);
+        }
+        
+        .counter.yellow { 
+            background-color: var(--yellow-base);
+            box-shadow: 0 6px 0 var(--yellow-dark);
+        }
+
+        /* Highlight for 3D gem effect */
+        .counter::after {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 15%;
+            width: 35%;
+            height: 25%;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+        
+        .counter:active {
+            cursor: grabbing;
+            transform: translateY(6px);
+            box-shadow: 0 0px 0 transparent !important;
+        }
+
+        /* Dragging Ghost */
+        .dragging-ghost {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1000;
+            width: 60px;
+            height: 60px;
+            transform: translate(-50%, -50%) scale(1.15);
+        }
+        .dragging-ghost.red { box-shadow: 0 8px 0 var(--red-dark), 0 15px 20px rgba(0,0,0,0.3); }
+
+        /* Number Bond */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .number-bond {
+            position: relative;
+            width: 220px;
+            height: 240px;
+        }
+
+        /* SVG lines */
+        .bond-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .bond-circle {
+            width: 80px;
+            height: 80px;
+            background: var(--surface-color);
+            border: 4px solid var(--gray-light);
+            border-radius: 50%;
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-main);
+            box-shadow: 0 6px 0 var(--gray-light);
+            z-index: 2;
+        }
+
+        .bond-whole { 
+            top: 0; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            color: var(--blue-base);
+            border-color: var(--blue-base);
+            box-shadow: 0 6px 0 var(--blue-dark);
+        }
+        .bond-part1 { 
+            bottom: 0; 
+            left: 0; 
+            color: var(--red-base);
+        }
+        .bond-part2 { 
+            bottom: 0; 
+            right: 0; 
+            color: var(--blue-dark);
+        }
+
+        /* Bottom Controls */
+        .bottom-panel {
+            width: 90%;
+            max-width: 900px;
+            background: var(--surface-color);
+            padding: 25px 20px 35px 20px;
+            border-radius: 30px;
+            border: 2px solid var(--gray-light);
+            border-bottom: 8px solid var(--gray-light);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            z-index: 10;
+            margin-bottom: 20px;
+        }
+
+        /* Speech Bubble */
+        .message-box {
+            position: relative;
+            background: var(--surface-color);
+            padding: 15px 30px;
+            border-radius: 20px;
+            border: 2px solid var(--gray-light);
+            box-shadow: 0 4px 0 var(--gray-light);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .message-box::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: var(--gray-light) transparent transparent transparent;
+            display: block;
+            width: 0;
+        }
+        .message-box::before {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: var(--surface-color) transparent transparent transparent;
+            display: block;
+            width: 0;
+            z-index: 1;
+        }
+
+        .message {
+            font-size: 1.3rem;
+            font-weight: 800;
+            text-align: center;
+            color: var(--text-main);
+            min-height: 35px;
+            line-height: 1.4;
+        }
+        .message span.red-text { color: var(--red-base); }
+        .message span.teacher-text { color: var(--purple-base); font-size: 1.1rem;}
+
+        .pools-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pools {
+            display: flex;
+            gap: 70px;
+            justify-content: center;
+        }
+
+        .pool {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .pool-counter {
+            width: 75px;
+            height: 75px;
+        }
+
+        .pool-label {
+            font-size: 1rem;
+            font-weight: 900;
+            color: var(--gray-mid);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        
+        .hint-text {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #999;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        button {
+            padding: 16px 40px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            border: none;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.1s;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-check { 
+            background: var(--green-base); 
+            color: white; 
+            box-shadow: 0 6px 0 var(--green-dark); 
+        }
+        .btn-check:active { 
+            transform: translateY(6px); 
+            box-shadow: 0 0px 0 var(--green-dark); 
+        }
+        
+        .btn-reset { 
+            background: var(--surface-color); 
+            color: var(--gray-mid); 
+            border: 2px solid var(--gray-light);
+            box-shadow: 0 6px 0 var(--gray-light); 
+        }
+        .btn-reset:active { 
+            transform: translateY(6px); 
+            box-shadow: 0 0px 0 var(--gray-light); 
+        }
+        
+        .btn-next { 
+            background: var(--blue-base); 
+            color: white; 
+            box-shadow: 0 6px 0 var(--blue-dark); 
+            display: none; 
+        }
+        .btn-next:active { 
+            transform: translateY(6px); 
+            box-shadow: 0 0px 0 var(--blue-dark); 
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Animations */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+        .shake { animation: shake 0.5s; }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        .pop { animation: pop 0.5s; }
+        
+        /* Correct State glow */
+        .correct-glow {
+            border-color: var(--green-base);
+            color: var(--green-base);
+            box-shadow: 0 6px 0 var(--green-dark), 0 0 15px var(--green-light);
+            transition: all 0.3s;
+        }
+
+        /* End Screen */
+        .end-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            display: none;
+            text-align: center;
+        }
+
+        .end-screen h1 { 
+            font-size: 3.5rem; 
+            font-weight: 900;
+            color: var(--yellow-base);
+            text-shadow: 0 4px 0 var(--yellow-dark);
+            margin-bottom: 20px; 
+            text-transform: uppercase;
+        }
+        .end-screen p { 
+            font-size: 1.8rem; 
+            font-weight: 800; 
+            color: var(--text-main); 
+            margin-bottom: 40px; 
+        }
+        .end-screen button { 
+            background: var(--green-base); 
+            color: white; 
+            box-shadow: 0 6px 0 var(--green-dark); 
+            font-size: 1.5rem; 
+            padding: 15px 40px;
+        }
+        .end-screen button:active {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0 var(--green-dark);
+        }
+
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1500;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header { flex-direction: column; padding: 15px; border-radius: 16px;}
+            main { flex-direction: column; gap: 40px; padding: 20px 10px;}
+            .number-bond { transform: scale(0.9); height: 220px; }
+            .message { font-size: 1.15rem; }
+            .pool-counter { width: 65px; height: 65px; }
+            .bottom-panel { width: 95%; padding: 20px 15px 30px; border-radius: 20px;}
+        }
+    </style>
+</head>
+<body>
+<img src="../assets/logo-oodles-math.png" class="oodles-logo" onerror="this.style.display='none'">
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <header>
+        <div class="title">Subtract from 10</div>
+        
+        <!-- Setup 2 Modes -->
+        <div class="mode-switcher">
+            <button class="mode-tab active" id="tab-challenge" onclick="setGameMode('challenge')">Challenge</button>
+            <button class="mode-tab" id="tab-practice" onclick="setGameMode('practice')">Practice</button>
+        </div>
+
+        <div class="stats" id="stats-container">
+            <div>Round <span id="round-disp">1</span>/10</div>
+            <div>Score <span id="score-disp">0</span></div>
+        </div>
+    </header>
+
+    <main>
+        <div class="left-panel">
+            <div class="ten-frame" id="ten-frame">
+                <!-- 10 cells generated by JS -->
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="number-bond">
+                <!-- SVG lines for perfect connection -->
+                <svg class="bond-svg" viewBox="0 0 220 240">
+                    <line x1="110" y1="40" x2="40" y2="200" stroke="#E5E5E5" stroke-width="8" stroke-linecap="round"/>
+                    <line x1="110" y1="40" x2="180" y2="200" stroke="#E5E5E5" stroke-width="8" stroke-linecap="round"/>
+                </svg>
+                <div class="bond-circle bond-whole">10</div>
+                <div class="bond-circle bond-part1" id="part1">?</div>
+                <div class="bond-circle bond-part2" id="part2">?</div>
+            </div>
+        </div>
+    </main>
+
+    <div class="bottom-panel">
+        <div class="message-box">
+            <div class="message" id="message">Loading...</div>
+        </div>
+        
+        <div class="pools-wrapper">
+            <div class="pools">
+                <div class="pool" id="red-pool-container">
+                    <div class="counter red pool-counter" id="pool-red"></div>
+                    <div class="pool-label">Counters</div>
+                </div>
+            </div>
+            <div class="hint-text">Tap or drag counters OUT to subtract!</div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn-reset" onclick="resetBoard()">Reset</button>
+            <button class="btn-check" id="btn-check" onclick="checkAnswer()">Check</button>
+            <button class="btn-next" id="btn-next" onclick="nextRound()">Next</button>
+        </div>
+    </div>
+
+    <div class="end-screen" id="end-screen">
+        <h1>Lesson Complete!</h1>
+        <p id="final-score">You got 8 out of 10!</p>
+        <button onclick="startGame()">Play Again</button>
+    </div>
+
+    <script>
+        // --- Audio Context for generating sound without external files ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+        }
+
+        function playTone(freq, type, duration, vol=0.1) {
+            if(!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playPop() { playTone(600, 'sine', 0.1, 0.2); }
+        function playDelete() { playTone(300, 'sine', 0.1, 0.15); }
+        function playWin() { 
+            playTone(440, 'sine', 0.1, 0.2); 
+            setTimeout(() => playTone(554, 'sine', 0.1, 0.2), 100);
+            setTimeout(() => playTone(659, 'sine', 0.2, 0.2), 200);
+            setTimeout(() => playTone(880, 'sine', 0.4, 0.25), 300); 
+        }
+        function playWrong() { playTone(150, 'sawtooth', 0.3, 0.1); }
+
+        // --- Game State ---
+        let gameMode = 'challenge'; // 'challenge' or 'practice'
+        let currentRound = 1;
+        let score = 0;
+        const maxRounds = 10;
+        let targetSubtract = 0;
+        let isChecking = false;
+
+        // --- DOM Elements ---
+        const tenFrame = document.getElementById('ten-frame');
+        const part1 = document.getElementById('part1');
+        const part2 = document.getElementById('part2');
+        const message = document.getElementById('message');
+        const btnCheck = document.getElementById('btn-check');
+        const btnNext = document.getElementById('btn-next');
+        const btnReset = document.querySelector('.btn-reset');
+        
+        let cells = [];
+
+        // --- Switch Game Mode ---
+        function setGameMode(mode) {
+            gameMode = mode;
+            document.getElementById('tab-challenge').classList.toggle('active', mode === 'challenge');
+            document.getElementById('tab-practice').classList.toggle('active', mode === 'practice');
+            
+            if(mode === 'practice') {
+                document.getElementById('stats-container').style.display = 'none';
+            } else {
+                document.getElementById('stats-container').style.display = 'flex';
+            }
+            startGame();
+        }
+
+        // --- Initialize Grid ---
+        function initGrid() {
+            tenFrame.innerHTML = '';
+            cells = [];
+            for (let i = 0; i < 10; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.index = i;
+                tenFrame.appendChild(cell);
+                cells.push(cell);
+            }
+        }
+
+        // --- Game Logic ---
+        function startGame() {
+            initAudio();
+            currentRound = 1;
+            score = 0;
+            document.getElementById('end-screen').style.display = 'none';
+            if (gameMode === 'challenge') updateStats();
+            startRound();
+        }
+
+        function startRound() {
+            isChecking = false;
+            btnCheck.style.display = 'block';
+            btnNext.style.display = 'none';
+            btnReset.disabled = false;
+            part2.textContent = '?';
+            part1.textContent = '?';
+            
+            part2.classList.remove('correct-glow');
+            part1.classList.remove('correct-glow');
+            
+            initGrid();
+
+            // Subtraction from 10: Start by filling the grid with 10 red counters
+            cells.forEach(cell => {
+                const counter = createCounterElement('red', cell);
+                cell.appendChild(counter);
+            });
+            
+            if (gameMode === 'challenge') {
+                targetSubtract = Math.floor(Math.random() * 9) + 1; // 1 to 9
+                message.innerHTML = `What is <span class="red-text">10 - ${targetSubtract}</span>?<br>Tap to take away <span class="red-text">${targetSubtract}</span> counters!`;
+            } else {
+                // Practice Mode: User freely removes any amount
+                message.innerHTML = `<span class="teacher-text">Teacher: We have 10 counters.</span><br>Student: Take some away to practice subtraction!`;
+            }
+        }
+
+        function getCounts() {
+            let red = 0;
+            cells.forEach(cell => {
+                if (cell.firstChild && cell.firstChild.classList.contains('red')) {
+                    red++;
+                }
+            });
+            return { red };
+        }
+
+        function updateBond() {
+            const counts = getCounts();
+            const removed = 10 - counts.red;
+            // Optionally dynamically update part1 to show how many removed
+            part1.textContent = removed > 0 ? removed : '?';
+        }
+
+        function resetBoard() {
+            if(isChecking) return;
+            startRound();
+        }
+
+        function checkAnswer() {
+            if (isChecking) return;
+            initAudio(); 
+            
+            const counts = getCounts();
+            const removed = 10 - counts.red;
+
+            if (removed === 0) {
+                playWrong();
+                message.textContent = "You haven't taken any away yet!";
+                btnCheck.classList.add('shake');
+                setTimeout(() => btnCheck.classList.remove('shake'), 500);
+                return;
+            }
+
+            // Challenge Mode requires subtracting a specific amount
+            if (gameMode === 'challenge' && removed !== targetSubtract) {
+                playWrong();
+                message.innerHTML = `Oops! You need to take away exactly <span class="red-text">${targetSubtract}</span> counters!`;
+                btnCheck.classList.add('shake');
+                setTimeout(() => btnCheck.classList.remove('shake'), 500);
+                return;
+            }
+
+            // Success (Removed correct amount)
+            isChecking = true;
+            playWin();
+            
+            if (gameMode === 'challenge') {
+                score++;
+                updateStats();
+            }
+            
+            part1.textContent = removed;
+            part2.textContent = counts.red;
+            part1.classList.add('correct-glow');
+            part2.classList.add('correct-glow');
+            
+            tenFrame.classList.add('pop');
+            setTimeout(() => tenFrame.classList.remove('pop'), 500);
+            
+            message.innerHTML = `Awesome! <span class="red-text">10 - ${removed} = ${counts.red}</span>!`;
+            
+            btnCheck.style.display = 'none';
+            btnReset.disabled = true;
+            btnNext.style.display = 'block';
+            fireFireworks();
+        }
+
+        function nextRound() {
+            if (gameMode === 'practice') {
+                // Infinite practice mode
+                startRound();
+            } else {
+                // Challenge mode
+                if (currentRound < maxRounds) {
+                    currentRound++;
+                    updateStats();
+                    startRound();
+                } else {
+                    showEndScreen();
+                }
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('round-disp').textContent = currentRound;
+            document.getElementById('score-disp').textContent = score;
+        }
+
+        function showEndScreen() {
+            const end = document.getElementById('end-screen');
+            const final = document.getElementById('final-score');
+            end.style.display = 'flex';
+            final.textContent = `You got ${score} out of ${maxRounds}!`;
+            
+            // Big fireworks finale
+            let fwCount = 0;
+            const fwInterval = setInterval(() => {
+                fireFireworks(true);
+                fwCount++;
+                if (fwCount > 8) clearInterval(fwInterval);
+            }, 400);
+        }
+
+        // --- Custom Drag and Drop & TAP implementation ---
+        let draggedType = null;
+        let draggedSourceCell = null;
+        let ghost = null;
+        let startX = 0, startY = 0;
+
+        function getEventType(e) {
+            return e.type.includes('touch') ? e.touches[0] : e;
+        }
+
+        function createCounterElement(type, cellToBind) {
+            const counter = document.createElement('div');
+            counter.className = `counter ${type}`;
+            counter.addEventListener('mousedown', (ev) => startDrag(ev, type, cellToBind));
+            counter.addEventListener('touchstart', (ev) => startDrag(ev, type, cellToBind), {passive: false});
+            return counter;
+        }
+
+        function startDrag(e, type, sourceCell = null) {
+            if (isChecking) return;
+            initAudio();
+            e.preventDefault();
+            draggedType = type;
+            draggedSourceCell = sourceCell;
+
+            const evt = getEventType(e);
+            startX = evt.clientX;
+            startY = evt.clientY;
+
+            ghost = document.createElement('div');
+            ghost.className = `counter ${type} dragging-ghost`;
+            document.body.appendChild(ghost);
+            
+            moveGhost(evt.clientX, evt.clientY);
+
+            document.addEventListener('mousemove', onDragMove, {passive: false});
+            document.addEventListener('touchmove', onDragMove, {passive: false});
+            document.addEventListener('mouseup', onDragEnd);
+            document.addEventListener('touchend', onDragEnd);
+        }
+
+        function onDragMove(e) {
+            e.preventDefault();
+            if (!ghost) return;
+            const evt = getEventType(e);
+            moveGhost(evt.clientX, evt.clientY);
+        }
+
+        function moveGhost(x, y) {
+            ghost.style.left = x + 'px';
+            ghost.style.top = y + 'px';
+        }
+
+        function onDragEnd(e) {
+            document.removeEventListener('mousemove', onDragMove);
+            document.removeEventListener('touchmove', onDragMove);
+            document.removeEventListener('mouseup', onDragEnd);
+            document.removeEventListener('touchend', onDragEnd);
+
+            if (!ghost) return;
+
+            const evt = e.type.includes('touch') ? e.changedTouches[0] : e;
+            const endX = evt.clientX;
+            const endY = evt.clientY;
+            const dist = Math.hypot(endX - startX, endY - startY);
+
+            ghost.style.display = 'none';
+
+            // --- TAP / CLICK LOGIC ---
+            if (dist < 10) {
+                if (!draggedSourceCell) {
+                    // Tapped the pool -> Place in first empty cell (Left to right, top to bottom)
+                    const emptyCell = cells.find(c => !c.firstChild);
+                    if (emptyCell) {
+                        const counter = createCounterElement(draggedType, emptyCell);
+                        emptyCell.appendChild(counter);
+                        playPop();
+                    } else {
+                        playWrong(); // Frame full
+                    }
+                } else {
+                    // Tapped an existing counter in the ten frame -> Remove it!
+                    draggedSourceCell.innerHTML = '';
+                    playDelete();
+                }
+            } 
+            // --- DRAG & DROP LOGIC ---
+            else {
+                let target = document.elementFromPoint(evt.clientX, evt.clientY);
+                const targetCell = target ? target.closest('.cell') : null;
+
+                if (targetCell) {
+                    // Dropped on a cell
+                    if (!targetCell.firstChild || targetCell === draggedSourceCell) {
+                        if(draggedSourceCell && draggedSourceCell !== targetCell) {
+                             draggedSourceCell.innerHTML = ''; 
+                        }
+                        targetCell.innerHTML = '';
+                        const counter = createCounterElement(draggedType, targetCell);
+                        targetCell.appendChild(counter);
+                        playPop();
+                    }
+                } else {
+                    // Dropped outside
+                    if (draggedSourceCell) {
+                        draggedSourceCell.innerHTML = '';
+                        playDelete();
+                    }
+                }
+            }
+
+            // Cleanup
+            ghost.remove();
+            ghost = null;
+            draggedType = null;
+            draggedSourceCell = null;
+            
+            updateBond();
+        }
+
+        // Attach listeners to Pool (We only need the red counter pool to refill mistakes)
+        document.getElementById('pool-red').addEventListener('mousedown', (e) => startDrag(e, 'red'));
+        document.getElementById('pool-red').addEventListener('touchstart', (e) => startDrag(e, 'red'), {passive: false});
+
+
+        // --- Lightweight Fireworks Canvas ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationId;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function fireFireworks(randomPos = false) {
+            const colors = ['#FF4B4B', '#FFC800', '#1CB0F6', '#58CC02', '#CE82FF'];
+            const originX = randomPos ? (Math.random() * canvas.width*0.8 + canvas.width*0.1) : canvas.width / 2;
+            const originY = randomPos ? (Math.random() * canvas.height*0.5 + canvas.height*0.2) : canvas.height;
+
+            for (let i = 0; i < 120; i++) {
+                particles.push({
+                    x: originX,
+                    y: originY,
+                    vx: (Math.random() - 0.5) * 30, // wide spread
+                    vy: randomPos ? (Math.random() - 0.5) * 30 : (Math.random() - 1) * 25 - 5, // shoot up if bottom
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    life: 1.0,
+                    decay: Math.random() * 0.02 + 0.015
+                });
+            }
+            if (!animationId) animateFireworks();
+        }
+
+        function animateFireworks() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let activeParticles = false;
+
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                if (p.life <= 0) continue;
+
+                activeParticles = true;
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.4; // gravity
+                p.vx *= 0.95; // friction
+                p.vy *= 0.95;
+                p.life -= p.decay;
+
+                ctx.globalAlpha = Math.max(0, p.life);
+                ctx.beginPath();
+                
+                // Ensure the radius is never negative
+                let currentSize = Math.max(0, p.size * p.life);
+                ctx.arc(p.x, p.y, currentSize, 0, Math.PI * 2);
+                
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            }
+            
+            ctx.globalAlpha = 1.0;
+
+            // Remove dead particles periodically to save memory
+            particles = particles.filter(p => p.life > 0);
+
+            if (activeParticles) {
+                animationId = requestAnimationFrame(animateFireworks);
+            } else {
+                animationId = null;
+            }
+        }
+
+        // Start initial game
+        startGame();
+
+    </script>
+</body>
+</html>

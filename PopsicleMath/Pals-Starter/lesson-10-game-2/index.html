@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oodles Math: Shape Explorer V5</title>
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #1cb0f6;
+            --success: #58cc02;
+            --warning: #ffc800;
+            --danger: #ff4b4b;
+            --purple: #ce82ff;
+            --dark: #0f172a;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(180deg, #87d3f8 0%, #ddf4ff 100%);
+            user-select: none;
+            overflow-x: hidden;
+            touch-action: pan-y;
+            min-height: 100vh;
+        }
+
+        /* 3D Button Effects */
+        .btn-3d {
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 6px solid rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .btn-3d:active:not(:disabled) {
+            transform: translateY(4px);
+            border-bottom-width: 2px;
+        }
+
+        /* Scenery Background elements */
+        .bg-clouds {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            animation: move-clouds linear infinite;
+            box-shadow: 0 8px 0 0 rgba(255,255,255,0.4);
+        }
+
+        @keyframes move-clouds {
+            from { transform: translateX(-200px); }
+            to { transform: translateX(100vw); }
+        }
+
+        .bg-hills {
+            position: fixed;
+            bottom: 0; left: -10%; right: -10%;
+            height: 25vh;
+            background: #58cc02;
+            border-top-left-radius: 50% 100%;
+            border-top-right-radius: 50% 100%;
+            z-index: -1;
+            box-shadow: inset 0 15px 0 0 #7ade28;
+            pointer-events: none;
+        }
+
+        .sunburst {
+            position: fixed;
+            top: 50%; left: 50%;
+            width: 200vw; height: 200vw;
+            margin-left: -100vw; margin-top: -100vw;
+            background: repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.1) 0deg 15deg, transparent 15deg 30deg);
+            animation: rotate-sun 60s linear infinite;
+            z-index: -3;
+            pointer-events: none;
+        }
+
+        @keyframes rotate-sun {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Flashlight Mask Effect */
+        #game-stage { 
+            cursor: crosshair; 
+            box-shadow: 0 0 0 8px white, 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .flashlight-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: #0f172a;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            mask-image: radial-gradient(circle var(--torch-size, 90px) at var(--torch-x, 50%) var(--torch-y, 50%), transparent 0%, black 100%);
+            -webkit-mask-image: radial-gradient(circle var(--torch-size, 90px) at var(--torch-x, 50%) var(--torch-y, 50%), transparent 0%, black 100%);
+            mask-composite: intersect;
+        }
+
+        .torch-ring {
+            position: absolute;
+            pointer-events: none;
+            border: 4px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            width: calc(var(--torch-size, 90px) * 2);
+            height: calc(var(--torch-size, 90px) * 2);
+            left: var(--torch-x, 50%);
+            top: var(--torch-y, 50%);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.2), 0 0 50px rgba(255, 255, 255, 0.4);
+            transition: width 0.1s, height 0.1s;
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px; width: 24px;
+            border-radius: 50%;
+            background: #ffc800;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            margin-top: -8px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 8px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 4px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        .hidden-element { display: none !important; }
+    </style>
+</head>
+<body class="flex flex-col items-center p-4 relative">
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <!-- Scenery -->
+    <div class="sunburst" id="bg-sunburst"></div>
+    <div class="bg-clouds">
+        <div class="cloud w-32 h-12 top-10" style="animation-duration: 40s; animation-delay: -5s;"></div>
+        <div class="cloud w-48 h-16 top-40" style="animation-duration: 60s; animation-delay: -20s;"></div>
+        <div class="cloud w-40 h-14 top-80" style="animation-duration: 50s; animation-delay: -45s;"></div>
+        <div class="cloud w-56 h-20 bottom-32" style="animation-duration: 70s; animation-delay: -10s;"></div>
+    </div>
+    <div class="bg-hills" id="bg-hills"></div>
+
+    <!-- START SCREEN -->
+    <div id="screen-start" class="fixed inset-0 flex items-center justify-center p-4 z-50 bg-black/10 backdrop-blur-sm">
+        <div class="bg-white rounded-[3.5rem] p-10 md:p-14 max-w-lg w-full text-center shadow-[0_20px_0_0_rgba(0,0,0,0.1)] border-4 border-white">
+            <div class="text-8xl mb-6 drop-shadow-lg">🔭</div>
+            <h1 class="text-4xl md:text-5xl font-black text-slate-700 mb-2 tracking-tight">SHAPE<br><span class="text-[#1cb0f6]">EXPLORER</span></h1>
+            <p class="text-slate-400 font-bold text-lg mb-10">Find all the hidden magic shapes!</p>
+            
+            <div class="flex flex-col gap-5">
+                <button onclick="startGame('2D')" class="btn-3d w-full bg-[#58cc02] border-[#46a302] text-white text-2xl font-black py-6 rounded-3xl">
+                    2D ADVENTURE
+                </button>
+                <button onclick="startGame('3D')" class="btn-3d w-full bg-[#ce82ff] border-[#a85ad4] text-white text-2xl font-black py-6 rounded-3xl">
+                    3D CHALLENGE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME OVER SCREEN -->
+    <div id="screen-over" class="fixed inset-0 flex items-center justify-center p-4 z-50 hidden-element bg-black/10 backdrop-blur-sm">
+        <div class="bg-white rounded-[4rem] p-10 md:p-14 max-w-lg w-full text-center shadow-[0_20px_0_0_rgba(0,0,0,0.1)] border-4 border-white">
+            <div class="text-8xl mb-6 animate-bounce drop-shadow-xl">🏆</div>
+            <h1 class="text-5xl font-black text-slate-700 mb-2">WOW!</h1>
+            <p class="text-2xl font-bold text-slate-400 mb-8">You found every single shape!</p>
+            
+            <div id="star-container" class="flex justify-center gap-2 mb-10 text-5xl"></div>
+
+            <button onclick="location.reload()" class="btn-3d w-full bg-[#1cb0f6] border-[#1899d6] text-white text-2xl font-black py-6 rounded-3xl flex items-center justify-center gap-3">
+                PLAY AGAIN
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN GAMEPLAY -->
+    <div id="game-ui" class="w-full max-w-4xl hidden-element relative z-10">
+        <!-- Top Bar -->
+        <div class="flex justify-between items-center mb-6 bg-white/90 backdrop-blur-md py-4 px-8 rounded-[2rem] shadow-lg border-b-4 border-white">
+            <div class="flex items-center gap-5">
+                <button onclick="location.reload()" class="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center hover:bg-slate-200 transition-all font-bold text-2xl shadow-sm">
+                    ↺
+                </button>
+                <div id="progress-dots" class="flex gap-2"></div>
+            </div>
+            <div class="flex items-center gap-2 bg-[#ffc800]/20 text-[#d4a000] px-5 py-2.5 rounded-2xl font-black text-xl border-2 border-[#ffc800]/40">
+                ⭐ <span id="current-score">0</span>
+            </div>
+        </div>
+
+        <!-- Stage -->
+        <div id="game-stage" class="relative aspect-square md:aspect-[16/9] bg-[#f8fafc] rounded-[3rem] overflow-hidden">
+            <div class="absolute inset-0 opacity-[0.1]" style="background-image: radial-gradient(#1cb0f6 4px, transparent 0); background-size: 50px 50px;"></div>
+            
+            <div id="shape-render-area" class="absolute inset-0 flex items-center justify-center pointer-events-none transition-transform duration-1000 filter drop-shadow-2xl"></div>
+
+            <!-- Overlays -->
+            <div id="darkness" class="flashlight-overlay"></div>
+            <div id="torch-ring" class="torch-ring"></div>
+
+            <div id="success-label" class="absolute top-10 left-0 w-full text-center hidden-element">
+                <span class="bg-white/95 backdrop-blur-sm text-success px-10 py-4 rounded-full text-4xl font-black uppercase tracking-widest shadow-2xl border-4 border-success animate-bounce inline-block">
+                    PERFECT!
+                </span>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="mt-8 text-center bg-white/80 backdrop-blur-md p-6 rounded-[2.5rem] shadow-lg">
+            <h2 class="text-slate-500 text-xl font-black mb-5 uppercase tracking-widest">Which shape is it?</h2>
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6"></div>
+            
+            <!-- Adjustable Torch Size Slider -->
+            <div class="flex items-center justify-center gap-4 bg-slate-100/50 py-3 px-6 rounded-2xl border border-slate-200 inline-flex mx-auto">
+                <span class="text-xl opacity-60">🔦</span>
+                <span class="text-slate-400 font-bold uppercase tracking-wider text-sm">Light Size</span>
+                <input type="range" id="torch-slider" min="60" max="180" value="100" class="w-32 md:w-48 ml-2">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- High Quality 2D & 3D SVGs ---
+        // 2D shapes feature a subtle white semi-transparent highlight overlay to look like 3D stickers
+        const SHAPES_2D = [
+            { name: 'Circle', color: '#ff4b4b', svg: '<g stroke="#1e293b" stroke-width="3"><circle cx="50" cy="50" r="40" fill="currentColor"/><path d="M 25 35 A 25 25 0 0 1 75 35 A 30 30 0 0 0 25 35 Z" fill="white" fill-opacity="0.3" stroke="none"/></g>' },
+            { name: 'Triangle', color: '#1cb0f6', svg: '<g stroke="#1e293b" stroke-width="3" stroke-linejoin="round"><polygon points="50,15 90,85 10,85" fill="currentColor"/><polygon points="50,25 75,70 25,70" fill="white" fill-opacity="0.2" stroke="none"/></g>' },
+            { name: 'Rectangle', color: '#ce82ff', svg: '<g stroke="#1e293b" stroke-width="3" stroke-linejoin="round"><rect x="10" y="30" width="80" height="40" fill="currentColor"/><rect x="15" y="35" width="70" height="15" fill="white" fill-opacity="0.25" stroke="none"/></g>' },
+            { name: 'Square', color: '#ffc800', svg: '<g stroke="#1e293b" stroke-width="3" stroke-linejoin="round"><rect x="20" y="20" width="60" height="60" fill="currentColor"/><rect x="25" y="25" width="50" height="20" fill="white" fill-opacity="0.3" stroke="none"/></g>' },
+            { name: 'Half Circle', color: '#ff9600', svg: '<g stroke="#1e293b" stroke-width="3" stroke-linejoin="round"><path d="M 10 70 A 40 40 0 0 1 90 70 Z" fill="currentColor"/><path d="M 20 60 A 30 30 0 0 1 80 60 Z" fill="white" fill-opacity="0.25" stroke="none"/></g>' },
+            { name: 'Quarter Circle', color: '#58cc02', svg: '<g stroke="#1e293b" stroke-width="3" stroke-linejoin="round"><path d="M 20 80 L 80 80 A 60 60 0 0 0 20 20 Z" fill="currentColor"/><path d="M 30 70 L 65 70 A 45 45 0 0 0 30 35 Z" fill="white" fill-opacity="0.2" stroke="none"/></g>' },
+            { name: 'Diamond', color: '#ff4b4b', svg: '<g stroke="#1e293b" stroke-width="3" stroke-linejoin="round"><polygon points="50,5 80,50 50,95 20,50" fill="currentColor"/><polygon points="50,15 70,50 50,85 30,50" fill="white" fill-opacity="0.2" stroke="none"/></g>' }
+        ];
+
+        // 3D Shapes feature isometric perspective with beautiful flat shading, NO confusing hidden lines
+        const SHAPES_3D = [
+            { name: 'Cube', color: '#1cb0f6', svg: '<g stroke="#1e293b" stroke-width="3" stroke-linejoin="round"><polygon points="50,25 75,40 50,55 25,40" fill="currentColor" fill-opacity="0.4"/><polygon points="25,40 50,55 50,85 25,70" fill="currentColor" fill-opacity="0.9"/><polygon points="50,55 75,40 75,70 50,85" fill="currentColor" fill-opacity="0.6"/></g>' },
+            { name: 'Sphere', color: '#ff4b4b', svg: '<g><circle cx="50" cy="50" r="40" fill="currentColor" stroke="#1e293b" stroke-width="3"/><circle cx="50" cy="50" r="40" fill="url(#sphereGrad)"/></g>' },
+            { name: 'Cone', color: '#ffc800', svg: '<g stroke="#1e293b" stroke-width="3" stroke-linejoin="round"><path d="M 50,15 L 20,75 A 30 12 0 0 0 80,75 Z" fill="currentColor" fill-opacity="0.9"/><path d="M 50,15 L 25,72 A 30 12 0 0 0 45,86 Z" fill="white" fill-opacity="0.25" stroke="none"/></g>' },
+            { name: 'Cylinder', color: '#00cd9c', svg: '<g stroke="#1e293b" stroke-width="3" stroke-linejoin="round"><path d="M 25,30 L 25,75 A 25 12 0 0 0 75,75 L 75,30 Z" fill="currentColor" fill-opacity="0.8"/><ellipse cx="50" cy="30" rx="25" ry="12" fill="currentColor" fill-opacity="0.4"/><path d="M 25,30 L 25,75 A 25 12 0 0 0 40,85 L 40,40 Z" fill="white" fill-opacity="0.2" stroke="none"/></g>' },
+            { name: 'Pyramid', color: '#ce82ff', svg: '<g stroke="#1e293b" stroke-width="3" stroke-linejoin="round"><polygon points="50,20 20,75 50,90" fill="currentColor" fill-opacity="0.9"/><polygon points="50,20 50,90 80,75" fill="currentColor" fill-opacity="0.5"/></g>' },
+            { name: 'Cuboid', color: '#58cc02', svg: '<g stroke="#1e293b" stroke-width="3" stroke-linejoin="round"><polygon points="50,15 75,30 50,45 25,30" fill="currentColor" fill-opacity="0.4"/><polygon points="25,30 50,45 50,90 25,75" fill="currentColor" fill-opacity="0.9"/><polygon points="50,45 75,30 75,75 50,90" fill="currentColor" fill-opacity="0.6"/></g>' },
+            { name: 'Prism', color: '#ff9600', svg: '<g stroke="#1e293b" stroke-width="3" stroke-linejoin="round"><polygon points="50,35 75,80 90,60 65,15" fill="currentColor" fill-opacity="0.5"/><polygon points="25,80 75,80 50,35" fill="currentColor" fill-opacity="0.9"/><polygon points="35,75 65,75 50,45" fill="white" fill-opacity="0.15" stroke="none"/></g>' }
+        ];
+
+        // --- State ---
+        let mode = '2D';
+        let currentRound = 1;
+        let score = 0;
+        let shapeQueue = [];
+        let currentTarget = null;
+        let isRevealed = false;
+
+        // --- Core Functions ---
+        function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+
+        function playSfx(type) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
+                if (type === 'correct') {
+                    osc.type = 'sine'; osc.frequency.setValueAtTime(659.25, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1046.50, ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                } else {
+                    osc.type = 'triangle'; osc.frequency.setValueAtTime(200, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                }
+                osc.start(); osc.stop(ctx.currentTime + 0.4);
+            } catch(e) {}
+        }
+
+        // --- Game Flow ---
+        function startGame(selectedMode) {
+            mode = selectedMode;
+            document.getElementById('screen-start').classList.add('hidden-element');
+            document.getElementById('game-ui').classList.remove('hidden-element');
+            document.getElementById('bg-sunburst').classList.add('hidden-element'); // Hide sunburst while playing
+            document.getElementById('bg-hills').style.zIndex = "0"; // Bring hills to background of UI
+            
+            const list = mode === '2D' ? [...SHAPES_2D] : [...SHAPES_3D];
+            shapeQueue = shuffle(list); 
+            
+            initProgressDots();
+            setupRound();
+            updateTorchSize(document.getElementById('torch-slider').value);
+        }
+
+        function initProgressDots() {
+            const container = document.getElementById('progress-dots');
+            container.innerHTML = '';
+            shapeQueue.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'h-4 w-10 rounded-full bg-slate-200 shadow-inner transition-all';
+                dot.id = `dot-${i + 1}`;
+                container.appendChild(dot);
+            });
+        }
+
+        function setupRound() {
+            isRevealed = false;
+            currentTarget = shapeQueue[currentRound - 1];
+            
+            document.getElementById('darkness').style.opacity = '1';
+            document.getElementById('torch-ring').style.opacity = '1';
+            document.getElementById('success-label').classList.add('hidden-element');
+            
+            const currentDot = document.getElementById(`dot-${currentRound}`);
+            currentDot.classList.remove('bg-slate-200');
+            currentDot.classList.add('bg-[#ffc800]', 'animate-pulse');
+
+            const area = document.getElementById('shape-render-area');
+            area.innerHTML = `
+                <svg width="280" height="280" viewBox="0 0 100 100" style="color: ${currentTarget.color}">
+                    <defs>
+                        <radialGradient id="sphereGrad" cx="30%" cy="30%" r="60%">
+                            <stop offset="0%" stop-color="white" stop-opacity="0.7" />
+                            <stop offset="50%" stop-color="currentColor" stop-opacity="0.8" />
+                            <stop offset="100%" stop-color="black" stop-opacity="0.3" />
+                        </radialGradient>
+                    </defs>
+                    ${currentTarget.svg}
+                </svg>
+            `;
+            area.style.transform = 'scale(1)';
+
+            // Generate 3 unique Options
+            const allShapes = mode === '2D' ? SHAPES_2D : SHAPES_3D;
+            let wrongs = shuffle(allShapes.filter(s => s.name !== currentTarget.name)).slice(0, 2);
+            const opts = shuffle([currentTarget, ...wrongs]);
+
+            const optContainer = document.getElementById('options-container');
+            optContainer.innerHTML = '';
+            opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-3d text-2xl font-black py-6 rounded-3xl bg-white text-slate-600 border-slate-200 hover:bg-slate-50 uppercase tracking-widest';
+                btn.innerText = opt.name;
+                btn.onclick = () => handleGuess(opt.name, btn);
+                optContainer.appendChild(btn);
+            });
+        }
+
+        function handleGuess(name, btn) {
+            if (isRevealed) return;
+            if (name === currentTarget.name) {
+                isRevealed = true; score++;
+                playSfx('correct');
+                document.getElementById('current-score').innerText = score;
+                document.getElementById('darkness').style.opacity = '0';
+                document.getElementById('torch-ring').style.opacity = '0';
+                document.getElementById('success-label').classList.remove('hidden-element');
+                document.getElementById('shape-render-area').style.transform = 'scale(1.25)';
+                
+                const dot = document.getElementById(`dot-${currentRound}`);
+                dot.className = 'h-4 w-10 rounded-full bg-[#58cc02] shadow-sm';
+                
+                btn.classList.add('bg-[#58cc02]', 'text-white', 'border-[#46a302]');
+
+                setTimeout(() => {
+                    if (currentRound < shapeQueue.length) {
+                        currentRound++;
+                        setupRound();
+                    } else {
+                        finishGame();
+                    }
+                }, 2200);
+            } else {
+                playSfx('wrong');
+                btn.classList.add('shake', 'bg-red-50', 'text-red-500', 'border-red-200');
+                setTimeout(() => btn.classList.remove('shake', 'bg-red-50', 'text-red-500', 'border-red-200'), 400);
+            }
+        }
+
+        function finishGame() {
+            document.getElementById('game-ui').classList.add('hidden-element');
+            document.getElementById('bg-sunburst').classList.remove('hidden-element');
+            document.getElementById('screen-over').classList.remove('hidden-element');
+            document.getElementById('bg-hills').style.zIndex = "-1";
+
+            const starContainer = document.getElementById('star-container');
+            starContainer.innerHTML = '';
+            for(let i=0; i<7; i++) {
+                const s = document.createElement('span');
+                s.innerText = i < score ? '⭐' : '☆';
+                s.className = i < score ? 'animate-bounce drop-shadow-md' : 'opacity-30';
+                s.style.animationDelay = `${i * 0.1}s`;
+                starContainer.appendChild(s);
+            }
+            confetti({ particleCount: 250, spread: 80, origin: { y: 0.6 }, colors: ['#ff4b4b', '#1cb0f6', '#ffc800', '#58cc02', '#ce82ff'] });
+            setTimeout(() => confetti({ particleCount: 200, spread: 120, origin: { y: 0.7 } }), 600);
+        }
+
+        // --- Interaction ---
+        const stage = document.getElementById('game-stage');
+        const torchSlider = document.getElementById('torch-slider');
+
+        function moveTorch(e) {
+            const rect = stage.getBoundingClientRect();
+            const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+            const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+            stage.style.setProperty('--torch-x', `${x}px`);
+            stage.style.setProperty('--torch-y', `${y}px`);
+        }
+        
+        function updateTorchSize(val) {
+            stage.style.setProperty('--torch-size', `${val}px`);
+        }
+
+        stage.addEventListener('mousemove', moveTorch);
+        stage.addEventListener('touchmove', (e) => { e.preventDefault(); moveTorch(e); }, { passive: false });
+        
+        torchSlider.addEventListener('input', (e) => {
+            updateTorchSize(e.target.value);
+        });
+
+        // Initialize center pos
+        stage.style.setProperty('--torch-x', `50%`);
+        stage.style.setProperty('--torch-y', `50%`);
+        updateTorchSize(100);
+
+    </script>
+</body>
+</html>
