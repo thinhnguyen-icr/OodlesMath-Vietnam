@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Bond Forest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            touch-action: manipulation;
+            /* Beautiful Forest/Sky Background */
+            background: linear-gradient(180deg, #4fc3f7 0%, #b3e5fc 50%, #81c784 50%, #4caf50 100%);
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Animated Clouds */
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.8;
+            animation: drift linear infinite;
+            z-index: 0;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        }
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+        .cloud1 { width: 120px; height: 40px; top: 10%; left: -150px; animation-duration: 25s; }
+        .cloud1::before { width: 50px; height: 50px; top: -25px; left: 15px; }
+        .cloud1::after { width: 70px; height: 70px; top: -35px; right: 15px; }
+        
+        .cloud2 { width: 160px; height: 50px; top: 25%; left: -200px; animation-duration: 35s; animation-delay: -10s; transform: scale(0.8); }
+        .cloud2::before { width: 60px; height: 60px; top: -30px; left: 20px; }
+        .cloud2::after { width: 80px; height: 80px; top: -40px; right: 20px; }
+
+        @keyframes drift {
+            0% { transform: translateX(-200px); }
+            100% { transform: translateX(120vw); }
+        }
+
+        /* App Container */
+        #app-wrapper {
+            position: relative;
+            z-index: 10;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2), inset 0 0 0 5px rgba(255,255,255,0.5);
+            border: 6px solid #fff;
+        }
+
+        /* 3D Number Nodes */
+        .number-node {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            z-index: 5;
+            text-shadow: 1px 2px 3px rgba(0,0,0,0.3);
+        }
+
+        @media (min-width: 640px) {
+            .number-node { width: 110px; height: 110px; font-size: 3.5rem; }
+        }
+
+        .whole { 
+            background: radial-gradient(circle at 30% 30%, #ffca28, #f57f17); 
+            border: 5px solid #fff;
+            box-shadow: 0 8px 15px rgba(245, 127, 23, 0.4), inset -4px -4px 10px rgba(0,0,0,0.2);
+        }
+        .part { 
+            background: radial-gradient(circle at 30% 30%, #66bb6a, #2e7d32); 
+            border: 5px solid #fff;
+            box-shadow: 0 8px 15px rgba(46, 125, 50, 0.4), inset -4px -4px 10px rgba(0,0,0,0.2);
+        }
+        .missing { 
+            background: radial-gradient(circle at 30% 30%, #e0e0e0, #9e9e9e); 
+            border: 5px dashed #757575; 
+            color: #424242;
+            box-shadow: inset 4px 4px 10px rgba(0,0,0,0.1);
+            text-shadow: none;
+        }
+
+        /* Number Bond Lines (SVG Container) - Sửa lại nét chuẩn như ảnh */
+        .bond-svg-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; /* Nằm dưới hình tròn (z-index: 5) */
+            pointer-events: none;
+        }
+        
+        .bond-line-path {
+            stroke: #0f4c81; /* Màu xanh đen đậm giống ảnh minh họa */
+            stroke-width: 5; /* Độ dày nét giống ảnh minh họa */
+            stroke-linecap: round;
+        }
+
+        /* Fruits / Icons */
+        .fruit {
+            width: 45px;
+            height: 45px;
+            font-size: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            /* Tăng độ chân thực: Tăng độ tương phản và bóng đổ */
+            filter: drop-shadow(2px 6px 4px rgba(0,0,0,0.35)) saturate(1.2) contrast(1.1);
+        }
+        @media (min-width: 640px) {
+            .fruit { width: 55px; height: 55px; font-size: 45px; }
+        }
+        .fruit:active { transform: scale(1.1) translateY(4px); filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.3)) saturate(1.2) contrast(1.1); }
+        .fruit.dimmed { opacity: 0.3; filter: grayscale(80%) drop-shadow(0px 0px 0px rgba(0,0,0,0)); transform: scale(0.9); }
+
+        /* Animations */
+        .correct-pop { animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes pop {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .shake { animation: shake 0.5s ease-in-out; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px) rotate(-5deg); }
+            40%, 80% { transform: translateX(10px) rotate(5deg); }
+        }
+
+        /* 3D Buttons */
+        .btn-3d {
+            transition: all 0.1s;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.2);
+            position: relative;
+            top: 0;
+        }
+        .btn-3d:active {
+            top: 8px;
+            box-shadow: 0 0 0 rgba(0,0,0,0.2);
+        }
+
+        /* Falling Fruit Bonus */
+        .falling-fruit {
+            position: absolute;
+            font-size: 50px;
+            cursor: pointer;
+            user-select: none;
+            z-index: 60;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.3)) saturate(1.2);
+            animation: falling linear forwards;
+        }
+        @keyframes falling {
+            from { transform: translateY(-80px) rotate(0deg); }
+            to { transform: translateY(100vh) rotate(360deg); }
+        }
+        .bonus-star-pop {
+            position: absolute;
+            color: #ffca28;
+            font-weight: 900;
+            font-size: 32px;
+            pointer-events: none;
+            animation: starUp 0.8s ease-out forwards;
+            z-index: 70;
+            text-shadow: 2px 2px 0px #fff, -2px -2px 0px #fff, 2px -2px 0px #fff, -2px 2px 0px #fff;
+        }
+        @keyframes starUp {
+            0% { transform: translateY(0) scale(0.5); opacity: 1; }
+            50% { transform: translateY(-40px) scale(1.2); }
+            100% { transform: translateY(-80px) scale(1); opacity: 0; }
+        }
+
+        /* Fireworks Canvas */
+        #fireworks-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 100;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-2 sm:p-4">
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <!-- Scenic Background Elements -->
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+
+    <!-- Main Game Wrapper -->
+    <div id="app-wrapper" class="glass-panel w-full max-w-3xl min-h-[550px] sm:min-h-[650px] relative overflow-hidden flex flex-col items-center p-4 sm:p-8">
+        
+        <!-- Top Bar UI -->
+        <div class="w-full flex justify-between items-center mb-6 z-20">
+            <div class="flex items-center gap-2 bg-yellow-100 border-4 border-yellow-400 px-4 py-2 rounded-full shadow-md">
+                <span class="text-3xl filter drop-shadow-md">⭐</span>
+                <span id="score-text" class="text-2xl sm:text-3xl text-yellow-600 font-black">0</span>
+            </div>
+            
+            <div id="level-display" class="bg-green-100 border-4 border-green-400 px-5 py-2 rounded-full text-green-700 font-black text-sm sm:text-lg shadow-md uppercase tracking-wide">
+                Level 1
+            </div>
+            
+            <div id="timer-container" class="hidden flex items-center gap-2 bg-red-100 border-4 border-red-400 px-5 py-2 rounded-full text-red-600 font-black text-sm sm:text-lg shadow-md">
+                <span class="text-2xl">⏰</span> <span id="timer-text">30</span>s
+            </div>
+
+            <button onclick="resetGame()" class="bg-white border-4 border-gray-300 p-3 rounded-full hover:bg-gray-100 btn-3d" title="Restart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4a5568" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+            </button>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="absolute inset-0 z-50 bg-white bg-opacity-95 flex flex-col items-center justify-center p-6 text-center rounded-[24px]">
+            <div class="text-7xl sm:text-8xl mb-2 filter drop-shadow-lg">🐻🌲</div>
+            <h1 class="text-4xl sm:text-6xl font-black text-green-600 mb-2 drop-shadow-sm leading-tight text-center">Number Bond<br>Forest</h1>
+            <p class="text-lg sm:text-2xl text-gray-600 mb-8 font-bold">Find the missing part to win stars!</p>
+            
+            <div class="flex flex-col gap-4 w-full max-w-sm">
+                <button onclick="startGame('easy')" class="btn-3d bg-gradient-to-b from-green-400 to-green-600 border-4 border-white text-white text-xl sm:text-2xl py-4 rounded-3xl font-black tracking-wider">EASY (Up to 5)</button>
+                <button onclick="startGame('medium')" class="btn-3d bg-gradient-to-b from-blue-400 to-blue-600 border-4 border-white text-white text-xl sm:text-2xl py-4 rounded-3xl font-black tracking-wider">MEDIUM (Up to 10)</button>
+                <button onclick="startGame('challenge')" class="btn-3d bg-gradient-to-b from-purple-400 to-purple-600 border-4 border-white text-white text-xl sm:text-2xl py-4 rounded-3xl font-black tracking-wider flex justify-center items-center gap-2">CHALLENGE ⚡</button>
+            </div>
+        </div>
+
+        <!-- Main Gameplay -->
+        <div id="play-area" class="w-full flex-1 flex flex-col items-center justify-between relative hidden z-20">
+            
+            <h2 id="instruction" class="text-2xl sm:text-3xl font-black text-gray-700 mb-2 bg-white px-6 py-2 rounded-full shadow-sm border-2 border-gray-100">What is the missing part?</h2>
+
+            <!-- Number Bond Diagram -->
+            <div class="relative w-full h-64 sm:h-80 flex justify-center mt-4">
+                
+                <!-- SVG Connecting Lines: Tọa độ căn chuẩn tâm -->
+                <svg class="bond-svg-container">
+                    <line x1="50%" y1="31%" x2="25%" y2="68%" class="bond-line-path" />
+                    <line x1="50%" y1="31%" x2="75%" y2="68%" class="bond-line-path" />
+                </svg>
+
+                <!-- Nodes -->
+                <!-- Sửa: Chuyển chữ "WHOLE" lên phía trên vòng tròn -->
+                <div class="absolute top-[0%] left-[50%] -translate-x-1/2 flex flex-col items-center z-10">
+                    <div class="text-sm sm:text-base font-black text-[#0f4c81] mb-2 uppercase tracking-widest bg-white px-4 py-1 rounded-full border-2 border-gray-200 shadow-sm">Whole</div>
+                    <div id="whole-node" class="number-node whole">?</div>
+                </div>
+                
+                <div class="absolute bottom-[0%] left-[25%] -translate-x-1/2 flex flex-col items-center z-10">
+                    <div id="part-1-node" class="number-node part">?</div>
+                    <div class="text-sm sm:text-base font-black text-[#0f4c81] mt-2 uppercase tracking-widest bg-white px-4 py-1 rounded-full border-2 border-gray-200 shadow-sm">Part</div>
+                </div>
+
+                <div class="absolute bottom-[0%] left-[75%] -translate-x-1/2 flex flex-col items-center z-10">
+                    <div id="part-2-node" class="number-node missing">?</div>
+                    <div class="text-sm sm:text-base font-black text-[#0f4c81] mt-2 uppercase tracking-widest bg-white px-4 py-1 rounded-full border-2 border-gray-200 shadow-sm">Part</div>
+                </div>
+            </div>
+
+            <!-- Visual Counters Area (Fruits) -->
+            <div id="counter-area" class="flex flex-wrap justify-center content-center gap-2 sm:gap-3 min-h-[90px] w-full max-w-lg bg-orange-50 bg-opacity-80 backdrop-blur-sm p-4 sm:p-5 rounded-[30px] border-4 border-orange-200 my-4 shadow-inner">
+            </div>
+
+            <!-- Answer Choices -->
+            <div id="options-container" class="flex gap-3 sm:gap-6 flex-wrap justify-center pb-2">
+                <!-- Buttons injected here -->
+            </div>
+        </div>
+
+        <!-- Bonus Round Screen -->
+        <div id="bonus-screen" class="absolute inset-0 z-40 bg-gradient-to-b from-orange-200 to-yellow-100 flex flex-col items-center justify-center hidden rounded-[24px]">
+            <div class="absolute top-10 text-center z-50 bg-white p-4 rounded-3xl border-4 border-orange-400 shadow-xl">
+                <h2 class="text-4xl sm:text-5xl font-black text-orange-600 mb-2 drop-shadow-md">BONUS ROUND!</h2>
+                <p class="text-xl sm:text-2xl text-orange-800 font-bold">Tap the falling fruits!</p>
+                <div class="flex justify-center items-center mt-2 gap-2">
+                    <span class="text-3xl">⏰</span>
+                    <span id="bonus-timer" class="text-4xl font-black text-red-500">10</span>
+                </div>
+            </div>
+            <div id="bonus-catcher-area" class="w-full h-full relative overflow-hidden">
+                <!-- Falling fruits injected here -->
+            </div>
+        </div>
+
+        <!-- Feedback Overlay -->
+        <div id="feedback-msg" class="absolute bottom-32 px-8 py-4 bg-white border-4 rounded-full shadow-2xl text-2xl font-black transform scale-0 transition-all duration-300 z-50 pointer-events-none text-center"></div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="absolute inset-0 z-50 bg-white bg-opacity-95 flex flex-col items-center justify-center p-8 text-center hidden rounded-[24px]">
+            <canvas id="fireworks-canvas"></canvas>
+            <div class="z-10 bg-white p-8 rounded-[40px] border-8 border-yellow-400 shadow-2xl max-w-md w-full">
+                <h2 class="text-5xl sm:text-6xl font-black text-green-600 mb-4 drop-shadow-md">Amazing!</h2>
+                <div id="badge-display" class="text-8xl sm:text-9xl mb-6 filter drop-shadow-xl animate-bounce">🏆</div>
+                <div id="final-stats" class="text-2xl sm:text-3xl mb-8 space-y-4"></div>
+                <button onclick="resetGame()" class="btn-3d bg-gradient-to-b from-orange-400 to-orange-600 border-4 border-white text-white font-black text-2xl sm:text-3xl px-12 py-5 rounded-full shadow-xl tracking-wider w-full">PLAY AGAIN</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Web Audio API Setup for Sound Effects ---
+        let audioCtx;
+        
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const t = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, t);
+                osc.frequency.exponentialRampToValueAtTime(1200, t + 0.1);
+                gain.gain.setValueAtTime(0.5, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+                osc.start(t);
+                osc.stop(t + 0.4);
+                
+                setTimeout(() => {
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
+                    osc2.connect(gain2); gain2.connect(audioCtx.destination);
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    osc2.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 0.1);
+                    gain2.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc2.start(); osc2.stop(audioCtx.currentTime + 0.3);
+                }, 100);
+
+            } else if (type === 'wrong') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(200, t);
+                osc.frequency.exponentialRampToValueAtTime(150, t + 0.3);
+                gain.gain.setValueAtTime(0.5, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+                osc.start(t);
+                osc.stop(t + 0.4);
+
+            } else if (type === 'pop') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, t);
+                osc.frequency.exponentialRampToValueAtTime(300, t + 0.1);
+                gain.gain.setValueAtTime(0.5, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+                osc.start(t);
+                osc.stop(t + 0.1);
+            } else if (type === 'firework') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150 + Math.random()*200, t);
+                osc.frequency.exponentialRampToValueAtTime(50, t + 0.4);
+                
+                gain.gain.setValueAtTime(0.3, t);
+                gain.gain.linearRampToValueAtTime(0.5, t + 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
+                
+                osc.start(t);
+                osc.stop(t + 0.5);
+            } else if (type === 'yay') {
+                [400, 500, 600].forEach(freq => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g); g.connect(audioCtx.destination);
+                    o.type = 'sine';
+                    o.frequency.value = freq;
+                    g.gain.setValueAtTime(0.2, t);
+                    g.gain.linearRampToValueAtTime(0.3, t + 0.2);
+                    g.gain.exponentialRampToValueAtTime(0.01, t + 1.5);
+                    o.start(t); o.stop(t + 1.5);
+                });
+            }
+        }
+
+        // --- Game Logic ---
+        const state = {
+            mode: 'easy',
+            score: 0,
+            streak: 0,
+            level: 1,
+            timer: 30,
+            timerInterval: null,
+            currentWhole: 0,
+            currentPart1: 0,
+            currentPart2: 0,
+            maxNum: 5,
+            fruits: ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒', '🍑', '🍍', '🍅'],
+            isCorrecting: false,
+            bonusInterval: null,
+            bonusCountdown: null
+        };
+
+        const dom = {
+            start: document.getElementById('start-screen'),
+            play: document.getElementById('play-area'),
+            bonus: document.getElementById('bonus-screen'),
+            bonusTimer: document.getElementById('bonus-timer'),
+            bonusArea: document.getElementById('bonus-catcher-area'),
+            result: document.getElementById('result-screen'),
+            whole: document.getElementById('whole-node'),
+            p1: document.getElementById('part-1-node'),
+            p2: document.getElementById('part-2-node'),
+            options: document.getElementById('options-container'),
+            counters: document.getElementById('counter-area'),
+            feedback: document.getElementById('feedback-msg'),
+            score: document.getElementById('score-text'),
+            level: document.getElementById('level-display'),
+            timerBox: document.getElementById('timer-container'),
+            timerText: document.getElementById('timer-text'),
+            finalStats: document.getElementById('final-stats'),
+        };
+
+        function startGame(mode) {
+            initAudio(); 
+            state.mode = mode;
+            state.score = 0;
+            state.level = 1;
+            state.streak = 0;
+            state.currentWhole = 0; 
+            state.currentPart1 = 0;
+            state.maxNum = mode === 'easy' ? 5 : 10;
+            
+            dom.start.classList.add('hidden');
+            dom.play.classList.remove('hidden');
+            dom.bonus.classList.add('hidden');
+            dom.result.classList.add('hidden');
+            
+            if (mode === 'challenge') {
+                dom.timerBox.classList.remove('hidden');
+                startTimer();
+            } else {
+                dom.timerBox.classList.add('hidden');
+            }
+
+            nextProblem();
+        }
+
+        function startTimer() {
+            state.timer = 45;
+            dom.timerText.innerText = state.timer;
+            if (state.timerInterval) clearInterval(state.timerInterval);
+            
+            state.timerInterval = setInterval(() => {
+                state.timer--;
+                dom.timerText.innerText = state.timer;
+                if (state.timer <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function nextProblem() {
+            state.isCorrecting = false;
+            
+            let range = state.maxNum;
+            if (state.mode !== 'challenge' && state.level > 5) {
+                range = state.maxNum + Math.floor(state.level / 2);
+            }
+
+            let newWhole, newPart1, newPart2;
+            
+            do {
+                newWhole = Math.floor(Math.random() * (range - 2)) + 3; 
+                newPart1 = Math.floor(Math.random() * (newWhole - 1)) + 1; 
+                newPart2 = newWhole - newPart1;
+            } while (newWhole === state.currentWhole && newPart1 === state.currentPart1);
+
+            state.currentWhole = newWhole;
+            state.currentPart1 = newPart1;
+            state.currentPart2 = newPart2;
+
+            updateUI();
+        }
+
+        function updateUI() {
+            dom.whole.innerText = state.currentWhole;
+            dom.p1.innerText = state.currentPart1;
+            dom.p2.innerText = "?";
+            dom.p2.className = "number-node missing";
+            dom.score.innerText = state.score;
+            dom.level.innerText = `Level ${state.level}`;
+
+            dom.counters.innerHTML = '';
+            const fruitType = state.fruits[Math.floor(Math.random() * state.fruits.length)];
+            for (let i = 0; i < state.currentWhole; i++) {
+                const f = document.createElement('div');
+                f.className = 'fruit';
+                f.innerText = fruitType;
+                f.onclick = function() {
+                    initAudio();
+                    playSound('pop');
+                    this.classList.toggle('dimmed');
+                };
+                dom.counters.appendChild(f);
+            }
+
+            dom.options.innerHTML = '';
+            const answers = new Set([state.currentPart2]);
+            const limit = Math.max(state.maxNum + 2, state.currentWhole + 2);
+            
+            while (answers.size < 4) {
+                const wrong = Math.floor(Math.random() * limit);
+                if (wrong !== state.currentPart2) answers.add(wrong);
+            }
+
+            [...answers].sort(() => Math.random() - 0.5).forEach(val => {
+                const btn = document.createElement('button');
+                btn.className = "btn-3d bg-white border-4 border-green-400 text-green-600 font-black text-3xl sm:text-4xl w-20 h-20 sm:w-24 sm:h-24 rounded-[20px] shadow-lg hover:bg-green-50 focus:outline-none";
+                btn.innerText = val;
+                btn.onclick = () => checkAnswer(val);
+                dom.options.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(val) {
+            initAudio();
+            if (state.isCorrecting) return;
+
+            if (val === state.currentPart2) {
+                handleCorrect();
+            } else {
+                handleIncorrect();
+            }
+        }
+
+        function handleCorrect() {
+            state.isCorrecting = true;
+            playSound('correct');
+            state.score += 10;
+            state.streak++;
+            
+            dom.p2.innerText = state.currentPart2;
+            dom.p2.className = "number-node part correct-pop";
+            
+            showFeedback("SUPER! ⭐", "text-green-600 border-green-400");
+
+            if (state.streak > 0 && state.streak % 5 === 0) {
+                setTimeout(startBonusRound, 1200);
+                return;
+            }
+
+            if (state.streak % 3 === 0) {
+                state.level++;
+                if (state.mode === 'challenge') {
+                    state.timer += 5;
+                    showFeedback("TIME +5s ⏱️", "text-blue-600 border-blue-400");
+                }
+            }
+
+            setTimeout(nextProblem, 1500);
+        }
+
+        function handleIncorrect() {
+            playSound('wrong');
+            dom.p2.classList.add('shake');
+            setTimeout(() => dom.p2.classList.remove('shake'), 500);
+            
+            state.streak = 0;
+            showFeedback(`Oops! Try again.`, "text-red-500 border-red-400");
+        }
+
+        function showFeedback(text, classes) {
+            dom.feedback.innerText = text;
+            dom.feedback.className = `absolute bottom-32 px-8 py-4 bg-white border-4 rounded-full shadow-2xl text-2xl font-black transform scale-0 transition-all duration-300 z-50 pointer-events-none text-center ${classes}`;
+            dom.feedback.style.transform = "scale(1.1)";
+            dom.feedback.style.opacity = "1";
+            
+            setTimeout(() => {
+                dom.feedback.style.transform = "scale(0)";
+                dom.feedback.style.opacity = "0";
+            }, 1200);
+        }
+
+        // --- Bonus Round ---
+        function startBonusRound() {
+            state.isCorrecting = true;
+            dom.play.classList.add('hidden');
+            dom.bonus.classList.remove('hidden');
+            dom.bonusArea.innerHTML = '';
+            
+            let bonusTimer = 10;
+            dom.bonusTimer.innerText = bonusTimer;
+            
+            state.bonusInterval = setInterval(() => {
+                spawnBonusFruit();
+            }, 400); 
+
+            state.bonusCountdown = setInterval(() => {
+                bonusTimer--;
+                dom.bonusTimer.innerText = bonusTimer;
+                if (bonusTimer <= 0) {
+                    endBonusRound();
+                }
+            }, 1000);
+        }
+
+        function spawnBonusFruit() {
+            const f = document.createElement('div');
+            f.className = 'falling-fruit';
+            f.innerText = state.fruits[Math.floor(Math.random() * state.fruits.length)];
+            f.style.left = Math.random() * 80 + 10 + '%';
+            f.style.animationDuration = (Math.random() * 2 + 2.5) + 's'; 
+            
+            f.addEventListener('touchstart', catchFruit, {passive: false});
+            f.addEventListener('mousedown', catchFruit);
+            
+            function catchFruit(e) {
+                e.preventDefault();
+                playSound('pop');
+                state.score += 5;
+                dom.score.innerText = state.score;
+                
+                const pop = document.createElement('div');
+                pop.className = 'bonus-star-pop';
+                pop.innerText = '+5 ⭐';
+                
+                let clientX = e.clientX;
+                let clientY = e.clientY;
+                if(e.touches && e.touches.length > 0) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                }
+                
+                pop.style.left = clientX - 30 + 'px';
+                pop.style.top = clientY - 30 + 'px';
+                pop.style.position = 'fixed';
+                document.body.appendChild(pop);
+                
+                setTimeout(() => pop.remove(), 800);
+                f.remove();
+            }
+
+            dom.bonusArea.appendChild(f);
+            
+            setTimeout(() => {
+                if (f.parentNode) f.remove();
+            }, 5000);
+        }
+
+        function endBonusRound() {
+            clearInterval(state.bonusInterval);
+            clearInterval(state.bonusCountdown);
+            
+            showFeedback("YUMMY! 🍎", "text-orange-600 border-orange-400");
+            
+            setTimeout(() => {
+                dom.bonus.classList.add('hidden');
+                dom.play.classList.remove('hidden');
+                state.level++;
+                nextProblem();
+            }, 1500);
+        }
+
+        // --- End Game & Fireworks ---
+        function endGame() {
+            if (state.timerInterval) clearInterval(state.timerInterval);
+            if (state.bonusInterval) clearInterval(state.bonusInterval);
+            if (state.bonusCountdown) clearInterval(state.bonusCountdown);
+            
+            playSound('yay');
+            
+            dom.play.classList.add('hidden');
+            dom.bonus.classList.add('hidden');
+            dom.result.classList.remove('hidden');
+            
+            dom.finalStats.innerHTML = `
+                <div class="bg-gray-50 p-6 rounded-3xl border-4 border-gray-100 mb-4">
+                    <p class="text-gray-500 uppercase font-black tracking-widest text-lg">Total Stars</p>
+                    <p class="text-6xl sm:text-7xl text-orange-500 font-black my-2">${state.score}</p>
+                </div>
+            `;
+            
+            const badge = document.getElementById('badge-display');
+            if (state.score >= 300) badge.innerText = "👑";
+            else if (state.score >= 150) badge.innerText = "🏆";
+            else if (state.score >= 50) badge.innerText = "🌟";
+            else badge.innerText = "👍";
+
+            startFireworks();
+        }
+
+        function resetGame() {
+            if (state.timerInterval) clearInterval(state.timerInterval);
+            if (state.bonusInterval) clearInterval(state.bonusInterval);
+            if (state.bonusCountdown) clearInterval(state.bonusCountdown);
+            stopFireworks();
+            
+            state.score = 0;
+            state.level = 1;
+            state.streak = 0;
+            dom.result.classList.add('hidden');
+            dom.play.classList.add('hidden');
+            dom.bonus.classList.add('hidden');
+            dom.start.classList.remove('hidden');
+            dom.score.innerText = "0";
+        }
+
+        // --- Canvas Fireworks System ---
+        const canvas = document.getElementById('fireworks-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let fireworkAnimationId;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function createFirework(x, y) {
+            playSound('firework');
+            const colors = ['#ff0043', '#14fc56', '#1e7fff', '#f6ff00', '#ff8400'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            for (let i = 0; i < 60; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 15,
+                    vy: (Math.random() - 0.5) * 15,
+                    life: 1,
+                    color: color,
+                    size: Math.random() * 5 + 2
+                });
+            }
+        }
+
+        function animateFireworks() {
+            if (dom.result.classList.contains('hidden')) return;
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; // Trail effect over white bg
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            if (Math.random() < 0.05) {
+                createFirework(
+                    Math.random() * canvas.width, 
+                    canvas.height * 0.2 + Math.random() * (canvas.height * 0.4)
+                );
+            }
+
+            particles.forEach((p, index) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.15; // Gravity
+                p.life -= 0.015;
+                
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                
+                if (p.life <= 0) particles.splice(index, 1);
+            });
+            
+            fireworkAnimationId = requestAnimationFrame(animateFireworks);
+        }
+
+        function startFireworks() {
+            resizeCanvas();
+            particles = [];
+            createFirework(canvas.width / 2, canvas.height / 3);
+            animateFireworks();
+        }
+
+        function stopFireworks() {
+            cancelAnimationFrame(fireworkAnimationId);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles = [];
+        }
+
+    </script>
+</body>
+</html>

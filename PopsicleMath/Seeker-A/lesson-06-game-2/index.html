@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ordinal Numbers Fun!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            touch-action: manipulation;
+            background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            overscroll-behavior: none;
+        }
+
+        /* 3D Button Styles */
+        .btn-3d {
+            transition: transform 0.1s cubic-bezier(0, 0, 0.58, 1), box-shadow 0.1s cubic-bezier(0, 0, 0.58, 1);
+            border-radius: 1rem;
+            position: relative;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .btn-option {
+            background-color: #ffffff;
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 6px 0 #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-option:active, .btn-option.active-press {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0 #e5e7eb;
+        }
+
+        .btn-primary {
+            background-color: #58cc02;
+            color: white;
+            box-shadow: 0 6px 0 #58a700;
+        }
+
+        .btn-primary:active, .btn-primary.active-press {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0 #58a700;
+        }
+
+        /* Card Container */
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 4px solid white;
+        }
+
+        /* Colorful Text Effects */
+        .text-rainbow {
+            background: linear-gradient(to right, #ff416c, #ff4b2b, #facc15, #10b981, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 300% 300%;
+            animation: rainbow-anim 4s ease infinite;
+        }
+
+        @keyframes rainbow-anim {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .speaker-icon {
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: #e0f2fe;
+            border-radius: 50%;
+            padding: 12px;
+            box-shadow: 0 4px 0 #bae6fd;
+        }
+        .speaker-icon:active {
+            transform: scale(0.9) translateY(4px);
+            box-shadow: 0 0px 0 #bae6fd;
+        }
+
+        .score-ping {
+            animation: ping-bounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes ping-bounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); color: #f59e0b; }
+            100% { transform: scale(1); }
+        }
+
+        /* Sequence Emoji Styling - Adjusted to fit 10 items */
+        .emoji-item {
+            animation: bounce-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+            filter: drop-shadow(0px 3px 3px rgba(0,0,0,0.2)); 
+            transition: transform 0.2s ease;
+        }
+        .emoji-item:hover {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        @keyframes bounce-in {
+            0% { opacity: 0; transform: scale(0.3) translateY(20px); }
+            50% { opacity: 1; transform: scale(1.1) translateY(-5px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Modals */
+        .modal-overlay {
+            backdrop-filter: blur(4px);
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: scale(0);
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        /* Bonus Game (Falling Fruits) Styles */
+        #bonus-modal {
+            background: rgba(0, 0, 0, 0.7);
+            background-image: radial-gradient(circle at center, rgba(30,58,138,0.6) 0%, rgba(0,0,0,0.9) 100%);
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); }
+            100% { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        .falling-fruit {
+            position: absolute;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            cursor: pointer;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+            z-index: 100;
+        }
+
+        .floating-text {
+            position: absolute;
+            color: #4ade80;
+            font-weight: 900;
+            font-size: 2.5rem;
+            pointer-events: none;
+            animation: floatUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+            z-index: 101;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translate(-50%, 0) scale(0.5); opacity: 0; }
+            20% { transform: translate(-50%, -20px) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -60px) scale(1); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-2 sm:p-4">
+<img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <!-- Main Game UI -->
+    <div id="game-container" class="w-full max-w-4xl mx-auto">
+        <div class="game-card p-4 sm:p-8 text-center">
+            
+            <!-- Header: Score and Progress -->
+            <div class="flex justify-between items-center mb-6">
+                <div class="bg-blue-100 rounded-2xl px-4 py-2 border-2 border-blue-200 flex items-center gap-2">
+                    <span class="text-2xl filter drop-shadow-sm">⭐</span>
+                    <h2 class="font-bold text-xl sm:text-2xl text-blue-800">Score: <span id="score" class="text-orange-500 font-black inline-block">0</span></h2>
+                </div>
+                <div class="bg-gray-100 rounded-2xl px-4 py-2 border-2 border-gray-200">
+                    <h3 class="text-lg sm:text-xl text-gray-600 font-bold"><span id="question-number">1</span> / 10</h3>
+                </div>
+            </div>
+            
+            <!-- Question Area -->
+            <div id="question-area" class="mb-6">
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button id="speak-button" class="speaker-icon cursor-pointer flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    </button>
+                    <h1 id="question-text" class="font-black text-3xl sm:text-4xl text-purple-600 tracking-wide">Which is third?</h1>
+                </div>
+            </div>
+
+            <!-- Sequence Display (Widened to fit 10 items) -->
+            <div class="bg-indigo-50 border-4 border-indigo-100 rounded-2xl p-3 sm:p-5 mb-8 shadow-inner w-full">
+                <div id="sequence-container" class="flex justify-between items-center w-full px-1 sm:px-2">
+                    <!-- Emojis will be inserted here by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Answer Options -->
+            <div id="options-container" class="grid grid-cols-2 gap-4 sm:gap-6">
+                <!-- Options will be inserted here by JavaScript -->
+            </div>
+
+        </div>
+    </div>
+    
+    <!-- Game Over Screen -->
+    <div id="game-over-screen" class="hidden w-full max-w-lg mx-auto text-center">
+        <div class="game-card p-8 sm:p-10">
+            <h2 class="font-black text-5xl sm:text-6xl mb-4 text-rainbow">Awesome!</h2>
+            <p class="text-2xl text-gray-600 font-semibold mb-6">You collected:</p>
+            <div class="flex justify-center items-center gap-2 mb-8">
+                <span class="text-6xl filter drop-shadow-md">⭐</span>
+                <p id="final-score" class="font-black text-8xl text-orange-500 filter drop-shadow-md">0</p>
+            </div>
+            <button id="play-again-button" class="btn-3d btn-primary w-full py-5 text-3xl font-bold uppercase tracking-wider">Play Again</button>
+        </div>
+    </div>
+    
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="hidden fixed inset-0 bg-black/40 modal-overlay flex items-center justify-center z-40 p-4">
+        <div id="feedback-content" class="modal-content text-center bg-white rounded-3xl p-8 sm:p-12 w-full max-w-sm border-4">
+            <div id="feedback-icon" class="text-7xl mb-4 filter drop-shadow-lg">✨</div>
+            <h3 id="feedback-text" class="font-black text-4xl sm:text-5xl">Correct!</h3>
+        </div>
+    </div>
+
+    <!-- Bonus Game Modal (Fruit Tap) -->
+    <div id="bonus-modal" class="hidden fixed inset-0 z-50 overflow-hidden touch-none">
+        <!-- Top HUD -->
+        <div class="absolute top-4 sm:top-8 left-4 right-4 flex justify-between z-50">
+            <div class="text-white text-2xl sm:text-3xl font-bold bg-white/20 rounded-full px-6 py-2 border-2 border-white/30 backdrop-blur-md shadow-lg flex items-center gap-2">
+                ⏳ <span id="bonus-timer">15</span>s
+            </div>
+            <div class="text-white text-2xl sm:text-3xl font-bold bg-white/20 rounded-full px-6 py-2 border-2 border-white/30 backdrop-blur-md shadow-lg flex items-center gap-2">
+                ⭐ <span id="bonus-score-display">0</span>
+            </div>
+        </div>
+
+        <div class="absolute top-24 w-full text-center z-40 pointer-events-none">
+            <h2 class="font-black text-4xl sm:text-5xl text-yellow-300 drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] tracking-wider">Tap the Fruits!</h2>
+        </div>
+
+        <!-- Canvas for Falling Fruits -->
+        <div id="fruit-canvas" class="w-full h-full relative"></div>
+        
+        <!-- Game Over Message -->
+        <div id="bonus-message" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center w-full z-50 pointer-events-none">
+            <h3 class="text-5xl sm:text-7xl font-black text-white drop-shadow-[0_5px_5px_rgba(0,0,0,0.6)] mb-2 text-rainbow">Time's Up!</h3>
+            <p class="text-4xl sm:text-5xl font-bold text-white drop-shadow-lg">Bonus: <span class="text-yellow-400 font-black text-5xl sm:text-6xl" id="bonus-final-score">+0</span></p>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const scoreEl = document.getElementById('score');
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const sequenceContainer = document.getElementById('sequence-container');
+        const optionsContainer = document.getElementById('options-container');
+        const speakButton = document.getElementById('speak-button');
+        const gameContainer = document.getElementById('game-container');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const finalScoreEl = document.getElementById('final-score');
+        const playAgainButton = document.getElementById('play-again-button');
+        
+        const feedbackModal = document.getElementById('feedback-modal');
+        const feedbackText = document.getElementById('feedback-text');
+        const feedbackIcon = document.getElementById('feedback-icon');
+        const feedbackContent = document.getElementById('feedback-content');
+        
+        // Bonus Game Elements
+        const bonusModal = document.getElementById('bonus-modal');
+        const fruitCanvas = document.getElementById('fruit-canvas');
+        const bonusTimerEl = document.getElementById('bonus-timer');
+        const bonusScoreEl = document.getElementById('bonus-score-display');
+        const bonusMessage = document.getElementById('bonus-message');
+        const bonusFinalScore = document.getElementById('bonus-final-score');
+
+        // Game State
+        let score = 0;
+        let currentQuestionIndex = 0;
+        let questions = [];
+        let currentCorrectAnswer = '';
+        let isAnswering = false;
+
+        // --- Sound Synthesis ---
+        const synth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: "triangle" },
+            envelope: { attack: 0.02, decay: 0.2, sustain: 0.2, release: 1 }
+        }).toDestination();
+
+        const popSynth = new Tone.Synth({
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 }
+        }).toDestination();
+
+        const sounds = {
+            correct: () => {
+                const now = Tone.now();
+                synth.triggerAttackRelease(["C5", "E5"], "8n", now);
+                synth.triggerAttackRelease(["E5", "G5"], "8n", now + 0.15);
+                synth.triggerAttackRelease(["G5", "C6"], "4n", now + 0.3);
+            },
+            wrong: () => {
+                const now = Tone.now();
+                synth.triggerAttackRelease("A3", "8n", now);
+                synth.triggerAttackRelease("E3", "4n", now + 0.15);
+            },
+            win: () => {
+                const now = Tone.now();
+                synth.triggerAttackRelease(["C4", "E4", "G4"], "8n", now);
+                synth.triggerAttackRelease(["F4", "A4", "C5"], "8n", now + 0.2);
+                synth.triggerAttackRelease(["G4", "B4", "D5"], "8n", now + 0.4);
+                synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "2n", now + 0.6);
+            },
+            pop: () => {
+                const now = Tone.now();
+                // Random pitch for pops to make it fun
+                const notes = ["C6", "D6", "E6", "G6", "A6"];
+                const randomNote = notes[Math.floor(Math.random() * notes.length)];
+                popSynth.triggerAttackRelease(randomNote, "32n", now);
+            }
+        };
+
+        // --- Speech Synthesis ---
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                utterance.pitch = 1.2;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // --- Utility Functions ---
+        function shuffleArray(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        const vibrantColors = ['text-pink-500', 'text-blue-500', 'text-green-500', 'text-purple-500', 'text-orange-500'];
+
+        // --- Game Logic ---
+        const ordinals = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"];
+        const allEmojis = ['🍎', '🐶', '🚗', '🧸', '🦋', '🎈', '🍕', '🦁', '🚀', '🎸', '🍓', '🚁', '🐠', '🦖', '⚽'];
+        const bonusFruits = ['🍎', '🍌', '🍉', '🍇', '🍓', '🍊', '🍍', '🍒', '🍑', '🥝'];
+
+        function generateQuestion() {
+            const shuffledEmojis = shuffleArray([...allEmojis]);
+            const sequence = shuffledEmojis.slice(0, 10);
+            
+            const correctIndex = Math.floor(Math.random() * 10);
+            const correctAnswer = sequence[correctIndex];
+            const ordinal = ordinals[correctIndex];
+
+            const wrongOptions = shuffledEmojis.filter(e => e !== correctAnswer);
+            const option2 = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
+            
+            const options = shuffleArray([correctAnswer, option2]);
+            const colorClass = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
+
+            return {
+                questionText: `Which is `,
+                ordinalWord: ordinal,
+                questionComplete: `Which is ${ordinal}?`,
+                colorClass: colorClass,
+                sequence: sequence,
+                options: options,
+                answer: correctAnswer
+            };
+        }
+        
+        function displayQuestion() {
+            if (currentQuestionIndex >= 10) {
+                endGame();
+                return;
+            }
+
+            isAnswering = false;
+            const q = questions[currentQuestionIndex];
+            currentCorrectAnswer = q.answer;
+
+            questionNumberEl.textContent = `${currentQuestionIndex + 1}`;
+            questionTextEl.innerHTML = `${q.questionText} <span class="${q.colorClass} underline decoration-4 underline-offset-4">${q.ordinalWord}</span>?`;
+            
+            sequenceContainer.innerHTML = '';
+            q.sequence.forEach((emoji, index) => {
+                const emojiSpan = document.createElement('span');
+                emojiSpan.textContent = emoji;
+                // Font sizes optimized to fit 10 items perfectly
+                emojiSpan.className = 'emoji-item text-3xl sm:text-4xl md:text-5xl flex-shrink-0';
+                emojiSpan.style.animationDelay = `${index * 50}ms`;
+                sequenceContainer.appendChild(emojiSpan);
+            });
+
+            optionsContainer.innerHTML = '';
+            q.options.forEach((option, index) => {
+                const optionButton = document.createElement('button');
+                optionButton.className = 'btn-3d btn-option p-6 sm:p-10 text-6xl sm:text-7xl flex items-center justify-center';
+                optionButton.style.animation = `bounce-in 0.5s ease forwards`;
+                optionButton.style.animationDelay = `${(index * 100) + 300}ms`;
+                optionButton.style.opacity = "0";
+                
+                const innerSpan = document.createElement('span');
+                innerSpan.textContent = option;
+                innerSpan.className = 'filter drop-shadow-md';
+                optionButton.appendChild(innerSpan);
+
+                optionButton.addEventListener('touchstart', () => optionButton.classList.add('active-press'), {passive: true});
+                optionButton.addEventListener('touchend', () => {
+                    optionButton.classList.remove('active-press');
+                    checkAnswer(option, option === q.answer);
+                });
+                optionButton.addEventListener('mousedown', () => optionButton.classList.add('active-press'));
+                optionButton.addEventListener('mouseup', () => {
+                    optionButton.classList.remove('active-press');
+                    checkAnswer(option, option === q.answer);
+                });
+                optionButton.addEventListener('mouseleave', () => optionButton.classList.remove('active-press'));
+
+                optionsContainer.appendChild(optionButton);
+            });
+
+            setTimeout(() => speak(q.questionComplete), 500);
+        }
+
+        function checkAnswer(selectedOption, isCorrect) {
+            if (isAnswering) return;
+            isAnswering = true;
+            
+            if (isCorrect) {
+                sounds.correct();
+                score++;
+                scoreEl.textContent = score;
+                scoreEl.classList.add('score-ping');
+                triggerMiniConfetti();
+                setTimeout(() => scoreEl.classList.remove('score-ping'), 600);
+                showFeedback(true);
+                
+                // Proceed to Bonus Game after correct answer
+                setTimeout(() => {
+                    hideFeedback();
+                    startBonusGame();
+                }, 1500);
+            } else {
+                sounds.wrong();
+                showFeedback(false);
+                
+                 setTimeout(() => {
+                    hideFeedback();
+                    currentQuestionIndex++;
+                    displayQuestion();
+                }, 1800);
+            }
+        }
+
+        function showFeedback(isCorrect) {
+            feedbackModal.classList.remove('hidden');
+            setTimeout(() => feedbackModal.classList.add('active'), 10);
+
+            if (isCorrect) {
+                feedbackIcon.textContent = '🌟';
+                feedbackText.innerHTML = `Awesome!<br><span class="text-green-500 text-3xl block mt-2">+1 Point</span>`;
+                feedbackContent.className = 'modal-content text-center bg-white rounded-3xl p-8 sm:p-12 w-full max-w-sm border-4 border-green-400 text-green-600 shadow-[0_0_40px_rgba(74,222,128,0.5)]';
+            } else {
+                feedbackIcon.textContent = 'Oops!';
+                feedbackIcon.className = 'text-5xl mb-4 font-black';
+                feedbackText.textContent = 'Let\'s try the next one!';
+                feedbackContent.className = 'modal-content text-center bg-white rounded-3xl p-8 sm:p-12 w-full max-w-sm border-4 border-red-400 text-red-500 shadow-[0_0_40px_rgba(248,113,113,0.5)]';
+            }
+        }
+        
+        function hideFeedback(){
+            feedbackModal.classList.remove('active');
+            setTimeout(() => {
+                feedbackModal.classList.add('hidden');
+                feedbackIcon.className = 'text-7xl mb-4 filter drop-shadow-lg'; 
+            }, 300);
+        }
+
+        // --- Bonus Game (Fruit Tap) Logic ---
+        let bonusTime = 15;
+        let bonusPoints = 0;
+        let bonusTimerInterval;
+        let fruitSpawnInterval;
+
+        function startBonusGame() {
+            bonusTime = 15;
+            bonusPoints = 0;
+            bonusTimerEl.textContent = bonusTime;
+            bonusScoreEl.textContent = bonusPoints;
+            fruitCanvas.innerHTML = '';
+            bonusMessage.classList.add('hidden');
+            
+            bonusModal.classList.remove('hidden');
+
+            // Timer
+            bonusTimerInterval = setInterval(() => {
+                bonusTime--;
+                bonusTimerEl.textContent = bonusTime;
+                
+                // Color timer red when low
+                if(bonusTime <= 5) {
+                    bonusTimerEl.parentElement.classList.add('bg-red-500/50', 'border-red-400');
+                }
+
+                if (bonusTime <= 0) {
+                    endBonusGame();
+                }
+            }, 1000);
+
+            // Spawner (every 400ms)
+            fruitSpawnInterval = setInterval(spawnFruit, 400);
+        }
+
+        function spawnFruit() {
+            const fruit = document.createElement('div');
+            fruit.textContent = bonusFruits[Math.floor(Math.random() * bonusFruits.length)];
+            
+            // Random sizes for variety
+            const sizes = ['text-6xl', 'text-7xl', 'text-8xl'];
+            const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
+            fruit.className = `falling-fruit ${randomSize}`;
+            
+            // Random X position (10% to 85% to keep inside screen)
+            fruit.style.left = `${Math.random() * 75 + 10}%`;
+            
+            // Random fall duration (2s to 4s)
+            const duration = Math.random() * 2 + 2;
+            fruit.style.animation = `fall ${duration}s linear forwards`;
+
+            // Interaction Event
+            const handleTap = (e) => {
+                e.preventDefault();
+                if (fruit.parentNode) {
+                    sounds.pop();
+                    bonusPoints++;
+                    bonusScoreEl.textContent = bonusPoints;
+
+                    // Create Floating +1 text
+                    const plusText = document.createElement('div');
+                    plusText.textContent = '+1';
+                    plusText.className = 'floating-text';
+                    
+                    // Get position relative to screen to spawn text exactly where tapped
+                    const rect = fruit.getBoundingClientRect();
+                    plusText.style.left = `${rect.left + (rect.width/2)}px`;
+                    plusText.style.top = `${rect.top}px`;
+                    bonusModal.appendChild(plusText);
+
+                    // Tiny confetti burst at tap location
+                    confetti({
+                        particleCount: 15,
+                        spread: 50,
+                        origin: { x: (rect.left + rect.width/2) / window.innerWidth, y: rect.top / window.innerHeight },
+                        colors: ['#4ade80', '#facc15'],
+                        zIndex: 1000,
+                        ticks: 30
+                    });
+
+                    // Remove text after animation
+                    setTimeout(() => {
+                        if(plusText.parentNode) plusText.remove();
+                    }, 800);
+
+                    // Remove fruit
+                    fruitCanvas.removeChild(fruit);
+                }
+            };
+
+            fruit.addEventListener('mousedown', handleTap);
+            fruit.addEventListener('touchstart', handleTap, {passive: false});
+
+            // Cleanup if it reaches the bottom
+            setTimeout(() => {
+                if (fruit.parentNode) {
+                    fruitCanvas.removeChild(fruit);
+                }
+            }, duration * 1000);
+
+            fruitCanvas.appendChild(fruit);
+        }
+
+        function endBonusGame() {
+            clearInterval(bonusTimerInterval);
+            clearInterval(fruitSpawnInterval);
+            
+            // Stop current fruits
+            const activeFruits = document.querySelectorAll('.falling-fruit');
+            activeFruits.forEach(f => {
+                f.style.animationPlayState = 'paused';
+                f.style.opacity = '0.5';
+                f.style.pointerEvents = 'none';
+            });
+
+            // Reset timer styling
+            bonusTimerEl.parentElement.classList.remove('bg-red-500/50', 'border-red-400');
+
+            // Show results
+            bonusFinalScore.textContent = `+${bonusPoints}`;
+            bonusMessage.classList.remove('hidden');
+
+            // Add to main score
+            if (bonusPoints > 0) {
+                sounds.win();
+                triggerMiniConfetti();
+                score += bonusPoints;
+                scoreEl.textContent = score;
+            }
+
+            // Go to next question after 2.5 seconds
+            setTimeout(() => {
+                bonusModal.classList.add('hidden');
+                fruitCanvas.innerHTML = ''; // clear remaining fruits
+                currentQuestionIndex++;
+                displayQuestion();
+            }, 2500);
+        }
+
+        function startGame() {
+            score = 0;
+            currentQuestionIndex = 0;
+            questions = [];
+            for(let i=0; i<10; i++){
+                questions.push(generateQuestion());
+            }
+            scoreEl.textContent = score;
+            gameOverScreen.classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+            
+            Tone.start();
+            displayQuestion();
+        }
+
+        function endGame() {
+            sounds.win();
+            triggerFireworks();
+            finalScoreEl.textContent = score;
+            gameContainer.classList.add('hidden');
+            gameOverScreen.classList.remove('hidden');
+        }
+        
+        // --- Confetti Functions ---
+        function triggerMiniConfetti() {
+            confetti({
+                particleCount: 50,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff'],
+                zIndex: 2000
+            });
+        }
+
+        function triggerFireworks() {
+            const duration = 5 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+                const particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.4, 0.6), y: Math.random() - 0.1 } }));
+            }, 250);
+        }
+
+        // Event Listeners
+        speakButton.addEventListener('click', () => {
+            const q = questions[currentQuestionIndex];
+            if(q) speak(q.questionComplete);
+        });
+
+        playAgainButton.addEventListener('mousedown', () => playAgainButton.classList.add('active-press'));
+        playAgainButton.addEventListener('mouseleave', () => playAgainButton.classList.remove('active-press'));
+        playAgainButton.addEventListener('mouseup', () => {
+            playAgainButton.classList.remove('active-press');
+            startGame();
+        });
+        
+        playAgainButton.addEventListener('touchstart', () => playAgainButton.classList.add('active-press'), {passive: true});
+        playAgainButton.addEventListener('touchend', () => {
+            playAgainButton.classList.remove('active-press');
+            startGame();
+        });
+
+        // Initialize Tone.js
+        document.body.addEventListener('click', async () => {
+            await Tone.start();
+        }, { once: true });
+
+        // Initial Start
+        startGame();
+
+    </script>
+
+</body>
+</html>

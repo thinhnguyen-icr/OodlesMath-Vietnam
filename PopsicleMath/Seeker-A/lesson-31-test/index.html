@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Math Review Adventure - Exam Mode V14</title>
+  
+  <!-- Font Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    /* --- SUPER VIBRANT & MAGICAL THEME FOR KIDS --- */
+    :root {
+      --text: #1e293b;
+      --c-blue: #0ea5e9;
+      --c-pink: #ec4899;
+      --c-yellow: #f59e0b;
+      --c-green: #10b981;
+      --c-purple: #8b5cf6;
+      --c-orange: #f97316;
+      --c-red: #ef4444;
+      
+      --shadow-soft: 0 10px 25px rgba(0,0,0,0.08);
+      --shadow-hard: 0 8px 0 rgba(0,0,0,0.15);
+      --radius: 30px;
+    }
+
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
+    
+    body {
+      font-family: "Poppins", sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      /* Animated Magical Gradient Background */
+      background: linear-gradient(-45deg, #a8edea, #fed6e3, #e0c3fc, #8ec5fc);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Floating Particles */
+    .particles span {
+      position: fixed; pointer-events: none; opacity: 0.4;
+      animation: floatUp 10s linear infinite; z-index: 0;
+      font-size: clamp(20px, 4vw, 40px);
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) rotate(0deg) scale(0.8); opacity: 0; }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.5; }
+      100% { transform: translateY(-20vh) rotate(360deg) scale(1.2); opacity: 0; }
+    }
+
+    /* Header Logo */
+    .header-logo-container {
+        position: fixed; top: 12px; left: 16px; z-index: 10;
+        background: rgba(255, 255, 255, 0.9); padding: 8px 16px; border-radius: 99px;
+        box-shadow: var(--shadow-soft); display: flex; align-items: center; gap: 12px;
+        border: 4px solid #fff; backdrop-filter: blur(8px);
+    }
+    
+    .wrap {
+      max-width: 1280px; margin: 0 auto; padding: 90px 16px 24px;
+      display: grid; grid-template-columns: 420px 1fr; gap: 24px;
+      min-height: 100vh; position: relative; z-index: 1;
+    }
+
+    /* --- GLASSMORPHISM CARDS --- */
+    .card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-radius: var(--radius); box-shadow: var(--shadow-soft);
+      border: 5px solid rgba(255,255,255,0.9);
+      overflow: hidden; display: flex; flex-direction: column;
+    }
+
+    header {
+      padding: 20px; background: rgba(255,255,255,0.6);
+      border-bottom: 4px dashed rgba(203, 213, 225, 0.6);
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      width: 56px; height: 56px; border-radius: 18px;
+      background: linear-gradient(135deg, #a78bfa, #c084fc); color: white;
+      display: grid; place-items: center; font-size: 28px;
+      box-shadow: 0 6px 15px rgba(167, 139, 250, 0.4);
+    }
+    .t b { display: block; font-size: 20px; color: #5b21b6; font-weight: 900; }
+    .t span { display: block; font-size: 14px; color: #475569; font-weight: 800; }
+
+    .chips { display: flex; gap: 8px; flex-direction: column; align-items: flex-end; }
+    .chip {
+      background: #fef08a; color: #854d0e; border: 3px solid #eab308;
+      border-radius: 99px; padding: 6px 16px; font-size: 15px; font-weight: 900;
+      box-shadow: 0 4px 0 #ca8a04;
+    }
+
+    /* LEFT PANEL */
+    .left .body { padding: 24px 20px; flex: 1; display: flex; flex-direction: column; }
+    .big { font-size: 28px; color: var(--c-pink); margin-bottom: 6px; font-weight: 900; }
+    .sub { font-size: 16px; color: #334155; font-weight: 700; line-height: 1.5; }
+
+    /* Progress Bar */
+    .progress {
+      margin-top: 20px; background: rgba(255,255,255,0.8);
+      border: 4px solid #fff; border-radius: 24px; padding: 18px; box-shadow: var(--shadow-soft);
+    }
+    .row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .meter {
+      height: 22px; background: #e2e8f0; border-radius: 99px; overflow: hidden;
+      border: 3px solid #cbd5e1; box-shadow: inset 0 3px 6px rgba(0,0,0,0.1);
+    }
+    .bar {
+      height: 100%; width: 0%;
+      background: repeating-linear-gradient(45deg, #34d399, #34d399 12px, #10b981 12px, #10b981 24px);
+      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 99px;
+    }
+    .small { font-size: 15px; color: #1e293b; font-weight: 800; }
+
+    .btnrow { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+    .btn {
+      border: none; border-radius: 20px; padding: 14px 20px; font-size: 16px; font-weight: 900;
+      cursor: pointer; transition: all 0.1s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      text-transform: uppercase; letter-spacing: 1px; color: white; flex: 1;
+    }
+    .btn:active { transform: translateY(6px); box-shadow: none !important; }
+    .btn.primary { background: #38bdf8; box-shadow: 0 6px 0 #0284c7; }
+    .btn.ghost { background: #e2e8f0; color: #475569; box-shadow: 0 6px 0 #94a3b8; flex: 0.5; }
+    .btn.pink { background: #f472b6; box-shadow: 0 6px 0 #be185d; }
+
+    /* Skills Grid - 2 Columns */
+    .skills { margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .skill {
+      background: rgba(255,255,255,0.9); border: 3px solid #e2e8f0; border-radius: 20px;
+      padding: 10px; display: flex; align-items: center; gap: 10px;
+      cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .skill:hover { transform: translateY(-4px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); }
+    .skill:active { transform: translateY(2px); box-shadow: 0 0 0; }
+    
+    /* Active & Done States */
+    .skill.active {
+      border-color: var(--c-blue);
+      background: #f0f9ff;
+      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.25);
+      transform: translateY(-2px);
+    }
+    .skill.done {
+        border-color: #cbd5e1;
+        background: #f8fafc;
+        box-shadow: none;
+    }
+    
+    .sico {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(135deg, #fdf2f8, #fbcfe8); color: #db2777;
+      display: grid; place-items: center; font-size: 20px; flex-shrink: 0;
+    }
+    .skill div:last-child { flex: 1; min-width: 0; }
+    .skill b { font-size: 13px; color: #1e293b; display:block; line-height: 1.2; margin-bottom: 2px; font-weight: 800;}
+    .skill span { font-size: 11px; font-weight: 700; color: #64748b; display:block; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+
+    /* RIGHT PANEL */
+    .right .stage { padding: 24px; flex: 1; display: flex; flex-direction: column;}
+    .panel {
+      background: rgba(255,255,255,0.95); border-radius: 28px; border: 5px solid #fff;
+      padding: 30px; flex: 1; position: relative; box-shadow: var(--shadow-soft);
+      overflow-y: auto; display: flex; flex-direction: column;
+    }
+
+    .qtop { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .qtitle { font-size: 28px; color: var(--c-purple); font-weight: 900; }
+    .tag { background: #fef08a; color: #854d0e; padding: 8px 20px; border-radius: 99px; font-weight: 900; font-size: 16px; box-shadow: 0 4px 0 #eab308; }
+
+    .question { background: rgba(241, 245, 249, 0.5); border: 4px dashed #cbd5e1; border-radius: 28px; padding: 30px; margin-bottom: 28px; }
+    .prompt-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+    .prompt { font-size: 32px; color: #0f172a; margin: 0; line-height: 1.4; font-weight: 900; flex: 1; }
+    .hint { margin-top: 20px; color: #475569; font-style: italic; font-weight: 800; font-size: 18px; display: block; text-align: center; }
+    
+    .speak-btn {
+      width: 60px; height: 60px; background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: white;
+      border-radius: 50%; display: grid; place-items: center; font-size: 28px;
+      cursor: pointer; box-shadow: 0 6px 0 #0284c7; transition: 0.1s; flex-shrink: 0;
+    }
+    .speak-btn:active { transform: translateY(6px); box-shadow: none; }
+
+    /* Visual Components */
+    .pop-emoji { display: inline-block; filter: drop-shadow(0px 6px 4px rgba(0,0,0,0.2)); transition: transform 0.3s ease; }
+    .pop-emoji:hover { transform: scale(1.15) rotate(5deg); }
+    .emoji-big { font-size: clamp(40px, 8vw, 75px); }
+    .emoji-line { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-items: center; padding: 10px; }
+    
+    /* Choices */
+    .choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
+    .choice {
+      flex: 1 1 calc(50% - 16px); min-width: 140px;
+      background: #fff; border: 4px solid #e2e8f0; border-radius: 24px;
+      padding: 16px; font-size: 32px; color: #1e293b; font-weight: 900;
+      min-height: 90px; display: flex; align-items: center; justify-content: center; text-align: center;
+      cursor: pointer; box-shadow: 0 8px 0 #cbd5e1; transition: 0.1s;
+    }
+    .choice:hover { transform: translateY(-4px); border-color: #cbd5e1; background: #f8fafc; }
+    .choice:active { transform: translateY(6px); box-shadow: 0 2px 0 #cbd5e1; }
+    
+    /* Selected State for Exam Mode */
+    .choice.selected {
+      border-color: var(--c-blue) !important;
+      background: #e0f2fe !important;
+      color: var(--c-blue);
+      box-shadow: 0 8px 0 #0284c7;
+      transform: translateY(-4px);
+    }
+    .choice.disabled { opacity: 0.7; pointer-events: none; }
+
+    /* Custom Layouts for Specific Questions */
+    .choices.choices-vertical { flex-direction: column; align-items: stretch; }
+    .choices.choices-vertical .choice { min-height: 70px; padding: 12px 24px; align-items: center; justify-content: flex-start; }
+    
+    /* Scene style for Height Question */
+    .choices.choices-scene { 
+      background: #f8fafc; border: 4px solid #e2e8f0; border-bottom: 8px solid #a7f3d0; 
+      border-radius: 24px; padding: 20px 10px 0 10px; align-items: flex-end; justify-content: space-around; flex-wrap: nowrap;
+    }
+    .choices.choices-scene .choice {
+      background: transparent; border: none; box-shadow: none; padding: 0 10px 10px 10px; margin: 0; min-height: 150px; min-width: auto;
+    }
+    .choices.choices-scene .choice:hover { transform: translateY(-10px) scale(1.05); background: transparent; }
+    .choices.choices-scene .choice:active { transform: translateY(0); }
+    .choices.choices-scene .choice.selected { background: transparent !important; transform: translateY(-15px) scale(1.1); filter: drop-shadow(0 0 20px #38bdf8); box-shadow: none; border-color: transparent !important; }
+
+    /* Quiz Navigation Bar */
+    .quiz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; border-top: 3px dashed #e2e8f0; padding-top: 20px; }
+
+    .end { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+    .summary-container {
+      background: #fff; border: 5px solid var(--c-blue); border-radius: 24px;
+      max-height: 350px; margin-top: 28px; width: 100%; overflow-y: auto; box-shadow: inset 0 -10px 20px rgba(0,0,0,0.05);
+    }
+    .sum-table { width: 100%; border-collapse: collapse; font-size: 16px; text-align: left; }
+    .sum-table th { background: #f0f9ff; color: #0284c7; font-size: 18px; padding: 16px; position: sticky; top: 0; font-weight: 900; z-index: 2; border-bottom: 4px solid #bae6fd;}
+    .sum-table td { padding: 16px; border-bottom: 3px solid #f1f5f9; font-weight: 700; color: #334155;}
+    .st-status { font-size: 28px; text-align: center; }
+    
+    #bonusGame {
+      position: absolute; top:0; left:0; width:100%; height:100%;
+      background: rgba(255,255,255,0.95); z-index: 20; display:none; flex-direction:column;
+      border-radius: 28px; backdrop-filter: blur(10px);
+    }
+    .timer-badge { background: #ec4899; box-shadow: 0 6px 0 #be185d; font-size: 26px; padding: 10px 24px; color: white; border-radius: 99px; font-weight: 900; }
+    #confetti, #fireworks { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
+
+    .hl-pink { color: #ec4899; } .hl-blue { color: #0ea5e9; } .hl-green { color: #10b981; } .hl-purple { color: #8b5cf6; } .hl-orange { color: #f97316; }
+
+    @media (max-width: 900px){
+      .wrap { grid-template-columns: 1fr; padding-top: 90px; }
+      .left .body { min-height: auto; border-radius: 20px;}
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Magical Background Particles -->
+  <div class="particles" id="particles"></div>
+  
+  <canvas id="confetti"></canvas>
+  <canvas id="fireworks"></canvas>
+
+  <div class="header-logo-container">
+    <img src="https://image2url.com/r2/default/images/1770270908168-036a8878-e468-415d-9a50-73d8cbcc8574.png" alt="Oodles Logo" style="height: 36px; object-fit: contain;">
+  </div>
+  
+  <div class="wrap">
+    <!-- LEFT SIDEBAR -->
+    <section class="card left">
+      <header>
+        <div class="brand">
+          <div class="logo">📝</div>
+          <div class="t">
+            <b>Exam Mode</b>
+            <span>Mid-Module Review</span>
+          </div>
+        </div>
+        <div class="chips">
+          <div class="chip" id="chipTimer" style="background:#fffbeb; color:#b45309; border-color:#f59e0b;">⏱ 00:00</div>
+          <div class="chip" id="chipQ">🧩 0/10</div>
+        </div>
+      </header>
+
+      <div class="body">
+        <div class="big">Math Assessment</div>
+        <div class="sub">Finish all 10 questions to unlock a special game!</div>
+
+        <div class="progress">
+          <div class="row">
+            <div class="small"><b>Your Progress</b></div>
+            <div class="small" id="mini">Ready?</div>
+          </div>
+          <div class="meter"><div class="bar" id="bar"></div></div>
+        </div>
+
+        <!-- Skills Grid (2 Columns) -->
+        <div class="skills" id="skillGrid"></div>
+
+        <div class="btnrow">
+          <button class="btn primary" id="startBtn">▶ Start Exam</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN GAME AREA -->
+    <section class="card right">
+      <div class="stage">
+        <div class="panel">
+          <!-- Welcome -->
+          <div class="end" id="welcome">
+            <div>
+              <div style="font-size:120px; margin-bottom:20px; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.15));">🧠</div>
+              <h2 style="font-size: 46px; color: var(--c-purple); margin: 10px 0; font-weight: 900;">Ready for the Test?</h2>
+              <p style="font-size: 22px; color: #475569; font-weight: 700;">Press <b style="color: var(--c-blue);">Start Exam</b> to begin!</p>
+            </div>
+          </div>
+
+          <!-- Quiz Screen -->
+          <div id="quiz" style="display:none;">
+            <div class="qtop">
+              <div class="qtitle" id="qTitle">Question 1 of 10</div>
+              <div class="tag" id="qTag">Topic</div>
+            </div>
+            
+            <div class="question" id="qBox"></div>
+            
+            <div class="choices" id="choices"></div>
+            
+            <!-- Exam Navigation -->
+            <div class="quiz-nav">
+                <button class="btn ghost" id="prevBtn" onclick="goPrev()">⬅ Previous</button>
+                <button class="btn primary" id="nextBtn" onclick="goNext()">Next ➡</button>
+                <button class="btn pink" id="submitBtn" onclick="submitExam()" style="display:none;">✅ Submit Test</button>
+            </div>
+          </div>
+
+          <!-- Finish Screen -->
+          <div class="end" id="finish" style="display:none;">
+            <div style="width:100%; max-width:650px;">
+              <div style="font-size:110px; animation: bounce 2s infinite; text-shadow: 0 15px 20px rgba(0,0,0,0.2);">🏆</div>
+              <h2 id="finalTitle" style="font-size:52px; color: var(--c-blue); margin: 15px 0; font-weight: 900;">Submitted!</h2>
+              <p id="finalText" style="font-size:24px; color:#475569; font-weight: 800;">Evaluating...</p>
+              <div id="summary" class="summary-container"></div>
+              <div class="btnrow" style="justify-content:center; margin-top:35px;">
+                <button class="btn pink" id="bonusBtn">🎈 Play Bubble Pop!</button>
+                <button class="btn ghost" id="playAgain">🔄 Retake Exam</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bonus Game -->
+          <div id="bonusGame">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding: 24px;">
+               <div style="display:flex; align-items:center; gap:12px;">
+                 <b style="font-size:28px; color:var(--c-blue); font-weight: 900;">🎈 Pop the Bubbles!</b>
+                 <span id="bonusScoreDisplay" style="font-size:22px; color:#475569; font-weight:900; margin-left:10px; background: #f1f5f9; padding: 8px 20px; border-radius: 99px;">Score: 0</span>
+               </div>
+               <div class="timer-badge" id="bonusTimer">20s</div>
+            </div>
+            <canvas id="bonusCanvas" style="flex:1; width: 100%; cursor: crosshair;"></canvas>
+            <div style="text-align:center; padding:20px; font-weight:900; font-size: 26px; color:var(--c-pink);">Tap the bubbles fast!</div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+<script>
+  // --- Background Particles ---
+  const ptContainer = document.getElementById('particles');
+  const ptEmojis = ['✨','🌟','💖','🎈','☁️']; 
+  for(let i=0; i<15; i++){
+    let span = document.createElement('span');
+    span.textContent = ptEmojis[Math.floor(Math.random()*ptEmojis.length)];
+    span.style.left = Math.random() * 100 + 'vw';
+    span.style.animationDelay = Math.random() * 10 + 's';
+    span.style.animationDuration = 10 + Math.random() * 10 + 's';
+    ptContainer.appendChild(span);
+  }
+
+  // --- Audio System ---
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function playTone(freq, type, duration, vol = 0.1) {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + duration);
+  }
+  function sfxClick() { playTone(400, 'sine', 0.1, 0.05); }
+  function sfxSelect() { playTone(600, 'triangle', 0.1, 0.05); }
+  function sfxPop() { playTone(600 + Math.random()*400, 'sine', 0.1, 0.1); }
+  function sfxWin() { [523.25, 659.25, 783.99, 1046.50].forEach((f,i) => setTimeout(() => playTone(f, 'sine', 0.4, 0.15), i*120)); }
+  function speak(text) {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US'; utterance.rate = 0.9; utterance.pitch = 1.1;
+      window.speechSynthesis.speak(utterance);
+    }
+  }
+
+  // Helper
+  const rand = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+  function shuffle(arr){
+    const a = [...arr];
+    for(let i=a.length-1; i>0; i--){
+      const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+  function genChoices(correct, wrongGenFn, count=4) {
+    let s = new Set([correct.toString()]);
+    while(s.size < count) s.add(wrongGenFn().toString());
+    return shuffle(Array.from(s));
+  }
+
+  // Pure SVG Generators
+  const shapeSVG = {
+    square: `<svg width="80" height="80" viewBox="0 0 40 40"><rect x="5" y="5" width="30" height="30" fill="#ec4899" /></svg>`,
+    circle: `<svg width="80" height="80" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="#0ea5e9" /></svg>`,
+    triangle: `<svg width="80" height="80" viewBox="0 0 40 40"><polygon points="20,5 36,35 4,35" fill="#f59e0b" /></svg>`
+  };
+
+  // --- 10 NEW TOPICS MAPPED TO 10 BUILDERS ---
+  const skills = [
+    { key:"q1",  icon:"🔢", name:"Numbers", sub:"Count & Compare" },
+    { key:"q2",  icon:"🥇", name:"Ordinal", sub:"Positions" },
+    { key:"q3",  icon:"🎈", name:"Number bonds", sub:"within 10" },
+    { key:"q4",  icon:"➕", name:"Addition", sub:"within 10" },
+    { key:"q5",  icon:"➖", name:"Subtraction", sub:"within 10" },
+    { key:"q6",  icon:"🔗", name:"Fact Families", sub:"Add & Subtract" },
+    { key:"q7",  icon:"⏰", name:"Time", sub:"Hour / O'clock" },
+    { key:"q8",  icon:"🔺", name:"2D Shapes", sub:"Identify" },
+    { key:"q9",  icon:"🦋", name:"Patterns", sub:"Numbers & Shapes" },
+    { key:"q10", icon:"📏", name:"Measure & Graph", sub:"Compare & Read" }
+  ];
+
+  const skillGrid = document.getElementById("skillGrid");
+  
+  function renderSkills(){
+    skillGrid.innerHTML = "";
+    const activeIndex = (els.welcome.style.display === "none" && els.finish.style.display === "none") ? idx : -1;
+    
+    skills.forEach((s, i) => {
+      const div = document.createElement("div");
+      const isDone = userAnswers[i] !== null;
+      const isActive = (i === activeIndex);
+      
+      div.className = "skill" + (isDone ? " done" : "") + (isActive ? " active" : "");
+      div.innerHTML = `<div class="sico" style="padding:6px;">${s.icon}</div><div><b>${s.name}</b><span>${s.sub}</span></div>`;
+      
+      // Allow clicking to navigate during exam
+      div.onclick = () => { 
+        if(els.welcome.style.display === "none" && els.finish.style.display === "none") {
+          idx = i; loadQuestion(); sfxClick();
+        } 
+      };
+      skillGrid.appendChild(div);
+    });
+  }
+
+  // Q1: Count & Compare within 10
+  function qComparingSimple() {
+    const n1 = rand(1, 10); let n2 = rand(1, 10); while(n2 === n1) n2 = rand(1, 10);
+    const mode = rand(0,1); const ans = mode ? Math.max(n1, n2) : Math.min(n1, n2);
+    const pText = mode ? "Which number is greater?" : "Which number is smaller?";
+    let n3 = rand(1, 10); while(n3===n1 || n3===n2) n3 = rand(1, 10);
+    return {
+      skill: "q1", tag: "⚖️ Compare Numbers", text: pText,
+      html: `
+        <div class="prompt-row">
+          <div class="prompt">${pText}</div>
+          <div class="speak-btn" onclick="speak('${pText}')">🔊</div>
+        </div>
+        <div style="display:flex;gap:20px;justify-content:center;margin-top:20px">
+           <div style="font-size:60px;font-weight:900;border:5px solid var(--c-blue);padding:15px 35px;border-radius:25px;color:var(--c-blue);background:white; pointer-events:none;">${n1}</div>
+           <div style="font-size:60px;font-weight:900;border:5px solid var(--c-blue);padding:15px 35px;border-radius:25px;color:var(--c-blue);background:white; pointer-events:none;">${n2}</div>
+        </div>
+        <div class="hint">Compare the numbers inside the boxes.</div>
+      `,
+      choices: shuffle([String(n1), String(n2), String(n3)]),
+      answer: String(ans)
+    };
+  }
+
+  // Q2: Ordinal Numbers (Updated to fit nicely)
+  function qOrdinal() {
+    const animals = ["🐶","🐱","🐰","🦊","🐼","🐯","🐸","🦁","🐮","🐨"]; const pos = rand(1,10);
+    const ord = ["1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th"][pos-1];
+    const pText = `Which animal is in the ${ord} position from the left?`;
+    return {
+      skill: "q2", tag: "🥇 Ordinal Numbers", text: pText,
+      html: `
+        <div class="prompt-row">
+          <div class="prompt">Find the <span style="color:var(--c-pink)">${ord}</span> animal!</div>
+          <div class="speak-btn" onclick="speak('${pText}')">🔊</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 5px; background:rgba(255,255,255,0.7); border-radius:20px; border: 4px dashed #bae6fd; margin-top:10px; width:100%;">
+           ${animals.map(a=>`<span style="font-size:clamp(22px, 4vw, 40px); line-height:1; filter:drop-shadow(0 2px 2px rgba(0,0,0,0.1));">${a}</span>`).join("")}
+        </div>
+        <div class="hint">Start counting from the left side →</div>
+      `,
+      choicesData: shuffle([animals[pos-1], animals[(pos+2)%10], animals[(pos+5)%10]]).map(a => ({
+         val: a, html: `<span style="font-size:40px;">${a}</span>`
+      })),
+      answer: animals[pos-1]
+    };
+  }
+
+  // Q3: Number bonds
+  function qBonds() {
+    const whole = rand(5, 10);
+    const p1 = rand(1, whole - 1);
+    const p2 = whole - p1;
+    const hideMode = rand(0, 2); 
+    let wStr = whole, p1Str = p1, p2Str = p2, ans = 0;
+    if(hideMode === 0) { wStr = "?"; ans = whole; }
+    else if(hideMode === 1) { p1Str = "?"; ans = p1; }
+    else { p2Str = "?"; ans = p2; }
+    const pText = "Find the missing number in the number bond.";
+    return {
+      skill: "q3", tag: "🎈 Number Bonds", text: pText,
+      html: `
+        <div class="prompt-row">
+          <div class="prompt">Find the <span class="hl-blue">missing number</span>.</div>
+          <div class="speak-btn" onclick="speak('${pText}')">🔊</div>
+        </div>
+        
+        <div style="display:flex; flex-direction:column; align-items:center; margin-top:20px; position:relative; height:180px;">
+          <svg width="200" height="150" style="position:absolute; z-index:0; top:0;">
+            <line x1="100" y1="40" x2="50" y2="110" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round"/>
+            <line x1="100" y1="40" x2="150" y2="110" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round"/>
+          </svg>
+          <div style="z-index:1; background:${hideMode===0?'#f8fafc':'#fef08a'}; border:5px solid ${hideMode===0?'#cbd5e1':'#eab308'}; border-radius:50%; width:80px; height:80px; display:flex; align-items:center; justify-content:center; font-size:36px; font-weight:900; color:${hideMode===0?'#94a3b8':'#854d0e'}; box-shadow:var(--shadow-hard); margin-bottom:10px;">${wStr}</div>
+          <div style="display:flex; gap:40px; z-index:1;">
+             <div style="background:${hideMode===1?'#f8fafc':'#bae6fd'}; border:5px solid ${hideMode===1?'#cbd5e1':'#38bdf8'}; border-radius:50%; width:70px; height:70px; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:900; color:${hideMode===1?'#94a3b8':'#0284c7'}; box-shadow:var(--shadow-hard);">${p1Str}</div>
+             <div style="background:${hideMode===2?'#f8fafc':'#a7f3d0'}; border:5px solid ${hideMode===2?'#cbd5e1':'#10b981'}; border-radius:50%; width:70px; height:70px; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:900; color:${hideMode===2?'#94a3b8':'#047857'}; box-shadow:var(--shadow-hard);">${p2Str}</div>
+          </div>
+        </div>
+      `,
+      choices: genChoices(ans, () => rand(1, 10)),
+      answer: ans.toString()
+    };
+  }
+
+  // Q4: Addition
+  function qAddition() {
+    const a = rand(1, 5), b = rand(1, 10 - a);
+    const sum = a + b;
+    const fruits = ['🍎','🍓','🍌','🍇','🍒'][rand(0,4)];
+    const items1 = Array(a).fill(`<span class="pop-emoji">${fruits}</span>`).join('');
+    const items2 = Array(b).fill(`<span class="pop-emoji">${fruits}</span>`).join('');
+    const pText = `Count and add: ${a} + ${b} = ?`;
+    return {
+      skill: "q4", tag: "🍎 Addition", text: pText,
+      html: `
+        <div class="prompt-row">
+          <div class="prompt">Count and <span class="hl-green">add</span>.</div>
+          <div class="speak-btn" onclick="speak('Count and add. What is ${a} plus ${b}?')">🔊</div>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:center; gap:15px; background:#f0fdfa; padding: 25px; border-radius: 24px; border: 4px solid #a7f3d0;">
+          <div style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center; max-width: 140px; font-size:45px;">${items1}</div>
+          <div style="color:#10b981; font-weight:900; font-size:60px;">+</div>
+          <div style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center; max-width: 140px; font-size:45px;">${items2}</div>
+        </div>
+        <div style="text-align:center; margin-top:20px; font-size: 42px; font-weight:900; color: #1e293b;">${a} + ${b} = ?</div>
+      `,
+      choices: genChoices(sum, () => rand(2, 10)),
+      answer: sum.toString()
+    };
+  }
+
+  // Q5: Subtraction 
+  function qSubtraction() {
+    const a = rand(4, 10), b = rand(1, a - 1);
+    const diff = a - b;
+    const iconsList = ['🍬','🍩','🍓','🧸','🚗','🦄'];
+    const objects = iconsList[rand(0, iconsList.length - 1)];
+    let visual = '';
+    for(let i=0; i<a; i++) {
+      if(i < diff) {
+        visual += `<div><span class="pop-emoji" style="display:inline-block; position:relative;">${objects}</span></div>`;
+      } else {
+        visual += `<div><span class="pop-emoji" style="opacity:0.4; position:relative; display:inline-block;">${objects}<span style="position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); color:#ef4444; font-size:1.5em; pointer-events:none;">✖</span></span></div>`;
+      }
+    }
+    const pText = `Subtract: ${a} - ${b} = ?`;
+    return {
+      skill: "q5", tag: "🐸 Subtraction", text: pText,
+      html: `
+        <div class="prompt-row">
+          <div class="prompt">How many are <span class="hl-pink">left</span>?</div>
+          <div class="speak-btn" onclick="speak('How many are left? What is ${a} minus ${b}?')">🔊</div>
+        </div>
+        <div style="background:#fff1f2; padding: 25px; border-radius: 24px; border: 4px solid #fecdd3; display: flex; justify-content: center;">
+          <div style="display:grid; grid-template-columns: repeat(5, auto); gap: 16px; justify-content: center; font-size:45px;">
+            ${visual}
+          </div>
+        </div>
+        <div style="text-align:center; margin-top:20px; font-size: 42px; font-weight:900; color: #e11d48;">${a} - ${b} = ?</div>
+      `,
+      choices: genChoices(diff, () => rand(1, 9)),
+      answer: diff.toString()
+    };
+  }
+
+  // Q6: Relationship Add & Sub
+  function qRelationship() {
+    const a = rand(2, 7), b = rand(1, 10 - a);
+    const c = a + b;
+    const askB = rand(0, 1) === 0;
+    const subTarget = askB ? a : b;
+    const ans = askB ? b : a;
+    const pText = `If ${a} + ${b} = ${c}, then ${c} - ${subTarget} = ?`;
+
+    return {
+      skill: "q6", tag: "🔗 Fact Families", text: pText,
+      html: `
+        <div class="prompt-row">
+          <div class="prompt">Find the matching <span class="hl-purple">subtraction</span> fact.</div>
+          <div class="speak-btn" onclick="speak('If ${a} plus ${b} is ${c}, what is ${c} minus ${subTarget}?')">🔊</div>
+        </div>
+        <div style="background:#faf5ff; border: 4px solid #d8b4fe; border-radius:24px; padding:30px; text-align:center;">
+          <div style="font-size:32px; font-weight:900; color:#1e293b; margin-bottom:15px;">If <span style="color:#0ea5e9;">${a} + ${b} = ${c}</span></div>
+          <div style="font-size:38px; font-weight:900; color:#ec4899;">Then ${c} - ${subTarget} = ?</div>
+        </div>
+      `,
+      choices: genChoices(ans, () => rand(1, 9)),
+      answer: ans.toString()
+    };
+  }
+
+  // Q7: Hour / O'clock
+  function qHour() {
+    const hour = rand(1, 12);
+    let clockNums = '';
+    for(let i=1; i<=12; i++){
+       const a = (i * 30 - 90) * Math.PI / 180;
+       const x = 50 + 36 * Math.cos(a);
+       const y = 50 + 36 * Math.sin(a);
+       clockNums += `<text x="${x}" y="${y}" font-size="14" font-weight="900" font-family="'Poppins', sans-serif" text-anchor="middle" dominant-baseline="central" fill="#1e293b">${i}</text>`;
+    }
+    const pText = "What time does the clock show?";
+    return {
+      skill: "q7", tag: "⏰ Time", text: pText,
+      html: `
+        <div class="prompt-row">
+          <div class="prompt">What <span class="hl-purple">time</span> does the clock show?</div>
+          <div class="speak-btn" onclick="speak('${pText}')">🔊</div>
+        </div>
+        <svg viewBox="0 0 100 100" width="220" height="220" style="filter: drop-shadow(0 15px 25px rgba(0,0,0,0.15)); display: block; margin: 20px auto; background:white; border-radius:50%;">
+          <circle cx="50" cy="50" r="48" fill="#f8fafc" stroke="#8b5cf6" stroke-width="6"/>
+          ${clockNums}
+          <circle cx="50" cy="50" r="4" fill="#f472b6" z-index="10"/>
+          <line x1="50" y1="50" x2="50" y2="15" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+          <line x1="50" y1="50" x2="50" y2="28" stroke="#f472b6" stroke-width="6" stroke-linecap="round" transform="rotate(${hour*30} 50 50)"/>
+        </svg>
+      `,
+      choices: genChoices(`${hour}:00`, () => `${rand(1,12)}:00`),
+      answer: `${hour}:00`
+    };
+  }
+
+  // Q8: 2D Shapes 
+  function qShapes() {
+    const shapeTypes = ['Circle', 'Square', 'Triangle', 'Rectangle'];
+    const colors = ['#f472b6', '#38bdf8', '#34d399', '#facc15'];
+    const shufColors = shuffle(colors);
+    const targetShape = shapeTypes[rand(0,3)];
+    
+    const getSvg = (type, color) => {
+      if(type==='Circle') return `<svg width="70" height="70" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="${color}"/></svg>`;
+      if(type==='Square') return `<svg width="70" height="70" viewBox="0 0 50 50"><rect x="10" y="10" width="30" height="30" fill="${color}" rx="4"/></svg>`;
+      if(type==='Triangle') return `<svg width="70" height="70" viewBox="0 0 50 50"><polygon points="25,5 45,40 5,40" fill="${color}" stroke-linejoin="round"/></svg>`;
+      if(type==='Rectangle') return `<svg width="70" height="70" viewBox="0 0 50 50"><rect x="5" y="15" width="40" height="20" fill="${color}" rx="4"/></svg>`;
+    };
+
+    const choicesHTML = shapeTypes.map((type, i) => {
+       return { val: type, html: getSvg(type, shufColors[i]) };
+    });
+    const pText = `Tap the ${targetShape}.`;
+
+    return {
+      skill: "q8", tag: "🔺 2D Shapes", text: pText,
+      html: `
+        <div class="prompt-row">
+          <div class="prompt">Tap the <span class="hl-pink">${targetShape}</span>.</div>
+          <div class="speak-btn" onclick="speak('Tap the ${targetShape}.')">🔊</div>
+        </div>
+      `,
+      choicesData: shuffle(choicesHTML),
+      answer: targetShape
+    };
+  }
+
+  // Q9: Patterns (Number or Shape)
+  function qPatterns() {
+    const isNumberPattern = rand(0, 1) === 0;
+    const pText = "What comes next?";
+    
+    if (isNumberPattern) {
+        const type = rand(0, 2); let seq, ans;
+        if(type === 0) { const start = rand(1, 2) * 2; seq = [start, start+2, start+4, start+6]; ans = start+8; } 
+        else if(type === 1) { const start = rand(1, 5); seq = [start, start+1, start+2, start+3]; ans = start+4; } 
+        else { const start = rand(8, 10); seq = [start, start-1, start-2, start-3]; ans = start-4; }
+        
+        return {
+          skill: "q9", tag: "📈 Number Patterns", text: pText,
+          html: `
+            <div class="prompt-row">
+              <div class="prompt">What number comes <span class="hl-blue">next</span>?</div>
+              <div class="speak-btn" onclick="speak('What number comes next?')">🔊</div>
+            </div>
+            <div style="display:flex; justify-content:center; align-items:center; gap:15px; margin:25px 0; background:rgba(255,255,255,0.7); padding:20px; border-radius:20px; font-size:45px; font-weight:900; color:#1e293b;">
+               ${seq.join(', ')}, 
+               <span style="color:var(--c-pink); margin-left:10px">?</span>
+            </div>
+          `,
+          choices: genChoices(ans, () => ans + rand(-2, 3) || 1),
+          answer: String(ans)
+        };
+    } else {
+        const type = rand(0,2); let seq, ans;
+        const s = [ {name: "square", svg: shapeSVG.square}, {name: "circle", svg: shapeSVG.circle}, {name: "triangle", svg: shapeSVG.triangle} ];
+        if(type==0){ seq=[s[0],s[1],s[0],s[1],s[0]]; ans=s[1]; } 
+        else if(type==1){ seq=[s[0],s[0],s[1],s[0],s[0]]; ans=s[1]; }
+        else { seq=[s[0],s[1],s[2],s[0],s[1],s[2],s[0]]; ans=s[1]; }
+        
+        return {
+          skill: "q9", tag: "📈 Shape Patterns", text: pText,
+          html: `
+            <div class="prompt-row">
+              <div class="prompt">What shape comes <span class="hl-blue">next</span>?</div>
+              <div class="speak-btn" onclick="speak('What shape comes next?')">🔊</div>
+            </div>
+            <div style="display:flex; justify-content:center; align-items:center; gap:15px; margin:25px 0; background:rgba(255,255,255,0.7); padding:20px; border-radius:20px;">
+               ${seq.map(x=>`<div style="width:60px;height:60px">${x.svg}</div>`).join('')}
+               <span style="font-size:50px; font-weight:900; color:var(--c-pink); margin-left:10px">?</span>
+            </div>
+          `,
+          choicesData: shuffle(s).map(x => ({ val: x.name, html: `<div style="width:60px;height:60px;display:flex;align-items:center;justify-content:center;">${x.svg}</div>` })),
+          answer: ans.name
+        };
+    }
+  }
+
+  // Q10: Measure & Graph Wrapper (Updated to restore beautiful SVGs from Ver 12)
+  function qMeasureGraphWrapper() {
+      const fns = [qLength, qHeight, qMass, qGraph];
+      const q = fns[rand(0, 3)]();
+      q.skill = "q10"; 
+      return q;
+  }
+
+  function qLength() {
+    const lengths = [3, 5, 8]; const shufL = shuffle(lengths);
+    const longestIdx = shufL.indexOf(8); const shortestIdx = shufL.indexOf(3);
+    const askLongest = rand(0, 1) === 0; const ansVal = askLongest ? longestIdx.toString() : shortestIdx.toString();
+    const lenThemes = [
+      { type: 'cubes', name: 'cube train' }, { type: 'ruler', name: 'ruler' },
+      { type: 'pencil', name: 'pencil' }, { type: 'paperclip', name: 'paperclip chain' }
+    ];
+    const t = lenThemes[rand(0, lenThemes.length-1)];
+    const choicesHTML = [];
+    for(let i=0; i<3; i++) {
+       let visual = '';
+       if (t.type === 'cubes') {
+           let cubeHTML = ''; const cubeColors = ['#ef4444', '#f97316', '#facc15', '#4ade80', '#38bdf8', '#8b5cf6', '#f472b6', '#ef4444'];
+           for(let j=0; j<shufL[i]; j++) cubeHTML += `<div style="width:36px; height:36px; background:${cubeColors[j]}; border-radius:6px; margin-right:-4px; box-shadow: inset 2px 2px 6px rgba(255,255,255,0.6), inset -2px -2px 6px rgba(0,0,0,0.15), 2px 2px 4px rgba(0,0,0,0.1); position:relative; z-index:${shufL[i]-j};"></div>`;
+           visual = `<div style="display:flex; align-items:center;">${cubeHTML}</div>`;
+       } else if (t.type === 'pencil') {
+           const colors = ['#f472b6', '#38bdf8', '#34d399'];
+           visual = `<svg viewBox="0 0 120 20" preserveAspectRatio="none" style="width:${shufL[i]*11}%; height:40px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.15));"><rect x="0" y="2" width="15" height="16" fill="#f472b6" rx="4"/><rect x="12" y="2" width="10" height="16" fill="#cbd5e1"/><line x1="15" y1="2" x2="15" y2="18" stroke="#94a3b8" stroke-width="2"/><line x1="19" y1="2" x2="19" y2="18" stroke="#94a3b8" stroke-width="2"/><rect x="22" y="3" width="70" height="14" fill="#fde047"/><rect x="22" y="3" width="70" height="4" fill="#fef08a"/><rect x="22" y="13" width="70" height="4" fill="#eab308"/><polygon points="92,3 112,10 92,17" fill="#fcd34d"/><polygon points="106,8 114,10 106,12" fill="#334155"/></svg>`;
+       } else if (t.type === 'ruler') {
+           const colors = ['#facc15', '#f97316', '#a78bfa'];
+           visual = `<svg viewBox="0 0 100 24" preserveAspectRatio="none" style="width:${shufL[i]*11}%; height:40px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.15));"><rect x="0" y="0" width="100" height="24" fill="${colors[i]}" rx="4" /><rect x="0" y="0" width="100" height="8" fill="rgba(255,255,255,0.3)" rx="4" /><path d="M10,0 v8 M20,0 v5 M30,0 v8 M40,0 v5 M50,0 v8 M60,0 v5 M70,0 v8 M80,0 v5 M90,0 v8" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+       } else if (t.type === 'paperclip') {
+           let clipHTML = ''; const clipColors = ['#f472b6', '#38bdf8', '#34d399', '#facc15', '#a78bfa'];
+           for(let j=0; j<shufL[i]; j++) clipHTML += `<svg viewBox="0 0 30 60" style="width:26px; height:52px; margin-right:-10px; filter:drop-shadow(2px 2px 1px rgba(0,0,0,0.15)); z-index:${shufL[i]-j}; position:relative;"><path d="M15,55 V15 A10,10 0 0,0 5,15 V50 A15,15 0 0,0 35,50 V20" fill="none" stroke="${clipColors[j%5]}" stroke-width="6" stroke-linecap="round"/></svg>`;
+           visual = `<div style="display:flex; align-items:center;">${clipHTML}</div>`;
+       }
+       choicesHTML.push({ val: i.toString(), html: `<div style="display:flex; align-items:center; width: 100%; pointer-events:none; min-height: 50px;">${visual}</div>` });
+    }
+    const pText = `Tap the ${askLongest ? 'longest' : 'shortest'} ${t.name}.`;
+    return { tag: "📏 Measure Length", text: pText, html: `<div class="prompt-row"><div class="prompt">Tap the <span class="hl-orange">${askLongest ? 'longest' : 'shortest'}</span> ${t.name}.</div><div class="speak-btn" onclick="speak('Tap the ${askLongest ? 'longest' : 'shortest'} ${t.name}.')">🔊</div></div>`, choicesData: choicesHTML, answer: ansVal, gridStyle: 'choices-vertical' };
+  }
+
+  function qHeight() {
+    const heightSets = [
+      [
+        { name: 'pine tree', svg: (s) => `<svg viewBox="0 0 100 140" style="height:140px; width:auto;"><rect x="40" y="100" width="20" height="40" fill="#78350f" rx="2"/><path d="M10,110 Q50,90 90,110 L50,50 Z" fill="#059669"/><path d="M15,75 Q50,60 85,75 L50,20 Z" fill="#10b981"/><path d="M25,45 Q50,35 75,45 L50,0 Z" fill="#34d399"/></svg>` },
+        { name: 'house', svg: (s) => `<svg viewBox="0 0 100 80" style="height:80px; width:auto;"><rect x="10" y="30" width="80" height="50" fill="#fcd34d" rx="4"/><polygon points="5,30 50,5 95,30" fill="#ef4444" stroke="#dc2626" stroke-width="4" stroke-linejoin="round"/><rect x="40" y="50" width="20" height="30" fill="#8b5cf6" rx="2"/><circle cx="55" cy="65" r="2" fill="#fff"/><rect x="20" y="45" width="15" height="15" fill="#fff" rx="2"/><rect x="65" y="45" width="15" height="15" fill="#fff" rx="2"/></svg>` },
+        { name: 'tower', svg: (s) => `<svg viewBox="0 0 100 180" style="height:180px; width:auto;"><path d="M20,180 C30,120 40,80 45,30 L55,30 C60,80 70,120 80,180 Z" fill="#ef4444"/><path d="M35,180 C40,150 45,130 50,130 C55,130 60,150 65,180 Z" fill="#f8fafc"/><rect x="35" y="110" width="30" height="8" fill="#334155" rx="2"/><rect x="40" y="60" width="20" height="6" fill="#334155" rx="2"/><rect x="48" y="0" width="4" height="30" fill="#94a3b8"/><circle cx="50" cy="0" r="4" fill="#ef4444"/></svg>` }
+      ],
+      [
+        { name: 'mushroom', svg: (s) => `<svg viewBox="0 0 100 80" style="height:80px; width:auto;"><rect x="35" y="40" width="30" height="40" fill="#fef08a" rx="10"/><path d="M 5,45 C 5,0 95,0 95,45 Z" fill="#ef4444"/><circle cx="30" cy="25" r="8" fill="#fff"/><circle cx="70" cy="25" r="8" fill="#fff"/><circle cx="50" cy="12" r="6" fill="#fff"/></svg>` },
+        { name: 'sunflower', svg: (s) => `<svg viewBox="0 0 100 130" style="height:130px; width:auto;"><rect x="46" y="30" width="8" height="100" fill="#22c55e"/><path d="M46,80 Q20,80 20,50 Q40,60 46,70 Z" fill="#16a34a"/><path d="M54,90 Q80,90 80,60 Q60,70 54,80 Z" fill="#16a34a"/><circle cx="50" cy="30" r="25" fill="#facc15"/><circle cx="50" cy="30" r="15" fill="#78350f"/></svg>` },
+        { name: 'tree', svg: (s) => `<svg viewBox="0 0 100 170" style="height:170px; width:auto;"><rect x="40" y="100" width="20" height="70" fill="#78350f" rx="2"/><circle cx="50" cy="50" r="45" fill="#10b981"/><circle cx="30" cy="40" r="25" fill="#34d399"/><circle cx="70" cy="60" r="20" fill="#059669"/></svg>` }
+      ],
+      [
+        { name: 'red blocks', hVal: 3, svg: (s) => `<div style="display:flex; flex-direction:column; justify-content:flex-end;">${Array(3).fill(`<div style="width:45px; height:35px; background:#ef4444; border-radius:4px; margin-top:-2px; position:relative; box-shadow:inset 2px 2px 4px rgba(255,255,255,0.4), inset -2px -2px 4px rgba(0,0,0,0.1);"></div>`).join('')}</div>` },
+        { name: 'blue blocks', hVal: 5, svg: (s) => `<div style="display:flex; flex-direction:column; justify-content:flex-end;">${Array(5).fill(`<div style="width:45px; height:35px; background:#38bdf8; border-radius:4px; margin-top:-2px; position:relative; box-shadow:inset 2px 2px 4px rgba(255,255,255,0.4), inset -2px -2px 4px rgba(0,0,0,0.1);"></div>`).join('')}</div>` },
+        { name: 'green blocks', hVal: 2, svg: (s) => `<div style="display:flex; flex-direction:column; justify-content:flex-end;">${Array(2).fill(`<div style="width:45px; height:35px; background:#10b981; border-radius:4px; margin-top:-2px; position:relative; box-shadow:inset 2px 2px 4px rgba(255,255,255,0.4), inset -2px -2px 4px rgba(0,0,0,0.1);"></div>`).join('')}</div>` }
+      ]
+    ];
+    
+    const group = heightSets[rand(0, heightSets.length-1)]; const shufGroup = shuffle([...group]);
+    const sorted = [...group].sort((a,b) => { if(a.hVal !== undefined) return a.hVal - b.hVal; const hA = parseInt(a.svg(1).match(/height:(\d+)px/)[1]); const hB = parseInt(b.svg(1).match(/height:(\d+)px/)[1]); return hA - hB; });
+    const tallest = sorted[sorted.length - 1]; const shortest = sorted[0];
+    const askTallest = rand(0, 1) === 0; const target = askTallest ? tallest : shortest;
+    const targetIdx = shufGroup.findIndex(item => item.name === target.name);
+
+    const choicesHTML = shufGroup.map((item, i) => ({ val: i.toString(), html: `<div style="pointer-events:none; filter:drop-shadow(0 5px 5px rgba(0,0,0,0.15)); display:flex; flex-direction:column; justify-content:flex-end; height:100%;">${item.svg(1)}</div>` }));
+    const pText = `Tap the ${askTallest ? 'tallest' : 'shortest'} item.`;
+    return { tag: "🦒 Measure Height", text: pText, html: `<div class="prompt-row"><div class="prompt">Tap the <span class="hl-green">${askTallest ? 'tallest' : 'shortest'}</span> item.</div><div class="speak-btn" onclick="speak('Tap the ${askTallest ? 'tallest' : 'shortest'} item.')">🔊</div></div>`, choicesData: choicesHTML, answer: targetIdx.toString(), gridStyle: 'choices-scene' };
+  }
+
+  function qMass() {
+    const massPairs = [ { h: '🐘', l: '🐁', hn: 'elephant', ln: 'mouse' }, { h: '🍉', l: '🍓', hn: 'watermelon', ln: 'strawberry' } ];
+    const pair = massPairs[rand(0, massPairs.length-1)];
+    const tiltRight = rand(0, 1) === 0; const askHeavier = rand(0, 1) === 0;
+    const leftItem = tiltRight ? pair.l : pair.h; const rightItem = tiltRight ? pair.h : pair.l;
+    const ansItem = askHeavier ? pair.h : pair.l; const rot = tiltRight ? 15 : -15;
+    const choicesHTML = [pair.h, pair.l].map(icon => ({ val: icon, html: `<span style="font-size:50px;">${icon}</span>` }));
+    const pText = `Which object is ${askHeavier ? 'heavier' : 'lighter'}?`;
+    return { tag: "⚖️ Measure Mass", text: pText, html: `<div class="prompt-row"><div class="prompt">Which object is <span class="hl-blue">${askHeavier ? 'heavier' : 'lighter'}</span>?</div><div class="speak-btn" onclick="speak('Which object is ${askHeavier ? 'heavier' : 'lighter'}?')">🔊</div></div><div style="position:relative; width:300px; height:180px; margin: 0 auto 20px;"><div style="position:absolute; bottom:20px; left:125px; width:0; height:0; border-left:25px solid transparent; border-right:25px solid transparent; border-bottom:40px solid #94a3b8;"></div><div style="position:absolute; bottom:60px; left:20px; width:260px; height:12px; background:#f59e0b; border-radius:6px; transform-origin:center; transform:rotate(${rot}deg);"><div style="position:absolute; left:10px; bottom:12px; font-size:50px; transform:rotate(${-rot}deg);">${leftItem}</div><div style="position:absolute; right:10px; bottom:12px; font-size:50px; transform:rotate(${-rot}deg);">${rightItem}</div></div><div style="position:absolute; bottom:0; left:0; width:100%; height:20px; background:#a7f3d0; border-radius:10px;"></div></div>`, choicesData: shuffle(choicesHTML), answer: ansItem, gridStyle: '' };
+  }
+
+  function qGraph() {
+    const animalSets = [ [{icon:'🐶', name:'Dogs'}, {icon:'🐱', name:'Cats'}, {icon:'🐠', name:'Fish'}, {icon:'🐦', name:'Birds'}], [{icon:'🚗', name:'Cars'}, {icon:'✈️', name:'Planes'}, {icon:'🚀', name:'Rockets'}, {icon:'🚁', name:'Copters'}] ];
+    const items = animalSets[rand(0, animalSets.length-1)]; const counts = shuffle([2, 3, 4, 5, 6]).slice(0,4); items.forEach((item, i) => item.count = counts[i]);
+    const askMost = rand(0,1) === 0; const minItem = items.reduce((a,b) => a.count < b.count ? a : b); const maxItem = items.reduce((a,b) => a.count > b.count ? a : b);
+    const pText = askMost ? "Which group has the MOST?" : "Which group has the LEAST?";
+    const answer = askMost ? maxItem.icon : minItem.icon;
+    const choicesHTML = items.map(item => ({ val: item.icon, html: `<div style="font-size:45px; filter:drop-shadow(0 4px 4px rgba(0,0,0,0.2));">${item.icon}</div>` }));
+    let graphHTML = `<div style="background:#fff; border:4px solid #e2e8f0; border-radius:20px; padding:10px; width:100%;">`;
+    items.forEach(item => {
+      let iconsStr = Array(item.count).fill(`<div style="background:linear-gradient(135deg, #f0f9ff, #e0f2fe); width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:26px; border:2px solid #bae6fd; box-shadow:0 4px 6px rgba(0,0,0,0.05);">${item.icon}</div>`).join('');
+      graphHTML += `<div style="display:flex; align-items:center; gap:12px; padding:8px 10px; border-bottom:2px dashed #f1f5f9;"><div style="width:60px; font-weight:800; font-size:24px; color:#475569;">${item.icon}</div><div style="display:flex; gap:6px;">${iconsStr}</div></div>`;
+    });
+    graphHTML += `</div>`;
+    return { tag: "📊 Picture Graph", text: pText, html: `<div class="prompt-row"><div class="prompt">${askMost ? 'Which group has the <span class="hl-orange">MOST</span>?' : 'Which group has the <span class="hl-orange">LEAST</span>?'}</div><div class="speak-btn" onclick="speak('${pText}')">🔊</div></div>${graphHTML}`, choicesData: shuffle(choicesHTML), answer: answer };
+  }
+
+  const builders = [
+    qComparingSimple, qOrdinal, qBonds, qAddition, qSubtraction, 
+    qRelationship, qHour, qShapes, qPatterns, qMeasureGraphWrapper
+  ];
+
+  // --- Game Engine ---
+  let generatedQuestions = [], userAnswers = [], idx = 0, score = 0, historyLog = [];
+  let timerInterval, seconds = 0;
+
+  const els = {
+    start: document.getElementById("startBtn"),
+    welcome: document.getElementById("welcome"), quiz: document.getElementById("quiz"),
+    finish: document.getElementById("finish"), qTitle: document.getElementById("qTitle"),
+    qTag: document.getElementById("qTag"), qBox: document.getElementById("qBox"),
+    choices: document.getElementById("choices"), 
+    qNum: document.getElementById("chipQ"), playAgain: document.getElementById("playAgain"),
+    bonusBtn: document.getElementById("bonusBtn"), bonusGame: document.getElementById("bonusGame"),
+    bar: document.getElementById("bar"), mini: document.getElementById("mini"),
+    summary: document.getElementById("summary"), chipTimer: document.getElementById("chipTimer")
+  };
+
+  function init(){ renderSkills(); fitCanvas(); }
+
+  function start(){
+    idx = 0; score = 0; seconds = 0;
+    userAnswers = new Array(10).fill(null);
+    historyLog = [];
+    
+    // Generate the 10 questions once per session
+    generatedQuestions = builders.map(b => b());
+    
+    els.welcome.style.display = "none"; els.finish.style.display = "none";
+    els.quiz.style.display = "block"; els.bonusGame.style.display = "none";
+    
+    confettiPieces = []; particles = [];
+    ctxC.clearRect(0,0,cvsC.width,cvsC.height); ctxF.clearRect(0,0,cvsF.width,cvsF.height);
+    
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        seconds++;
+        const m = String(Math.floor(seconds/60)).padStart(2, '0');
+        const s = String(seconds%60).padStart(2, '0');
+        els.chipTimer.textContent = `⏱ ${m}:${s}`;
+    }, 1000);
+    
+    updateUI(); loadQuestion();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function updateUI(){
+    const answeredCount = userAnswers.filter(a => a !== null).length;
+    els.qNum.textContent = `🧩 ${answeredCount}/10`;
+    els.bar.style.width = `${Math.round((answeredCount/10)*100)}%`;
+    els.mini.textContent = `Answered: ${answeredCount}/10`;
+    renderSkills(); 
+  }
+  
+  function jumpToSkill(targetSkillIndex) {
+      if (els.finish.style.display === "flex" || els.welcome.style.display === "flex") return;
+      idx = targetSkillIndex;
+      loadQuestion();
+  }
+
+  function loadQuestion(){
+    const q = generatedQuestions[idx];
+    els.qTitle.textContent = `Question ${idx+1} of 10`;
+    els.qTag.textContent = q.tag; els.qBox.innerHTML = q.html;
+    els.choices.innerHTML = "";
+    els.choices.className = "choices " + (q.gridStyle || "");
+    
+    if(q.choicesData) {
+      q.choicesData.forEach(c => {
+        const btn = document.createElement("button"); btn.className = "choice";
+        if(userAnswers[idx] === c.val) btn.classList.add('selected');
+        btn.innerHTML = c.html; btn.dataset.val = c.val;
+        btn.onclick = () => selectAnswer(btn, c.val);
+        els.choices.appendChild(btn);
+      });
+    } else {
+      q.choices.forEach(c => {
+        const btn = document.createElement("button"); btn.className = "choice";
+        if(userAnswers[idx] === c) btn.classList.add('selected');
+        btn.textContent = c; btn.dataset.val = c;
+        btn.onclick = () => selectAnswer(btn, c);
+        els.choices.appendChild(btn);
+      });
+    }
+    
+    document.getElementById('prevBtn').style.visibility = idx === 0 ? 'hidden' : 'visible';
+    if (idx === 9) {
+        document.getElementById('nextBtn').style.display = 'none';
+        document.getElementById('submitBtn').style.display = 'inline-flex';
+    } else {
+        document.getElementById('nextBtn').style.display = 'inline-flex';
+        document.getElementById('submitBtn').style.display = 'none';
+    }
+    renderSkills(); 
+  }
+
+  function selectAnswer(btn, val){
+    sfxSelect();
+    userAnswers[idx] = val;
+    document.querySelectorAll('.choice').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    updateUI();
+  }
+
+  function goPrev() { if(idx > 0) { idx--; sfxClick(); loadQuestion(); } }
+  function goNext() { if(idx < 9) { idx++; sfxClick(); loadQuestion(); } }
+
+  function submitExam(){
+    clearInterval(timerInterval);
+    let correctCount = 0;
+    historyLog = [];
+    
+    for(let i=0; i<10; i++) {
+        const q = generatedQuestions[i];
+        const uAns = userAnswers[i];
+        const isCorrect = (uAns === q.answer);
+        if(isCorrect) correctCount++;
+        
+        historyLog.push({
+            text: q.text,
+            userCorrect: isCorrect,
+            correctAnswer: q.answer,
+            userAnswer: uAns || "No answer"
+        });
+    }
+
+    score = correctCount;
+    els.quiz.style.display = "none"; els.finish.style.display = "flex";
+    
+    const m = String(Math.floor(seconds/60)).padStart(2, '0');
+    const s = String(seconds%60).padStart(2, '0');
+    
+    document.getElementById("finalTitle").textContent = (score >= 8) ? "Super Star! 🌟" : "Great Effort! 👍";
+    document.getElementById("finalText").innerHTML = `You scored <b>${score}/10</b> in ${m}:${s}!<br>Time for a special bonus game!`;
+    els.bar.style.width = "100%"; els.mini.textContent = "Completed";
+
+    let tableHtml = `<table class="sum-table"><thead><tr><th width="60">Result</th><th>Question Review</th></tr></thead><tbody>`;
+    historyLog.forEach(log => {
+       tableHtml += `<tr><td class="st-status">${log.userCorrect ? "⭐" : "❌"}</td>
+           <td><div style="color:#1e293b; font-weight:800; font-size:18px; margin-bottom:6px;">${log.text}</div>
+             <div style="color:#64748b; font-size:15px;">Your Answer: <b style="color:${log.userCorrect ? '#10b981' : '#f43f5e'}">${log.userAnswer}</b><br>Correct Answer: <b style="color:#0ea5e9">${log.correctAnswer}</b></div></td></tr>`;
+    });
+    els.summary.innerHTML = tableHtml + `</tbody></table>`;
+    
+    // Clear sidebar active highlights
+    idx = -1; renderSkills(); 
+    sfxWin(); burstConfetti(300); launchFireworks(6);
+  }
+
+  // --- Effects ---
+  const cvsC = document.getElementById('confetti'); const ctxC = cvsC.getContext('2d');
+  const cvsF = document.getElementById('fireworks'); const ctxF = cvsF.getContext('2d');
+  let confettiPieces = [], particles = [];
+
+  function fitCanvas(){
+    [cvsC, cvsF].forEach(c => { c.width = window.innerWidth * devicePixelRatio; c.height = window.innerHeight * devicePixelRatio; c.style.width = window.innerWidth + 'px'; c.style.height = window.innerHeight + 'px'; });
+    ctxC.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); ctxF.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  }
+  window.addEventListener('resize', fitCanvas);
+
+  function burstConfetti(count = 100){
+    const colors = ['#f472b6','#38bdf8','#34d399','#fde047','#a78bfa'];
+    for(let i=0; i<count; i++) confettiPieces.push({ x: Math.random() * window.innerWidth, y: -20 - Math.random() * 100, w: 10 + Math.random() * 12, h: 14 + Math.random() * 16, vx: -4 + Math.random() * 8, vy: 3 + Math.random() * 6, rot: Math.random() * Math.PI, vr: -0.3 + Math.random() * 0.6, color: colors[Math.floor(Math.random() * colors.length)] });
+  }
+  function animateConfetti(){
+    ctxC.clearRect(0,0,window.innerWidth,window.innerHeight);
+    confettiPieces.forEach(p => { p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vy += 0.08; ctxC.save(); ctxC.translate(p.x, p.y); ctxC.rotate(p.rot); ctxC.fillStyle = p.color; ctxC.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctxC.restore(); });
+    confettiPieces = confettiPieces.filter(p => p.y < window.innerHeight + 50); requestAnimationFrame(animateConfetti);
+  }
+  function launchFireworks(rounds = 5){
+    for(let r=0; r<rounds; r++) setTimeout(() => explode(100 + Math.random() * (window.innerWidth - 200), 50 + Math.random() * (window.innerHeight * 0.5)), r * 400);
+  }
+  function explode(x, y){
+    const colors = ['#f472b6','#38bdf8','#34d399','#fde047','#ffffff']; const baseColor = colors[Math.floor(Math.random() * colors.length)];
+    for(let i=0; i<70; i++) { const angle = (Math.PI * 2 * i) / 70; const speed = 2 + Math.random() * 7; particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 50 + Math.random() * 40, color: Math.random() > 0.2 ? baseColor : '#ffffff', size: 3 + Math.random() * 5 }); }
+  }
+  function animateFireworks(){
+    ctxF.clearRect(0,0,window.innerWidth,window.innerHeight);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vx *= 0.96; p.vy *= 0.96; p.vy += 0.06; p.life -= 1; ctxF.globalAlpha = Math.max(p.life / 90, 0); ctxF.beginPath(); ctxF.fillStyle = p.color; ctxF.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctxF.fill(); });
+    ctxF.globalAlpha = 1; particles = particles.filter(p => p.life > 0); requestAnimationFrame(animateFireworks);
+  }
+  animateConfetti(); animateFireworks();
+
+  // --- Bonus Game ---
+  let bonusLoop, bonusTimerInterval, bonusTime = 20, bonusScore = 0, bubbles = [];
+  const cvsB = document.getElementById("bonusCanvas"), ctxB = cvsB.getContext("2d");
+  const bonusTimerEl = document.getElementById("bonusTimer"), bonusScoreEl = document.getElementById("bonusScoreDisplay");
+
+  function startBonus(){
+    els.bonusGame.style.display = "flex"; const rect = els.bonusGame.getBoundingClientRect();
+    cvsB.width = rect.width; cvsB.height = rect.height - 80; 
+    bonusTime = 20; bonusScore = 0; bonusTimerEl.textContent = bonusTime + "s"; bonusScoreEl.textContent = "Score: " + bonusScore;
+    bubbles = []; for(let i=0; i<25; i++) spawnBubble();
+    if(bonusLoop) cancelAnimationFrame(bonusLoop); if(bonusTimerInterval) clearInterval(bonusTimerInterval);
+    updateBonus();
+    bonusTimerInterval = setInterval(() => { bonusTime--; bonusTimerEl.textContent = bonusTime + "s"; if(bonusTime <= 0) endBonusGame(); }, 1000);
+  }
+  function endBonusGame(){ clearInterval(bonusTimerInterval); cancelAnimationFrame(bonusLoop); els.bonusGame.style.display = "none"; alert(`Time's up! ⏰\nYou popped ${bonusScore} bubbles!`); }
+  function spawnBubble(){ const r = rand(40, 70); bubbles.push({ x: rand(r, cvsB.width-r), y: cvsB.height + r + rand(0, 200), r: r, dy: rand(2, 7) * 0.6, color: `hsl(${rand(0,360)}, 85%, 65%)`, txt: ["⭐","❤️","🎈","🍬","🎀"][rand(0,4)] }); }
+  function updateBonus(){
+    ctxB.clearRect(0,0, cvsB.width, cvsB.height);
+    for(let i=0; i<bubbles.length; i++){
+      let b = bubbles[i]; b.y -= b.dy;
+      ctxB.beginPath(); ctxB.arc(b.x, b.y, b.r, 0, Math.PI*2); ctxB.fillStyle = b.color; ctxB.fill();
+      ctxB.strokeStyle = "rgba(255,255,255,0.9)"; ctxB.lineWidth = 4; ctxB.stroke();
+      ctxB.beginPath(); ctxB.arc(b.x - b.r*0.35, b.y - b.r*0.35, b.r*0.25, 0, Math.PI*2); ctxB.fillStyle = "rgba(255,255,255,0.5)"; ctxB.fill();
+      ctxB.fillStyle = "white"; ctxB.font = `${b.r*0.8}px 'Poppins', sans-serif`; ctxB.textAlign = "center"; ctxB.textBaseline = "middle"; ctxB.fillText(b.txt, b.x, b.y + b.r*0.1);
+      if(b.y < -b.r) bubbles[i] = { ...b, y: cvsB.height + b.r, x: rand(b.r, cvsB.width-b.r) };
+    }
+    bonusLoop = requestAnimationFrame(updateBonus);
+  }
+  cvsB.addEventListener("pointerdown", (e)=>{
+    if(bonusTime <= 0) return;
+    const rect = cvsB.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    for(let i=bubbles.length-1; i>=0; i--){
+      let b = bubbles[i];
+      if(Math.sqrt((mx-b.x)**2 + (my-b.y)**2) < b.r){ sfxPop(); bonusScore++; bonusScoreEl.textContent = "Score: " + bonusScore; bubbles[i].y = cvsB.height + rand(50, 200); bubbles[i].x = rand(b.r, cvsB.width-b.r); bubbles[i].color = `hsl(${rand(0,360)}, 85%, 65%)`; break; }
+    }
+  });
+
+  els.start.onclick = start; els.playAgain.onclick = start; els.bonusBtn.onclick = startBonus;
+  init();
+</script>
+</body>
+</html>

@@ -1,1072 +1,1119 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
- <head>
-   <link rel="stylesheet" href="../assets/brand.css">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Let's Count the Fruits!</title>
-  <script src="/_sdk/element_sdk.js"></script>
-  <style>
-    body {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', cursive, sans-serif;
-      background: linear-gradient(135deg, #FFF9C4 0%, #C5E1A5 50%, #B3E5FC 100%);
-      overflow-x: hidden;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    html {
-      height: 100%;
-    }
-
-    .audio-btn {
-      background: #FF6B6B;
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 2em;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      transition: all 0.2s;
-      margin: 10px;
-    }
-
-    .audio-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
-    }
-
-    .audio-btn:active {
-      transform: scale(0.95);
-    }
-
-    .game-container {
-      width: 100%;
-      max-width: 1200px;
-      height: 100%;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .screen {
-      display: none;
-      width: 100%;
-      height: 100%;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      animation: fadeIn 0.5s ease-in;
-    }
-
-    .screen.active {
-      display: flex;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .title {
-      font-size: 3em;
-      color: #FF6B6B;
-      text-shadow: 3px 3px 0px #FFE66D;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .instruction {
-      font-size: 1.5em;
-      color: #4A4A4A;
-      background: white;
-      padding: 15px 30px;
-      border-radius: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      margin-bottom: 30px;
-      text-align: center;
-    }
-
-    .fruits-area {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      justify-content: center;
-      margin-bottom: 30px;
-      max-width: 800px;
-    }
-
-    .fruit {
-      font-size: 3em;
-      cursor: pointer;
-      transition: transform 0.2s;
-      filter: brightness(1);
-    }
-
-    .fruit:hover {
-      transform: scale(1.2);
-    }
-
-    .fruit.counted {
-      opacity: 0.5;
-      cursor: default;
-    }
-
-    .graph-container {
-      background: white;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-      margin-bottom: 30px;
-    }
-
-    .graph-title {
-      font-size: 1.8em;
-      color: #FF6B6B;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .graph-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 15px;
-      gap: 10px;
-    }
-
-    .fruit-label {
-      font-size: 2em;
-      width: 60px;
-    }
-
-    .boxes {
-      display: flex;
-      gap: 5px;
-    }
-
-    .box {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #ddd;
-      border-radius: 8px;
-      background: white;
-      transition: all 0.3s;
-    }
-
-    .box.filled {
-      animation: fillBox 0.3s ease-in;
-    }
-
-    @keyframes fillBox {
-      0% { transform: scale(0); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); }
-    }
-
-    .count-number {
-      font-size: 1.5em;
-      font-weight: bold;
-      color: #4A4A4A;
-      margin-left: 10px;
-      min-width: 30px;
-    }
-
-    .addition-section {
-      background: white;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-      margin-bottom: 30px;
-      text-align: center;
-    }
-
-    .question {
-      font-size: 1.8em;
-      color: #4A4A4A;
-      margin-bottom: 20px;
-    }
-
-    .number-bond {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin: 30px 0;
-      position: relative;
-    }
-
-    .bond-top {
-      margin-bottom: 60px;
-    }
-
-    .bond-bottom {
-      display: flex;
-      gap: 100px;
-      align-items: center;
-    }
-
-    .bond-circle {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 4px solid #FF6B6B;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2em;
-      font-weight: bold;
-      background: white;
-      color: #4A4A4A;
-      position: relative;
-    }
-
-    .bond-line {
-      position: absolute;
-      width: 3px;
-      height: 50px;
-      background: #FF6B6B;
-    }
-
-    .line-left {
-      top: 84px;
-      left: 50%;
-      transform: translateX(-50%) rotate(-45deg);
-      transform-origin: top;
-    }
-
-    .line-right {
-      top: 84px;
-      left: 50%;
-      transform: translateX(-50%) rotate(45deg);
-      transform-origin: top;
-    }
-
-    .answer-options {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      margin-top: 30px;
-    }
-
-    .answer-btn {
-      font-size: 2em;
-      padding: 20px 40px;
-      border: none;
-      border-radius: 20px;
-      background: #4ECDC4;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      transition: all 0.2s;
-      font-family: inherit;
-    }
-
-    .answer-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
-    }
-
-    .answer-btn.correct {
-      background: #51CF66;
-      animation: pulse 0.5s;
-    }
-
-    .answer-btn.wrong {
-      background: #FF6B6B;
-      animation: shake 0.5s;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-10px); }
-      75% { transform: translateX(10px); }
-    }
-
-    .feedback {
-      font-size: 2em;
-      font-weight: bold;
-      margin-top: 20px;
-      min-height: 50px;
-    }
-
-    .feedback.correct {
-      color: #51CF66;
-    }
-
-    .feedback.wrong {
-      color: #FF6B6B;
-    }
-
-    .celebration {
-      text-align: center;
-    }
-
-    .celebration-title {
-      font-size: 3.5em;
-      color: #FF6B6B;
-      text-shadow: 3px 3px 0px #FFE66D;
-      margin-bottom: 30px;
-      animation: bounce 1s infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
-    }
-
-    .dancing-fruits {
-      display: flex;
-      gap: 30px;
-      font-size: 4em;
-      margin: 30px 0;
-      justify-content: center;
-    }
-
-    .dancing-fruit {
-      animation: dance 1s infinite;
-    }
-
-    .dancing-fruit:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .dancing-fruit:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    .dancing-fruit:nth-child(4) {
-      animation-delay: 0.6s;
-    }
-
-    @keyframes dance {
-      0%, 100% { transform: rotate(0deg) scale(1); }
-      25% { transform: rotate(-15deg) scale(1.1); }
-      75% { transform: rotate(15deg) scale(1.1); }
-    }
-
-    .stars {
-      font-size: 3em;
-      margin-top: 20px;
-    }
-
-    .next-btn {
-      font-size: 1.5em;
-      padding: 15px 40px;
-      border: none;
-      border-radius: 20px;
-      background: #FF6B6B;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      transition: all 0.2s;
-      margin-top: 20px;
-      font-family: inherit;
-    }
-
-    .next-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
-    }
-
-    .confetti {
-      position: fixed;
-      width: 10px;
-      height: 10px;
-      background: #FF6B6B;
-      position: absolute;
-      animation: confettiFall 3s linear;
-    }
-
-    @keyframes confettiFall {
-      to {
-        transform: translateY(100%) rotate(360deg);
-        opacity: 0;
-      }
-    }
-
-    .mystery-box {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 40px;
-      border-radius: 30px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-      z-index: 1000;
-      text-align: center;
-      animation: popIn 0.5s forwards;
-    }
-
-    @keyframes popIn {
-      to {
-        transform: translate(-50%, -50%) scale(1);
-      }
-    }
-
-    .mystery-content {
-      font-size: 4em;
-      margin: 20px 0;
-      animation: spin 1s ease-in-out;
-    }
-
-    @keyframes spin {
-      from { transform: rotate(0deg) scale(0); }
-      to { transform: rotate(360deg) scale(1); }
-    }
-
-    .mystery-text {
-      font-size: 2em;
-      color: white;
-      font-weight: bold;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    }
-
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 999;
-      display: none;
-    }
-
-    .overlay.active {
-      display: block;
-    }
-
-    .quiz-section {
-      background: white;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-      margin: 20px 0;
-      text-align: center;
-    }
-
-    .quiz-question {
-      font-size: 2em;
-      color: #4A4A4A;
-      margin-bottom: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 15px;
-    }
-
-    @media (max-width: 768px) {
-      .title {
-        font-size: 2em;
-      }
-
-      .instruction {
-        font-size: 1.2em;
-      }
-
-      .fruit {
-        font-size: 2.5em;
-      }
-
-      .graph-title {
-        font-size: 1.4em;
-      }
-
-      .answer-btn {
-        font-size: 1.5em;
-        padding: 15px 30px;
-      }
-
-      .celebration-title {
-        font-size: 2.5em;
-      }
-    }
-  </style>
-  <style>@view-transition { navigation: auto; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
- </head>
- <body>
-   <img src="../assets/logo-oodles-math.png" class="oodles-logo">
-  <div class="game-container"><!-- Counting Screen -->
-   <div class="screen active" id="countingScreen">
-    <h1 class="title" id="gameTitle">Let's Count the Fruits!</h1>
-    <div class="instruction" id="instructionText">
-     Click on each fruit to count them!
+<head>
+    <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Number Line Subtraction Game V2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* Beautiful Landscape Background */
+            background: linear-gradient(180deg, #87CEEB 0%, #B3E5FC 55%, #A5D6A7 55%, #4CAF50 100%);
+            touch-action: manipulation;
+            overflow-x: hidden;
+            overflow-y: auto;
+            min-height: 100vh;
+        }
+
+        /* Animated Clouds */
+        @keyframes float-cloud {
+            from { transform: translateX(-150px); }
+            to { transform: translateX(120vw); }
+        }
+        .animate-cloud-slow { animation: float-cloud 45s linear infinite; }
+        .animate-cloud-fast { animation: float-cloud 25s linear infinite; }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 8px solid #ffffff;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 8px rgba(255, 255, 255, 0.4);
+            width: 100%;
+            max-width: 850px;
+            user-select: none;
+            position: relative;
+            z-index: 10;
+        }
+
+        .number-line-container {
+            position: relative;
+            height: 140px;
+            margin: 30px 0;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .number-line-container {
+                height: 180px;
+                margin: 50px 0;
+            }
+        }
+
+        .line {
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            right: 5%;
+            height: 8px;
+            background: linear-gradient(90deg, #f43f5e, #fb7185, #f43f5e);
+            border-radius: 10px;
+            transform: translateY(-50%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), inset 0 2px 4px rgba(255,255,255,0.3);
+        }
+
+        @media (min-width: 768px) {
+            .line { height: 12px; }
+        }
+
+        .tick-zone {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 30px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        @media (min-width: 768px) {
+            .tick-zone { width: 50px; }
+        }
+
+        .tick {
+            width: 4px;
+            height: 20px;
+            background-color: #be123c;
+            position: absolute;
+            bottom: 50%; 
+            border-radius: 4px;
+        }
+
+        @media (min-width: 768px) {
+            .tick { width: 6px; height: 28px; }
+        }
+
+        .tick-label {
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: #1e293b;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-top: 65px; 
+            text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white;
+        }
+
+        @media (min-width: 768px) {
+            .tick-label { font-size: 2rem; margin-top: 95px; }
+        }
+
+        .tick-zone:hover .tick-label {
+            transform: scale(1.4) translateY(3px);
+            color: #f43f5e;
+        }
+
+        /* SVG Frog Character Styling */
+        .character {
+            position: absolute;
+            bottom: 50%; 
+            width: 60px;
+            height: 80px;
+            transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 30; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            filter: drop-shadow(0 8px 6px rgba(0,0,0,0.2));
+            transform: translateY(15%); 
+        }
+
+        @media (min-width: 768px) {
+            .character { width: 80px; height: 110px; }
+        }
+
+        .arc-path {
+            position: absolute;
+            top: 0;
+            fill: none;
+            stroke-width: 4;
+            stroke-dasharray: 8, 4;
+            stroke-dashoffset: 1000;
+            stroke-linecap: round;
+            filter: drop-shadow(0 4px 3px rgba(0,0,0,0.15));
+        }
+
+        @media (min-width: 768px) {
+            .arc-path { stroke-width: 6; stroke-dasharray: 12, 6; }
+        }
+
+        @keyframes drawArc {
+            to { stroke-dashoffset: 0; }
+        }
+
+        .jump-animation {
+            animation: jump 0.4s ease;
+        }
+
+        @keyframes jump {
+            0%, 100% { transform: translateY(15%) scale(1); }
+            50% { transform: translateY(-50px) scale(1.1); }
+        }
+
+        @media (min-width: 768px) {
+            @keyframes jump {
+                0%, 100% { transform: translateY(15%) scale(1); }
+                50% { transform: translateY(-80px) scale(1.1); }
+            }
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(244, 63, 94, 0.3);
+            transform: scale(0);
+            animation: ripple-effect 0.6s ease-out;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @keyframes ripple-effect {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        /* Candy-style Buttons */
+        .btn-primary { 
+            background: #f43f5e; 
+            box-shadow: 0 6px 0 #be123c, 0 10px 15px -3px rgba(244, 63, 94, 0.5); 
+            transition: all 0.15s; 
+        }
+        .btn-primary:active { transform: translateY(6px); box-shadow: 0 0px 0 #be123c; }
+        
+        .btn-secondary { 
+            background: #fbbf24; 
+            box-shadow: 0 6px 0 #d97706, 0 10px 15px -3px rgba(251, 191, 36, 0.5); 
+            transition: all 0.15s; 
+        }
+        .btn-secondary:active { transform: translateY(6px); box-shadow: 0 0px 0 #d97706; }
+        
+        .btn-success { 
+            background: #10b981; 
+            box-shadow: 0 6px 0 #047857, 0 10px 15px -3px rgba(16, 185, 129, 0.5); 
+            transition: all 0.15s; 
+        }
+        .btn-success:active { transform: translateY(6px); box-shadow: 0 0px 0 #047857; }
+
+        /* Bonus Game Styles */
+        .bonus-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, #f0fdf4 0%, #bbf7d0 100%);
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            border-radius: 2rem;
+            animation: fadeIn 0.3s ease-in;
+            padding-top: 1rem;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .bonus-fly-element {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            z-index: 600;
+            user-select: none;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+
+        @media (min-width: 768px) {
+            .bonus-fly-element { width: 56px; height: 56px; }
+        }
+
+        .fly-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            animation: buzz-jitter 0.1s infinite;
+        }
+
+        @keyframes buzz-jitter {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(1.5px, -1.5px); }
+            50% { transform: translate(-1.5px, 1.5px); }
+            75% { transform: translate(1.5px, 1.5px); }
+        }
+
+        .fly-wing {
+            position: absolute;
+            width: 18px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(150, 180, 200, 0.6);
+            border-radius: 50%;
+            top: 12px;
+            transform-origin: center;
+            animation: flap 0.05s infinite alternate;
+        }
+
+        @media (min-width: 768px) {
+            .fly-wing { width: 24px; height: 14px; top: 18px; }
+        }
+
+        .wing-left { left: 4px; transform: rotate(-30deg); }
+        .wing-right { right: 4px; transform: rotate(30deg); }
+
+        @keyframes flap {
+            from { transform: scaleY(1) rotate(20deg); }
+            to { transform: scaleY(0.2) rotate(40deg); }
+        }
+
+        .fly-body {
+            position: absolute;
+            width: 14px;
+            height: 18px;
+            background: #1e293b;
+            border-radius: 40% 40% 50% 50%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @media (min-width: 768px) {
+            .fly-body { width: 18px; height: 26px; }
+        }
+
+        .fly-head {
+            position: absolute;
+            width: 100%;
+            height: 9px;
+            background: #0f172a;
+            border-radius: 50%;
+            top: -5px;
+            left: 0;
+        }
+
+        @media (min-width: 768px) {
+            .fly-head { height: 12px; top: -7px; }
+        }
+
+        .bonus-frog {
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 160px;
+            z-index: 700;
+            pointer-events: none;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.25));
+        }
+
+        @media (min-width: 768px) {
+            .bonus-frog { width: 160px; height: 220px; }
+        }
+
+        .bonus-tongue {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 650;
+        }
+
+        .text-glow {
+            text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.6);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-2 sm:p-4">
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <!-- CSS Clouds Background Layer -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
+        <div class="absolute top-10 left-[-20%] animate-cloud-slow opacity-90">
+            <svg width="180" height="90" viewBox="0 0 150 80" fill="#ffffff"><path d="M 30 50 A 20 20 0 0 1 50 30 A 30 30 0 0 1 100 30 A 20 20 0 0 1 120 50 Q 140 50 140 65 Q 140 80 120 80 L 30 80 Q 10 80 10 65 Q 10 50 30 50 Z"/></svg>
+        </div>
+        <div class="absolute top-24 left-[-10%] animate-cloud-fast opacity-70" style="animation-delay: -10s">
+            <svg width="120" height="60" viewBox="0 0 150 80" fill="#ffffff"><path d="M 30 50 A 20 20 0 0 1 50 30 A 30 30 0 0 1 100 30 A 20 20 0 0 1 120 50 Q 140 50 140 65 Q 140 80 120 80 L 30 80 Q 10 80 10 65 Q 10 50 30 50 Z"/></svg>
+        </div>
+        <div class="absolute top-4 left-[-30%] animate-cloud-slow opacity-80" style="animation-delay: -20s">
+            <svg width="200" height="100" viewBox="0 0 150 80" fill="#ffffff"><path d="M 30 50 A 20 20 0 0 1 50 30 A 30 30 0 0 1 100 30 A 20 20 0 0 1 120 50 Q 140 50 140 65 Q 140 80 120 80 L 30 80 Q 10 80 10 65 Q 10 50 30 50 Z"/></svg>
+        </div>
     </div>
-    <div class="fruits-area" id="fruitsArea"></div>
-    <div class="graph-container" id="graphContainer">
-     <div class="graph-title">
-      Fruit Graph
-     </div>
-     <div class="graph-row">
-      <div class="fruit-label">
-       🍎
-      </div>
-      <div class="boxes" id="appleBoxes"></div>
-      <div class="count-number" id="appleCount">
-       0
-      </div>
-     </div>
-     <div class="graph-row">
-      <div class="fruit-label">
-       🍌
-      </div>
-      <div class="boxes" id="bananaBoxes"></div>
-      <div class="count-number" id="bananaCount">
-       0
-      </div>
-     </div>
-     <div class="graph-row">
-      <div class="fruit-label">
-       🍇
-      </div>
-      <div class="boxes" id="grapeBoxes"></div>
-      <div class="count-number" id="grapeCount">
-       0
-      </div>
-     </div>
-     <div class="graph-row">
-      <div class="fruit-label">
-       🍊
-      </div>
-      <div class="boxes" id="orangeBoxes"></div>
-      <div class="count-number" id="orangeCount">
-       0
-      </div>
-     </div>
-    </div><button class="next-btn" id="nextToAddition" style="display: none;">Let's Add! →</button>
-   </div><!-- Quiz Screen -->
-   <div class="screen" id="quizScreen">
-    <h1 class="title">Quiz Time!</h1>
-    <div class="quiz-section">
-     <div class="quiz-question"><span id="quizQuestionText">How many apples are there?</span> <button class="audio-btn" id="quizAudioBtn" title="Listen to question">🔊</button>
-     </div>
-     <div class="fruits-area" id="quizFruitsArea" style="margin: 30px 0;"></div>
-     <div class="answer-options" id="quizAnswerOptions"></div>
-     <div class="feedback" id="quizFeedback"></div>
-    </div><button class="next-btn" id="nextToAdditionFromQuiz" style="display: none;">Continue to Addition! →</button>
-   </div><!-- Addition Screen -->
-   <div class="screen" id="additionScreen">
-    <h1 class="title">Addition Time!</h1>
-    <div class="addition-section">
-     <div class="quiz-question"><span id="questionText">How many fruits altogether?</span> <button class="audio-btn" id="additionAudioBtn" title="Listen to question">🔊</button>
-     </div>
-     <div class="number-bond">
-      <div class="bond-top">
-       <div class="bond-circle" id="whole">
-        ? 
-        <div class="bond-line line-left"></div>
-        <div class="bond-line line-right"></div>
-       </div>
-      </div>
-      <div class="bond-bottom">
-       <div class="bond-circle" id="part1">
-        ?
-       </div>
-       <div class="bond-circle" id="part2">
-        ?
-       </div>
-      </div>
-     </div>
-     <div class="answer-options" id="answerOptions"></div>
-     <div class="feedback" id="feedback"></div>
+
+    <!-- START SCREEN (To unlock Audio Context & welcome kids) -->
+    <div id="start-screen" class="fixed inset-0 z-[100] bg-white/40 backdrop-blur-lg flex flex-col items-center justify-center p-6 text-center">
+        <div class="bg-white border-8 border-emerald-400 p-8 sm:p-16 rounded-[3rem] shadow-2xl flex flex-col items-center">
+            <!-- Reuse our cute SVG frog for the logo -->
+            <div class="w-32 h-40 sm:w-48 sm:h-64 mb-4">
+                <svg viewBox="0 0 200 220" width="100%" height="100%" style="overflow: visible;">
+                    <path d="M 35 60 Q 30 140 45 180" fill="none" stroke="#2E7D32" stroke-width="8" stroke-linecap="round"/>
+                    <ellipse cx="65" cy="190" rx="25" ry="12" fill="#7CB342"/>
+                    <ellipse cx="145" cy="190" rx="25" ry="12" fill="#7CB342"/>
+                    <ellipse cx="105" cy="140" rx="60" ry="50" fill="#7CB342"/>
+                    <ellipse cx="105" cy="160" rx="40" ry="25" fill="#FFFFFF"/>
+                    <circle cx="45" cy="150" r="12" fill="#7CB342"/>
+                    <circle cx="70" cy="85" r="28" fill="#7CB342"/>
+                    <circle cx="140" cy="85" r="28" fill="#7CB342"/>
+                    <ellipse cx="105" cy="110" rx="75" ry="45" fill="#7CB342"/>
+                    <circle cx="70" cy="85" r="16" fill="#212121"/>
+                    <circle cx="64" cy="79" r="6" fill="#FFFFFF"/>
+                    <circle cx="140" cy="85" r="16" fill="#212121"/>
+                    <circle cx="134" cy="79" r="6" fill="#FFFFFF"/>
+                    <circle cx="45" cy="120" r="14" fill="#FFAB91"/>
+                    <circle cx="165" cy="120" r="14" fill="#FFAB91"/>
+                    <path d="M 75 125 Q 105 145 135 125" stroke="#212121" stroke-width="6" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="105" cy="40" rx="85" ry="30" fill="#388E3C"/>
+                    <path d="M 190 40 A 85 30 0 1 0 180 55 L 145 40 Z" fill="#388E3C"/>
+                    <circle cx="95" cy="30" r="6" fill="#81D4FA"/>
+                    <circle cx="93" cy="28" r="2" fill="#FFFFFF"/>
+                    <circle cx="125" cy="38" r="8" fill="#81D4FA"/>
+                    <circle cx="122" cy="35" r="3" fill="#FFFFFF"/>
+                </svg>
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-black text-rose-500 mb-2 drop-shadow-sm uppercase">Froggy Math!</h1>
+            <p class="text-xl sm:text-2xl font-bold text-slate-500 mb-8">Learn Subtraction with Fun!</p>
+            <button id="start-game-btn" class="btn-primary py-5 px-10 sm:py-6 sm:px-14 text-2xl sm:text-4xl text-white rounded-[2rem] font-black uppercase tracking-wider">
+                PLAY NOW!
+            </button>
+        </div>
     </div>
-   </div><!-- Celebration Screen -->
-   <div class="screen" id="celebrationScreen">
-    <div class="celebration">
-     <h1 class="celebration-title" id="celebrationText">Great job! You can count and add fruits!</h1>
-     <div class="dancing-fruits"><span class="dancing-fruit">🍎</span> <span class="dancing-fruit">🍌</span> <span class="dancing-fruit">🍇</span> <span class="dancing-fruit">🍊</span>
-     </div>
-     <div class="stars">
-      ⭐ ⭐ ⭐ ⭐ ⭐
-     </div>
-     <div style="margin-top: 30px; font-size: 1.5em; color: #4A4A4A;">
-      Round <span id="roundNumber">1</span> of 5 complete!
-     </div><button class="next-btn" id="nextRoundBtn" style="display: none;">Next Round →</button> <button class="next-btn" id="finishBtn" style="display: none; background: #51CF66;">🎉 Finish Game! 🎉</button>
+
+    <!-- END SCREEN (Summary & Fireworks) -->
+    <div id="end-screen" class="hidden fixed inset-0 z-[90] bg-white/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
+        <h1 class="text-6xl sm:text-8xl font-black text-rose-500 mb-6 animate-bounce text-glow">AMAZING!</h1>
+        <p class="text-3xl sm:text-4xl text-slate-700 font-bold mb-8">You helped the frog solve them all!</p>
+        <div class="text-5xl sm:text-6xl font-black text-emerald-600 bg-emerald-100 px-10 py-6 rounded-[2rem] mb-10 border-8 border-emerald-300 shadow-xl">
+            Score: <span id="final-score">0</span>
+        </div>
+        <button id="play-again-btn" class="btn-success py-5 px-12 sm:py-6 sm:px-16 text-3xl sm:text-4xl text-white rounded-[2rem] font-black uppercase tracking-wider relative z-[110]">
+            PLAY AGAIN!
+        </button>
     </div>
-   </div>
-  </div><!-- Overlay and Mystery Box -->
-  <div class="overlay" id="overlay"></div>
-  <div class="mystery-box" id="mysteryBox" style="display: none;">
-   <div class="mystery-text">
-    🎁 Mystery Box! 🎁
-   </div>
-   <div class="mystery-content" id="mysteryContent">
-    🎉
-   </div>
-   <div class="mystery-text" id="mysteryMessage">
-    Tuyệt vời!
-   </div>
-  </div>
-  <script>
-    const defaultConfig = {
-      game_title: "Let's Count the Fruits!",
-      instruction_text: "Click on each fruit to count them!",
-      question_text: "How many fruits altogether?",
-      celebration_text: "Great job! You can count and add fruits!"
-    };
 
-    const fruits = [
-      { emoji: '🍎', type: 'apple', color: '#FF6B6B' },
-      { emoji: '🍌', type: 'banana', color: '#FFE66D' },
-      { emoji: '🍇', type: 'grape', color: '#A29BFE' },
-      { emoji: '🍊', type: 'orange', color: '#FFA94D' }
-    ];
+    <div class="game-card rounded-[2.5rem] p-5 sm:p-8 md:p-12 relative overflow-hidden">
+        
+        <!-- Bonus Game Overlay -->
+        <div id="bonus-overlay" class="hidden bonus-overlay">
+            <div class="text-center z-10 px-4 w-full max-w-md">
+                <h2 class="text-4xl sm:text-6xl font-black text-emerald-600 mb-2 drop-shadow-md text-glow">BONUS!</h2>
+                <p class="text-lg sm:text-2xl text-emerald-800 mb-4 font-bold uppercase tracking-widest">Catch the flies!</p>
+                <div class="w-full bg-white/70 rounded-full h-4 sm:h-6 overflow-hidden mb-2 border-4 border-emerald-200">
+                    <div id="bonus-timer-bar" class="h-full bg-emerald-500 transition-all duration-75" style="width: 100%"></div>
+                </div>
+                <p class="font-black text-emerald-900 text-lg sm:text-2xl">TIME: <span id="bonus-seconds">5.0</span>s</p>
+            </div>
 
-    let counts = { apple: 0, banana: 0, grape: 0, orange: 0 };
-    let totalCounted = 0;
-    let totalFruits = 0;
-    let currentQuestion = null;
-    let currentQuizQuestion = null;
-    let currentRound = 1;
-    const totalRounds = 5;
+            <div id="bonus-area" class="absolute inset-0 overflow-hidden pointer-events-none">
+                <!-- Cute SVG Frog for Bonus Game -->
+                <div class="bonus-frog">
+                    <svg viewBox="0 0 200 220" width="100%" height="100%" style="overflow: visible;">
+                        <path d="M 35 60 Q 30 140 45 180" fill="none" stroke="#2E7D32" stroke-width="8" stroke-linecap="round"/>
+                        <ellipse cx="65" cy="190" rx="25" ry="12" fill="#7CB342"/>
+                        <ellipse cx="145" cy="190" rx="25" ry="12" fill="#7CB342"/>
+                        <ellipse cx="105" cy="140" rx="60" ry="50" fill="#7CB342"/>
+                        <ellipse cx="105" cy="160" rx="40" ry="25" fill="#FFFFFF"/>
+                        <circle cx="45" cy="150" r="12" fill="#7CB342"/>
+                        <circle cx="70" cy="85" r="28" fill="#7CB342"/>
+                        <circle cx="140" cy="85" r="28" fill="#7CB342"/>
+                        <ellipse cx="105" cy="110" rx="75" ry="45" fill="#7CB342"/>
+                        <circle cx="70" cy="85" r="16" fill="#212121"/>
+                        <circle cx="64" cy="79" r="6" fill="#FFFFFF"/>
+                        <circle cx="140" cy="85" r="16" fill="#212121"/>
+                        <circle cx="134" cy="79" r="6" fill="#FFFFFF"/>
+                        <circle cx="45" cy="120" r="14" fill="#FFAB91"/>
+                        <circle cx="165" cy="120" r="14" fill="#FFAB91"/>
+                        
+                        <!-- Interactive Mouth for Bonus -->
+                        <path class="bonus-mouth-closed" d="M 75 125 Q 105 145 135 125" stroke="#212121" stroke-width="6" fill="none" stroke-linecap="round"/>
+                        <ellipse class="bonus-mouth-open" cx="105" cy="125" rx="20" ry="15" fill="#B71C1C" visibility="hidden"/>
 
-    // Audio Context for sound effects
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        <ellipse cx="105" cy="40" rx="85" ry="30" fill="#388E3C"/>
+                        <path d="M 190 40 A 85 30 0 1 0 180 55 L 145 40 Z" fill="#388E3C"/>
+                        <circle cx="95" cy="30" r="6" fill="#81D4FA"/>
+                        <circle cx="93" cy="28" r="2" fill="#FFFFFF"/>
+                        <circle cx="125" cy="38" r="8" fill="#81D4FA"/>
+                        <circle cx="122" cy="35" r="3" fill="#FFFFFF"/>
+                    </svg>
+                </div>
 
-    function playSound(type) {
-      if (type === 'pop') {
-        // Pop sound - short high beep
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        oscillator.frequency.value = 800;
-        oscillator.type = 'sine';
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.1);
-      } else if (type === 'correct') {
-        // Success sound - ascending notes
-        [523.25, 659.25, 783.99].forEach((freq, i) => {
-          const oscillator = audioContext.createOscillator();
-          const gainNode = audioContext.createGain();
-          oscillator.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-          oscillator.frequency.value = freq;
-          oscillator.type = 'sine';
-          const startTime = audioContext.currentTime + (i * 0.1);
-          gainNode.gain.setValueAtTime(0.3, startTime);
-          gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.3);
-          oscillator.start(startTime);
-          oscillator.stop(startTime + 0.3);
+                <svg class="bonus-tongue" id="bonus-tongue-svg">
+                    <line id="tongue-line" x1="0" y1="0" x2="0" y2="0" stroke="#f472b6" stroke-width="10" stroke-linecap="round" visibility="hidden" />
+                    <circle id="tongue-tip" cx="0" cy="0" r="8" fill="#f472b6" visibility="hidden" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="text-center mb-6 sm:mb-10 mt-2">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-black text-rose-500 mb-2 drop-shadow-sm uppercase">Jump & Subtract!</h1>
+            <p class="text-slate-500 text-lg sm:text-2xl font-bold">Help the frog jump backward!</p>
+        </div>
+
+        <!-- Problem Display -->
+        <div class="flex items-center justify-center gap-4 sm:gap-8 text-5xl sm:text-7xl md:text-8xl font-black text-slate-800 mb-8 sm:mb-12 select-none">
+            <span id="num1" class="text-blue-500 drop-shadow-md">0</span>
+            <span class="text-slate-300">-</span>
+            <span id="num2" class="text-amber-500 drop-shadow-md">0</span>
+            <span class="text-slate-300">=</span>
+            <div class="relative">
+                <div id="answer-display" class="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 flex items-center justify-center border-4 sm:border-[6px] border-dashed border-slate-300 rounded-2xl sm:rounded-[2rem] bg-slate-50 text-slate-400 transition-all duration-300 shadow-inner">?</div>
+            </div>
+        </div>
+
+        <!-- Number Line -->
+        <div class="number-line-container" id="number-line">
+            <div class="line"></div>
+            <div id="ticks-container"></div>
+            
+            <!-- Character with identical cute SVG -->
+            <div id="character" class="character">
+                <svg viewBox="0 0 200 220" width="100%" height="100%" style="overflow: visible;">
+                    <path d="M 35 60 Q 30 140 45 180" fill="none" stroke="#2E7D32" stroke-width="8" stroke-linecap="round"/>
+                    <ellipse cx="65" cy="190" rx="25" ry="12" fill="#7CB342"/>
+                    <ellipse cx="145" cy="190" rx="25" ry="12" fill="#7CB342"/>
+                    <ellipse cx="105" cy="140" rx="60" ry="50" fill="#7CB342"/>
+                    <ellipse cx="105" cy="160" rx="40" ry="25" fill="#FFFFFF"/>
+                    <circle cx="45" cy="150" r="12" fill="#7CB342"/>
+                    <circle cx="70" cy="85" r="28" fill="#7CB342"/>
+                    <circle cx="140" cy="85" r="28" fill="#7CB342"/>
+                    <ellipse cx="105" cy="110" rx="75" ry="45" fill="#7CB342"/>
+                    <circle cx="70" cy="85" r="16" fill="#212121"/>
+                    <circle cx="64" cy="79" r="6" fill="#FFFFFF"/>
+                    <circle cx="140" cy="85" r="16" fill="#212121"/>
+                    <circle cx="134" cy="79" r="6" fill="#FFFFFF"/>
+                    <circle cx="45" cy="120" r="14" fill="#FFAB91"/>
+                    <circle cx="165" cy="120" r="14" fill="#FFAB91"/>
+                    <path class="frog-mouth-closed" d="M 75 125 Q 105 145 135 125" stroke="#212121" stroke-width="6" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="105" cy="40" rx="85" ry="30" fill="#388E3C"/>
+                    <path d="M 190 40 A 85 30 0 1 0 180 55 L 145 40 Z" fill="#388E3C"/>
+                    <circle cx="95" cy="30" r="6" fill="#81D4FA"/>
+                    <circle cx="93" cy="28" r="2" fill="#FFFFFF"/>
+                    <circle cx="125" cy="38" r="8" fill="#81D4FA"/>
+                    <circle cx="122" cy="35" r="3" fill="#FFFFFF"/>
+                </svg>
+            </div>
+            <svg id="arc-svg" class="absolute inset-0 w-full h-full pointer-events-none"></svg>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex flex-col items-center gap-5 sm:gap-8 mt-10">
+            <div id="action-buttons" class="flex gap-3 sm:gap-6 w-full max-w-2xl">
+                <button id="reset-jumps-btn" class="btn-secondary flex-1 py-4 sm:py-6 text-white rounded-2xl sm:rounded-[1.5rem] text-xl sm:text-3xl font-black uppercase tracking-wider">
+                    Start Over
+                </button>
+                <button id="check-btn" class="btn-primary flex-[2] py-4 sm:py-6 text-white rounded-2xl sm:rounded-[1.5rem] text-2xl sm:text-4xl font-black uppercase tracking-widest">
+                    Check
+                </button>
+            </div>
+            
+            <button id="next-btn" class="btn-success hidden w-full max-w-2xl py-4 sm:py-6 text-white rounded-2xl sm:rounded-[1.5rem] text-2xl sm:text-4xl font-black uppercase tracking-widest">
+                Next Problem!
+            </button>
+            
+            <div id="feedback" class="h-10 sm:h-12 text-2xl sm:text-4xl font-black transition-all duration-300 opacity-0 transform"></div>
+        </div>
+
+        <!-- Progress -->
+        <div class="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t-4 border-slate-100 flex justify-between items-center text-slate-500 font-bold uppercase tracking-widest text-sm sm:text-xl">
+            <div class="bg-blue-50 px-5 py-2 sm:px-6 sm:py-3 rounded-2xl border-2 border-blue-200">Score: <span id="score" class="text-blue-600 text-xl sm:text-3xl font-black">0</span></div>
+            <div class="bg-emerald-50 px-5 py-2 sm:px-6 sm:py-3 rounded-2xl border-2 border-emerald-200">Round: <span id="solved-count" class="text-emerald-500 text-xl sm:text-3xl font-black">1</span>/5</div>
+        </div>
+    </div>
+
+    <script>
+        // --- Audio System (Synthesized, no external files) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let audioUnlocked = false;
+
+        function unlockAudio() {
+            if (!audioUnlocked) {
+                audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                gain.gain.value = 0;
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.01);
+                audioUnlocked = true;
+            }
+        }
+
+        document.body.addEventListener('click', unlockAudio, { once: true });
+        document.body.addEventListener('touchstart', unlockAudio, { once: true });
+
+        function playSound(type) {
+            if (!audioUnlocked || audioCtx.state === 'suspended') return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            if (type === 'jump') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'correct') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.1);
+                osc.frequency.setValueAtTime(659.25, now + 0.2);
+                osc.frequency.setValueAtTime(880, now + 0.3);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'catch') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(1500, now + 0.1);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'firework') {
+                const bufferSize = audioCtx.sampleRate * 0.5;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 1000;
+                
+                const noiseGain = audioCtx.createGain();
+                noiseGain.gain.setValueAtTime(0.5, now);
+                noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                
+                noise.connect(filter);
+                filter.connect(noiseGain);
+                noiseGain.connect(audioCtx.destination);
+                noise.start(now);
+            }
+        }
+
+        // --- Game Logic ---
+        let currentNum1 = 0;
+        let currentNum2 = 0;
+        let score = 0;
+        let currentPos = 0;
+        let isInitialJumping = false;
+        let solvedCount = 0;
+        let totalRounds = 5;
+        let isBonusActive = false;
+        let bonusTimer = null;
+        let flyInterval = null;
+        let fireworkInterval = null;
+        const maxNum = 10;
+        
+        const character = document.getElementById('character');
+        const num1El = document.getElementById('num1');
+        const num2El = document.getElementById('num2');
+        const answerDisplay = document.getElementById('answer-display');
+        const checkBtn = document.getElementById('check-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const resetBtn = document.getElementById('reset-jumps-btn');
+        const feedback = document.getElementById('feedback');
+        const scoreEl = document.getElementById('score');
+        const solvedCountEl = document.getElementById('solved-count');
+        const ticksContainer = document.getElementById('ticks-container');
+        const arcSvg = document.getElementById('arc-svg');
+        const bonusOverlay = document.getElementById('bonus-overlay');
+        const bonusBar = document.getElementById('bonus-timer-bar');
+        const bonusSeconds = document.getElementById('bonus-seconds');
+        const tongueLine = document.getElementById('tongue-line');
+        const tongueTip = document.getElementById('tongue-tip');
+        const mouthClosed = document.querySelector('.bonus-mouth-closed');
+        const mouthOpen = document.querySelector('.bonus-mouth-open');
+
+        // Start Screen Logic
+        document.getElementById('start-game-btn').addEventListener('click', () => {
+            unlockAudio();
+            document.getElementById('start-screen').classList.add('hidden');
+            playSound('correct');
+            initNumberLine();
+            generateProblem();
         });
-        createConfetti();
-      } else if (type === 'wrong') {
-        // Wrong sound - descending buzz
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.3);
-        oscillator.type = 'sawtooth';
-        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.3);
-      }
-    }
 
-    function speak(text) {
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
-        utterance.rate = 0.9;
-        utterance.pitch = 1.2;
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(utterance);
-      }
-    }
+        // End Screen Logic
+        document.getElementById('play-again-btn').addEventListener('click', () => {
+            document.getElementById('end-screen').classList.add('hidden');
+            clearInterval(fireworkInterval);
+            score = 0;
+            solvedCount = 0;
+            scoreEl.innerText = score;
+            solvedCountEl.innerText = `1/${totalRounds}`;
+            generateProblem();
+        });
 
-    function createConfetti() {
-      const colors = ['#FF6B6B', '#FFE66D', '#4ECDC4', '#A29BFE', '#FFA94D'];
-      for (let i = 0; i < 50; i++) {
-        setTimeout(() => {
-          const confetti = document.createElement('div');
-          confetti.className = 'confetti';
-          confetti.style.left = Math.random() * 100 + '%';
-          confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-          confetti.style.animationDelay = Math.random() * 0.5 + 's';
-          document.body.appendChild(confetti);
-          setTimeout(() => confetti.remove(), 3000);
-        }, i * 30);
-      }
-    }
-
-    function showMysteryBox() {
-      const prizes = ['🏆', '⭐', '🎖️', '👑', '💎', '🌟', '✨', '🎪'];
-      const messages = ['Awesome!', 'Great job!', 'Excellent!', 'Well done!', 'Fantastic!'];
-      
-      const prize = prizes[Math.floor(Math.random() * prizes.length)];
-      const message = messages[Math.floor(Math.random() * messages.length)];
-      
-      document.getElementById('mysteryContent').textContent = prize;
-      document.getElementById('mysteryMessage').textContent = message;
-      document.getElementById('overlay').classList.add('active');
-      document.getElementById('mysteryBox').style.display = 'block';
-      
-      speak(message);
-      
-      setTimeout(() => {
-        document.getElementById('overlay').classList.remove('active');
-        document.getElementById('mysteryBox').style.display = 'none';
-      }, 3000);
-    }
-
-    function initGame() {
-      counts = { apple: 0, banana: 0, grape: 0, orange: 0 };
-      totalCounted = 0;
-      
-      // Generate random fruits (5-8 of each type)
-      const fruitsArea = document.getElementById('fruitsArea');
-      fruitsArea.innerHTML = '';
-      
-      const fruitElements = [];
-      fruits.forEach(fruit => {
-        const count = Math.floor(Math.random() * 4) + 5; // 5-8 fruits
-        totalFruits += count;
-        
-        for (let i = 0; i < count; i++) {
-          fruitElements.push({ ...fruit });
+        function initNumberLine() {
+            ticksContainer.innerHTML = '';
+            for (let i = 0; i <= maxNum; i++) {
+                const percentage = 5 + (i * 9);
+                const zone = document.createElement('div');
+                zone.className = 'tick-zone';
+                zone.style.left = `${percentage}%`;
+                zone.onclick = () => handleTickClick(i);
+                
+                const tick = document.createElement('div');
+                tick.className = 'tick';
+                
+                const label = document.createElement('div');
+                label.className = 'tick-label';
+                label.innerText = i;
+                
+                zone.appendChild(tick);
+                zone.appendChild(label);
+                ticksContainer.appendChild(zone);
+            }
         }
-      });
-      
-      // Shuffle fruits
-      fruitElements.sort(() => Math.random() - 0.5);
-      
-      // Create fruit elements
-      fruitElements.forEach((fruit, index) => {
-        const fruitEl = document.createElement('div');
-        fruitEl.className = 'fruit';
-        fruitEl.textContent = fruit.emoji;
-        fruitEl.dataset.type = fruit.type;
-        fruitEl.dataset.index = index;
-        fruitEl.onclick = () => countFruit(fruitEl);
-        fruitsArea.appendChild(fruitEl);
-      });
-      
-      // Create boxes for graph
-      ['apple', 'banana', 'grape', 'orange'].forEach(type => {
-        const boxesContainer = document.getElementById(`${type}Boxes`);
-        boxesContainer.innerHTML = '';
-        const maxCount = fruitElements.filter(f => f.type === type).length;
-        
-        for (let i = 0; i < maxCount; i++) {
-          const box = document.createElement('div');
-          box.className = 'box';
-          box.dataset.type = type;
-          box.dataset.index = i;
-          boxesContainer.appendChild(box);
+
+        function getPositionForValue(val) {
+            return 5 + (val * 9);
         }
-      });
-    }
 
-    function countFruit(fruitEl) {
-      if (fruitEl.classList.contains('counted')) return;
-      
-      const type = fruitEl.dataset.type;
-      fruitEl.classList.add('counted');
-      counts[type]++;
-      totalCounted++;
-      
-      playSound('pop');
-      
-      // Fill box in graph
-      const boxes = document.querySelectorAll(`#${type}Boxes .box`);
-      const box = boxes[counts[type] - 1];
-      if (box) {
-        const fruit = fruits.find(f => f.type === type);
-        box.style.background = fruit.color;
-        box.classList.add('filled');
-      }
-      
-      // Update count
-      document.getElementById(`${type}Count`).textContent = counts[type];
-      
-      // Check if all fruits counted
-      if (totalCounted === totalFruits) {
-        setTimeout(() => {
-          showQuizScreen();
-        }, 1000);
-      }
-    }
-
-    function showQuizScreen() {
-      document.getElementById('graphContainer').style.display = 'none';
-      document.getElementById('countingScreen').classList.remove('active');
-      document.getElementById('quizScreen').classList.add('active');
-      
-      // Pick a random fruit type
-      const fruitTypes = ['apple', 'banana', 'grape', 'orange'];
-      const fruitNames = { apple: 'apples', banana: 'bananas', grape: 'grapes', orange: 'oranges' };
-      const selectedType = fruitTypes[Math.floor(Math.random() * fruitTypes.length)];
-      const selectedFruit = fruits.find(f => f.type === selectedType);
-      const correctAnswer = counts[selectedType];
-      
-      currentQuizQuestion = {
-        type: selectedType,
-        fruit: selectedFruit,
-        answer: correctAnswer,
-        question: `How many ${fruitNames[selectedType]} are there?`
-      };
-      
-      // Display question
-      document.getElementById('quizQuestionText').textContent = currentQuizQuestion.question;
-      
-      // Display fruits
-      const quizFruitsArea = document.getElementById('quizFruitsArea');
-      quizFruitsArea.innerHTML = '';
-      for (let i = 0; i < correctAnswer; i++) {
-        const fruitEl = document.createElement('div');
-        fruitEl.className = 'fruit';
-        fruitEl.textContent = selectedFruit.emoji;
-        fruitEl.style.cursor = 'default';
-        quizFruitsArea.appendChild(fruitEl);
-      }
-      
-      // Generate answer options
-      const answers = [correctAnswer];
-      while (answers.length < 4) {
-        const wrong = correctAnswer + Math.floor(Math.random() * 5) - 2;
-        if (wrong > 0 && wrong !== correctAnswer && !answers.includes(wrong)) {
-          answers.push(wrong);
+        function createRipple(pos) {
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            const left = getPositionForValue(pos);
+            const container = document.getElementById('number-line');
+            ripple.style.left = `calc(${left}% - 10px)`;
+            ripple.style.top = '50%';
+            ripple.style.width = '20px';
+            ripple.style.height = '20px';
+            container.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
         }
-      }
-      answers.sort(() => Math.random() - 0.5);
-      
-      const optionsContainer = document.getElementById('quizAnswerOptions');
-      optionsContainer.innerHTML = '';
-      
-      answers.forEach(answer => {
-        const btn = document.createElement('button');
-        btn.className = 'answer-btn';
-        btn.textContent = answer;
-        btn.onclick = () => checkQuizAnswer(answer, btn);
-        optionsContainer.appendChild(btn);
-      });
-      
-      document.getElementById('quizFeedback').textContent = '';
-    }
 
-    function checkQuizAnswer(answer, btn) {
-      const buttons = document.querySelectorAll('#quizAnswerOptions .answer-btn');
-      buttons.forEach(b => b.disabled = true);
-      
-      if (answer === currentQuizQuestion.answer) {
-        btn.classList.add('correct');
-        document.getElementById('quizFeedback').textContent = 'Correct! 🎉';
-        document.getElementById('quizFeedback').className = 'feedback correct';
-        playSound('correct');
-        showMysteryBox();
-        
-        setTimeout(() => {
-          showAdditionScreen();
-        }, 3500);
-      } else {
-        btn.classList.add('wrong');
-        document.getElementById('quizFeedback').textContent = 'Try again!';
-        document.getElementById('quizFeedback').className = 'feedback wrong';
-        playSound('wrong');
-        
-        setTimeout(() => {
-          btn.classList.remove('wrong');
-          buttons.forEach(b => b.disabled = false);
-          document.getElementById('quizFeedback').textContent = '';
-        }, 1500);
-      }
-    }
-
-    function showAdditionScreen() {
-      document.getElementById('quizScreen').classList.remove('active');
-      document.getElementById('additionScreen').classList.add('active');
-      
-      // Pick two random fruit types that have counts > 0
-      const availableTypes = Object.keys(counts).filter(type => counts[type] > 0);
-      const type1 = availableTypes[Math.floor(Math.random() * availableTypes.length)];
-      let type2 = availableTypes[Math.floor(Math.random() * availableTypes.length)];
-      while (type2 === type1 && availableTypes.length > 1) {
-        type2 = availableTypes[Math.floor(Math.random() * availableTypes.length)];
-      }
-      
-      const part1 = counts[type1];
-      const part2 = counts[type2];
-      const whole = part1 + part2;
-      
-      currentQuestion = { part1, part2, whole };
-      
-      // Update number bond
-      document.getElementById('part1').textContent = part1;
-      document.getElementById('part2').textContent = part2;
-      document.getElementById('whole').textContent = '?';
-      
-      // Generate answer options
-      const answers = [whole];
-      while (answers.length < 3) {
-        const wrong = whole + Math.floor(Math.random() * 5) - 2;
-        if (wrong > 0 && wrong !== whole && !answers.includes(wrong)) {
-          answers.push(wrong);
+        function generateProblem() {
+            currentNum1 = Math.floor(Math.random() * 8) + 3; // 3 to 10
+            currentNum2 = Math.floor(Math.random() * currentNum1) + 1;
+            
+            num1El.innerText = currentNum1;
+            num2El.innerText = currentNum2;
+            solvedCountEl.innerText = `${Math.min(solvedCount + 1, totalRounds)}/${totalRounds}`;
+            
+            resetAnswerDisplay();
+            
+            currentPos = 0;
+            isInitialJumping = true;
+            feedback.style.opacity = '0';
+            
+            document.getElementById('action-buttons').classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+            bonusOverlay.classList.add('hidden');
+            
+            clearArcs();
+            moveCharacter(0, false);
+            
+            setTimeout(() => { showInitialJump(); }, 600);
         }
-      }
-      answers.sort(() => Math.random() - 0.5);
-      
-      const optionsContainer = document.getElementById('answerOptions');
-      optionsContainer.innerHTML = '';
-      
-      answers.forEach(answer => {
-        const btn = document.createElement('button');
-        btn.className = 'answer-btn';
-        btn.textContent = answer;
-        btn.onclick = () => checkAnswer(answer, btn);
-        optionsContainer.appendChild(btn);
-      });
-      
-      document.getElementById('feedback').textContent = '';
-    }
 
-    function checkAnswer(answer, btn) {
-      const buttons = document.querySelectorAll('#answerOptions .answer-btn');
-      buttons.forEach(b => b.disabled = true);
-      
-      if (answer === currentQuestion.whole) {
-        btn.classList.add('correct');
-        document.getElementById('whole').textContent = currentQuestion.whole;
-        document.getElementById('feedback').textContent = 'Correct! 🎉';
-        document.getElementById('feedback').className = 'feedback correct';
-        playSound('correct');
-        showMysteryBox();
-        
-        setTimeout(() => {
-          showCelebrationScreen();
-        }, 3500);
-      } else {
-        btn.classList.add('wrong');
-        document.getElementById('feedback').textContent = 'Try again!';
-        document.getElementById('feedback').className = 'feedback wrong';
-        playSound('wrong');
-        
-        setTimeout(() => {
-          btn.classList.remove('wrong');
-          buttons.forEach(b => b.disabled = false);
-          document.getElementById('feedback').textContent = '';
-        }, 1500);
-      }
-    }
+        function resetAnswerDisplay() {
+            answerDisplay.innerText = '?';
+            answerDisplay.className = "w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 flex items-center justify-center border-4 sm:border-[6px] border-dashed border-slate-300 rounded-2xl sm:rounded-[2rem] bg-slate-50 text-slate-400 transition-all duration-300 shadow-inner";
+        }
 
-    function showCelebrationScreen() {
-      document.getElementById('additionScreen').classList.remove('active');
-      document.getElementById('celebrationScreen').classList.add('active');
-      createConfetti();
-      
-      document.getElementById('roundNumber').textContent = currentRound;
-      
-      if (currentRound < totalRounds) {
-        document.getElementById('nextRoundBtn').style.display = 'block';
-        document.getElementById('finishBtn').style.display = 'none';
-      } else {
-        document.getElementById('nextRoundBtn').style.display = 'none';
-        document.getElementById('finishBtn').style.display = 'block';
-      }
-    }
-    
-    function startNextRound() {
-      currentRound++;
-      document.getElementById('celebrationScreen').classList.remove('active');
-      document.getElementById('countingScreen').classList.add('active');
-      document.getElementById('graphContainer').style.display = 'block';
-      
-      counts = { apple: 0, banana: 0, grape: 0, orange: 0 };
-      totalCounted = 0;
-      totalFruits = 0;
-      
-      initGame();
-    }
-    
-    function finishGame() {
-      document.getElementById('celebrationScreen').classList.remove('active');
-      document.getElementById('countingScreen').classList.add('active');
-      document.getElementById('graphContainer').style.display = 'block';
-      
-      currentRound = 1;
-      counts = { apple: 0, banana: 0, grape: 0, orange: 0 };
-      totalCounted = 0;
-      totalFruits = 0;
-      
-      initGame();
-    }
+        function moveCharacter(value, animate = true) {
+            const pos = getPositionForValue(value);
+            const charWidth = character.offsetWidth;
+            character.style.left = `calc(${pos}% - ${charWidth / 2}px)`;
+            
+            if (animate) {
+                character.classList.remove('jump-animation');
+                void character.offsetWidth;
+                character.classList.add('jump-animation');
+                playSound('jump');
+                setTimeout(() => createRipple(value), 350);
+            }
+            currentPos = value;
+            
+            if (!isInitialJumping) {
+                updateAnswerDisplay();
+            }
+        }
 
-    async function onConfigChange(config) {
-      document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
-      document.getElementById('instructionText').textContent = config.instruction_text || defaultConfig.instruction_text;
-      document.getElementById('questionText').textContent = config.question_text || defaultConfig.question_text;
-      document.getElementById('celebrationText').textContent = config.celebration_text || defaultConfig.celebration_text;
-    }
+        function updateAnswerDisplay() {
+            answerDisplay.innerText = currentPos;
+            answerDisplay.classList.remove('border-dashed', 'text-slate-400', 'border-slate-300', 'bg-slate-50');
+            answerDisplay.classList.add('border-solid', 'text-rose-500', 'border-rose-400', 'bg-rose-50');
+        }
 
-    function mapToCapabilities(config) {
-      return {
-        recolorables: [],
-        borderables: [],
-        fontEditable: undefined,
-        fontSizeable: undefined
-      };
-    }
+        function handleTickClick(targetVal) {
+            if (!nextBtn.classList.contains('hidden') || isBonusActive) return;
+            isInitialJumping = false;
 
-    function mapToEditPanelValues(config) {
-      return new Map([
-        ["game_title", config.game_title || defaultConfig.game_title],
-        ["instruction_text", config.instruction_text || defaultConfig.instruction_text],
-        ["question_text", config.question_text || defaultConfig.question_text],
-        ["celebration_text", config.celebration_text || defaultConfig.celebration_text]
-      ]);
-    }
+            if (targetVal < currentPos) {
+                const stepBack = () => {
+                    if (currentPos > targetVal) {
+                        const start = currentPos;
+                        const end = currentPos - 1;
+                        drawJumpArc(start, end, '#f43f5e');
+                        moveCharacter(end);
+                        setTimeout(stepBack, 450);
+                    }
+                };
+                stepBack();
+            } else if (targetVal > currentPos) {
+                const stepForward = () => {
+                    if (currentPos < targetVal) {
+                        const start = currentPos;
+                        const end = currentPos + 1;
+                        drawJumpArc(start, end, '#fb7185');
+                        moveCharacter(end);
+                        setTimeout(stepForward, 450);
+                    }
+                };
+                stepForward();
+            }
+        }
 
-    // Initialize Element SDK
-    if (window.elementSdk) {
-      window.elementSdk.init({
-        defaultConfig,
-        onConfigChange,
-        mapToCapabilities,
-        mapToEditPanelValues
-      });
-    }
+        function drawJumpArc(start, end, color = '#f43f5e') {
+            const containerRect = arcSvg.getBoundingClientRect();
+            const containerWidth = containerRect.width;
+            const containerHeight = containerRect.height;
+            
+            const startX = (getPositionForValue(start) / 100) * containerWidth;
+            const endX = (getPositionForValue(end) / 100) * containerWidth;
+            const centerY = containerHeight / 2;
+            const dist = Math.abs(end - start);
+            const height = Math.min(containerHeight * 0.4, dist * (containerHeight / 5));
 
-    // Event listeners
-    document.getElementById('quizAudioBtn').onclick = () => {
-      if (currentQuizQuestion) {
-        speak(currentQuizQuestion.question);
-      }
-    };
-    
-    document.getElementById('additionAudioBtn').onclick = () => {
-      const part1 = document.getElementById('part1').textContent;
-      const part2 = document.getElementById('part2').textContent;
-      const question = `What is ${part1} plus ${part2}?`;
-      speak(question);
-    };
-    
-    document.getElementById('nextRoundBtn').onclick = startNextRound;
-    document.getElementById('finishBtn').onclick = finishGame;
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            const d = `M ${startX} ${centerY} Q ${(startX + endX) / 2} ${centerY - height * 2.5} ${endX} ${centerY}`;
+            
+            path.setAttribute("d", d);
+            path.setAttribute("class", "arc-path");
+            path.style.stroke = color;
+            path.style.animation = "drawArc 0.5s forwards";
+            
+            arcSvg.appendChild(path);
+        }
 
-    // Start game
-    initGame();
-  </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b5af55746a73bdd',t:'MTc2NzAyODcyNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+        function clearArcs() {
+            arcSvg.innerHTML = '';
+        }
+
+        function showInitialJump() {
+            const step = () => {
+                if (currentPos < currentNum1) {
+                    const next = currentPos + 1;
+                    drawJumpArc(currentPos, next, '#cbd5e1'); 
+                    moveCharacter(next);
+                    setTimeout(step, 450);
+                } else {
+                    isInitialJumping = false;
+                    resetAnswerDisplay();
+                }
+            };
+            step();
+        }
+
+        function checkAnswer() {
+            const correctAnswer = currentNum1 - currentNum2;
+
+            if (currentPos === correctAnswer) {
+                score += 10;
+                solvedCount++;
+                scoreEl.innerText = score;
+                
+                showFeedback("CORRECT! 🌟", "text-emerald-500");
+                playSound('correct');
+                answerDisplay.classList.remove('bg-rose-50', 'border-rose-400', 'text-rose-500');
+                answerDisplay.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-600');
+                createConfetti();
+                
+                document.getElementById('action-buttons').classList.add('hidden');
+                
+                if (solvedCount >= totalRounds) {
+                    setTimeout(() => {
+                        document.getElementById('end-screen').classList.remove('hidden');
+                        document.getElementById('final-score').innerText = score;
+                        playSound('correct');
+                        fireworkInterval = setInterval(launchFirework, 700);
+                    }, 1500);
+                } else if (solvedCount % 2 === 0) {
+                    setTimeout(startBonusGame, 1000);
+                } else {
+                    nextBtn.classList.remove('hidden');
+                }
+            } else {
+                showFeedback("TRY AGAIN! 🐸", "text-rose-500");
+                playSound('wrong');
+                answerDisplay.classList.add('animate-pulse');
+                setTimeout(() => {
+                    answerDisplay.classList.remove('animate-pulse');
+                }, 500);
+            }
+        }
+
+        function startBonusGame() {
+            isBonusActive = true;
+            bonusOverlay.classList.remove('hidden');
+            
+            for(let i=0; i<4; i++) spawnFly();
+            flyInterval = setInterval(spawnFly, 1200);
+
+            let timeLeft = 6000;
+            const interval = 50;
+            
+            bonusTimer = setInterval(() => {
+                timeLeft -= interval;
+                const percentage = (timeLeft / 6000) * 100;
+                bonusBar.style.width = percentage + '%';
+                bonusSeconds.innerText = (timeLeft / 1000).toFixed(1);
+
+                if (timeLeft <= 0) endBonusGame();
+            }, interval);
+        }
+
+        function spawnFly() {
+            if(!isBonusActive) return;
+            const fly = document.createElement('div');
+            fly.className = 'bonus-fly-element pointer-events-auto';
+            
+            fly.innerHTML = `
+                <div class="fly-inner">
+                    <div class="fly-wing wing-left"></div>
+                    <div class="fly-wing wing-right"></div>
+                    <div class="fly-body">
+                        <div class="fly-head"></div>
+                    </div>
+                </div>
+            `;
+            
+            const rect = bonusOverlay.getBoundingClientRect();
+            const startX = Math.random() * (rect.width - 60);
+            const startY = Math.random() * (rect.height * 0.45) + 60; 
+            
+            fly.style.left = startX + 'px';
+            fly.style.top = startY + 'px';
+            
+            bonusOverlay.appendChild(fly);
+
+            const moveFly = () => {
+                if(!isBonusActive || !fly.parentElement) return;
+                const nextX = Math.max(20, Math.min(rect.width - 80, parseFloat(fly.style.left) + (Math.random() - 0.5) * 180));
+                const nextY = Math.max(60, Math.min(rect.height * 0.55, parseFloat(fly.style.top) + (Math.random() - 0.5) * 120));
+                
+                fly.animate([
+                    { left: fly.style.left, top: fly.style.top },
+                    { left: nextX + 'px', top: nextY + 'px' }
+                ], { duration: 1000 + Math.random() * 1000, easing: 'ease-in-out' }).onfinish = moveFly;
+            };
+            moveFly();
+
+            fly.onclick = (e) => catchFly(e, fly);
+        }
+
+        function catchFly(e, fly) {
+            if (fly.getAttribute('data-caught')) return;
+            fly.setAttribute('data-caught', 'true');
+            fly.style.pointerEvents = 'none';
+
+            playSound('catch');
+
+            const rect = bonusOverlay.getBoundingClientRect();
+            const frogX = rect.width / 2;
+            const frogY = rect.height - (rect.height < 500 ? 50 : 70); 
+            
+            const flyRect = fly.getBoundingClientRect();
+            const flyX = flyRect.left - rect.left + flyRect.width / 2;
+            const flyY = flyRect.top - rect.top + flyRect.height / 2;
+
+            mouthClosed.setAttribute('visibility', 'hidden');
+            mouthOpen.setAttribute('visibility', 'visible');
+
+            tongueLine.setAttribute('x1', frogX);
+            tongueLine.setAttribute('y1', frogY);
+            tongueLine.setAttribute('x2', frogX);
+            tongueLine.setAttribute('y2', frogY);
+            tongueLine.setAttribute('visibility', 'visible');
+            
+            tongueTip.setAttribute('cx', frogX);
+            tongueTip.setAttribute('cy', frogY);
+            tongueTip.setAttribute('visibility', 'visible');
+
+            const duration = 100;
+            const startTime = performance.now();
+
+            function animateTongue(time) {
+                const elapsed = time - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                if (progress < 1) {
+                    const curX = frogX + (flyX - frogX) * progress;
+                    const curY = frogY + (flyY - frogY) * progress;
+                    tongueLine.setAttribute('x2', curX);
+                    tongueLine.setAttribute('y2', curY);
+                    tongueTip.setAttribute('cx', curX);
+                    tongueTip.setAttribute('cy', curY);
+                    requestAnimationFrame(animateTongue);
+                } else {
+                    score += 5;
+                    scoreEl.innerText = score;
+                    
+                    const pullStartTime = performance.now();
+                    function retract(time2) {
+                        const elapsed2 = time2 - pullStartTime;
+                        const progress2 = Math.min(elapsed2 / duration, 1);
+                        const curX = flyX + (frogX - flyX) * progress2;
+                        const curY = flyY + (frogY - flyY) * progress2;
+                        
+                        tongueLine.setAttribute('x2', curX);
+                        tongueLine.setAttribute('y2', curY);
+                        tongueTip.setAttribute('cx', curX);
+                        tongueTip.setAttribute('cy', curY);
+                        
+                        fly.style.left = (curX - flyRect.width/2) + 'px';
+                        fly.style.top = (curY - flyRect.height/2) + 'px';
+                        fly.style.transform = `scale(${1 - progress2}) rotate(${progress2 * 360}deg)`;
+
+                        if (progress2 < 1) {
+                            requestAnimationFrame(retract);
+                        } else {
+                            tongueLine.setAttribute('visibility', 'hidden');
+                            tongueTip.setAttribute('visibility', 'hidden');
+                            fly.remove();
+                            mouthClosed.setAttribute('visibility', 'visible');
+                            mouthOpen.setAttribute('visibility', 'hidden');
+                        }
+                    }
+                    requestAnimationFrame(retract);
+                }
+            }
+            requestAnimationFrame(animateTongue);
+        }
+
+        function endBonusGame() {
+            clearInterval(bonusTimer);
+            clearInterval(flyInterval);
+            isBonusActive = false;
+            document.querySelectorAll('.bonus-fly-element').forEach(f => f.remove());
+            bonusOverlay.classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+            showFeedback("BONUS DONE! 🌟", "text-rose-500");
+        }
+
+        function showFeedback(text, colorClass) {
+            feedback.innerText = text;
+            feedback.className = `h-10 sm:h-12 text-2xl sm:text-4xl font-black transition-all duration-300 opacity-100 transform translate-y-0 ${colorClass}`;
+        }
+
+        // Standard Confetti for correct answers
+        function createConfetti() {
+            const colors = ['#f43f5e', '#10b981', '#f59e0b', '#3b82f6', '#a855f7', '#ec4899'];
+            for (let i = 0; i < 40; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'absolute w-3 h-3 sm:w-4 sm:h-4 z-[200]';
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.top = '-20px';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                document.body.appendChild(conf);
+
+                conf.animate([
+                    { transform: `translate(0, 0) rotate(0deg) scale(0.5)`, opacity: 1 },
+                    { transform: `translate(${(Math.random() - 0.5) * 400}px, ${window.innerHeight + 50}px) rotate(${Math.random() * 1080}deg) scale(1.5)`, opacity: 0 }
+                ], {
+                    duration: 2500 + Math.random() * 1500,
+                    easing: 'cubic-bezier(0,.37,.52,.99)'
+                }).onfinish = () => conf.remove();
+            }
+        }
+
+        // Firework functions for End Screen
+        function launchFirework() {
+            const x = Math.random() * (window.innerWidth - 100) + 50;
+            const y = window.innerHeight; 
+            const rocket = document.createElement('div');
+            rocket.className = 'absolute w-2 h-8 bg-yellow-300 rounded-full z-[150] shadow-[0_0_10px_#fde047]';
+            rocket.style.left = x + 'px';
+            rocket.style.top = y + 'px';
+            document.body.appendChild(rocket);
+            
+            const targetY = window.innerHeight * 0.1 + Math.random() * (window.innerHeight * 0.4);
+            playSound('jump'); // Ascend sound effect
+            
+            rocket.animate([
+                { top: y + 'px', transform: 'scaleY(1)' },
+                { top: targetY + 'px', transform: 'scaleY(0.5)' }
+            ], { duration: 800, easing: 'ease-out' }).onfinish = () => {
+                rocket.remove();
+                playSound('firework'); // Explosion sound
+                createExplosion(x, targetY);
+            };
+        }
+
+        function createExplosion(x, y) {
+            const colors = ['#f43f5e', '#10b981', '#3b82f6', '#f59e0b', '#a855f7', '#06b6d4', '#ec4899'];
+            for(let i=0; i<60; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'absolute w-3 h-3 rounded-full z-[150]';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.boxShadow = `0 0 8px ${particle.style.backgroundColor}`;
+                document.body.appendChild(particle);
+                
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 80 + Math.random() * 250;
+                
+                particle.animate([
+                    { transform: 'translate(0,0) scale(1)', opacity: 1 },
+                    { transform: `translate(${Math.cos(angle)*velocity}px, ${Math.sin(angle)*velocity + 150}px) scale(0)`, opacity: 0 }
+                ], { duration: 1200 + Math.random()*1000, easing: 'cubic-bezier(.17,.89,.32,1)' }).onfinish = () => particle.remove();
+            }
+        }
+
+        // Event Listeners
+        checkBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', generateProblem);
+        resetBtn.addEventListener('click', () => {
+            if (isBonusActive) return;
+            isInitialJumping = true; 
+            clearArcs();
+            currentPos = 0;
+            moveCharacter(0, false);
+            setTimeout(showInitialJump, 300);
+            playSound('jump');
+        });
+
+        window.addEventListener('resize', () => {
+            clearArcs();
+            const pos = getPositionForValue(currentPos);
+            const charWidth = character.offsetWidth;
+            character.style.left = `calc(${pos}% - ${charWidth / 2}px)`;
+        });
+    </script>
+</body>
 </html>

@@ -1,27 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="../assets/brand.css">
+    <link rel="stylesheet" href="../assets/brand.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>What time is it? (O'clock)</title>
-    <!-- Tailwind CSS for layout and styling -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom Font - Fredoka is rounded and friendly for kids */
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+        /* Custom Font - Poppins is beautiful, round, and modern for kids */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
 
         body {
-            font-family: 'Fredoka', sans-serif;
-            background-color: #FFF5F5; /* Warmer background */
-            /* Colorful playful background pattern */
-            background-image: 
-                radial-gradient(#FF9F1C 15%, transparent 16%), 
-                radial-gradient(#2EC4B6 15%, transparent 16%);
-            background-size: 60px 60px;
-            background-position: 0 0, 30px 30px;
+            font-family: 'Poppins', sans-serif;
+            /* Animated Magical Gradient Background */
+            background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             user-select: none;
             overflow: hidden; /* Prevent scrolling during game */
+            /* Fun magic wand cursor */
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><text y="20" font-size="20">✨</text></svg>'), auto;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Bubbles Background Effect */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            animation: floatUp 10s infinite ease-in;
+            bottom: -100px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.8); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(-120vh) scale(1.5); opacity: 0; }
         }
 
         /* Animations */
@@ -68,39 +89,44 @@
         }
 
         /* Candy Game Styles */
-        .candy {
-            position: absolute;
-            font-size: 2rem;
-            animation: spin 2s linear infinite;
+        .candy-inner {
+            font-size: 3.5rem; /* Bigger candies */
+            animation: spin 3s linear infinite;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
         }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin { 
+            0% { transform: rotate(-15deg); }
+            50% { transform: rotate(15deg); }
+            100% { transform: rotate(-15deg); }
+        }
         
         #basket {
             position: absolute;
-            bottom: 20px;
-            font-size: 4rem;
+            bottom: 10px;
             transform: translateX(-50%);
-            transition: left 0.1s ease-out;
-            pointer-events: none; /* Let clicks pass through if needed */
+            pointer-events: none; 
+            z-index: 55;
+            filter: drop-shadow(0 15px 15px rgba(0,0,0,0.3));
         }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col items-center justify-center relative text-gray-800">
-<img src="../assets/logo-oodles-math.png" class="oodles-logo">
-    <!-- Confetti Container (Background FX) -->
-    <div id="confetti-container" class="absolute inset-0 pointer-events-none z-0"></div>
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <!-- Background Bubbles -->
+    <div id="bubbles-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+    <div id="fireworks-container" class="absolute inset-0 pointer-events-none overflow-hidden z-50"></div>
 
     <!-- START SCREEN -->
-    <div id="start-screen" class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full text-center border-b-8 border-yellow-400 animate-pop z-10 mx-4">
+    <div id="start-screen" class="bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl max-w-md w-full text-center border-b-8 border-yellow-400 animate-pop z-10 mx-4">
         <div class="mb-6 flex justify-center text-yellow-400 animate-float">
-            <!-- Sun/Star Icon -->
+            <!-- Cute Sun Icon -->
             <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                <circle cx="12" cy="12" r="6" fill="#FFD700"/>
-                <path d="M12 2L14 7L19 7L16 11L18 16L13 14L12 14L7 16L9 11L6 7L11 7L12 2Z" fill="#FFA500"/>
+                <circle cx="12" cy="12" r="5" fill="#FFD700"/>
+                <path d="M12 2L14 6L18 5L17 9L21 12L17 15L18 19L14 18L12 22L10 18L6 19L7 15L3 12L7 9L6 5L10 6L12 2Z" fill="#FFA500"/>
             </svg>
         </div>
-        <h1 class="text-5xl font-bold text-indigo-600 mb-2 tracking-tight" style="text-shadow: 2px 2px 0px #FFD700;">Time Game!</h1>
-        <p class="text-xl text-gray-500 mb-8 font-medium">Learn O'clock & Catch Candy! 🍬</p>
+        <h1 class="text-5xl font-extrabold text-indigo-600 mb-2 tracking-tight" style="text-shadow: 2px 3px 0px #FFD700;">Time Game!</h1>
+        <p class="text-xl text-gray-600 mb-8 font-semibold">Learn O'clock & Catch Candy! 🍬</p>
         <button id="start-btn" class="w-full bg-green-500 hover:bg-green-400 text-white text-3xl font-bold py-4 rounded-2xl shadow-lg border-b-8 border-green-700 active:border-b-0 active:translate-y-2 flex items-center justify-center gap-3">
             PLAY ▶️
         </button>
@@ -111,22 +137,22 @@
         
         <!-- Header: Level & Sound -->
         <div class="w-full flex justify-between items-center mb-2">
-            <div class="bg-white px-4 py-2 rounded-full shadow-md border-2 border-indigo-200">
+            <div class="bg-white/90 px-5 py-2 rounded-full shadow-md border-2 border-indigo-200 backdrop-blur-sm">
                 <span class="font-bold text-indigo-600 text-lg">Question <span id="level-indicator">1</span>/10</span>
             </div>
-            <button id="sound-toggle" class="p-2 bg-white rounded-full shadow-md border-2 border-indigo-200 hover:bg-indigo-50 text-indigo-500">
+            <button id="sound-toggle" class="p-3 bg-white/90 rounded-full shadow-md border-2 border-indigo-200 hover:bg-indigo-50 text-indigo-500 backdrop-blur-sm transition-transform hover:scale-110">
                 <span id="icon-sound" class="text-2xl">🔊</span>
             </button>
         </div>
 
         <!-- Main Card -->
-        <div class="bg-white/95 backdrop-blur-sm p-4 md:p-6 rounded-3xl shadow-xl w-full border-4 border-indigo-200 relative">
+        <div class="bg-white/95 backdrop-blur-md p-5 md:p-8 rounded-3xl shadow-2xl w-full border-4 border-indigo-200 relative">
             
             <!-- Question with Speaker -->
             <div class="text-center mb-4 flex items-center justify-center gap-3">
-                <h2 class="text-3xl md:text-4xl font-bold text-indigo-800">What time is it?</h2>
-                <button onclick="speakQuestion()" class="bg-yellow-400 hover:bg-yellow-300 text-white p-2 rounded-full shadow-md border-b-4 border-yellow-600 active:border-b-0 active:translate-y-1 transition-all" title="Listen">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-indigo-800">What time is it?</h2>
+                <button onclick="speakQuestion()" class="bg-yellow-400 hover:bg-yellow-300 text-white p-3 rounded-full shadow-md border-b-4 border-yellow-600 active:border-b-0 active:translate-y-1 transition-all" title="Listen">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
                 </button>
             </div>
 
@@ -134,12 +160,11 @@
             <div class="relative w-56 h-56 md:w-72 md:h-72 mx-auto mb-6 transition-transform hover:scale-105 duration-300">
                 <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-2xl">
                     <!-- Bezel -->
-                    <circle cx="100" cy="100" r="95" fill="#FFFFFF" stroke="#FF9F1C" stroke-width="8" />
-                    <circle cx="100" cy="100" r="85" fill="#FFF" stroke="#FFBF69" stroke-width="2" />
+                    <circle cx="100" cy="100" r="95" fill="#FFFFFF" stroke="#4ECDC4" stroke-width="10" />
+                    <circle cx="100" cy="100" r="85" fill="#F7FFF7" stroke="#FFE66D" stroke-width="3" />
                     
                     <!-- Rainbow Numbers -->
-                    <g class="font-bold text-2xl" style="font-family: 'Fredoka', sans-serif; text-anchor: middle; dominant-baseline: middle;">
-                        <!-- Using different colors for numbers to be attractive -->
+                    <g class="font-bold text-2xl" style="font-family: 'Poppins', sans-serif; text-anchor: middle; dominant-baseline: middle;">
                         <text x="135" y="39.38" fill="#FF6B6B">1</text>
                         <text x="160.62" y="65" fill="#4ECDC4">2</text>
                         <text x="170" y="100" fill="#45B7D1">3</text>
@@ -155,68 +180,99 @@
                     </g>
 
                     <!-- Minute Hand (Blue, Fixed at 12) -->
-                    <line x1="100" y1="100" x2="100" y2="30" stroke="#4ECDC4" stroke-width="8" stroke-linecap="round" />
+                    <line x1="100" y1="100" x2="100" y2="25" stroke="#4ECDC4" stroke-width="8" stroke-linecap="round" />
                     <!-- Hour Hand (Red, Rotates) -->
                     <line id="hour-hand" x1="100" y1="100" x2="100" y2="55" stroke="#FF6B6B" stroke-width="10" stroke-linecap="round" />
                     <!-- Center Pin -->
-                    <circle cx="100" cy="100" r="8" fill="#FF9F1C" />
+                    <circle cx="100" cy="100" r="8" fill="#FFBE0B" />
                 </svg>
             </div>
 
             <!-- Feedback Area -->
             <div class="h-8 mb-2 flex justify-center items-center">
-                <div id="wrong-msg" class="hidden bg-red-100 text-red-500 px-6 py-1 rounded-full font-bold animate-wiggle border-2 border-red-200">
+                <div id="wrong-msg" class="hidden bg-red-100 text-red-500 px-6 py-2 rounded-full font-bold animate-wiggle border-2 border-red-200 text-lg">
                     ❌ Try again!
                 </div>
             </div>
 
             <!-- Answer Buttons -->
-            <div id="options-container" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <!-- JS will fill this -->
             </div>
         </div>
     </div>
 
     <!-- CANDY GAME OVERLAY -->
-    <div id="candy-game-screen" class="hidden fixed inset-0 z-50 flex-col bg-blue-100/90 backdrop-blur-sm cursor-none touch-none overflow-hidden">
-        <div class="absolute top-4 left-0 right-0 text-center pointer-events-none">
-            <h2 class="text-4xl font-bold text-pink-500 animate-bounce drop-shadow-md">Catch the Candy! 🍬</h2>
-            <p class="text-2xl text-blue-500 font-bold">Bonus Round!</p>
+    <div id="candy-game-screen" class="hidden fixed inset-0 z-50 flex-col bg-white/40 backdrop-blur-md cursor-none touch-none overflow-hidden">
+        <div class="absolute top-8 left-0 right-0 text-center pointer-events-none">
+            <h2 class="text-5xl font-extrabold text-pink-500 animate-bounce" style="text-shadow: 2px 2px 0px #FFF;">Catch the Candy! 🍬</h2>
+            <p class="text-3xl text-indigo-600 font-bold mt-2" style="text-shadow: 1px 1px 0px #FFF;">Bonus Round!</p>
         </div>
         
-        <!-- Basket -->
-        <div id="basket">🧺</div>
+        <!-- Basket (Cute SVG Graphic) -->
+        <div id="basket">
+            <svg viewBox="0 0 100 100" width="120" height="120">
+                <!-- Basket Body -->
+                <path d="M15 35 L85 35 L75 85 C73 93 68 95 60 95 L40 95 C32 95 27 93 25 85 Z" fill="#FF9F1C" stroke="#E67E22" stroke-width="4" stroke-linejoin="round"/>
+                <!-- Basket Rim -->
+                <path d="M15 35 L85 35 L80 48 L20 48 Z" fill="#F39C12"/>
+                <!-- Basket Handle -->
+                <path d="M25 35 C25 5 75 5 75 35" fill="none" stroke="#D35400" stroke-width="6" stroke-linecap="round"/>
+                <!-- Shiny reflection -->
+                <ellipse cx="65" cy="70" rx="6" ry="12" fill="#FFF" opacity="0.3" transform="rotate(-15 65 70)"/>
+            </svg>
+        </div>
 
         <!-- Score for Candy Game -->
-        <div class="absolute top-4 right-4 bg-white px-4 py-2 rounded-full border-4 border-pink-300 shadow-lg text-2xl font-bold text-pink-500">
+        <div class="absolute top-6 right-6 bg-white px-6 py-3 rounded-full border-4 border-pink-400 shadow-xl text-3xl font-bold text-pink-500 flex items-center gap-2">
             🍬 <span id="candy-score">0</span>
         </div>
     </div>
 
     <!-- SUCCESS MESSAGE (Pre-Next Level) -->
-    <div id="next-level-overlay" class="hidden fixed inset-0 z-40 bg-black/50 flex items-center justify-center">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl animate-pop text-center max-w-sm w-full border-4 border-green-400">
-            <div class="text-6xl mb-4">🌟</div>
-            <h2 class="text-3xl font-bold text-green-600 mb-2">Awesome!</h2>
-            <p id="level-summary" class="text-xl text-gray-500 mb-6">You got lots of candy!</p>
-            <button id="next-btn" class="w-full bg-indigo-500 hover:bg-indigo-400 text-white text-2xl font-bold py-3 rounded-xl border-b-4 border-indigo-700 active:border-b-0 active:translate-y-1">
+    <div id="next-level-overlay" class="hidden fixed inset-0 z-40 bg-indigo-900/60 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white p-10 rounded-3xl shadow-2xl animate-pop text-center max-w-sm w-full border-4 border-green-400 mx-4">
+            <div class="text-7xl mb-6">🌟</div>
+            <h2 class="text-4xl font-extrabold text-green-500 mb-2">Awesome!</h2>
+            <p id="level-summary" class="text-2xl text-gray-600 mb-8 font-semibold">You caught lots of candy!</p>
+            <button id="next-btn" class="w-full bg-indigo-500 hover:bg-indigo-400 text-white text-2xl font-bold py-4 rounded-2xl border-b-6 border-indigo-700 active:border-b-0 active:translate-y-2 shadow-lg transition-all">
                 Next Question ➡
             </button>
         </div>
     </div>
 
     <!-- END SCREEN -->
-    <div id="end-screen" class="hidden bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full text-center border-b-8 border-yellow-400 animate-pop z-10 mx-4">
-        <div class="text-8xl mb-4 animate-bounce">🏆</div>
-        <h2 class="text-4xl font-bold text-indigo-600 mb-2">You are a Star! ⭐</h2>
-        <p class="text-2xl text-gray-500 mb-6">Completed all 10 clocks!</p>
-        <p class="text-xl text-pink-500 font-bold mb-8">Total Candies: <span id="total-candies">0</span> 🍬</p>
-        <button id="restart-btn" class="w-full bg-blue-500 hover:bg-blue-400 text-white text-2xl font-bold py-4 rounded-2xl shadow-lg border-b-8 border-blue-700 active:border-b-0 active:translate-y-2">
+    <div id="end-screen" class="hidden bg-white/95 backdrop-blur-md p-10 rounded-3xl shadow-2xl max-w-md w-full text-center border-b-8 border-yellow-400 animate-pop z-10 mx-4 relative overflow-hidden">
+        <div class="text-8xl mb-6 animate-bounce">🏆</div>
+        <h2 class="text-5xl font-extrabold text-indigo-600 mb-2">You are a Star! ⭐</h2>
+        <p class="text-2xl text-gray-600 mb-6 font-semibold">Completed all 10 clocks!</p>
+        <div class="bg-pink-100 rounded-2xl p-4 mb-8 border-2 border-pink-300">
+            <p class="text-2xl text-pink-500 font-bold">Total Candies:</p>
+            <p class="text-4xl text-pink-600 font-extrabold"><span id="total-candies">0</span> 🍬</p>
+        </div>
+        <button id="restart-btn" class="w-full bg-blue-500 hover:bg-blue-400 text-white text-3xl font-bold py-4 rounded-2xl shadow-lg border-b-8 border-blue-700 active:border-b-0 active:translate-y-2">
             Play Again 🔄
         </button>
     </div>
 
     <script>
+        // --- Generate Background Bubbles ---
+        function createBackgroundBubbles() {
+            const container = document.getElementById('bubbles-container');
+            for(let i = 0; i < 15; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = 20 + Math.random() * 60;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                bubble.style.left = Math.random() * 100 + 'vw';
+                bubble.style.animationDuration = 8 + Math.random() * 10 + 's';
+                bubble.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(bubble);
+            }
+        }
+        createBackgroundBubbles();
+
         // --- Audio Context & Synthesis ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
@@ -224,8 +280,8 @@
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance("What time is it?");
                 utterance.lang = 'en-US';
-                utterance.rate = 0.9; // Slightly slower for kids
-                utterance.pitch = 1.1; // Cheerful pitch
+                utterance.rate = 0.85; // Slower for 3-5yo kids
+                utterance.pitch = 1.2; // Cheerful, higher pitch
                 window.speechSynthesis.speak(utterance);
             }
         }
@@ -239,44 +295,76 @@
             const now = audioCtx.currentTime;
 
             if (type === 'correct') {
-                // Happy magical chime
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(523.25, now);
                 osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.1);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.6);
                 osc.start(now);
-                osc.stop(now + 0.5);
+                osc.stop(now + 0.6);
             } else if (type === 'wrong') {
-                // Gentle error
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(200, now);
-                osc.frequency.linearRampToValueAtTime(150, now + 0.2);
+                osc.frequency.setValueAtTime(250, now);
+                osc.frequency.linearRampToValueAtTime(150, now + 0.3);
                 gain.gain.setValueAtTime(0.1, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
                 osc.start(now);
-                osc.stop(now + 0.2);
+                osc.stop(now + 0.3);
             } else if (type === 'pop') {
-                // Bubble pop for candy
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(800, now);
                 osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
-                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.setValueAtTime(0.08, now);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
                 osc.start(now);
                 osc.stop(now + 0.1);
             } else if (type === 'win') {
-                // Victory Fanfare
                 osc.type = 'square';
                 osc.frequency.setValueAtTime(440, now);
-                osc.frequency.setValueAtTime(440, now + 0.1);
-                osc.frequency.setValueAtTime(440, now + 0.2);
-                osc.frequency.setValueAtTime(659, now + 0.3);
+                osc.frequency.setValueAtTime(554, now + 0.2);
+                osc.frequency.setValueAtTime(659, now + 0.4);
+                osc.frequency.setValueAtTime(880, now + 0.6);
                 gain.gain.setValueAtTime(0.1, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
                 osc.start(now);
-                osc.stop(now + 1.0);
+                osc.stop(now + 1.5);
             }
+        }
+
+        // Beautiful Firework Sound
+        function playFireworkSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+
+            // Whistle (bay lên)
+            const osc1 = audioCtx.createOscillator();
+            const gain1 = audioCtx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(600, now);
+            osc1.frequency.exponentialRampToValueAtTime(1200, now + 0.3);
+            gain1.gain.setValueAtTime(0, now);
+            gain1.gain.linearRampToValueAtTime(0.05, now + 0.1);
+            gain1.gain.linearRampToValueAtTime(0, now + 0.3);
+            osc1.connect(gain1);
+            gain1.connect(audioCtx.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.3);
+
+            // Boom (phát nổ)
+            setTimeout(() => {
+                const boomNow = audioCtx.currentTime;
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.type = 'square';
+                osc2.frequency.setValueAtTime(150, boomNow);
+                osc2.frequency.exponentialRampToValueAtTime(0.01, boomNow + 0.6);
+                gain2.gain.setValueAtTime(0.15, boomNow);
+                gain2.gain.exponentialRampToValueAtTime(0.001, boomNow + 0.6);
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.start(boomNow);
+                osc2.stop(boomNow + 0.6);
+            }, 300);
         }
 
         // --- Game State ---
@@ -285,6 +373,7 @@
         let targetHour = 3;
         let totalCandiesCollected = 0;
         let currentCandies = 0;
+        let fireworksIntervalId = null;
 
         // --- Elements ---
         const startScreen = document.getElementById('start-screen');
@@ -301,6 +390,7 @@
         const candyScoreEl = document.getElementById('candy-score');
         const nextLevelOverlay = document.getElementById('next-level-overlay');
         const levelSummary = document.getElementById('level-summary');
+        const fireworksContainer = document.getElementById('fireworks-container');
 
         // --- Helper Functions ---
         function numberToWord(num) {
@@ -312,12 +402,15 @@
         function initGame() {
             round = 1;
             totalCandiesCollected = 0;
+            if(fireworksIntervalId) {
+                clearInterval(fireworksIntervalId);
+                fireworksContainer.innerHTML = '';
+            }
             startScreen.classList.add('hidden');
             endScreen.classList.add('hidden');
             gameScreen.classList.remove('hidden');
             gameScreen.classList.add('flex');
             
-            // Try to speak first time to unlock audio
             speakQuestion(); 
             loadRound();
         }
@@ -339,14 +432,11 @@
             optionsContainer.innerHTML = '';
             shuffled.forEach(opt => {
                 const btn = document.createElement('button');
-                // Updated Button Styles for "Colorful" look
-                const colors = ['bg-pink-500 border-pink-700', 'bg-blue-500 border-blue-700', 'bg-purple-500 border-purple-700', 'bg-orange-500 border-orange-700'];
-                const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                btn.className = `game-btn ${randomColor} text-white w-full p-4 rounded-2xl relative overflow-hidden group hover:brightness-110`;
+                // Uniform, beautiful color for all answer blocks (Cyan)
+                btn.className = `game-btn bg-cyan-500 hover:bg-cyan-400 border-cyan-700 text-white w-full p-4 md:p-5 rounded-2xl relative overflow-hidden group shadow-md`;
                 btn.innerHTML = `
-                    <div class="text-3xl font-bold mb-1 pointer-events-none drop-shadow-md">${opt}:00</div>
-                    <div class="text-lg opacity-90 font-medium pointer-events-none">${numberToWord(opt)} o'clock</div>
+                    <div class="text-4xl font-extrabold mb-1 pointer-events-none drop-shadow-md">${opt}:00</div>
+                    <div class="text-xl font-bold pointer-events-none">${numberToWord(opt)} o'clock</div>
                 `;
                 btn.onclick = () => handleAnswer(opt, btn);
                 optionsContainer.appendChild(btn);
@@ -356,15 +446,77 @@
         function handleAnswer(selected, btn) {
             if (selected === targetHour) {
                 playSound('correct');
-                // Trigger Candy Game!
                 startCandyGame();
             } else {
                 playSound('wrong');
                 wrongMsg.classList.remove('hidden');
-                btn.classList.add('opacity-50', 'cursor-not-allowed', 'grayscale');
+                btn.classList.add('opacity-40', 'cursor-not-allowed', 'scale-95');
+                btn.classList.replace('bg-cyan-500', 'bg-gray-400');
+                btn.classList.replace('border-cyan-700', 'border-gray-500');
                 btn.disabled = true;
                 setTimeout(() => wrongMsg.classList.add('hidden'), 1500);
             }
+        }
+
+        // --- Advanced Fireworks Logic ---
+        function shootFirework() {
+            const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FF006E', '#8338EC'];
+            // Vị trí nổ ngẫu nhiên (chỉ trong vùng màn hình phía trên)
+            const startX = window.innerWidth * (0.2 + Math.random() * 0.6); 
+            const startY = window.innerHeight * (0.2 + Math.random() * 0.4);
+            
+            playFireworkSound();
+
+            const particles = [];
+            // Tạo 50 hạt pháo hoa
+            for(let i=0; i<50; i++) {
+                const p = document.createElement('div');
+                p.className = 'absolute rounded-full pointer-events-none';
+                const size = 4 + Math.random() * 6;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                p.style.left = startX + 'px';
+                p.style.top = startY + 'px';
+                p.style.boxShadow = `0 0 ${size*1.5}px ${p.style.backgroundColor}`;
+                fireworksContainer.appendChild(p);
+                
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 2 + Math.random() * 10;
+                
+                particles.push({
+                    el: p,
+                    x: startX,
+                    y: startY,
+                    vx: Math.cos(angle) * velocity,
+                    vy: Math.sin(angle) * velocity,
+                    alpha: 1
+                });
+            }
+
+            // Vòng lặp vật lý pháo hoa
+            function animateFW() {
+                let alive = false;
+                particles.forEach(p => {
+                    if(p.alpha <= 0) return;
+                    alive = true;
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.15; // Gravity (trọng lực kéo xuống)
+                    p.alpha -= 0.015; // Mờ dần
+                    
+                    p.el.style.left = p.x + 'px';
+                    p.el.style.top = p.y + 'px';
+                    p.el.style.opacity = Math.max(0, p.alpha);
+                });
+                
+                if(alive) {
+                    requestAnimationFrame(animateFW);
+                } else {
+                    particles.forEach(p => p.el.remove());
+                }
+            }
+            requestAnimationFrame(animateFW);
         }
 
         // --- Candy Mini Game Logic ---
@@ -374,26 +526,24 @@
         let basketX = window.innerWidth / 2;
         let isCandyGameRunning = false;
 
+        const cuteCandyIcons = ['🍬', '🍭', '🧁', '🍩', '🍫', '🍓', '🍒', '🌈', '🦄', '🍎'];
+
         function startCandyGame() {
             isCandyGameRunning = true;
             currentCandies = 0;
             candyScoreEl.textContent = "0";
             
-            // Hide Main Game, Show Candy Overlay
             gameScreen.classList.remove('flex');
             gameScreen.classList.add('hidden');
             candyGameScreen.classList.remove('hidden');
             candyGameScreen.classList.add('flex');
             
-            // Reset Basket
             basketX = window.innerWidth / 2;
             updateBasketPos();
 
-            // Start Spawning
-            candyInterval = setInterval(spawnCandy, 400); // New candy every 0.4s
+            candyInterval = setInterval(spawnCandy, 350); // Faster spawn for more fun
             gameLoopAnim = requestAnimationFrame(updateCandyGame);
 
-            // End game after 5 seconds
             setTimeout(endCandyGame, 5000);
         }
 
@@ -402,14 +552,11 @@
             clearInterval(candyInterval);
             cancelAnimationFrame(gameLoopAnim);
             
-            // Clear candies
             activeCandies.forEach(c => c.element.remove());
             activeCandies = [];
 
-            // Add to total
             totalCandiesCollected += currentCandies;
 
-            // Show Summary
             candyGameScreen.classList.add('hidden');
             candyGameScreen.classList.remove('flex');
             gameScreen.classList.remove('hidden');
@@ -421,52 +568,62 @@
         }
 
         function spawnCandy() {
-            const types = ['🍬', '🍭', '🍫', '🍪', '🍩'];
-            const type = types[Math.floor(Math.random() * types.length)];
-            const el = document.createElement('div');
-            el.className = 'candy';
-            el.textContent = type;
-            el.style.left = Math.random() * (window.innerWidth - 50) + 'px';
-            el.style.top = '-50px';
-            candyGameScreen.appendChild(el);
+            const type = cuteCandyIcons[Math.floor(Math.random() * cuteCandyIcons.length)];
+            
+            // Lớp cha chứa vị trí Absolute để di chuyển rơi xuống
+            const outer = document.createElement('div');
+            outer.style.position = 'absolute';
+            outer.style.left = Math.random() * (window.innerWidth - 60) + 'px';
+            outer.style.top = '-80px';
+            outer.style.zIndex = '60';
+
+            // Lớp con chứa animation xoay vòng (để không xung đột CSS)
+            const inner = document.createElement('div');
+            inner.className = 'candy-inner';
+            inner.textContent = type;
+            
+            outer.appendChild(inner);
+            candyGameScreen.appendChild(outer);
             
             activeCandies.push({
-                element: el,
-                x: parseFloat(el.style.left),
-                y: -50,
-                speed: 3 + Math.random() * 4 // Random speed
+                element: outer,
+                y: -80,
+                speed: 4 + Math.random() * 5 // Rơi mượt mà
             });
         }
 
         function updateCandyGame() {
             if (!isCandyGameRunning) return;
 
-            // Move Candies
             for (let i = activeCandies.length - 1; i >= 0; i--) {
                 const c = activeCandies[i];
                 c.y += c.speed;
+                // Cập nhật vị trí trực tiếp bằng thuộc tính top
                 c.element.style.top = c.y + 'px';
 
-                // Check collision with basket
                 const basketRect = basket.getBoundingClientRect();
                 const candyRect = c.element.getBoundingClientRect();
 
-                // Simple AABB Collision
+                // Collision Detection (Chạm rổ)
                 if (
-                    candyRect.bottom >= basketRect.top + 20 &&
+                    candyRect.bottom >= basketRect.top + 30 &&
                     candyRect.right >= basketRect.left &&
                     candyRect.left <= basketRect.right &&
                     candyRect.top < basketRect.bottom
                 ) {
-                    // Caught!
                     currentCandies++;
                     candyScoreEl.textContent = currentCandies;
+                    
+                    // Visual Pop effect on score
+                    candyScoreEl.parentElement.classList.add('scale-125');
+                    setTimeout(() => candyScoreEl.parentElement.classList.remove('scale-125'), 100);
+                    
                     playSound('pop');
                     c.element.remove();
                     activeCandies.splice(i, 1);
                 } 
-                // Missed (out of screen)
                 else if (c.y > window.innerHeight) {
+                    // Ra khỏi màn hình
                     c.element.remove();
                     activeCandies.splice(i, 1);
                 }
@@ -476,20 +633,21 @@
         }
 
         function updateBasketPos() {
-            // Keep basket within screen bounds
             const limit = window.innerWidth;
-            if (basketX < 40) basketX = 40;
-            if (basketX > limit - 40) basketX = limit - 40;
+            if (basketX < 60) basketX = 60;
+            if (basketX > limit - 60) basketX = limit - 60;
+            // Direct DOM style update, no CSS transition = Butter smooth
             basket.style.left = basketX + 'px';
         }
 
-        // Mouse/Touch Move for Basket
+        // Extremely responsive mouse/touch listeners
         window.addEventListener('mousemove', (e) => {
             if (isCandyGameRunning) {
                 basketX = e.clientX;
                 updateBasketPos();
             }
         });
+        
         window.addEventListener('touchmove', (e) => {
             if (isCandyGameRunning) {
                 basketX = e.touches[0].clientX;
@@ -509,6 +667,11 @@
                 document.getElementById('total-candies').textContent = totalCandiesCollected;
                 endScreen.classList.remove('hidden');
                 playSound('win');
+                
+                // Start Advanced Fireworks loop
+                shootFirework();
+                fireworksIntervalId = setInterval(shootFirework, 1000);
+
             } else {
                 round++;
                 loadRound();

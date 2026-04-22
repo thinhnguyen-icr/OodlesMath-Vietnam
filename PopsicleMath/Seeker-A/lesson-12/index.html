@@ -1,589 +1,776 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="../assets/brand.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ladybug Number Bonds Game</title>
+    <title>Ladybug Number Bonds Game v14</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Varela+Round&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Varela Round', sans-serif;
-            background: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom, #a8e063 0%, #56ab2f 100%);
+            background-attachment: fixed;
             overflow: hidden;
-            touch-action: none; /* Prevent scrolling on mobile */
+            touch-action: none;
             user-select: none;
         }
 
-        .font-bubble { font-family: 'Fredoka One', cursive; }
-
-        /* Ladybug Styling */
-        .ladybug-body {
-            background: #ff4757;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* Full Garden Theme for Overlays */
+        .garden-overlay {
+            background: radial-gradient(circle at 50% 50%, #d4fc79 0%, #56ab2f 100%);
         }
+
+        .flower-deco {
+            position: absolute;
+            width: 25px; height: 25px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255,255,255,0.8);
+            z-index: 0;
+        }
+        .flower-deco::after {
+            content: '';
+            position: absolute; inset: 6px;
+            background: #FFD700;
+            border-radius: 50%;
+        }
+
+        /* Improved Text Styles */
+        .colorful-text {
+            background: linear-gradient(to bottom, #ffeb3b 0%, #ff9800 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0px 4px 0px #bf360c);
+        }
+
+        .text-outline {
+            text-shadow: 
+                -2px -2px 0 #2d5a27,  
+                 2px -2px 0 #2d5a27,
+                -2px  2px 0 #2d5a27,  
+                 2px  2px 0 #2d5a27,
+                 0px  6px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Ladybug 3D Body */
+        .ladybug-body {
+            background: radial-gradient(circle at 35% 35%, #ff5e62 0%, #ff1c2f 45%, #b30000 100%);
+            box-shadow: inset -15px -15px 30px rgba(0,0,0,0.4), 
+                        inset 10px 10px 20px rgba(255,255,255,0.4),
+                        0 20px 45px rgba(0,0,0,0.5);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid #800000;
+            position: relative;
+        }
+
+        .ladybug-body::before {
+            content: '';
+            position: absolute;
+            top: 4%; left: 10%;
+            width: 45%; height: 35%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 80%);
+            border-radius: 50%;
+            transform: rotate(-30deg);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .ladybug-head {
+            background: radial-gradient(circle at 30% 20%, #555 0%, #111 70%, #000 100%);
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.6), 0 10px 20px rgba(0,0,0,0.4);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        /* NEW Antennae with knobs (anchored correctly) */
+        .antenna-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        .antenna {
+            position: absolute;
+            width: 3px;
+            height: 30px;
+            background: #111;
+            bottom: 85%;
+            transform-origin: bottom center;
+            border-radius: 2px;
+        }
+        .antenna::after {
+            content: '';
+            position: absolute;
+            width: 10px; height: 10px;
+            background: #111;
+            border-radius: 50%;
+            top: -8px; left: -3.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
+        .ant-left { left: 25%; transform: rotate(-25deg); }
+        .ant-right { right: 25%; transform: rotate(25deg); }
 
         .wing-divider {
             position: absolute;
-            left: 50%;
-            top: 20%;
-            bottom: 5%;
-            width: 4px;
-            background: rgba(0,0,0,0.3);
+            left: 50%; top: 10%; bottom: 2%;
+            width: 6px;
+            background: linear-gradient(to right, #111, #444, #111);
             transform: translateX(-50%);
-            border-radius: 2px;
+            border-radius: 3px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.8);
+            z-index: 6;
         }
 
         .dot {
-            width: 40px; /* Reduced from 45px for better fit */
-            height: 40px;
-            background: #2f3542;
+            width: clamp(28px, 8vw, 42px);
+            height: clamp(28px, 8vw, 42px);
+            background: radial-gradient(circle at 30% 30%, #444, #000);
             border-radius: 50%;
-            box-shadow: 2px 4px 8px rgba(0,0,0,0.3);
+            box-shadow: inset -3px -3px 5px rgba(0,0,0,0.8), 2px 4px 8px rgba(0,0,0,0.5);
             position: absolute;
             transform: translate(-50%, -50%);
             z-index: 20;
-            transition: transform 0.1s, top 0.3s ease-out, left 0.3s ease-out, width 0.3s, height 0.3s;
-        }
-        
-        .dot.small {
-            width: 32px; /* Adjusted small size */
-            height: 32px;
-        }
-        
-        .dot::after {
-            content: '';
-            position: absolute;
-            top: 20%;
-            left: 20%;
-            width: 30%;
-            height: 30%;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
         }
 
-        /* Source Dot (in the tray) */
-        .source-dot {
-            width: 60px;
-            height: 60px;
-            background: #2f3542;
-            border-radius: 50%;
-            cursor: grab;
-            display: inline-block;
-            margin: 0 10px;
-            position: relative;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .source-dot:active { cursor: grabbing; transform: scale(0.95); }
-
-        /* Drop Zones */
-        /* Heavily adjusted to define a strict "Safe Zone" inside the curve */
         .wing-zone {
             position: absolute;
-            top: 25%; /* Pushed down to avoid top curve */
-            width: 34%; /* Narrower to avoid side curves */
-            height: 52%; /* Shorter to avoid bottom curve */
-            /* border: 1px solid rgba(255,255,255,0.2); Debugging: shows safe zone */
+            top: 15%;
+            width: 35%;
+            height: 70%;
             z-index: 10;
+            cursor: pointer;
         }
-        .left-wing { left: 12%; } /* Pushed in from edge */
-        .right-wing { right: 12%; } /* Pushed in from edge */
+        .left-wing { left: 8%; }
+        .right-wing { right: 8%; }
+
+        /* Buttons Styling */
+        .btn-game {
+            transition: all 0.1s;
+            border: 4px solid white;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+        .btn-game:active {
+            transform: translateY(6px);
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
+            box-shadow: 0 8px 0px #e91e63, 0 12px 20px rgba(0,0,0,0.2);
+            color: #d81b60;
+        }
+        
+        .check-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            box-shadow: 0 8px 0px #276749, 0 12px 20px rgba(0,0,0,0.2);
+            color: #f0fff4;
+        }
 
         /* Animations */
         @keyframes pop {
-            0% { transform: scale(0); }
-            80% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+            0% { transform: translate(-50%, -50%) scale(0); }
+            80% { transform: translate(-50%, -50%) scale(1.3); }
+            100% { transform: translate(-50%, -50%) scale(1); }
         }
-
         @keyframes cheer {
-            0%, 100% { transform: translateY(0) rotate(0); }
-            25% { transform: translateY(-20px) rotate(-5deg); }
-            75% { transform: translateY(-10px) rotate(5deg); }
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.05); }
         }
-
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+            20%, 60% { transform: translateX(-15px); }
+            40%, 80% { transform: translateX(15px); }
         }
-
-        .animate-pop { animation: pop 0.4s ease-out forwards; }
+        .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .animate-cheer { animation: cheer 0.6s ease-in-out; }
-        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .animate-shake { animation: shake 0.5s ease-in-out; }
 
-        /* Progress Bar */
         .progress-pill {
-            width: 12px;
-            height: 12px;
+            flex: 1; height: 12px;
             background: rgba(255,255,255,0.3);
-            border-radius: 50%;
+            border-radius: 6px;
             transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.3);
         }
-        .progress-pill.active { background: #ffeb3b; transform: scale(1.3); }
+        .progress-pill.active { background: #FFD700; transform: scaleY(1.3); box-shadow: 0 0 10px #FFD700; }
+        .progress-pill.done { background: #4CAF50; }
 
-        #start-overlay {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(5px);
+        /* Minigame Web (Black) */
+        .obstacle-web {
+            position: absolute;
+            width: 80px; height: 80px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='0.8' d='M12 2L12 22M2 12L22 12M5 5L19 19M5 19L19 5'/%3E%3Ccircle cx='12' cy='12' r='3' fill='none' stroke='black' stroke-width='0.8'/%3E%3Ccircle cx='12' cy='12' r='6' fill='none' stroke='black' stroke-width='0.8'/%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='black' stroke-width='0.8'/%3E%3C/svg%3E");
+            background-size: contain;
+            z-index: 100;
+        }
+
+        /* Minigame Flower */
+        .reward-flower {
+            position: absolute;
+            width: 60px; height: 60px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='8' fill='%23FFD700'/%3E%3Ccircle cx='32' cy='18' r='10' fill='%23FF69B4'/%3E%3Ccircle cx='32' cy='46' r='10' fill='%23FF69B4'/%3E%3Ccircle cx='18' cy='32' r='10' fill='%23FF69B4'/%3E%3Ccircle cx='46' cy='32' r='10' fill='%23FF69B4'/%3E%3Ccircle cx='22' cy='22' r='8' fill='%23FFB6C1'/%3E%3Ccircle cx='42' cy='22' r='8' fill='%23FFB6C1'/%3E%3Ccircle cx='22' cy='42' r='8' fill='%23FFB6C1'/%3E%3Ccircle cx='42' cy='42' r='8' fill='%23FFB6C1'/%3E%3C/svg%3E");
+            background-size: contain;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+            z-index: 100;
+        }
+
+        .mg-ladybug-graphic {
+            position: absolute;
+            width: 75px; height: 75px;
+            z-index: 110;
+        }
+
+        .mg-head {
+            position: absolute;
+            width: 20px; height: 20px; 
+            background: #111;
+            border-radius: 50%;
+            top: -10px; left: 50%;
+            transform: translateX(-50%);
+            box-shadow: inset -2px -2px 5px rgba(0,0,0,0.5);
+            display: flex; justify-content: center; align-items: center; gap: 3px;
+            z-index: 2;
+        }
+        .mg-head .mg-eye { width: 3px; height: 3px; background: white; border-radius: 50%; }
+
+        #fireworks-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 300;
+            display: none;
+        }
+
+        #feedback-overlay {
+            position: absolute;
+            top: 40%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col items-center justify-between py-4">
+<body class="h-screen w-screen flex flex-col items-center justify-between py-2">
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <div class="fixed inset-0 z-0 pointer-events-none" id="garden-decor-container"></div>
 
-    <!-- Custom Logo Area -->
-    <div class="absolute top-4 left-4 z-[60]">
-        <!-- PASTE YOUR LOGO LINK BELOW inside src="" -->
-        <!-- Example: src="https://example.com/my-logo.png" -->
-        <img src="https://image2url.com/r2/default/images/1770270908168-036a8878-e468-415d-9a50-73d8cbcc8574.png" 
-             alt="Game Logo" 
-             class="max-h-20 max-w-[150px] object-contain border-none shadow-sm hover:opacity-90 transition-opacity">
-    </div>
+    <canvas id="fireworks-canvas"></canvas>
 
-    <!-- Start Screen Overlay -->
-    <div id="start-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-8 text-center">
-        <h1 class="font-bubble text-5xl text-green-600 mb-4">Ladybug Math</h1>
-        <div class="text-6xl mb-6">🐞</div>
-        <p class="text-xl text-gray-600 mb-8">Make the wings equal the target number!</p>
-        <button onclick="startGame()" class="bg-green-500 hover:bg-green-600 text-white font-bubble text-2xl px-8 py-4 rounded-full shadow-xl transition transform hover:scale-105 active:scale-95">
-            Play Game ▶
+    <!-- Start Overlay -->
+    <div id="start-overlay" class="fixed inset-0 z-[250] flex flex-col items-center justify-center p-8 text-center garden-overlay">
+        <h1 class="text-6xl md:text-8xl font-black colorful-text mb-6 text-outline leading-tight">Ladybug<br>Garden Math</h1>
+        
+        <div class="relative w-48 h-48 mb-8 scale-110 drop-shadow-2xl">
+            <div class="ladybug-body rounded-full w-full h-full border-4 border-[#800000]">
+                <div class="wing-divider"></div>
+                <div class="absolute top-[25%] left-[25%] w-6 h-6 bg-gray-900 rounded-full"></div>
+                <div class="absolute top-[55%] right-[25%] w-6 h-6 bg-gray-900 rounded-full"></div>
+                <div class="absolute top-[55%] left-[25%] w-6 h-6 bg-gray-900 rounded-full"></div>
+                <div class="absolute top-[25%] right-[25%] w-6 h-6 bg-gray-900 rounded-full"></div>
+            </div>
+            <div class="ladybug-head absolute -top-8 left-[30%] w-20 h-20 flex flex-col items-center pt-2">
+                <div class="antenna-container">
+                    <div class="antenna ant-left"></div>
+                    <div class="antenna ant-right"></div>
+                </div>
+                <div class="flex gap-4 mt-2">
+                    <div class="w-6 h-6 bg-white rounded-full flex items-center justify-center relative overflow-hidden">
+                        <div class="w-2 h-2 bg-black rounded-full"></div>
+                    </div>
+                    <div class="w-6 h-6 bg-white rounded-full flex items-center justify-center relative overflow-hidden">
+                        <div class="w-2 h-2 bg-black rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-3xl text-green-900 font-black mb-8 italic drop-shadow-sm">Solve the number puzzle!</p>
+        <button onclick="startGame()" class="btn-game check-btn font-black text-4xl px-16 py-6 rounded-full outline-none text-outline">
+            START PLAY!
         </button>
     </div>
 
-    <!-- Top Bar: Target & Progress -->
-    <div class="w-full max-w-lg flex flex-col items-center z-10">
-        <!-- Progress Dots -->
-        <div class="flex gap-2 mb-2" id="progress-container">
-            <!-- Generated via JS -->
-        </div>
-
-        <!-- Target Display -->
-        <div class="relative bg-white/90 backdrop-blur rounded-3xl px-8 py-3 shadow-lg border-b-4 border-green-600 animate-bounce-slight">
-            <h2 class="text-gray-500 text-lg uppercase tracking-wider font-bold text-center leading-none">Make</h2>
-            <div class="text-6xl font-bubble text-green-600 leading-none" id="target-number">5</div>
-        </div>
-    </div>
-
-    <!-- Game Area -->
-    <div class="flex-grow flex items-center justify-center w-full relative">
-        
-        <!-- The Ladybug -->
-        <div id="ladybug" class="ladybug-body relative w-[340px] h-[340px] md:w-[400px] md:h-[400px] rounded-full flex flex-col items-center">
-            
-            <!-- Head -->
-            <div class="absolute -top-12 w-32 h-32 bg-gray-800 rounded-full z-0 flex justify-center items-start pt-4">
-                <!-- Eyes -->
-                <div class="flex gap-4 mt-4">
-                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                        <div class="w-3 h-3 bg-black rounded-full"></div>
-                    </div>
-                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                        <div class="w-3 h-3 bg-black rounded-full"></div>
-                    </div>
-                </div>
-                <!-- Antennae -->
-                <div class="absolute -top-6 left-2 w-1 h-8 bg-black rotate-[-20deg]">
-                    <div class="absolute -top-2 -left-1 w-3 h-3 bg-black rounded-full"></div>
-                </div>
-                <div class="absolute -top-6 right-2 w-1 h-8 bg-black rotate-[20deg]">
-                    <div class="absolute -top-2 -left-1 w-3 h-3 bg-black rounded-full"></div>
-                </div>
+    <!-- UI Header -->
+    <div class="w-full max-w-2xl flex flex-col items-center z-10 mt-2 px-4">
+        <div class="flex gap-1 w-full mb-3 px-4 py-2 bg-white/40 backdrop-blur rounded-full shadow-inner" id="progress-container"></div>
+        <div class="flex justify-between w-full px-2 items-center">
+            <div class="bg-white/90 rounded-2xl px-5 py-2 flex flex-col items-center shadow-lg border-2 border-green-200">
+                <span class="text-xs font-black text-green-400 uppercase tracking-widest leading-none mb-1">Score</span>
+                <span class="text-3xl font-black text-green-700" id="score-display">0</span>
             </div>
-
-            <!-- Body Divider -->
-            <div class="wing-divider"></div>
-
-            <!-- Left Wing (Pre-filled) -->
-            <div id="left-wing" class="wing-zone left-wing"></div>
-
-            <!-- Right Wing (Drop Target) -->
-            <div id="right-wing" class="wing-zone right-wing"></div>
+            <div class="bg-white rounded-3xl px-10 py-3 border-b-8 border-green-500 flex flex-col items-center shadow-xl transform hover:scale-105 transition">
+                <h2 class="text-gray-400 text-sm md:text-lg uppercase tracking-wider font-black leading-none mb-1">Make</h2>
+                <div class="text-6xl font-black text-green-600 leading-none" id="target-number">5</div>
+            </div>
+            <div class="w-[90px]"></div> 
         </div>
     </div>
 
-    <!-- Bottom Tray: Draggable Dots -->
-    <div class="w-full bg-white/80 backdrop-blur-md h-32 rounded-t-3xl shadow-[0_-10px_30px_rgba(0,0,0,0.1)] z-20 flex flex-col items-center justify-center relative">
-        <p class="absolute -top-5 bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full font-bold text-sm shadow-md">Drag from here</p>
-        <div class="flex items-center justify-center w-full" id="dot-tray">
-            <div class="source-dot" id="drag-source"></div>
-            <div class="source-dot" style="opacity: 0.5; transform: scale(0.8);"></div>
-            <div class="source-dot" style="opacity: 0.3; transform: scale(0.6);"></div>
+    <!-- Main Game Area -->
+    <div class="flex-grow flex flex-col items-center justify-center w-full relative z-20">
+        
+        <div id="feedback-overlay" class="text-7xl font-black text-red-600 text-outline uppercase italic tracking-tighter">Try Again!</div>
+
+        <div id="ladybug-container" class="relative">
+            <div id="ladybug" class="ladybug-body relative w-[310px] h-[310px] md:w-[380px] md:h-[380px] rounded-full flex flex-col items-center">
+                <div class="ladybug-head absolute -top-10 w-28 h-28 rounded-full z-0 flex justify-center items-start pt-3">
+                    <div class="antenna-container">
+                        <div class="antenna ant-left"></div>
+                        <div class="antenna ant-right"></div>
+                    </div>
+                    <div class="flex gap-5 mt-4">
+                        <div class="w-9 h-9 bg-white rounded-full flex items-center justify-center relative overflow-hidden">
+                            <div class="w-4 h-4 bg-black rounded-full relative"><div class="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-white rounded-full"></div></div>
+                        </div>
+                        <div class="w-9 h-9 bg-white rounded-full flex items-center justify-center relative overflow-hidden">
+                            <div class="w-4 h-4 bg-black rounded-full relative"><div class="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-white rounded-full"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="wing-divider"></div>
+                <div id="left-wing" class="wing-zone left-wing"></div>
+                <div id="right-wing" class="wing-zone right-wing" onclick="addDot()"></div>
+            </div>
+        </div>
+
+        <div id="equation-display" class="mt-12 bg-green-50 px-10 py-4 rounded-full text-4xl md:text-6xl font-black hidden items-center gap-4 shadow-2xl border-4 border-green-400">
+            <span id="eq-left" class="text-blue-600">2</span>
+            <span class="text-gray-400">+</span>
+            <span id="eq-right" class="text-pink-600">3</span>
+            <span class="text-gray-400">=</span>
+            <span id="eq-target" class="text-green-600">5</span>
         </div>
     </div>
 
-    <!-- Hidden audio helper -->
-    <div id="audio-helper"></div>
+    <!-- Control Tray -->
+    <div class="w-full max-w-2xl px-6 pb-8 pt-2 z-30 flex gap-4 md:gap-10 justify-center">
+        <button onclick="addDot()" class="flex-1 btn-game add-btn rounded-3xl py-5 flex flex-col items-center justify-center">
+            <span class="text-2xl md:text-3xl font-black tracking-wide">ADD DOT</span>
+            <span class="text-xs font-bold opacity-80">(Tap wing or button)</span>
+        </button>
+
+        <button onclick="checkAnswerBtn()" class="flex-1 btn-game check-btn rounded-3xl py-5 flex flex-col items-center justify-center text-outline">
+            <span class="text-3xl md:text-4xl font-black tracking-widest">CHECK!</span>
+        </button>
+    </div>
+
+    <!-- Minigame Overlay -->
+    <div id="minigame-overlay" class="fixed inset-0 z-[260] garden-overlay hidden flex-col items-center">
+        <div class="w-full p-4 bg-white/40 flex justify-between items-center shadow-md backdrop-blur-md">
+            <div class="text-2xl md:text-3xl font-black text-green-800 text-outline">GARDEN CHALLENGE!</div>
+            <div class="flex gap-2" id="mg-lives-container"></div>
+            <div class="text-2xl md:text-3xl font-black text-orange-500 text-outline">TIME: <span id="mg-timer">15</span></div>
+        </div>
+        <div id="mg-area" class="relative w-full max-w-2xl flex-grow bg-gradient-to-b from-sky-200 to-green-100 overflow-hidden border-x-8 border-green-800/30">
+            <div id="mg-player" class="mg-ladybug-graphic transition-transform" style="left: 50%; bottom: 80px; transform: translateX(-50%);">
+                 <!-- Small head realistic bug -->
+                 <div class="mg-head">
+                    <div class="antenna ant-left" style="height: 12px; top: -8px;"></div>
+                    <div class="antenna ant-right" style="height: 12px; top: -8px;"></div>
+                    <div class="mg-eye"></div><div class="mg-eye"></div>
+                 </div>
+                 <div class="w-full h-full ladybug-body rounded-full border-2 border-red-900 shadow-xl relative">
+                     <div class="wing-divider"></div>
+                     <div class="absolute top-[20%] left-[20%] w-3 h-3 bg-black rounded-full"></div>
+                     <div class="absolute top-[55%] right-[20%] w-3 h-3 bg-black rounded-full"></div>
+                 </div>
+            </div>
+            <div id="speed-alert" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl font-black text-red-600 text-outline uppercase italic opacity-0 transition-opacity pointer-events-none">SPEED UP! ⚡</div>
+            <div class="absolute bottom-4 w-full text-center text-green-900/40 font-black text-xl pointer-events-none hidden md:block">Use ← → arrows to fly!</div>
+        </div>
+        <div class="h-32 w-full max-w-2xl flex justify-between p-4 bg-white/50 gap-4 backdrop-blur-md">
+           <button onpointerdown="mgStartMove(-1)" onpointerup="mgStopMove()" class="flex-1 bg-white rounded-2xl text-green-600 font-black text-4xl shadow-xl active:translate-y-2 transition-all">◀ LEFT</button>
+           <button onpointerdown="mgStartMove(1)" onpointerup="mgStopMove()" class="flex-1 bg-white rounded-2xl text-green-600 font-black text-4xl shadow-xl active:translate-y-2 transition-all">RIGHT ▶</button>
+        </div>
+    </div>
 
 <script>
-    // --- Game Configuration (15 Questions) ---
+    // --- Garden Deco Initialization ---
+    function initGardenDeco() {
+        const container = document.getElementById('garden-decor-container');
+        container.innerHTML = '';
+        for(let i=0; i<30; i++) {
+            const flower = document.createElement('div');
+            flower.className = 'flower-deco';
+            flower.style.left = Math.random() * 100 + '%';
+            flower.style.top = Math.random() * 100 + '%';
+            flower.style.transform = `scale(${0.5 + Math.random()})`;
+            flower.style.opacity = 0.3 + Math.random() * 0.4;
+            container.appendChild(flower);
+        }
+    }
+    initGardenDeco();
+
     const levels = [
-        { target: 5, prefilled: 2 },
-        { target: 6, prefilled: 3 },
-        { target: 5, prefilled: 1 },
-        { target: 7, prefilled: 4 },
-        { target: 8, prefilled: 4 },
-        { target: 6, prefilled: 2 },
-        { target: 9, prefilled: 5 },
-        { target: 10, prefilled: 5 },
-        { target: 7, prefilled: 2 },
-        { target: 10, prefilled: 3 },
-        // New Levels added below
-        { target: 8, prefilled: 3 },
-        { target: 9, prefilled: 2 },
-        { target: 6, prefilled: 1 },
-        { target: 7, prefilled: 3 },
-        { target: 10, prefilled: 6 }
+        { target: 5, prefilled: 2 }, { target: 6, prefilled: 3 }, { target: 4, prefilled: 1 }, { target: 7, prefilled: 4 }, { target: 8, prefilled: 4 },
+        { target: 6, prefilled: 2 }, { target: 9, prefilled: 5 }, { target: 10, prefilled: 5 }, { target: 7, prefilled: 2 }, { target: 10, prefilled: 3 },
+        { target: 8, prefilled: 3 }, { target: 9, prefilled: 2 }, { target: 5, prefilled: 1 }, { target: 7, prefilled: 3 }, { target: 10, prefilled: 6 }
     ];
 
     let currentLevelIdx = 0;
-    let currentDotsOnRight = 0;
+    let dotsOnRight = 0;
+    let score = 0;
     let audioContext = null;
+    let isCheckingState = false;
 
-    // --- Dot Patterns (Percentage Top, Left) ---
-    // Refined for better spacing on the vertical wings
+    // Refined Dot Patterns
     const dotPatterns = {
         1: [{t:50, l:50}],
         2: [{t:25, l:50}, {t:75, l:50}],
-        3: [{t:20, l:50}, {t:80, l:20}, {t:80, l:80}], // Triangle - wider base
-        4: [{t:20, l:20}, {t:20, l:80}, {t:80, l:20}, {t:80, l:80}], // Square - pushed to corners
-        5: [{t:15, l:15}, {t:15, l:85}, {t:50, l:50}, {t:85, l:15}, {t:85, l:85}], // Quincunx - wide
-        6: [{t:15, l:20}, {t:15, l:80}, {t:50, l:20}, {t:50, l:80}, {t:85, l:20}, {t:85, l:80}], // 2x3 Grid - wide
-        7: [{t:15, l:20}, {t:15, l:80}, {t:50, l:20}, {t:50, l:50}, {t:50, l:80}, {t:85, l:20}, {t:85, l:80}], // H-shape
-        8: [{t:10, l:20}, {t:10, l:80}, {t:37, l:20}, {t:37, l:80}, {t:63, l:20}, {t:63, l:80}, {t:90, l:20}, {t:90, l:80}], // 2x4 Grid
-        9: [{t:15, l:15}, {t:15, l:50}, {t:15, l:85}, {t:50, l:15}, {t:50, l:50}, {t:50, l:85}, {t:85, l:15}, {t:85, l:50}, {t:85, l:85}], // 3x3 Grid
-        10: [{t:8, l:20}, {t:8, l:80}, {t:29, l:20}, {t:29, l:80}, {t:50, l:20}, {t:50, l:80}, {t:71, l:20}, {t:71, l:80}, {t:92, l:20}, {t:92, l:80}] // 2x5 Grid
+        3: [{t:20, l:50}, {t:80, l:25}, {t:80, l:75}],
+        4: [{t:25, l:25}, {t:25, l:75}, {t:75, l:25}, {t:75, l:75}],
+        5: [{t:20, l:25}, {t:20, l:75}, {t:50, l:50}, {t:80, l:25}, {t:80, l:75}],
+        6: [{t:15, l:30}, {t:15, l:70}, {t:50, l:30}, {t:50, l:70}, {t:85, l:30}, {t:85, l:70}],
+        7: [{t:10, l:50}, {t:35, l:30}, {t:35, l:70}, {t:65, l:30}, {t:65, l:70}, {t:90, l:30}, {t:90, l:70}],
+        8: [{t:10, l:30}, {t:10, l:70}, {t:35, l:30}, {t:35, l:70}, {t:65, l:30}, {t:65, l:70}, {t:90, l:30}, {t:90, l:70}],
+        9: [{t:15, l:20}, {t:15, l:50}, {t:15, l:80}, {t:50, l:20}, {t:50, l:50}, {t:50, l:80}, {t:85, l:20}, {t:85, l:50}, {t:85, l:80}],
+        10: [{t:10, l:25}, {t:10, l:75}, {t:30, l:25}, {t:30, l:75}, {t:50, l:25}, {t:50, l:75}, {t:70, l:25}, {t:70, l:75}, {t:90, l:25}, {t:90, l:75}]
     };
-
-    // --- DOM Elements ---
-    const targetDisplay = document.getElementById('target-number');
-    const leftWing = document.getElementById('left-wing');
-    const rightWing = document.getElementById('right-wing');
-    const ladybug = document.getElementById('ladybug');
-    const dragSource = document.getElementById('drag-source');
-    const progressContainer = document.getElementById('progress-container');
-
-    // --- Initialization ---
-    function initProgress() {
-        progressContainer.innerHTML = '';
-        levels.forEach((_, idx) => {
-            const pill = document.createElement('div');
-            pill.className = `progress-pill ${idx === 0 ? 'active' : ''}`;
-            pill.id = `pill-${idx}`;
-            progressContainer.appendChild(pill);
-        });
-    }
 
     function startGame() {
         document.getElementById('start-overlay').style.display = 'none';
-        
-        // Init Audio Context for sound effects
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        audioContext = new AudioContext();
-
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
         initProgress();
         loadLevel(0);
+    }
+
+    function initProgress() {
+        const container = document.getElementById('progress-container');
+        container.innerHTML = levels.map((_, i) => `<div id="pill-${i}" class="progress-pill"></div>`).join('');
     }
 
     function loadLevel(idx) {
         currentLevelIdx = idx;
         const level = levels[idx];
-        currentDotsOnRight = 0;
-
-        // Update UI
-        targetDisplay.innerText = level.target;
+        dotsOnRight = 0;
+        isCheckingState = false;
         
-        // Update Progress Bar
+        document.getElementById('target-number').innerText = level.target;
+        document.getElementById('equation-display').classList.add('hidden');
+        document.getElementById('equation-display').style.display = 'none';
+        
         document.querySelectorAll('.progress-pill').forEach((p, i) => {
+            p.className = 'progress-pill';
             if (i === idx) p.classList.add('active');
-            else p.classList.remove('active');
-            if (i < idx) p.style.backgroundColor = '#4CAF50'; // Green for completed
+            if (i < idx) p.classList.add('done');
         });
+        
+        document.getElementById('left-wing').innerHTML = '';
+        document.getElementById('right-wing').innerHTML = '';
+        
+        for(let i=0; i<level.prefilled; i++) createDotInWing(document.getElementById('left-wing'), false, false);
+        
+        speak(`Make ${level.target}. Tap to add dots!`);
+    }
 
-        // Clear Wings
-        leftWing.innerHTML = '';
-        rightWing.innerHTML = '';
-
-        // Fill Left Wing (Pre-filled)
-        for(let i=0; i<level.prefilled; i++) {
-            createDot(leftWing, false);
+    function createDotInWing(container, isAnimated, isRemovable) {
+        const dot = document.createElement('div');
+        dot.className = isAnimated ? 'dot animate-pop' : 'dot';
+        
+        if (isRemovable) {
+            dot.onclick = function(e) {
+                if (isCheckingState) return;
+                e.stopPropagation(); 
+                this.remove();
+                dotsOnRight--; 
+                if (dotsOnRight < 0) dotsOnRight = 0;
+                repositionDots(container);
+                playTone('drop'); 
+            };
         }
-
-        // Voice Prompt
-        speak(`Look at this wing. Drag more dots to make ${level.target}.`);
+        container.appendChild(dot);
+        repositionDots(container);
     }
 
     function repositionDots(container) {
         const dots = container.getElementsByClassName('dot');
         const count = dots.length;
-        const pattern = dotPatterns[count] || dotPatterns[1]; // Fallback
-
-        if (count > 0) {
-            Array.from(dots).forEach((dot, index) => {
-                // Shrink dots if crowded (8 or more)
-                if (count >= 8) {
-                    dot.classList.add('small');
-                } else {
-                    dot.classList.remove('small');
-                }
-
-                const pos = pattern[index] || {t: 50, l: 50}; 
-                dot.style.top = pos.t + '%';
-                dot.style.left = pos.l + '%';
-            });
-        }
+        const p = dotPatterns[count] || dotPatterns[1];
+        Array.from(dots).forEach((dot, index) => {
+            const pos = p[index] || {t: 50, l: 50}; 
+            dot.style.top = pos.t + '%';
+            dot.style.left = pos.l + '%';
+        });
     }
 
-    function createDot(container, isAnimated) {
-        const dot = document.createElement('div');
-        dot.className = isAnimated ? 'dot animate-pop' : 'dot';
+    function addDot() {
+        if (isCheckingState) return;
+        if (dotsOnRight >= 10) return; 
         
-        // Initial random position to pop from (visual flair), then it snaps to grid
-        if (isAnimated) {
-            dot.style.top = '50%';
-            dot.style.left = '50%';
-        }
-        
-        container.appendChild(dot);
-        repositionDots(container);
-    }
-
-    // --- Interaction Logic ---
-
-    // Drag Setup
-    let activeDrag = null;
-    let touchOffset = { x: 0, y: 0 };
-
-    function startDrag(e) {
-        e.preventDefault();
-        
-        // Determine input coordinates
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-        // Create a temporary flying dot
-        activeDrag = document.createElement('div');
-        activeDrag.className = 'dot';
-        activeDrag.style.position = 'fixed';
-        activeDrag.style.zIndex = 100;
-        activeDrag.style.width = '60px'; // Slightly larger while dragging
-        activeDrag.style.height = '60px';
-        activeDrag.style.pointerEvents = 'none'; // Let clicks pass through to detect drop zones
-        
-        // Center it on finger/cursor
-        activeDrag.style.left = clientX + 'px';
-        activeDrag.style.top = clientY + 'px';
-        
-        document.body.appendChild(activeDrag);
-        
-        playTone('pop');
-
-        document.addEventListener('mousemove', onDrag);
-        document.addEventListener('touchmove', onDrag, {passive: false});
-        document.addEventListener('mouseup', endDrag);
-        document.addEventListener('touchend', endDrag);
-    }
-
-    function onDrag(e) {
-        if (!activeDrag) return;
-        e.preventDefault();
-        
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-        activeDrag.style.left = clientX + 'px';
-        activeDrag.style.top = clientY + 'px';
-    }
-
-    function endDrag(e) {
-        if (!activeDrag) return;
-
-        // Get drop coordinates
-        // For touch, changedTouches gives the final position
-        const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-        const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
-
-        // Check collision with Right Wing
-        const rect = rightWing.getBoundingClientRect();
-        
-        // Simple bounding box check
-        if (clientX >= rect.left && clientX <= rect.right &&
-            clientY >= rect.top && clientY <= rect.bottom) {
-            
-            // Success Drop
-            handleDropSuccess();
-        } 
-
-        // Cleanup
-        activeDrag.remove();
-        activeDrag = null;
-        document.removeEventListener('mousemove', onDrag);
-        document.removeEventListener('touchmove', onDrag);
-        document.removeEventListener('mouseup', endDrag);
-        document.removeEventListener('touchend', endDrag);
-    }
-
-    dragSource.addEventListener('mousedown', startDrag);
-    dragSource.addEventListener('touchstart', startDrag, {passive: false});
-
-    // --- Game Mechanics ---
-
-    function handleDropSuccess() {
-        createDot(rightWing, true); // Create dot on wing
-        currentDotsOnRight++;
+        dotsOnRight++; 
+        createDotInWing(document.getElementById('right-wing'), true, true);
         playTone('drop');
-        checkAnswer();
     }
 
-    function checkAnswer() {
+    function checkAnswerBtn() {
+        if (isCheckingState) return;
         const level = levels[currentLevelIdx];
-        const currentTotal = level.prefilled + currentDotsOnRight;
-
-        if (currentTotal === level.target) {
-            // Correct!
+        
+        if (level.prefilled + dotsOnRight === level.target) {
             handleCorrect();
-        } else if (currentTotal > level.target) {
-            // Too many!
+        } else {
             handleIncorrect();
         }
-        // If less, do nothing, keep playing
     }
 
     function handleCorrect() {
+        isCheckingState = true;
+        const level = levels[currentLevelIdx];
         playTone('success');
-        ladybug.classList.add('animate-cheer');
+        document.getElementById('ladybug').classList.add('animate-cheer');
         
-        // confetti effect via simple DOM particles
-        spawnConfetti();
+        const eq = document.getElementById('equation-display');
+        document.getElementById('eq-left').innerText = level.prefilled;
+        document.getElementById('eq-right').innerText = dotsOnRight;
+        document.getElementById('eq-target').innerText = level.target;
+        eq.classList.remove('hidden');
+        eq.style.display = 'flex';
+        
+        score += 10;
+        document.getElementById('score-display').innerText = score;
+        
+        speak(`Correct! ${level.prefilled} plus ${dotsOnRight} equals ${level.target}!`);
 
-        // Voice encouragement
         setTimeout(() => {
-            speak("Great job!");
-        }, 500);
-
-        setTimeout(() => {
-            ladybug.classList.remove('animate-cheer');
-            
-            if (currentLevelIdx < levels.length - 1) {
-                loadLevel(currentLevelIdx + 1);
-            } else {
-                showWinScreen();
-            }
-        }, 2000);
+            document.getElementById('ladybug').classList.remove('animate-cheer');
+            if (currentLevelIdx === 4 || currentLevelIdx === 9) startMinigame();
+            else if (currentLevelIdx < levels.length - 1) loadLevel(currentLevelIdx + 1);
+            else showWinScreen();
+        }, 3000);
     }
 
     function handleIncorrect() {
         playTone('error');
-        ladybug.classList.add('animate-shake');
-        
-        // Remove the last added dot
+        document.getElementById('ladybug').classList.add('animate-shake');
+        const overlay = document.getElementById('feedback-overlay');
+        overlay.style.opacity = '1';
+        speak("Try again!");
         setTimeout(() => {
-            if (rightWing.lastChild) {
-                rightWing.lastChild.remove();
-                currentDotsOnRight--;
-                repositionDots(rightWing); // Re-distribute remaining dots evenly
-            }
-            ladybug.classList.remove('animate-shake');
-            speak("Oops. Too many.");
-        }, 500);
+            document.getElementById('ladybug').classList.remove('animate-shake');
+            overlay.style.opacity = '0';
+        }, 800);
     }
 
+    // --- MINIGAME LOGIC ---
+    let mgActive = false, mgPlayerX = 50, mgMoveDir = 0, mgLoopId = null, mgTimer = 15, mgItems = [], mgLives = 3;
+    let mgFlowerCount = 0;
+    let mgSpeedMultiplier = 1.0;
+    
+    function startMinigame() {
+        speak("Mini-game time! Catch flowers!");
+        document.getElementById('minigame-overlay').style.display = 'flex';
+        mgLives = 3; updateMgLives();
+        mgTimer = 15; 
+        mgFlowerCount = 0;
+        mgSpeedMultiplier = 1.0;
+        document.getElementById('mg-timer').innerText = mgTimer;
+        mgItems.forEach(o => o.el.remove());
+        mgItems = [];
+        mgActive = true; mgPlayerX = 50;
+        document.getElementById('mg-player').style.left = '50%';
+        
+        const tId = setInterval(() => {
+            if (!mgActive) { clearInterval(tId); return; }
+            mgTimer--; 
+            document.getElementById('mg-timer').innerText = mgTimer;
+            
+            // Speed up ramp (after 10s)
+            if (mgTimer === 5) {
+                mgSpeedMultiplier = 1.6;
+                const alert = document.getElementById('speed-alert');
+                alert.style.opacity = '1';
+                setTimeout(() => alert.style.opacity = '0', 1000);
+                playTone('pop');
+            }
+
+            if (mgTimer <= 0) { clearInterval(tId); endMinigame(true); }
+        }, 1000);
+        
+        mgLoop();
+    }
+
+    function updateMgLives() {
+        const container = document.getElementById('mg-lives-container');
+        container.innerHTML = '❤️'.repeat(mgLives);
+    }
+
+    function mgStartMove(d) { mgMoveDir = d; }
+    function mgStopMove() { mgMoveDir = 0; }
+
+    window.addEventListener('keydown', (e) => {
+        if (!mgActive) return;
+        if (e.key === 'ArrowLeft') mgStartMove(-1);
+        if (e.key === 'ArrowRight') mgStartMove(1);
+    });
+    window.addEventListener('keyup', (e) => {
+        if (!mgActive) return;
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') mgStopMove();
+    });
+
+    function mgLoop() {
+        if (!mgActive) return;
+        
+        if (mgMoveDir) {
+            mgPlayerX = Math.max(10, Math.min(90, mgPlayerX + mgMoveDir * 2.0));
+            document.getElementById('mg-player').style.left = mgPlayerX + '%';
+            document.getElementById('mg-player').style.transform = `translateX(-50%) rotate(${mgMoveDir * 12}deg)`;
+        } else {
+            document.getElementById('mg-player').style.transform = `translateX(-50%) rotate(0)`;
+        }
+
+        // Reduced Spawn Chance + Lower Base Speed
+        const spawnWebChance = 0.04 * mgSpeedMultiplier;
+        const spawnFlowerChance = 0.03 * mgSpeedMultiplier;
+
+        if (Math.random() < spawnWebChance) { 
+            const el = document.createElement('div');
+            el.className = 'obstacle-web'; 
+            el.style.left = Math.random() * 85 + '%'; el.style.top = '-80px';
+            document.getElementById('mg-area').appendChild(el);
+            mgItems.push({ el, y: -80, type: 'web' });
+        }
+        if (Math.random() < spawnFlowerChance) { 
+            const el = document.createElement('div');
+            el.className = 'reward-flower'; 
+            el.style.left = Math.random() * 85 + '%'; el.style.top = '-80px';
+            document.getElementById('mg-area').appendChild(el);
+            mgItems.push({ el, y: -80, type: 'flower' });
+        }
+        
+        const pRect = document.getElementById('mg-player').getBoundingClientRect();
+        
+        for (let i = mgItems.length - 1; i >= 0; i--) {
+            let o = mgItems[i]; 
+            // FIXED: Slower base falling speed (4.0 instead of 6.5)
+            o.y += 4.0 * mgSpeedMultiplier; 
+            o.el.style.top = o.y + 'px';
+            const oRect = o.el.getBoundingClientRect();
+            
+            if (oRect.left < pRect.right - 15 && oRect.right > pRect.left + 15 && oRect.top < pRect.bottom - 15 && oRect.bottom > pRect.top + 15) {
+                if (o.type === 'web') {
+                    playTone('error'); mgLives--; updateMgLives();
+                    document.getElementById('mg-player').classList.add('animate-shake');
+                    setTimeout(() => document.getElementById('mg-player').classList.remove('animate-shake'), 300);
+                    if (mgLives <= 0) { endMinigame(false); return; }
+                } else if (o.type === 'flower') {
+                    playTone('drop'); 
+                    mgFlowerCount++;
+                    score += 5;
+                    document.getElementById('score-display').innerText = score;
+                }
+                o.el.remove(); mgItems.splice(i, 1); continue;
+            }
+            if (o.y > 800) { o.el.remove(); mgItems.splice(i, 1); }
+        }
+        mgLoopId = requestAnimationFrame(mgLoop);
+    }
+
+    function endMinigame(success) {
+        mgActive = false; cancelAnimationFrame(mgLoopId);
+        if (success) speak(`Great job! You collected ${mgFlowerCount} flowers.`);
+        else speak(`Game Over! You got ${mgFlowerCount} flowers.`);
+        
+        setTimeout(() => {
+            document.getElementById('minigame-overlay').style.display = 'none';
+            if (currentLevelIdx < levels.length - 1) loadLevel(currentLevelIdx + 1);
+            else showWinScreen();
+        }, 2000);
+    }
+
+    // --- WIN SCREEN & FIREWORKS ---
     function showWinScreen() {
         const overlay = document.getElementById('start-overlay');
         overlay.style.display = 'flex';
         overlay.innerHTML = `
-            <h1 class="font-bubble text-5xl text-yellow-500 mb-4">You Did It!</h1>
-            <div class="text-6xl mb-6">🌟</div>
-            <p class="text-xl text-gray-600 mb-8">You finished all 15 questions!</p>
-            <button onclick="location.reload()" class="bg-blue-500 hover:bg-blue-600 text-white font-bubble text-2xl px-8 py-4 rounded-full shadow-xl">
-                Play Again ↺
-            </button>
+            <h1 class="text-7xl font-black colorful-text mb-4 text-outline leading-tight">YOU WIN!</h1>
+            <div class="text-8xl mb-6 drop-shadow-2xl animate-bounce">🏆</div>
+            <p class="text-4xl text-green-800 font-black mb-1">SCORE: ${score}</p>
+            <p class="text-xl text-green-600 font-bold mb-8">Master of Garden Math!</p>
+            <button onclick="location.reload()" class="btn-game check-btn font-black text-4xl px-12 py-5 rounded-full outline-none text-outline">REPLAY! ↺</button>
         `;
         playTone('win');
+        startFireworks();
     }
 
-    // --- Audio Utilities ---
+    function startFireworks() {
+        const canvas = document.getElementById('fireworks-canvas');
+        canvas.style.display = 'block';
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        let particles = [];
+        function createFirework(x, y) {
+            const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+            for (let i = 0; i < 70; i++) {
+                particles.push({
+                    x, y, color,
+                    vx: Math.random() * 10 - 5, vy: Math.random() * 10 - 5,
+                    life: 1.0, decay: Math.random() * 0.02 + 0.01
+                });
+            }
+        }
+        const fId = setInterval(() => {
+            if (canvas.style.display === 'none') { clearInterval(fId); return; }
+            createFirework(Math.random() * canvas.width, Math.random() * canvas.height * 0.4);
+            playTone('pop');
+        }, 600);
+        function anim() {
+            if (canvas.style.display === 'none') return;
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = 'lighter';
+            particles.forEach((p, i) => {
+                p.vy += 0.05; p.x += p.vx; p.y += p.vy; p.life -= p.decay;
+                if (p.life <= 0) particles.splice(i, 1);
+                else {
+                    ctx.fillStyle = p.color; ctx.globalAlpha = p.life;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fill();
+                }
+            });
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(anim);
+        }
+        anim();
+    }
 
-    function speak(text) {
+    function speak(t) {
         if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US';
-            utterance.rate = 0.9; // Slightly slower for kids
-            utterance.pitch = 1.1; // Slightly higher/friendly
-            window.speechSynthesis.speak(utterance);
+            const u = new SpeechSynthesisUtterance(t); 
+            u.lang = 'en-US'; u.rate = 1;
+            window.speechSynthesis.cancel(); 
+            window.speechSynthesis.speak(u);
         }
     }
 
     function playTone(type) {
         if (!audioContext) return;
-        
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        osc.connect(gain);
-        gain.connect(audioContext.destination);
-
+        const osc = audioContext.createOscillator(), gain = audioContext.createGain();
+        osc.connect(gain); gain.connect(audioContext.destination);
         const now = audioContext.currentTime;
-
-        if (type === 'pop') {
-            osc.frequency.setValueAtTime(400, now);
-            osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.1);
-            osc.start(now);
-            osc.stop(now + 0.1);
-        }
-        else if (type === 'drop') {
-            osc.frequency.setValueAtTime(600, now);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.1);
-            osc.start(now);
-            osc.stop(now + 0.1);
-        }
-        else if (type === 'success') {
-            // Chime
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(523.25, now); // C
-            osc.frequency.setValueAtTime(659.25, now + 0.1); // E
-            osc.frequency.setValueAtTime(783.99, now + 0.2); // G
-            gain.gain.setValueAtTime(0.2, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.6);
-            osc.start(now);
-            osc.stop(now + 0.6);
-        }
-        else if (type === 'error') {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(150, now);
-            osc.frequency.linearRampToValueAtTime(100, now + 0.3);
-            gain.gain.setValueAtTime(0.2, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.3);
-            osc.start(now);
-            osc.stop(now + 0.3);
-        }
-    }
-
-    function spawnConfetti() {
-        for(let i=0; i<30; i++) {
-            const conf = document.createElement('div');
-            conf.style.position = 'absolute';
-            conf.style.left = '50%';
-            conf.style.top = '50%';
-            conf.style.width = '10px';
-            conf.style.height = '10px';
-            conf.style.backgroundColor = ['#ff0', '#f00', '#0f0', '#00f'][Math.floor(Math.random()*4)];
-            conf.style.transition = 'all 1s ease-out';
-            conf.style.zIndex = 100;
-            document.body.appendChild(conf);
-
-            // Animate out
-            setTimeout(() => {
-                const angle = Math.random() * Math.PI * 2;
-                const dist = 200 + Math.random() * 100;
-                conf.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px) rotate(${Math.random()*360}deg)`;
-                conf.style.opacity = 0;
-            }, 10);
-
-            setTimeout(() => conf.remove(), 1000);
+        if (type === 'drop') {
+            osc.frequency.setValueAtTime(600, now); gain.gain.setValueAtTime(0.08, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.1); osc.start(); osc.stop(now + 0.1);
+        } else if (type === 'success') {
+            osc.frequency.setValueAtTime(523, now); osc.frequency.setValueAtTime(659, now + 0.1);
+            gain.gain.setValueAtTime(0.15, now); gain.gain.linearRampToValueAtTime(0, now + 0.6);
+            osc.start(); osc.stop(now + 0.6);
+        } else if (type === 'error') {
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now);
+            gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.3);
+            osc.start(); osc.stop(now + 0.3);
+        } else if (type === 'win') {
+            osc.frequency.setValueAtTime(440, now); osc.frequency.exponentialRampToValueAtTime(880, now + 1);
+            gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 1.5);
+            osc.start(); osc.stop(now + 1.5);
+        } else if (type === 'pop') {
+            osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+            gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0, now + 0.1);
+            osc.start(); osc.stop(now + 0.1);
         }
     }
 </script>

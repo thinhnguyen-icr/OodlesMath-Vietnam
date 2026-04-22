@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Measuring Fun!</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f9ff;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            /* Đổi từ overflow:hidden sang auto để mobile có thể cuộn nếu màn hình quá nhỏ */
+            overflow-x: hidden;
+            overflow-y: auto; 
+        }
+
+        /* Vui nhộn Polka dot background */
+        .bg-polka {
+           background-image: radial-gradient(#bae6fd 20%, transparent 20%), radial-gradient(#bae6fd 20%, transparent 20%);
+           background-position: 0 0, 30px 30px;
+           background-size: 60px 60px;
+        }
+
+        /* Nút bấm vật lý 3D */
+        .bouncy-button {
+           transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+           cursor: pointer;
+        }
+        .bouncy-button:active {
+           transform: scale(0.9) translateY(6px);
+           box-shadow: 0 0px 0 transparent !important;
+        }
+        .bouncy-button:disabled {
+           opacity: 0.5;
+           cursor: not-allowed;
+           transform: none;
+           box-shadow: none !important;
+        }
+
+        /* Animations */
+        @keyframes floating {
+           0%, 100% { transform: translateY(0); }
+           50% { transform: translateY(-10px); }
+        }
+        .animate-floating { animation: floating 3s ease-in-out infinite; }
+
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-10px) rotate(-3deg); }
+          75% { transform: translateX(10px) rotate(3deg); }
+        }
+        .animate-shake { animation: shake 0.3s 3; }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow { animation: spin-slow 4s linear infinite; }
+
+        /* Đường đua dọc siêu mượt */
+        .road-bg {
+            background-color: #374151; /* Màu đường nhựa */
+            background-image: 
+                linear-gradient(to bottom, #ffffff 50%, transparent 50%),
+                linear-gradient(to bottom, #ffffff 50%, transparent 50%);
+            background-size: 8px 80px; 
+            background-position: 33% 0, 67% 0; 
+            background-repeat: repeat-y;
+            border-left: 16px solid #4ade80; 
+            border-right: 16px solid #4ade80; 
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
+            animation: scrollRoad 0.4s linear infinite;
+        }
+        @keyframes scrollRoad {
+            from { background-position-y: 0px, 0px; }
+            to { background-position-y: 80px, 80px; } 
+        }
+
+        /* Quản lý các màn hình */
+        .screen { display: none; flex-direction: column; height: 100%; width: 100%; }
+        .screen.active { display: flex; }
+    </style>
+</head>
+<body class="bg-polka min-h-screen flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8">
+
+    <!-- HEADER / BẢNG ĐIỂM -->
+    <div id="header" class="w-full max-w-5xl flex justify-between items-center mb-3 md:mb-6 z-10 px-1 transition-all duration-300">
+        <div class="flex flex-col gap-1 md:gap-2 bg-white/95 backdrop-blur-md px-3 py-2 md:px-6 md:py-3 rounded-[24px] md:rounded-[28px] border-4 border-white shadow-sm">
+            <div class="flex items-center gap-2 md:gap-3">
+                <!-- Logo -->
+                <img src="https://image2url.com/r2/default/images/1770270908168-036a8878-e468-415d-9a50-73d8cbcc8574.png" alt="Logo" class="h-8 md:h-12 object-contain">
+                <h1 class="text-lg sm:text-2xl md:text-3xl font-black text-sky-500 drop-shadow-sm uppercase tracking-wide">
+                    Measuring Fun!
+                </h1>
+            </div>
+            <div id="progress-bar" class="flex gap-1.5 mt-1">
+                <!-- Tiến trình sinh bởi JS -->
+            </div>
+        </div>
+        <div class="flex flex-col items-end">
+            <div class="flex items-center gap-2 md:gap-4 bg-white px-4 py-2 md:px-6 md:py-3 rounded-[24px] md:rounded-[32px] shadow-[0_6px_0_#e2e8f0] md:shadow-[0_8px_0_#e2e8f0] border-4 border-slate-100 transform hover:-translate-y-1 transition-transform">
+                <svg class="text-yellow-400 fill-yellow-400 animate-spin-slow drop-shadow-md w-8 h-8 md:w-10 md:h-10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <span id="score-display" class="text-3xl sm:text-4xl md:text-5xl font-black text-slate-700">0</span>
+            </div>
+            <div id="streak-display" class="hidden text-white bg-orange-500 px-3 py-1 md:px-4 md:py-1.5 rounded-full font-black text-xs sm:text-sm md:text-lg mt-2 md:mt-4 shadow-lg animate-bounce border-2 border-white uppercase">
+                Streak: 0 🔥
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN KHUNG GAME -->
+    <div class="w-full max-w-5xl w-full flex-1 flex flex-col bg-white/95 backdrop-blur-md rounded-[32px] md:rounded-[56px] shadow-[0_12px_0_rgba(186,230,253,0.8)] md:shadow-[0_20px_0_rgba(186,230,253,0.8)] p-3 sm:p-4 md:p-10 relative z-10 border-[4px] md:border-8 border-white mb-4">
+        
+        <!-- 1. MÀN HÌNH BẮT ĐẦU -->
+        <div id="start-screen" class="screen active items-center justify-center text-center py-10">
+            <div class="relative mb-8 md:mb-12 cursor-pointer bouncy-button group animate-floating" onclick="startGame()">
+                <div class="w-32 h-32 md:w-56 md:h-56 bg-sky-400 rounded-[32px] md:rounded-[48px] flex items-center justify-center shadow-[0_10px_0_#0284c7] md:shadow-[0_16px_0_#0284c7] border-4 border-sky-300">
+                    <svg class="text-white fill-white translate-x-2 drop-shadow-md w-16 h-16 md:w-28 md:h-28" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    <div class="absolute top-4 left-6 w-14 md:w-20 h-5 md:h-8 bg-white/30 rounded-full transform rotate-[-20deg]"></div>
+                </div>
+            </div>
+            <h2 class="text-5xl md:text-7xl font-black text-slate-800 mb-4 md:mb-6 tracking-tight drop-shadow-sm uppercase" style="text-shadow: 2px 2px 0px #e2e8f0">Ready to Play?</h2>
+            <p class="text-xl md:text-3xl text-sky-600 mb-8 md:mb-12 font-black bg-sky-50 px-6 py-3 md:px-10 md:py-5 rounded-full border-4 border-sky-100 uppercase">Count the blocks!</p>
+            
+            <button onclick="startGame()" class="w-full max-w-xs md:max-w-lg py-5 md:py-6 bg-emerald-400 text-white rounded-[24px] md:rounded-[36px] text-3xl md:text-5xl font-black shadow-[0_8px_0_#059669] md:shadow-[0_14px_0_#059669] hover:bg-emerald-300 bouncy-button border-[4px] border-emerald-200">
+                LET'S GO!
+            </button>
+        </div>
+
+        <!-- 2. MÀN HÌNH CHƠI -->
+        <div id="play-screen" class="screen flex-col h-full justify-between">
+            <!-- Vùng hiển thị đối tượng -->
+            <div class="w-full flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-sky-50 to-white rounded-[24px] md:rounded-[40px] p-2 md:p-6 border-4 md:border-[6px] border-sky-100 shadow-inner overflow-hidden min-h-[30vh]">
+                <div class="w-full h-full flex items-center justify-center" id="svg-container">
+                    <!-- SVG được sinh ra bởi JS -->
+                </div>
+            </div>
+
+            <!-- Vùng thông báo: Nhỏ gọn lại để kéo bàn phím lên gần Cubes -->
+            <div id="status-area" class="h-14 md:h-20 flex items-center justify-center my-2 md:my-4 transition-all">
+                <!-- Nội dung thông báo sinh bởi JS -->
+            </div>
+
+            <!-- Bàn phím số: Thu nhỏ, gọn gàng -->
+            <div id="keypad" class="grid grid-cols-5 gap-2 sm:gap-3 md:gap-4 mt-auto">
+                <!-- Nút bấm sinh bởi JS -->
+            </div>
+        </div>
+
+        <!-- 3. MÀN HÌNH CHUYỂN BÀI -->
+        <div id="result-screen" class="screen absolute inset-0 bg-white/95 backdrop-blur-md rounded-[32px] md:rounded-[56px] items-center justify-center z-20 p-4">
+            <div class="relative">
+                <div class="absolute inset-0 bg-yellow-300 blur-3xl opacity-60 rounded-full animate-pulse"></div>
+                <div class="w-40 h-40 md:w-64 md:h-64 bg-yellow-400 rounded-full flex items-center justify-center mb-6 md:mb-12 animate-bounce shadow-[inset_0_-8px_0_rgba(0,0,0,0.15)] md:shadow-[inset_0_-12px_0_rgba(0,0,0,0.15)] border-8 md:border-[10px] border-white relative z-10">
+                    <svg class="text-white fill-white drop-shadow-md w-24 h-24 md:w-40 md:h-40" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <div class="absolute top-6 left-8 w-12 md:w-20 h-4 md:h-6 bg-white/40 rounded-full transform rotate-[-20deg]"></div>
+                </div>
+            </div>
+            <h2 class="text-5xl md:text-7xl font-black text-emerald-500 mb-8 md:mb-12 text-center drop-shadow-sm uppercase" style="text-shadow: 3px 3px 0px #a7f3d0">Awesome!</h2>
+            <button onclick="nextLevel()" class="flex items-center justify-center gap-3 md:gap-6 w-full max-w-xs md:max-w-lg py-5 md:py-6 bg-sky-400 text-white rounded-[28px] md:rounded-[36px] text-3xl md:text-5xl font-black shadow-[0_8px_0_#0284c7] md:shadow-[0_14px_0_#0284c7] bouncy-button border-[4px] border-sky-200">
+                NEXT 
+                <svg class="w-10 h-10 md:w-16 md:h-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+        </div>
+
+        <!-- 4. MÀN HÌNH KẾT THÚC GAME -->
+        <div id="end-screen" class="screen flex-1 items-center justify-center text-center py-6 z-10">
+            <div class="relative mb-6 md:mb-10">
+                <div class="absolute inset-0 bg-yellow-300 blur-[50px] opacity-70 rounded-full animate-pulse w-40 h-40 md:w-56 md:h-56 left-1/2 -translate-x-1/2"></div>
+                <svg class="w-32 h-32 md:w-56 md:h-56 text-yellow-400 fill-yellow-400 drop-shadow-2xl animate-floating relative z-10 mx-auto" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            
+            <h2 class="text-5xl sm:text-6xl md:text-8xl font-black text-rose-500 mb-6 md:mb-8 tracking-tight drop-shadow-xl uppercase" style="text-shadow: 3px 3px 0px #fda4af">YOU WIN!</h2>
+            
+            <div class="w-full max-w-xs md:max-w-lg flex flex-col gap-3 md:gap-5 mb-8 md:mb-12 bg-white/90 backdrop-blur-sm p-4 md:p-6 rounded-[24px] md:rounded-[32px] border-[4px] border-slate-100 shadow-lg">
+                <div class="flex justify-between items-center bg-yellow-50 px-5 py-3 md:px-8 md:py-5 rounded-[16px] md:rounded-[24px] border-[3px] border-yellow-200">
+                    <span class="text-xl md:text-3xl font-black text-yellow-600 uppercase">Total Stars</span>
+                    <span class="text-3xl md:text-4xl font-black text-yellow-500 flex items-center gap-2"><svg class="fill-yellow-500 w-6 h-6 md:w-10 md:h-10" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> <span id="final-score">0</span></span>
+                </div>
+                <div class="flex justify-between items-center bg-orange-50 px-5 py-3 md:px-8 md:py-5 rounded-[16px] md:rounded-[24px] border-[3px] border-orange-200">
+                    <span class="text-xl md:text-3xl font-black text-orange-600 uppercase">Best Streak</span>
+                    <span class="text-3xl md:text-4xl font-black text-orange-500">🔥 <span id="final-streak">0</span></span>
+                </div>
+            </div>
+
+            <button onclick="resetGame()" class="flex items-center justify-center gap-3 md:gap-5 w-full max-w-xs md:max-w-lg py-5 md:py-6 bg-emerald-400 text-white rounded-[28px] md:rounded-[36px] text-2xl sm:text-3xl md:text-5xl font-black shadow-[0_8px_0_#059669] md:shadow-[0_14px_0_#059669] bouncy-button border-[4px] border-emerald-200">
+                <svg class="w-8 h-8 md:w-14 md:h-14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> 
+                PLAY AGAIN
+            </button>
+        </div>
+
+        <!-- 5. MÀN HÌNH BONUS GAME (ĐUA XE) -->
+        <div id="bonus-screen" class="screen absolute inset-0 z-50 flex-col items-center justify-between p-4 md:p-6 rounded-[32px] md:rounded-[56px] overflow-hidden transition-colors duration-200 bg-slate-900">
+            <!-- Header Bonus -->
+            <div class="text-center relative z-10 w-full flex justify-between items-center px-1 md:px-4">
+                <div class="flex gap-1 md:gap-2 bg-white/20 px-3 py-1 md:px-4 md:py-2 rounded-full border-2 border-white/30 backdrop-blur-sm" id="lives-container">
+                    <!-- Trái tim -->
+                </div>
+                <h2 class="text-2xl md:text-4xl font-black text-amber-400 drop-shadow-md tracking-wider uppercase">Racing!</h2>
+                <div class="flex items-center gap-1 md:gap-2 bg-white/20 px-3 py-1 md:px-4 md:py-2 rounded-full border-2 border-white/30 text-white font-black text-lg md:text-xl backdrop-blur-sm justify-center">
+                    <svg class="animate-pulse text-sky-300 w-5 h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span id="bonus-time">15</span>s
+                </div>
+            </div>
+
+            <!-- Đường Đua -->
+            <div class="relative flex-1 w-full max-w-md mt-3 md:mt-4 rounded-[24px] md:rounded-[32px] overflow-hidden border-[6px] md:border-8 border-slate-700 road-bg">
+                <div id="obstacles-container"></div>
+                <div id="player-car" class="absolute w-16 h-24 md:w-20 md:h-28 transition-all duration-150 ease-out z-20" style="bottom: 5%; left: 50%; transform: translateX(-50%);">
+                    <svg viewBox="0 0 100 160" class="w-full h-full filter drop-shadow-lg">
+                        <rect x="10" y="30" width="12" height="30" rx="4" fill="#0f172a" />
+                        <rect x="78" y="30" width="12" height="30" rx="4" fill="#0f172a" />
+                        <rect x="10" y="110" width="12" height="30" rx="4" fill="#0f172a" />
+                        <rect x="78" y="110" width="12" height="30" rx="4" fill="#0f172a" />
+                        <path d="M 20 40 C 20 10 80 10 80 40 L 85 130 C 85 155 15 155 15 130 Z" fill="#ef4444" stroke="#991b1b" stroke-width="3" />
+                        <path d="M 25 40 C 25 15 75 15 75 40 L 80 130 C 80 150 20 150 20 130 Z" fill="#f87171" opacity="0.8" />
+                        <path d="M 28 60 Q 50 45 72 60 L 66 80 L 34 80 Z" fill="#1e293b" stroke="#334155" stroke-width="2" />
+                        <path d="M 35 110 L 65 110 L 68 125 L 32 125 Z" fill="#1e293b" />
+                        <rect x="15" y="145" width="70" height="8" rx="3" fill="#1e293b" />
+                        <rect x="30" y="135" width="6" height="10" fill="#1e293b" />
+                        <rect x="64" y="135" width="6" height="10" fill="#1e293b" />
+                        <circle cx="30" cy="25" r="5" fill="#fde047" />
+                        <circle cx="70" cy="25" r="5" fill="#fde047" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Phím điều khiển -->
+            <div class="w-full max-w-md flex justify-between gap-3 md:gap-4 mt-4 md:mt-6 z-10 touch-none">
+                <button id="btn-left" class="flex-1 py-4 md:py-5 bg-sky-500 rounded-[20px] md:rounded-[24px] border-b-[6px] md:border-b-8 border-sky-700 active:border-b-0 active:translate-y-2 flex justify-center items-center shadow-lg">
+                    <svg class="text-white w-10 h-10 md:w-12 md:h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </button>
+                <button id="btn-right" class="flex-1 py-4 md:py-5 bg-sky-500 rounded-[20px] md:rounded-[24px] border-b-[6px] md:border-b-8 border-sky-700 active:border-b-0 active:translate-y-2 flex justify-center items-center shadow-lg">
+                    <svg class="text-white w-10 h-10 md:w-12 md:h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+            </div>
+            
+            <div id="bonus-overlay" class="hidden absolute inset-0 z-30 flex items-center justify-center backdrop-blur-sm"></div>
+        </div>
+    </div>
+
+    <!-- Nút nghe trợ giúp -->
+    <button id="help-btn" onclick="playHelpAudio()" class="hidden fixed bottom-4 right-4 md:bottom-8 md:right-8 w-14 h-14 md:w-20 md:h-20 bg-white rounded-full items-center justify-center shadow-[0_6px_0_#bae6fd] md:shadow-[0_8px_0_#bae6fd] text-sky-500 bouncy-button border-[3px] md:border-[4px] border-sky-100 z-50">
+        <svg class="w-7 h-7 md:w-10 md:h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+    </button>
+
+    <script>
+        const SVG_DEFS = `
+            <defs>
+                <pattern id="candy-stripe" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <rect width="12" height="24" fill="#ef4444" />
+                    <rect x="12" width="12" height="24" fill="#ffffff" />
+                </pattern>
+                <filter id="cute-shadow" x="-10%" y="-10%" width="120%" height="130%">
+                    <feDropShadow dx="0" dy="6" stdDeviation="3" floodOpacity="0.2" floodColor="#000000" />
+                </filter>
+            </defs>
+        `;
+
+        const CUBE_COLORS = ["#ec4899", "#0ea5e9", "#f59e0b", "#10b981", "#8b5cf6", "#ef4444", "#14b8a6"];
+        const CUBE_SIZE = 65;
+
+        // --- CÁC ĐỐI TƯỢNG ĐÃ ĐƯỢC CHUẨN HOÁ VỚI ẢNH MẪU ---
+        const OBJECTS = [
+            { id: 1, name: "Popsicle Stick", length: 5, colors: CUBE_COLORS, 
+                draw: (w) => `<rect x="10" y="24" width="${w}" height="16" rx="8" fill="#f59e0b" filter="url(#cute-shadow)" />` },
+            { id: 2, name: "Silver Spoon", length: 7, colors: CUBE_COLORS, 
+                draw: (w) => `<g filter="url(#cute-shadow)"><rect x="10" y="28" width="${w - 20}" height="8" rx="4" fill="#cbd5e1" /><ellipse cx="${10 + w - 15}" cy="32" rx="15" ry="10" fill="#cbd5e1" /></g>` },
+            { id: 3, name: "Paintbrush", length: 5, colors: CUBE_COLORS, 
+                draw: (w) => `<g filter="url(#cute-shadow)">
+                    <path d="M 10 32 L ${10 + w - 20} 32" stroke="#ea580c" stroke-width="16" stroke-linecap="round" />
+                    <path d="M ${10 + w - 25} 20 L ${10 + w} 32 L ${10 + w - 25} 44 Z" fill="#facc15" stroke="#ca8a04" stroke-width="2" stroke-linejoin="round" />
+                </g>` },
+            { id: 4, name: "Party Blower", length: 4, colors: CUBE_COLORS, 
+                draw: (w) => `<g filter="url(#cute-shadow)">
+                    <path d="M 18 32 L ${10 + w - 20} 32" stroke="url(#candy-stripe)" stroke-width="16" stroke-linecap="round" />
+                    <path d="M ${10 + w - 20} 24 C ${10 + w + 10} 24, ${10 + w + 10} 40, ${10 + w - 10} 40 C ${10 + w - 20} 40, ${10 + w - 20} 32, ${10 + w - 10} 32" fill="none" stroke="url(#candy-stripe)" stroke-width="10" stroke-linecap="round" />
+                </g>` },
+            { id: 5, name: "Yellow Pencil", length: 6, colors: CUBE_COLORS, 
+                draw: (w) => `<g filter="url(#cute-shadow)">
+                    <rect x="10" y="24" width="${w - 25}" height="16" fill="#ea580c" rx="4" />
+                    <polygon points="${10 + w - 25},24 ${10 + w},32 ${10 + w - 25},40" fill="#facc15" />
+                    <polygon points="${10 + w - 8},29 ${10 + w},32 ${10 + w - 8},35" fill="#334155" />
+                </g>` },
+            { id: 6, name: "Blue Pipe", length: 8, colors: CUBE_COLORS, 
+                draw: (w) => `<g filter="url(#cute-shadow)">
+                    <rect x="10" y="24" width="${w}" height="16" fill="#3b82f6" rx="2" />
+                    <rect x="10" y="16" width="12" height="32" rx="4" fill="#2563eb" />
+                    <rect x="${10 + w/2 - 6}" y="16" width="12" height="32" rx="4" fill="#2563eb" />
+                    <rect x="${10 + w - 12}" y="16" width="12" height="32" rx="4" fill="#2563eb" />
+                </g>` },
+            { id: 7, name: "Caterpillar", length: 3, colors: CUBE_COLORS, 
+                draw: (w) => `<g filter="url(#cute-shadow)">
+                    <path d="M 20 32 Q ${10 + w*0.15} 10 ${10 + w*0.3} 32 T ${10 + w*0.6} 32 T ${10 + w - 20} 32" fill="none" stroke="#f472b6" stroke-width="24" stroke-linecap="round" />
+                    <circle cx="${10 + w - 25}" cy="26" r="4" fill="#fff" />
+                    <circle cx="${10 + w - 23}" cy="26" r="2" fill="#000" />
+                    <circle cx="${10 + w - 12}" cy="26" r="4" fill="#fff" />
+                    <circle cx="${10 + w - 10}" cy="26" r="2" fill="#000" />
+                </g>` },
+            { id: 8, name: "Toy Train", length: 9, colors: CUBE_COLORS, 
+                draw: (w) => `<g filter="url(#cute-shadow)">
+                    <rect x="10" y="24" width="${w}" height="14" rx="7" fill="#ef4444" stroke="#991b1b" stroke-width="2" />
+                    <rect x="${10 + w - 25}" y="8" width="20" height="18" rx="3" fill="#1e293b" />
+                    <circle cx="${10 + w*0.2}" cy="40" r="7" fill="#334155" stroke="#cbd5e1" stroke-width="2" />
+                    <circle cx="${10 + w*0.5}" cy="40" r="7" fill="#334155" stroke="#cbd5e1" stroke-width="2" />
+                    <circle cx="${10 + w*0.8}" cy="40" r="7" fill="#334155" stroke="#cbd5e1" stroke-width="2" />
+                </g>` },
+            { id: 9, name: "Long Ruler", length: 10, colors: CUBE_COLORS, 
+                draw: (w) => {
+                    let ticks = '';
+                    for(let i=1; i<20; i++) {
+                        ticks += `<line x1="${10 + i * (w/20)}" y1="16" x2="${10 + i * (w/20)}" y2="${i%2!==0?"26":"22"}" stroke="#334155" stroke-width="2.5" stroke-linecap="round" />`;
+                    }
+                    return `<g filter="url(#cute-shadow)">
+                        <rect x="10" y="16" width="${w}" height="24" fill="#f8fafc" stroke="#334155" stroke-width="3" rx="3" />
+                        ${ticks}
+                    </g>`;
+                }},
+            { id: 10, name: "Candy Cane", length: 5, colors: CUBE_COLORS, 
+                draw: (w) => `<g filter="url(#cute-shadow)">
+                    <!-- Candy Cane hình chữ J ngang, phần móc nằm bên trái móc xuống -->
+                    <path d="M ${10 + w - 4} 28 L 45 28 C 19 28, 19 10, 35 10 C 50 10, 50 30, 35 40" fill="none" stroke="url(#candy-stripe)" stroke-width="18" stroke-linecap="round" />
+                </g>` },
+            { id: 11, name: "Magic Wand", length: 6, colors: CUBE_COLORS, 
+                draw: (w) => `<g filter="url(#cute-shadow)">
+                    <line x1="10" y1="32" x2="${10 + w - 20}" y2="32" stroke="#1e293b" stroke-width="12" stroke-linecap="round" />
+                    <polygon points="0,-12 3,-3 12,-3 5,2 7,10 0,6 -7,10 -5,2 -12,-3 -3,-3" transform="translate(${10 + w - 20}, 32) scale(2)" fill="#facc15" />
+                </g>` },
+            { id: 12, name: "Giant Sword", length: 10, colors: CUBE_COLORS, 
+                draw: (w) => `<g filter="url(#cute-shadow)">
+                    <rect x="10" y="28" width="30" height="8" rx="4" fill="#a16207" />
+                    <rect x="40" y="12" width="8" height="40" rx="4" fill="#475569" />
+                    <path d="M 48 28 L ${10 + w - 10} 28 L ${10 + w} 32 L ${10 + w - 10} 36 L 48 36 Z" fill="#cbd5e1" />
+                </g>` }
+        ];
+
+        // --- Game State ---
+        let currentLevel = 0;
+        let countedIndices = [];
+        let score = 0;
+        let streak = 0;
+        let bestStreak = 0;
+        let hasMadeMistake = false;
+
+        function playSound(type) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!window.audioCtx) window.audioCtx = new AudioContext();
+                const ctx = window.audioCtx;
+                if (ctx.state === 'suspended') ctx.resume();
+
+                const osc = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                osc.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                const now = ctx.currentTime;
+
+                if (type === 'pop') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+                    gainNode.gain.setValueAtTime(0.3, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'ding') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+                    osc.frequency.setValueAtTime(1200, now + 0.1);
+                    osc.frequency.exponentialRampToValueAtTime(1600, now + 0.2);
+                    gainNode.gain.setValueAtTime(0.2, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                } else if (type === 'buzz') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(200, now);
+                    osc.frequency.linearRampToValueAtTime(100, now + 0.4);
+                    gainNode.gain.setValueAtTime(0.3, now);
+                    gainNode.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'tada') {
+                    [440, 554.37, 659.25, 880].forEach((freq, i) => { 
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.type = 'square';
+                        o.frequency.value = freq;
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        g.gain.setValueAtTime(0.05, now + i * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + 1.5 + i * 0.1);
+                        o.start(now + i * 0.1);
+                        o.stop(now + 1.5 + i * 0.1);
+                    });
+                } else if (type === 'vroom') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(60, now);
+                    osc.frequency.linearRampToValueAtTime(120, now + 0.3);
+                    gainNode.gain.setValueAtTime(0.15, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                }
+            } catch (e) { console.log("Audio disabled or failed", e); }
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                const voices = window.speechSynthesis.getVoices();
+                const usVoice = voices.find(v => v.lang.includes('en-US')) || voices.find(v => v.lang.includes('en'));
+                if (usVoice) utterance.voice = usVoice;
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85; 
+                utterance.pitch = 1.3; 
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function playHelpAudio() {
+            const obj = OBJECTS[currentLevel];
+            speak(`This is a ${obj.name}. Tap the blocks to count.`);
+        }
+
+        function fireConfetti(isBig = false) {
+            if (!window.confetti) return;
+            if (isBig) {
+                let duration = 4000;
+                let animationEnd = Date.now() + duration;
+                let defaults = { startVelocity: 40, spread: 360, ticks: 80, zIndex: 100, colors: CUBE_COLORS };
+                let interval = setInterval(function() {
+                    let timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) return clearInterval(interval);
+                    let particleCount = 80 * (timeLeft / duration);
+                    window.confetti(Object.assign({}, defaults, { particleCount, origin: { x: (Math.random() * 0.2 + 0.1), y: Math.random() - 0.2 } }));
+                    window.confetti(Object.assign({}, defaults, { particleCount, origin: { x: (Math.random() * 0.2 + 0.7), y: Math.random() - 0.2 } }));
+                }, 250);
+            } else {
+                window.confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors: CUBE_COLORS, shapes: ['circle', 'square'] });
+            }
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('help-btn').style.display = (id === 'play-screen') ? 'flex' : 'none';
+        }
+
+        function updateHeader() {
+            document.getElementById('score-display').innerText = score;
+            const streakDisplay = document.getElementById('streak-display');
+            if (streak > 0) {
+                streakDisplay.innerText = `Streak: ${streak} 🔥`;
+                streakDisplay.classList.remove('hidden');
+            } else {
+                streakDisplay.classList.add('hidden');
+            }
+
+            const pb = document.getElementById('progress-bar');
+            pb.innerHTML = '';
+            for(let i=0; i<OBJECTS.length; i++) {
+                let clz = `h-2 md:h-3 rounded-full transition-all duration-500 shadow-inner `;
+                if(i < currentLevel) clz += `bg-emerald-400 w-4 md:w-6 border-2 border-emerald-300`;
+                else if(i === currentLevel) clz += `bg-yellow-400 w-6 md:w-8 animate-pulse border-2 border-yellow-200`;
+                else clz += `bg-slate-200 w-2 md:w-3`;
+                pb.innerHTML += `<div class="${clz}"></div>`;
+            }
+        }
+
+        function renderPlayScreen() {
+            const obj = OBJECTS[currentLevel];
+            const objWidth = obj.length * CUBE_SIZE;
+
+            document.getElementById('status-area').innerHTML = '';
+
+            let cubesHTML = '';
+            for (let i = 0; i < obj.length; i++) {
+                const color = obj.colors[i % obj.colors.length];
+                const x = 10 + i * CUBE_SIZE;
+                const isCounted = countedIndices.includes(i);
+                
+                cubesHTML += `
+                <g transform="translate(${x}, 80)" onclick="handleCubeClick(${i})" class="cursor-pointer transition-transform duration-100 active:scale-95">
+                    <rect y="4" width="${CUBE_SIZE - 4}" height="${CUBE_SIZE - 4}" fill="#000000" rx="16" opacity="0.2" />
+                    <rect y="0" width="${CUBE_SIZE - 4}" height="${CUBE_SIZE - 4}" fill="${color}" rx="16" class="transition-all duration-300 ${isCounted ? 'stroke-white stroke-[4px]' : ''}" />
+                    <rect x="8" y="6" width="24" height="8" rx="4" fill="#ffffff" opacity="0.75" />
+                    ${isCounted ? `<text x="${(CUBE_SIZE - 4) / 2}" y="${(CUBE_SIZE - 4) / 2 + 10}" text-anchor="middle" fill="white" class="text-4xl font-black select-none pointer-events-none drop-shadow-md">★</text>` : ''}
+                </g>`;
+            }
+
+            document.getElementById('svg-container').innerHTML = `
+                <svg viewBox="0 0 700 180" class="w-full h-full drop-shadow-xl" preserveAspectRatio="xMidYMid meet" style="overflow: visible; max-width: 100%;">
+                    ${SVG_DEFS}
+                    <g transform="translate(${(700 - objWidth)/2}, 0)">
+                        ${obj.draw(objWidth)}
+                        ${cubesHTML}
+                    </g>
+                </svg>
+            `;
+
+            let keypadHTML = '';
+            for(let num=1; num<=10; num++) {
+                // Đã thu nhỏ nút phím số để phù hợp với màn hình di động ngang dọc
+                keypadHTML += `
+                <button onclick="checkAnswer(${num})" class="h-14 sm:h-16 md:h-20 text-3xl sm:text-4xl md:text-5xl font-black rounded-[16px] md:rounded-[24px] bouncy-button border-[3px] md:border-[5px] transition-all flex items-center justify-center bg-white border-sky-100 text-sky-500 shadow-[0_6px_0_#bae6fd] hover:bg-sky-50 active:shadow-[0_0px_0_#bae6fd]">
+                    ${num}
+                </button>`;
+            }
+            document.getElementById('keypad').innerHTML = keypadHTML;
+        }
+
+        function startGame() {
+            startLevel(0);
+        }
+
+        function resetGame() {
+            score = 0; streak = 0; bestStreak = 0;
+            updateHeader();
+            startLevel(0);
+        }
+
+        function startLevel(index) {
+            if (index >= OBJECTS.length) {
+                showScreen('end-screen');
+                document.getElementById('final-score').innerText = score;
+                document.getElementById('final-streak').innerText = bestStreak;
+                playSound('tada');
+                fireConfetti(true);
+                return;
+            }
+            currentLevel = index;
+            countedIndices = [];
+            hasMadeMistake = false;
+            updateHeader();
+            renderPlayScreen();
+            showScreen('play-screen');
+            speak(`How long is the ${OBJECTS[index].name}?`);
+        }
+
+        function handleCubeClick(i) {
+            if (!countedIndices.includes(i)) {
+                playSound('pop');
+                countedIndices.push(i);
+                speak(countedIndices.length.toString());
+                renderPlayScreen();
+            }
+        }
+
+        function checkAnswer(num) {
+            const correct = OBJECTS[currentLevel].length;
+            const statusArea = document.getElementById('status-area');
+            const keypadButtons = document.getElementById('keypad').children;
+
+            if (num === correct) {
+                playSound('ding');
+                let newStreak = streak;
+                
+                if (!hasMadeMistake) {
+                    score += 10;
+                    newStreak = streak + 1;
+                    streak = newStreak;
+                    if (newStreak > bestStreak) bestStreak = newStreak;
+                    speak(`Awesome! It is ${num} cubes long!`);
+                    fireConfetti(false);
+                    statusArea.innerHTML = `<div class="flex items-center justify-center gap-2 md:gap-4 text-4xl md:text-6xl font-black text-emerald-500 animate-bounce drop-shadow-md"><svg class="fill-emerald-100 w-12 h-12 md:w-16 md:h-16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> YAY!</div>`;
+                } else {
+                    streak = 0; newStreak = 0;
+                    speak(`That's right! It is ${num} cubes long!`);
+                    statusArea.innerHTML = `<div class="flex items-center justify-center gap-2 md:gap-4 text-4xl md:text-6xl font-black text-emerald-500 animate-bounce drop-shadow-md"><svg class="fill-emerald-100 w-12 h-12 md:w-16 md:h-16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> GOOD!</div>`;
+                }
+                
+                updateHeader();
+                
+                for(let btn of keypadButtons) {
+                    btn.disabled = true;
+                    if(parseInt(btn.innerText) === num) {
+                        btn.className = `h-14 sm:h-16 md:h-20 text-3xl sm:text-4xl md:text-5xl font-black rounded-[16px] md:rounded-[24px] bouncy-button border-[3px] md:border-[5px] transition-all flex items-center justify-center bg-emerald-400 text-white border-emerald-200 shadow-none scale-110 z-10`;
+                    } else {
+                        btn.classList.add('opacity-40', 'grayscale');
+                    }
+                }
+
+                setTimeout(() => {
+                    if (newStreak % 3 === 0 && newStreak > 0) {
+                        startBonusGame();
+                        speak("Bonus game time!");
+                    } else {
+                        showScreen('result-screen');
+                    }
+                }, 2000);
+
+            } else {
+                playSound('buzz');
+                streak = 0; 
+                hasMadeMistake = true;
+                updateHeader();
+                speak(`Whoops! Try counting again!`);
+                countedIndices = [];
+                
+                statusArea.innerHTML = `<div class="flex items-center justify-center text-3xl md:text-5xl font-black text-rose-500 gap-2 md:gap-4 animate-shake drop-shadow-md"><svg class="animate-spin w-10 h-10 md:w-14 md:h-14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg> TRY AGAIN!</div>`;
+                
+                for(let btn of keypadButtons) {
+                    if(parseInt(btn.innerText) === num) btn.classList.add('opacity-40', 'grayscale');
+                }
+
+                setTimeout(() => {
+                    renderPlayScreen(); 
+                }, 1500);
+            }
+        }
+
+        function nextLevel() {
+            playSound('pop');
+            startLevel(currentLevel + 1);
+        }
+
+        // --- ĐUA XE MINI GAME ---
+        let racingGameData = { active: false, lane: 1, obs: [], hits: 0, timeLeft: 15 };
+        let racingAnimationId = null;
+        let racingIntervalId = null;
+
+        function startBonusGame() {
+            showScreen('bonus-screen');
+            racingGameData = { active: true, lane: 1, obs: [], hits: 0, timeLeft: 15 };
+            updateRacingUI();
+            
+            racingIntervalId = setInterval(() => {
+                if(!racingGameData.active) return;
+                racingGameData.timeLeft -= 1;
+                document.getElementById('bonus-time').innerText = racingGameData.timeLeft;
+                if (racingGameData.timeLeft <= 0) endBonusGame('win');
+            }, 1000);
+
+            function gameLoop() {
+                if(!racingGameData.active) return;
+                
+                if (Math.random() < 0.035 && racingGameData.obs.every(o => o.y > 40)) {
+                    racingGameData.obs.push({ id: Date.now(), lane: Math.floor(Math.random() * 3), y: -20, type: Math.floor(Math.random() * 3) });
+                }
+
+                let hitObstacle = null;
+                for (let i = racingGameData.obs.length - 1; i >= 0; i--) {
+                    let o = racingGameData.obs[i];
+                    o.y += 1.6; 
+                    
+                    if (o.y > 65 && o.y < 95 && o.lane === racingGameData.lane) hitObstacle = o;
+                    if (o.y > 115) racingGameData.obs.splice(i, 1);
+                }
+
+                if (hitObstacle) {
+                    playSound('buzz');
+                    flashScreen();
+                    racingGameData.hits += 1;
+                    updateRacingUI();
+                    racingGameData.obs = racingGameData.obs.filter(o => o.id !== hitObstacle.id);
+                    
+                    if (racingGameData.hits >= 2) {
+                        endBonusGame('lose');
+                        return;
+                    }
+                }
+
+                renderObstacles();
+                racingAnimationId = requestAnimationFrame(gameLoop);
+            }
+            racingAnimationId = requestAnimationFrame(gameLoop);
+        }
+
+        function moveCar(dir) {
+            if (!racingGameData.active) return;
+            const newLane = Math.max(0, Math.min(2, racingGameData.lane + dir));
+            if (newLane !== racingGameData.lane) {
+                playSound('vroom');
+                racingGameData.lane = newLane;
+                const positions = ['16%', '50%', '84%'];
+                document.getElementById('player-car').style.left = positions[racingGameData.lane];
+            }
+        }
+
+        document.getElementById('btn-left').addEventListener('pointerdown', (e) => { e.preventDefault(); moveCar(-1); });
+        document.getElementById('btn-right').addEventListener('pointerdown', (e) => { e.preventDefault(); moveCar(1); });
+        window.addEventListener('keydown', (e) => {
+            if(document.getElementById('bonus-screen').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') moveCar(-1);
+                if (e.key === 'ArrowRight') moveCar(1);
+            }
+        });
+
+        function getEnemySVG(type) {
+            if (type === 0) { 
+                return `<svg viewBox="0 0 100 160" class="w-full h-full drop-shadow-md">
+                  <rect x="20" y="10" width="60" height="140" rx="20" fill="#eab308" stroke="#a16207" stroke-width="4" />
+                  <rect x="25" y="40" width="50" height="25" rx="5" fill="#334155" />
+                  <rect x="25" y="100" width="50" height="20" rx="5" fill="#334155" />
+                  <rect x="35" y="60" width="30" height="10" rx="2" fill="#000" />
+                  <rect x="40" y="62" width="20" height="6" fill="#facc15" />
+                  <circle cx="35" cy="15" r="5" fill="#fef08a" />
+                  <circle cx="65" cy="15" r="5" fill="#fef08a" />
+                </svg>`;
+            } else if (type === 1) { 
+                return `<svg viewBox="0 0 100 160" class="w-full h-full drop-shadow-md">
+                  <rect x="20" y="10" width="60" height="140" rx="20" fill="#f8fafc" stroke="#0f172a" stroke-width="4" />
+                  <rect x="20" y="70" width="60" height="30" fill="#0f172a" />
+                  <rect x="25" y="40" width="50" height="25" rx="5" fill="#334155" />
+                  <rect x="25" y="100" width="50" height="20" rx="5" fill="#334155" />
+                  <rect x="30" y="60" width="15" height="8" rx="2" fill="#ef4444" class="animate-pulse" />
+                  <rect x="55" y="60" width="15" height="8" rx="2" fill="#3b82f6" class="animate-pulse" />
+                </svg>`;
+            } else { 
+                return `<svg viewBox="0 0 100 160" class="w-full h-full drop-shadow-md">
+                  <rect x="15" y="10" width="70" height="140" rx="10" fill="#22c55e" stroke="#14532d" stroke-width="4" />
+                  <rect x="25" y="25" width="50" height="20" rx="5" fill="#1e293b" />
+                  <rect x="20" y="55" width="60" height="80" rx="4" fill="#bbf7d0" stroke="#166534" stroke-width="2" />
+                  <circle cx="30" cy="15" r="5" fill="#fde047" />
+                  <circle cx="70" cy="15" r="5" fill="#fde047" />
+                </svg>`;
+            }
+        }
+
+        function renderObstacles() {
+            const container = document.getElementById('obstacles-container');
+            const positions = ['16%', '50%', '84%'];
+            let html = '';
+            for(let o of racingGameData.obs) {
+                html += `<div class="absolute w-16 h-24 md:w-20 md:h-28 flex items-center justify-center transition-none" style="left: ${positions[o.lane]}; top: ${o.y}%; transform: translate(-50%, -50%) rotate(180deg)">${getEnemySVG(o.type)}</div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function updateRacingUI() {
+            document.getElementById('bonus-time').innerText = racingGameData.timeLeft;
+            const hearts = document.getElementById('lives-container');
+            hearts.innerHTML = `
+                <svg class="w-6 h-6 md:w-7 md:h-7 ${racingGameData.hits < 2 ? "text-rose-500 fill-rose-500" : "text-slate-500 fill-slate-500"}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                <svg class="w-6 h-6 md:w-7 md:h-7 ${racingGameData.hits < 1 ? "text-rose-500 fill-rose-500" : "text-slate-500 fill-slate-500"}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            `;
+            document.getElementById('player-car').style.left = ['16%', '50%', '84%'][racingGameData.lane];
+        }
+
+        function flashScreen() {
+            const screen = document.getElementById('bonus-screen');
+            screen.classList.remove('bg-slate-900');
+            screen.classList.add('bg-red-500');
+            setTimeout(() => {
+                screen.classList.remove('bg-red-500');
+                screen.classList.add('bg-slate-900');
+            }, 150);
+        }
+
+        function endBonusGame(status) {
+            racingGameData.active = false;
+            clearInterval(racingIntervalId);
+            cancelAnimationFrame(racingAnimationId);
+
+            const overlay = document.getElementById('bonus-overlay');
+            overlay.classList.remove('hidden');
+            
+            if (status === 'win') {
+                playSound('tada');
+                overlay.innerHTML = `<div class="absolute inset-0 bg-emerald-500/95 z-30 flex items-center justify-center backdrop-blur-sm"><div class="text-4xl md:text-7xl font-black text-white animate-bounce drop-shadow-xl text-center leading-tight">YOU SURVIVED!<br/><span class="text-2xl md:text-3xl text-emerald-200">+10 STARS</span></div></div>`;
+                setTimeout(() => handleBonusComplete(true), 2500);
+            } else {
+                overlay.innerHTML = `<div class="absolute inset-0 bg-rose-600/95 z-30 flex items-center justify-center backdrop-blur-sm"><div class="text-4xl md:text-7xl font-black text-white animate-shake drop-shadow-xl text-center leading-tight">GAME OVER<br/><span class="text-2xl md:text-3xl text-rose-200">Watch out!</span></div></div>`;
+                setTimeout(() => handleBonusComplete(false), 2500);
+            }
+        }
+
+        function handleBonusComplete(won) {
+            document.getElementById('bonus-overlay').classList.add('hidden');
+            if (won) {
+                score += 10;
+                updateHeader();
+                speak("Great driving! Ten bonus stars!");
+            } else {
+                speak("Oops! Be careful next time. Let's keep measuring.");
+            }
+            showScreen('result-screen');
+        }
+
+        window.onload = () => {
+            window.speechSynthesis.getVoices();
+        };
+    </script>
+</body>
+</html>

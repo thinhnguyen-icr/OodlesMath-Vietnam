@@ -4,20 +4,20 @@
     <link rel="stylesheet" href="../assets/brand.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Equation Adventure!</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Equation Adventure! V5</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-sky: #87CEEB;
             --font-main: 'Poppins', sans-serif;
             --c-red: #FF6B6B;
             --c-blue: #4ECDC4;
-            --c-green: #95E1D3;
-            --c-yellow: #FFE66D;
-            --c-orange: #FFA500;
-            --c-purple: #C39BD3;
-            --c-white: #FFFFFF;
-            --shadow-soft: 0 8px 25px rgba(0,0,0,0.1);
+            --c-green: #26de81;
+            --c-yellow: #fed330;
+            --c-orange: #fd9644;
+            --c-purple: #a55eea;
+            --c-pink: #fc5c65;
+            --shadow-soft: 0 10px 30px rgba(0,0,0,0.15);
+            --shadow-hard: 0 8px 0 rgba(0,0,0,0.1);
         }
 
         * {
@@ -28,12 +28,6 @@
 
         body {
             font-family: var(--font-main);
-            background-color: var(--bg-sky);
-            background-image: 
-                radial-gradient(circle at 50% 50%, white 10px, transparent 11px),
-                radial-gradient(circle at 10% 20%, rgba(255,255,255,0.6) 20px, transparent 21px),
-                radial-gradient(circle at 90% 80%, rgba(255,255,255,0.6) 30px, transparent 31px);
-            background-size: 100px 100px, 200px 200px, 300px 300px;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -41,30 +35,42 @@
             align-items: center;
             min-height: 100vh;
             overflow-x: hidden;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         /* --- Header --- */
         header {
             width: 100%;
             max-width: 850px;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             padding: 15px 25px;
             border-radius: 25px;
-            box-shadow: 0 8px 0 rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-hard);
             margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            backdrop-filter: blur(10px);
+            border: 4px solid white;
         }
 
         .title-group h1 {
-            color: #2c3e50;
-            font-size: 1.4rem;
+            font-size: 1.8rem;
             margin: 0;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 800;
+            letter-spacing: 2px;
+            font-weight: 900;
+            background: linear-gradient(to right, var(--c-pink), var(--c-orange), var(--c-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(2px 2px 0px rgba(255,255,255,0.8));
         }
 
         .controls {
@@ -75,45 +81,48 @@
 
         .speaker-btn {
             background: var(--c-yellow);
-            border: 3px solid #F1C40F;
+            border: none;
             border-radius: 50%;
-            width: 45px;
-            height: 45px;
+            width: 55px;
+            height: 55px;
             cursor: pointer;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: transform 0.1s;
-            box-shadow: 0 4px 0 #D4AC0D;
+            box-shadow: 0 6px 0 #d1a81e;
         }
 
-        .speaker-btn:active { transform: scale(0.9); box-shadow: 0 2px 0 #D4AC0D; }
+        .speaker-btn:active { transform: scale(0.9) translateY(4px); box-shadow: 0 2px 0 #d1a81e; }
 
         .score-board {
             background: var(--c-blue);
             color: white;
-            padding: 10px 20px;
-            border-radius: 15px;
-            font-size: 1.2rem;
-            font-weight: 800;
-            box-shadow: 0 4px 0 #2A9D8F;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 1.3rem;
+            font-weight: 900;
+            box-shadow: 0 6px 0 #20a098;
             text-align: center;
+            border: 3px solid white;
         }
 
         /* --- Main Stage --- */
         #main-stage {
             width: 100%;
             max-width: 850px;
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 35px;
-            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 40px;
+            padding: 40px 30px;
             box-shadow: var(--shadow-soft);
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
             min-height: 550px;
+            border: 5px solid white;
+            z-index: 10;
         }
 
         .screen {
@@ -121,19 +130,23 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            animation: fadeIn 0.4s ease-out;
+            animation: fadeIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .screen.active { display: flex; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(20px) scale(0.95); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
 
         .instruction-text {
-            font-size: 1.5rem;
-            color: #2c3e50;
+            font-size: 1.8rem;
+            color: var(--c-purple);
             text-align: center;
             margin-bottom: 25px;
-            font-weight: 800;
+            font-weight: 900;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
         /* --- Object Display Area --- */
@@ -141,256 +154,260 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-wrap: nowrap;
             gap: 15px;
             margin-bottom: 40px;
-            background: rgba(255,255,255,0.4);
-            padding: 25px;
-            border-radius: 30px;
+            background: rgba(255,255,255,0.6);
+            padding: 25px 15px;
+            border-radius: 35px;
             width: 100%;
-            max-width: 750px;
+            max-width: 800px;
+            min-height: 180px;
+            border: 3px dashed #d1d8e0;
+            overflow-x: hidden;
         }
 
         .object-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 8px;
             justify-content: center;
-            max-width: 300px;
-            min-height: 80px;
+            flex: 1;
         }
 
         .object-emoji {
-            font-size: 2.2rem;
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.1));
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            filter: drop-shadow(0px 8px 6px rgba(0,0,0,0.3)); 
+            transform-origin: center bottom;
         }
 
         @keyframes popIn {
-            0% { transform: scale(0); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+            0% { transform: scale(0) translateY(20px); opacity: 0; }
+            80% { transform: scale(1.1) translateY(-5px); opacity: 1; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
         }
 
         .plus-sign {
-            font-size: 3.5rem;
+            font-size: clamp(2.5rem, 5vw, 4rem);
             font-weight: 900;
-            color: var(--c-orange);
+            color: var(--c-pink);
             margin: 0 5px;
+            filter: drop-shadow(2px 4px 0px rgba(0,0,0,0.1));
+            flex-shrink: 0;
         }
 
-        /* --- Equations --- */
+        /* --- Make Ten Highlight Features --- */
+        .ten-group {
+            border: 5px dashed var(--c-yellow);
+            background: rgba(254, 211, 48, 0.2);
+            border-radius: 20px; 
+            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            justify-items: center;
+            animation: pulse-border 1.5s infinite alternate;
+        }
+        
+        .rest-group {
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        @keyframes pulse-border {
+            from { box-shadow: 0 0 10px rgba(254, 211, 48, 0.4); transform: scale(1); }
+            to { box-shadow: 0 0 25px rgba(254, 211, 48, 0.9); transform: scale(1.02); }
+        }
+
+        /* --- Equations (Choices) --- */
         .choices-grid {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
             width: 100%;
-            max-width: 450px;
+            max-width: 600px;
         }
 
         .equation-btn {
             background: white;
-            border: 3px solid #e2e8f0;
-            border-radius: 20px;
-            padding: 15px;
-            font-size: 1.8rem;
+            border: 4px solid #f1f2f6;
+            border-radius: 25px;
+            padding: 20px;
+            font-size: 2rem;
             font-weight: 800;
-            color: #2c3e50;
+            color: #2f3640;
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 6px 0 #cbd5e1;
+            box-shadow: 0 8px 0 #dcdde1;
+            text-align: center;
+            font-family: var(--font-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .equation-btn:hover { background: #fdfdfd; transform: translateY(-3px); }
+        .equation-btn:active { transform: translateY(5px); box-shadow: 0 3px 0 #dcdde1; }
+        
+        .equation-btn.correct { 
+            background: var(--c-green); border-color: transparent; color: white; box-shadow: 0 8px 0 #20bf6b; 
+        }
+        
+        .equation-btn.wrong { 
+            background: var(--c-red); border-color: transparent; color: white; box-shadow: 0 8px 0 #eb3b5a; 
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* --- Mini-game Screen (Beautiful Edition) --- */
+        #minigame-screen {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, #4a1c40, #1a0818);
+            border-radius: 35px;
+            z-index: 100;
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        .mg-rays {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 250%; height: 250%;
+            background: repeating-conic-gradient(
+                from 0deg,
+                rgba(255, 255, 255, 0.05) 0deg 15deg,
+                transparent 15deg 30deg
+            );
+            transform: translate(-50%, -50%);
+            animation: spinRays 20s linear infinite;
+            z-index: 99;
+            pointer-events: none;
+        }
+
+        @keyframes spinRays { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        .mg-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            color: white;
+            z-index: 101;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+            /* Glassmorphism style */
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 0 0 25px 25px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: none;
+            margin: 0 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .mg-timer { font-size: 2rem; font-weight: 900; color: #f1c40f; }
+        .mg-score { font-size: 2rem; font-weight: 900; color: #2ecc71; }
+
+        #mg-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            touch-action: none;
+            z-index: 100;
+        }
+
+        #mg-gameover-msg {
+            position: absolute;
+            inset: 0;
+            background: rgba(200, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 105;
+            color: white;
+            font-size: 4.5rem;
+            font-weight: 900;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.8);
+            animation: popIn 0.5s forwards;
             text-align: center;
         }
 
-        .equation-btn:hover { background: #f8fafc; transform: translateY(-2px); }
-        .equation-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #cbd5e1; }
-        .equation-btn.correct { background: var(--c-green); border-color: transparent; color: white; box-shadow: 0 6px 0 #6DBBAF; }
-        .equation-btn.wrong { background: var(--c-red); border-color: transparent; color: white; box-shadow: 0 6px 0 #d9534f; }
-
-        /* --- Gift Phase (Nâng cấp) --- */
-        .gift-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
-            margin: 40px 0;
-        }
-
-        .gift-box-wrapper {
-            position: relative;
-            width: 140px;
-            height: 140px;
-            perspective: 1000px;
-        }
-
-        .gift-box {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: visible;
-        }
-
-        /* Ribbon ngang */
-        .gift-box::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 25px;
-            background: #FFD700;
-            top: 50%;
-            transform: translateY(-50%);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        /* Ribbon dọc */
-        .gift-box::after {
-            content: '';
-            position: absolute;
-            width: 25px;
-            height: 100%;
-            background: #FFD700;
-            left: 50%;
-            transform: translateX(-50%);
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-        }
-
-        .gift-bow {
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 30px;
-            background: #FFD700;
-            border-radius: 50px;
-            z-index: 10;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-        }
-
-        .gift-bow::before, .gift-bow::after {
-            content: '';
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background: #FFD700;
-            border-radius: 50%;
-            top: -5px;
-        }
-        .gift-bow::before { left: -15px; }
-        .gift-bow::after { right: -15px; }
-
-        .gift-box:hover {
-            transform: translateY(-10px) rotate(3deg);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
-
-        .gift-box.opened {
-            background: white;
-            transform: scale(1.1);
-            box-shadow: 0 0 50px rgba(255,215,0,0.5);
-        }
-
-        .gift-box.opened .gift-lid, 
-        .gift-box.opened::before, 
-        .gift-box.opened::after,
-        .gift-box.opened .gift-bow {
-            display: none;
-        }
-
-        .reward-emoji {
-            font-size: 4rem;
-            z-index: 5;
-            opacity: 0;
-            transition: 0.3s;
-        }
-        .opened .reward-emoji { opacity: 1; transform: scale(1.2); }
-
-        .gift-lid-mask {
-            position: absolute;
-            inset: 0;
-            z-index: 20;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            color: #d97706;
-            font-size: 2.5rem;
-            text-shadow: 1px 1px 0 white;
-        }
-
-        .gift-box.opened .gift-lid-mask { display: none; }
-
-        /* --- Feedback --- */
+        /* --- Feedback Floating Text --- */
         .feedback-label {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 15px 30px;
-            border-radius: 20px;
-            font-size: 2rem;
-            font-weight: 800;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            z-index: 100;
-            display: none;
-            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 20px 40px; border-radius: 30px;
+            font-size: 3rem; font-weight: 900; box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            z-index: 200; display: none; border: 5px solid transparent; text-align: center;
+            animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
-        @keyframes bounceIn { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+        @keyframes bounceIn { 
+            0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; } 
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 
+        }
 
-        /* --- Victory --- */
+        /* --- Victory Modal --- */
         #victory-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px); z-index: 300; align-items: center; justify-content: center;
         }
 
         .victory-content {
-            background: white;
-            padding: 50px;
-            border-radius: 40px;
-            text-align: center;
-            max-width: 450px;
-            animation: bounceIn 0.6s;
+            background: white; padding: 50px 40px; border-radius: 40px;
+            text-align: center; max-width: 500px; width: 90%; border: 6px solid var(--c-yellow);
+            animation: bounceIn 0.6s; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        .victory-content h2 { font-size: 2.5rem; color: var(--c-purple); margin-bottom: 10px; font-weight: 800; }
+        .victory-content h2 { font-size: 3rem; color: var(--c-purple); margin: 15px 0; font-weight: 900; }
+        .victory-content p { font-size: 1.5rem; color: #2f3640; font-weight: 600; margin-bottom: 20px; }
+        .victory-score { font-size: 2.5rem; color: var(--c-pink); font-weight: 900; margin-bottom: 30px;}
+        
         .btn-restart {
-            background: var(--c-green);
-            color: #2c3e50;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 1.5rem;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 6px 0 #6DBBAF;
-            margin-top: 25px;
+            background: var(--c-green); color: white; border: none;
+            padding: 20px 50px; border-radius: 50px; font-size: 1.8rem; font-weight: 900;
+            cursor: pointer; box-shadow: 0 8px 0 #20bf6b; transition: all 0.2s;
+            text-transform: uppercase; letter-spacing: 1px;
         }
+        .btn-restart:hover { transform: translateY(-3px); background: #2cd47f;}
+        .btn-restart:active { transform: translateY(5px); box-shadow: 0 0px 0 #20bf6b; }
 
-        #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 150; }
+        #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 350; }
 
-        @media (max-width: 600px) {
-            .problem-container { padding: 15px; }
-            .object-emoji { font-size: 1.6rem; }
-            .plus-sign { font-size: 2.5rem; }
-            .equation-btn { font-size: 1.4rem; padding: 10px; }
-            .gift-grid { gap: 20px; }
-            .gift-box-wrapper { width: 100px; height: 100px; }
-            .reward-emoji { font-size: 2.5rem; }
-            .gift-bow { width: 40px; height: 20px; top: -15px; }
+        /* Responsive */
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 15px; }
+            .title-group h1 { font-size: 1.5rem; }
+            .problem-container { padding: 15px; gap: 8px; flex-wrap: nowrap; }
+            .plus-sign { margin: 0 2px; }
+            .equation-btn { font-size: 1.5rem; padding: 15px; }
+            .ten-group { gap: 5px; padding: 5px; }
+        }
+        
+        @media (max-width: 480px) {
+            #main-stage { padding: 25px 15px; }
+            .equation-btn { font-size: 1.2rem; }
+            .victory-content h2 { font-size: 2.2rem; }
+            .btn-restart { font-size: 1.4rem; padding: 15px 30px; }
+            .mg-timer, .mg-score { font-size: 1.3rem; }
+            #mg-gameover-msg { font-size: 3rem; }
+            .mg-header { margin: 0; border-radius: 0 0 15px 15px; }
         }
     </style>
 </head>
@@ -398,41 +415,40 @@
     <img src="../assets/logo-oodles-math.png" class="oodles-logo">
     <header>
         <div class="title-group">
-            <h1>Equation Adventure! 📝</h1>
+            <h1>✨ Equation Adventure ✨</h1>
         </div>
         <div class="controls">
             <button class="speaker-btn" onclick="speakQuestion()" title="Listen">🔊</button>
-            <div class="score-board">Round: <span id="round-val">1</span> / 10</div>
+            <div class="score-board">Round: <span id="round-val">1</span>/10</div>
         </div>
     </header>
 
     <main id="main-stage">
         <!-- Worksheet Screen -->
         <div id="worksheet-screen" class="screen active">
-            <div class="instruction-text">Choose the correct equation!</div>
-            <div class="problem-container">
+            <div class="instruction-text" id="instruction-title">Choose the correct equation!</div>
+            
+            <div class="problem-container" id="problem-display">
                 <div id="group1" class="object-group"></div>
-                <div class="plus-sign">+</div>
+                <div class="plus-sign" id="main-plus">+</div>
                 <div id="group2" class="object-group"></div>
             </div>
+
             <div id="choices-grid" class="choices-grid"></div>
         </div>
 
-        <!-- Gift Screen -->
-        <div id="gift-screen" class="screen">
-            <div class="instruction-text">Amazing Job! Pick a Reward! 🎁</div>
-            <div class="gift-grid">
-                <div class="gift-box-wrapper" onclick="openGift(this)">
-                    <div class="gift-box"><div class="gift-bow"></div><div class="gift-lid-mask">?</div><span class="reward-emoji"></span></div>
-                </div>
-                <div class="gift-box-wrapper" onclick="openGift(this)">
-                    <div class="gift-box"><div class="gift-bow"></div><div class="gift-lid-mask">?</div><span class="reward-emoji"></span></div>
-                </div>
-                <div class="gift-box-wrapper" onclick="openGift(this)">
-                    <div class="gift-box"><div class="gift-bow"></div><div class="gift-lid-mask">?</div><span class="reward-emoji"></span></div>
-                </div>
+        <!-- Mini-game Screen -->
+        <div id="minigame-screen">
+            <div class="mg-rays"></div>
+            <div class="mg-header">
+                <div class="mg-timer">⏳ <span id="mg-time">40</span>s</div>
+                <div class="mg-score">🍎 <span id="mg-score-val">0</span></div>
             </div>
-            <div id="reward-text" class="instruction-text" style="color: var(--c-orange); opacity: 0;">You earned a sticker!</div>
+            <canvas id="mg-canvas"></canvas>
+            <div id="mg-gameover-msg">
+                <div style="font-size: 7rem; margin-bottom: -10px;">💥</div>
+                BOMB!<br>GAME OVER!
+            </div>
         </div>
     </main>
 
@@ -440,9 +456,10 @@
 
     <div id="victory-modal">
         <div class="victory-content">
-            <div style="font-size: 5rem;">🏆</div>
+            <div style="font-size: 6rem; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));">🏆</div>
             <h2>Math Superstar!</h2>
-            <p>You solved all calculations (10-20) perfectly!</p>
+            <p>You finished all the adventures!</p>
+            <div class="victory-score">Math Score: <span id="final-score">10</span> / 10 ⭐</div>
             <button class="btn-restart" onclick="location.reload()">Play Again</button>
         </div>
     </div>
@@ -450,27 +467,32 @@
     <canvas id="confetti-canvas"></canvas>
 
     <script>
-        // Hết các hình ảnh và nội dung bài học được bảo lưu
         const OBJECT_TYPES = [
-            { emoji: '🥪', name: 'sandwich' }, { emoji: '📚', name: 'book' },
-            { emoji: '🦆', name: 'duck' }, { emoji: '🍍', name: 'pineapple' },
-            { emoji: '🎈', name: 'balloon' }, { emoji: '🍎', name: 'apple' },
-            { emoji: '🚗', name: 'car' }, { emoji: '🌟', name: 'star' },
-            { emoji: '🐱', name: 'cat' }, { emoji: '🍓', name: 'strawberry' }
+            { emoji: '🐶', name: 'puppy' }, { emoji: '🐱', name: 'kitten' },
+            { emoji: '🦊', name: 'fox' }, { emoji: '🐼', name: 'panda' },
+            { emoji: '🦁', name: 'lion' }, { emoji: '🐯', name: 'tiger' },
+            { emoji: '🐰', name: 'bunny' }, { emoji: '🐸', name: 'frog' },
+            { emoji: '🦋', name: 'butterfly' }, { emoji: '🚀', name: 'rocket' }
         ];
-
-        const REWARDS = ['⭐', '💖', '🏆', '🎖️', '🌟', '💎', '🎊', '🎉', '🍦', '🍩', '🍔', '🍕'];
 
         let state = {
             round: 1,
             totalRounds: 10,
+            score: 0,
+            n1: 0,
+            n2: 0,
+            total: 0,
+            currentEmojiObj: null,
             correctAnswer: "",
             isLocked: false,
             hasMistake: false,
-            currentTask: ""
+            currentTask: "",
+            clickedBtn: null
         };
 
+        let usedEquations = [];
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
         function playSfx(freq, type = 'sine', duration = 0.2) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
@@ -487,7 +509,8 @@
             window.speechSynthesis.cancel();
             const ut = new SpeechSynthesisUtterance(state.currentTask);
             ut.lang = 'en-US';
-            ut.rate = 0.9;
+            ut.rate = 0.85; 
+            ut.pitch = 1.1;
             window.speechSynthesis.speak(ut);
         }
 
@@ -495,42 +518,77 @@
             const f = document.getElementById('feedback');
             f.innerText = text;
             f.style.color = color;
+            f.style.borderColor = color;
             f.style.display = 'block';
-            setTimeout(() => { f.style.display = 'none'; }, 1000);
+            setTimeout(() => { f.style.display = 'none'; }, 1200);
         }
 
         function initRound() {
             state.isLocked = false;
             state.hasMistake = false;
+            state.clickedBtn = null;
+            
             document.getElementById('round-val').innerText = state.round;
+            document.getElementById('minigame-screen').style.display = 'none';
+            document.getElementById('worksheet-screen').style.display = 'flex';
             document.getElementById('worksheet-screen').classList.add('active');
-            document.getElementById('gift-screen').classList.remove('active');
+            document.getElementById('instruction-title').innerText = "Choose the correct equation!";
 
-            const objType = OBJECT_TYPES[Math.floor(Math.random() * OBJECT_TYPES.length)];
+            const display = document.getElementById('problem-display');
+            display.innerHTML = `
+                <div id="group1" class="object-group"></div>
+                <div class="plus-sign" id="main-plus">+</div>
+                <div id="group2" class="object-group"></div>
+            `;
             
-            // CẬP NHẬT PHẠM VI 10 ĐẾN 20
-            const total = Math.floor(Math.random() * 11) + 10; // 10 to 20
-            const n1 = Math.floor(Math.random() * (total - 5)) + 3; // Đảm bảo n1, n2 đủ lớn để trông đẹp
-            const n2 = total - n1;
-            
-            state.correctAnswer = `${n1} + ${n2} = ${total}`;
-            state.currentTask = `Count the ${objType.name}s and find the matching equation.`;
+            // --- Logic Mới: Số hạng < 10 (nghĩa là n1, n2 từ 2 đến 9) ---
+            let found = false;
+            while(!found) {
+                // Lấy số từ 2 đến 9
+                state.n1 = Math.floor(Math.random() * 8) + 2; 
+                state.n2 = Math.floor(Math.random() * 8) + 2; 
 
-            // Render Objects
+                state.total = state.n1 + state.n2;
+                
+                // Tổng sẽ nằm trong khoảng từ 4 đến 18, nhưng ta chỉ lấy từ 11 trở lên
+                if(state.total >= 11 && state.total <= 18) {
+                    let eqStr = `${state.n1}+${state.n2}`;
+                    if(!usedEquations.includes(eqStr)) {
+                        usedEquations.push(eqStr);
+                        found = true;
+                    }
+                }
+            }
+            
+            state.currentEmojiObj = OBJECT_TYPES[Math.floor(Math.random() * OBJECT_TYPES.length)];
+            state.correctAnswer = `${state.n1} + ${state.n2} = ${state.total}`;
+            state.currentTask = `Count the ${state.currentEmojiObj.name}s and find the matching equation.`;
+
             const g1 = document.getElementById('group1');
             const g2 = document.getElementById('group2');
-            g1.innerHTML = ''; g2.innerHTML = '';
-            for(let i=0; i<n1; i++) g1.innerHTML += `<span class="object-emoji" style="animation-delay: ${i*0.04}s">${objType.emoji}</span>`;
-            for(let i=0; i<n2; i++) g2.innerHTML += `<span class="object-emoji" style="animation-delay: ${(n1+i)*0.04}s">${objType.emoji}</span>`;
 
-            // Generate Choices
+            for(let i=0; i<state.n1; i++) {
+                g1.innerHTML += `<span class="object-emoji" style="animation-delay: ${i*0.04}s">${state.currentEmojiObj.emoji}</span>`;
+            }
+            for(let i=0; i<state.n2; i++) {
+                g2.innerHTML += `<span class="object-emoji" style="animation-delay: ${(state.n1+i)*0.04}s">${state.currentEmojiObj.emoji}</span>`;
+            }
+
+            // Sinh đáp án sai, đảm bảo các số hạng ở đáp án sai cũng nhỏ hơn 10 (từ 2 đến 9)
             const choices = [state.correctAnswer];
             while(choices.length < 3) {
-                let wTotal = Math.floor(Math.random() * 11) + 10;
-                let w1 = Math.floor(Math.random() * (wTotal - 2)) + 1;
+                let wTotal = state.total + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1);
+                if(wTotal < 11) wTotal = 11;
+                if(wTotal > 18) wTotal = 18;
+                
+                // Chọn w1, w2 sao cho w1 < 10, w2 < 10 và w1+w2 = wTotal
+                let minW1 = Math.max(2, wTotal - 9);
+                let maxW1 = Math.min(9, wTotal - 2);
+                let w1 = Math.floor(Math.random() * (maxW1 - minW1 + 1)) + minW1;
                 let w2 = wTotal - w1;
+                
                 let eq = `${w1} + ${w2} = ${wTotal}`;
-                if(!choices.includes(eq)) choices.push(eq);
+                if(!choices.includes(eq) && eq !== state.correctAnswer) choices.push(eq);
             }
             choices.sort(() => Math.random() - 0.5);
 
@@ -550,57 +608,74 @@
 
             if(val === state.correctAnswer) {
                 state.isLocked = true;
+                state.clickedBtn = btn;
                 btn.classList.add('correct');
-                playSfx(600, 'sine', 0.2);
-                showFeedback("Correct! 🎉", "var(--c-green)");
+                playSfx(800, 'sine', 0.3);
+                playSfx(1200, 'sine', 0.4); 
+                showFeedback("Awesome! 🎉", "var(--c-green)");
                 
-                setTimeout(() => {
-                    if(!state.hasMistake) {
-                        showGiftPhase();
-                    } else {
-                        nextRound();
-                    }
-                }, 1200);
+                if(!state.hasMistake) state.score++;
+                
+                setTimeout(() => playMakeTenAnimation(), 1200);
+
             } else {
                 state.hasMistake = true;
                 btn.classList.add('wrong');
-                playSfx(150, 'sawtooth', 0.2);
+                playSfx(200, 'square', 0.3);
                 showFeedback("Try Again! 💪", "var(--c-red)");
-                setTimeout(() => btn.classList.remove('wrong'), 800);
+                setTimeout(() => btn.classList.remove('wrong'), 600);
             }
         }
 
-        function showGiftPhase() {
-            document.getElementById('worksheet-screen').classList.remove('active');
-            document.getElementById('gift-screen').classList.add('active');
-            document.getElementById('reward-text').style.opacity = '0';
+        function playMakeTenAnimation() {
+            document.getElementById('instruction-title').innerText = "Look! Let's make a 10! ✨";
             
-            const boxEls = document.querySelectorAll('.gift-box');
-            boxEls.forEach(box => {
-                box.classList.remove('opened');
-                box.querySelector('.reward-emoji').innerText = REWARDS[Math.floor(Math.random() * REWARDS.length)];
-                box.parentElement.style.pointerEvents = 'auto';
-                box.parentElement.style.opacity = '1';
-            });
-            state.currentTask = "Pick a pretty gift box!";
-        }
-
-        function openGift(wrapper) {
-            const box = wrapper.querySelector('.gift-box');
-            if(box.classList.contains('opened')) return;
-
-            box.classList.add('opened');
-            playSfx(800, 'sine', 0.4);
+            const display = document.getElementById('problem-display');
+            display.innerHTML = ''; 
             
-            const wrappers = document.querySelectorAll('.gift-box-wrapper');
-            wrappers.forEach(w => w.style.pointerEvents = 'none');
-            
-            const reward = box.querySelector('.reward-emoji').innerText;
-            const rText = document.getElementById('reward-text');
-            rText.innerText = `You earned a ${reward} sticker!`;
-            rText.style.opacity = '1';
+            // Grid Make Ten (2x5)
+            const tenGroup = document.createElement('div');
+            tenGroup.className = 'ten-group';
+            for(let i=0; i<10; i++) {
+                tenGroup.innerHTML += `<span class="object-emoji">${state.currentEmojiObj.emoji}</span>`;
+            }
+            display.appendChild(tenGroup);
 
-            setTimeout(nextRound, 2000);
+            let remainder = state.total - 10;
+            if(remainder > 0) {
+                const plus = document.createElement('div');
+                plus.className = 'plus-sign';
+                plus.innerText = '+';
+                display.appendChild(plus);
+
+                const restGroup = document.createElement('div');
+                restGroup.className = 'rest-group';
+                for(let i=0; i<remainder; i++) {
+                    restGroup.innerHTML += `<span class="object-emoji">${state.currentEmojiObj.emoji}</span>`;
+                }
+                display.appendChild(restGroup);
+            }
+
+            if(state.clickedBtn) {
+                state.clickedBtn.innerHTML = `
+                    <span style="color:var(--c-blue)">${state.n1}</span> + 
+                    <span style="color:var(--c-orange)">${state.n2}</span> = 
+                    <span style="color:white; text-shadow: 0 0 10px rgba(255,255,255,0.8);">10</span> + 
+                    <span style="color:var(--c-purple)">${remainder}</span> = 
+                    <span style="color:white; font-size: 1.2em;">${state.total}</span>
+                `;
+            }
+
+            state.currentTask = `${state.n1} plus ${state.n2} equals 10 plus ${remainder}, which makes ${state.total}!`;
+            speakQuestion();
+
+            setTimeout(() => {
+                if(!state.hasMistake && state.round % 2 === 0) {
+                    startMiniGame();
+                } else {
+                    nextRound();
+                }
+            }, 4500);
         }
 
         function nextRound() {
@@ -613,36 +688,350 @@
         }
 
         function endGame() {
+            document.getElementById('final-score').innerText = state.score;
             document.getElementById('victory-modal').style.display = 'flex';
-            startConfetti();
-            playSfx(500, 'triangle', 0.5);
+            startFireworks();
+            playSfx(500, 'sine', 0.3);
+            setTimeout(() => playSfx(700, 'sine', 0.3), 200);
+            setTimeout(() => playSfx(900, 'sine', 0.6), 400);
         }
 
-        function startConfetti() {
+        // ==========================================
+        //         MINI-GAME: FRUIT NINJA V2 (ENHANCED)
+        // ==========================================
+        const mgEmojis = ['🍉', '🍊', '🍌', '🍍', '🍎', '🍓', '🥝', '🥥'];
+        let mgCanvas, mgCtx;
+        let mgObjects = [];
+        let mgTrail = [];
+        let mgParticles = []; // For Juice splash & floating numbers
+        let mgIsSwiping = false;
+        let mgTime = 40;
+        let mgScore = 0;
+        let mgTimerInt, mgSpawnInt, mgAnimFrame;
+        let mgIsActive = false;
+
+        function startMiniGame() {
+            state.currentTask = "Bonus Time! Slice the fruits, but avoid the bombs!";
+            speakQuestion();
+
+            document.getElementById('worksheet-screen').style.display = 'none';
+            const screen = document.getElementById('minigame-screen');
+            screen.style.display = 'flex';
+            document.getElementById('mg-gameover-msg').style.display = 'none';
+
+            mgCanvas = document.getElementById('mg-canvas');
+            mgCtx = mgCanvas.getContext('2d');
+            resizeCanvas();
+            
+            mgTime = 40;
+            mgScore = 0;
+            mgObjects = [];
+            mgTrail = [];
+            mgParticles = [];
+            mgIsActive = true;
+            updateMGUI();
+
+            mgTimerInt = setInterval(() => {
+                mgTime--;
+                updateMGUI();
+                if(mgTime <= 0) endMiniGame();
+            }, 1000);
+
+            mgSpawnInt = setInterval(spawnMGObject, 750);
+            
+            setupMGInputs();
+            mgLoop();
+        }
+
+        function updateMGUI() {
+            document.getElementById('mg-time').innerText = mgTime;
+            document.getElementById('mg-score-val').innerText = mgScore;
+        }
+
+        function resizeCanvas() {
+            mgCanvas.width = mgCanvas.parentElement.clientWidth;
+            mgCanvas.height = mgCanvas.parentElement.clientHeight;
+        }
+
+        function spawnMGObject() {
+            if(!mgIsActive) return;
+            const isBomb = Math.random() < 0.15;
+            const emoji = isBomb ? '💣' : mgEmojis[Math.floor(Math.random() * mgEmojis.length)];
+            const size = mgCanvas.height * 0.12;
+            
+            mgObjects.push({
+                emoji: emoji,
+                isBomb: isBomb,
+                x: Math.random() * (mgCanvas.width - size*2) + size,
+                y: mgCanvas.height + size,
+                vx: (Math.random() - 0.5) * 8, 
+                vy: -(Math.random() * 8 + 16), // Jump up
+                size: size,
+                rotation: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.2
+            });
+        }
+
+        function mgLoop() {
+            if(!mgIsActive) return;
+            mgCtx.clearRect(0, 0, mgCanvas.width, mgCanvas.height);
+            
+            // Update & Draw Particles (Juice & Text)
+            for(let i=mgParticles.length-1; i>=0; i--) {
+                let p = mgParticles[i];
+                if(p.type === 'juice') {
+                    p.x += p.vx; p.y += p.vy; 
+                    p.vy += 0.5; // gravity
+                    p.life -= 0.02;
+                    mgCtx.fillStyle = p.color;
+                    mgCtx.globalAlpha = Math.max(0, p.life);
+                    mgCtx.beginPath(); 
+                    mgCtx.arc(p.x, p.y, p.size, 0, Math.PI*2); 
+                    mgCtx.fill();
+                } else if (p.type === 'text') {
+                    p.y += p.vy; 
+                    p.life -= 0.02;
+                    mgCtx.globalAlpha = Math.max(0, p.life);
+                    mgCtx.fillStyle = '#fff';
+                    mgCtx.font = 'bold 40px Poppins';
+                    mgCtx.textAlign = 'center';
+                    mgCtx.shadowColor = '#000'; mgCtx.shadowBlur = 10;
+                    mgCtx.fillText(p.text, p.x, p.y);
+                    mgCtx.shadowBlur = 0; // reset
+                }
+                if(p.life <= 0) mgParticles.splice(i, 1);
+            }
+            mgCtx.globalAlpha = 1;
+
+            // Update & Draw Objects
+            for(let i = mgObjects.length - 1; i >= 0; i--) {
+                let obj = mgObjects[i];
+                obj.vy += 0.35; // Gravity
+                obj.x += obj.vx;
+                obj.y += obj.vy;
+                obj.rotation += obj.rotSpeed;
+
+                mgCtx.save();
+                mgCtx.translate(obj.x, obj.y);
+                mgCtx.rotate(obj.rotation);
+                mgCtx.font = `${obj.size}px Arial`;
+                mgCtx.textAlign = 'center';
+                mgCtx.textBaseline = 'middle';
+                
+                // Render shadow and bomb pulse
+                if(obj.isBomb) {
+                    mgCtx.shadowColor = 'rgba(255,0,0,0.8)';
+                    mgCtx.shadowBlur = 15 + Math.sin(Date.now()/100)*10; // Pulsing effect
+                } else {
+                    mgCtx.shadowColor = 'rgba(0,0,0,0.5)';
+                    mgCtx.shadowBlur = 15;
+                    mgCtx.shadowOffsetY = 10;
+                }
+                
+                mgCtx.fillText(obj.emoji, 0, 0);
+                mgCtx.restore();
+
+                if(obj.y > mgCanvas.height + obj.size + 100) mgObjects.splice(i, 1);
+            }
+
+            // Draw Tapered Glowing Trail
+            if (mgTrail.length > 1) {
+                mgCtx.lineCap = 'round';
+                mgCtx.lineJoin = 'round';
+                mgCtx.shadowColor = '#4ECDC4';
+                mgCtx.shadowBlur = 20;
+
+                for(let i = 1; i < mgTrail.length; i++) {
+                    mgCtx.beginPath();
+                    mgCtx.moveTo(mgTrail[i-1].x, mgTrail[i-1].y);
+                    mgCtx.lineTo(mgTrail[i].x, mgTrail[i].y);
+                    
+                    // Width increases towards the head
+                    let thickness = (i / mgTrail.length) * 16;
+                    mgCtx.lineWidth = thickness;
+                    
+                    // Opacity increases towards the head
+                    let alpha = i / mgTrail.length;
+                    mgCtx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+                    mgCtx.stroke();
+                }
+                mgCtx.shadowBlur = 0; // reset
+            }
+
+            if (mgTrail.length > 0 && !mgIsSwiping) {
+                mgTrail.shift();
+                if(mgTrail.length > 0) mgTrail.shift(); // decay faster
+            } else if (mgTrail.length > 12) {
+                mgTrail.shift(); // limit trail length
+            }
+
+            mgAnimFrame = requestAnimationFrame(mgLoop);
+        }
+
+        // Hit Detection
+        function checkMGSlices(x, y) {
+            mgTrail.push({x, y});
+            
+            for(let i = mgObjects.length - 1; i >= 0; i--) {
+                let obj = mgObjects[i];
+                let dist = Math.hypot(obj.x - x, obj.y - y);
+                
+                if (dist < obj.size / 1.5) { // Sliced
+                    if (obj.isBomb) {
+                        triggerBombGameOver();
+                    } else {
+                        mgScore++;
+                        updateMGUI();
+                        playSfx(1000 + Math.random()*500, 'sawtooth', 0.1);
+                        
+                        // Spawn Juice Splash
+                        for(let j=0; j<12; j++) {
+                            mgParticles.push({
+                                type: 'juice',
+                                x: obj.x, y: obj.y,
+                                vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15,
+                                life: 1, 
+                                size: Math.random()*5 + 3,
+                                color: `hsl(${Math.random()*360}, 100%, 65%)` // vibrant dots
+                            });
+                        }
+                        // Spawn +1 text
+                        mgParticles.push({
+                            type: 'text',
+                            text: '+1', x: obj.x, y: obj.y - 20,
+                            vy: -4, life: 1
+                        });
+
+                        mgObjects.splice(i, 1);
+                    }
+                }
+            }
+        }
+
+        function triggerBombGameOver() {
+            mgIsActive = false;
+            clearInterval(mgTimerInt);
+            clearInterval(mgSpawnInt);
+            cancelAnimationFrame(mgAnimFrame);
+            playSfx(100, 'square', 1); 
+            
+            document.getElementById('mg-gameover-msg').style.display = 'flex';
+            
+            setTimeout(() => { endMiniGame(); }, 2500);
+        }
+
+        function endMiniGame() {
+            mgIsActive = false;
+            clearInterval(mgTimerInt);
+            clearInterval(mgSpawnInt);
+            cancelAnimationFrame(mgAnimFrame);
+            
+            removeMGInputs();
+            nextRound();
+        }
+
+        // Input Handlers
+        const handleSwipeStart = (e) => { 
+            e.preventDefault(); 
+            mgIsSwiping = true; 
+            mgTrail = []; 
+        };
+        const handleSwipeMove = (e) => { 
+            e.preventDefault(); 
+            if(!mgIsSwiping || !mgIsActive) return;
+            const rect = mgCanvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            checkMGSlices(clientX - rect.left, clientY - rect.top);
+        };
+        const handleSwipeEnd = (e) => { 
+            e.preventDefault(); 
+            mgIsSwiping = false; 
+        };
+
+        function setupMGInputs() {
+            mgCanvas.addEventListener('mousedown', handleSwipeStart);
+            mgCanvas.addEventListener('mousemove', handleSwipeMove);
+            window.addEventListener('mouseup', handleSwipeEnd);
+            
+            mgCanvas.addEventListener('touchstart', handleSwipeStart, {passive: false});
+            mgCanvas.addEventListener('touchmove', handleSwipeMove, {passive: false});
+            window.addEventListener('touchend', handleSwipeEnd);
+        }
+
+        function removeMGInputs() {
+            mgCanvas.removeEventListener('mousedown', handleSwipeStart);
+            mgCanvas.removeEventListener('mousemove', handleSwipeMove);
+            window.removeEventListener('mouseup', handleSwipeEnd);
+            
+            mgCanvas.removeEventListener('touchstart', handleSwipeStart);
+            mgCanvas.removeEventListener('touchmove', handleSwipeMove);
+            window.removeEventListener('touchend', handleSwipeEnd);
+        }
+
+        // ==========================================
+        //         FIREWORKS
+        // ==========================================
+        function startFireworks() {
             const canvas = document.getElementById('confetti-canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             let particles = [];
-            for(let i=0; i<150; i++) {
-                particles.push({
-                    x: Math.random()*canvas.width, y: Math.random()*canvas.height - canvas.height,
-                    size: Math.random()*8+4, color: `hsl(${Math.random()*360}, 70%, 50%)`,
-                    speed: Math.random()*3+2, angle: Math.random()*6.2
-                });
+            
+            function createExplosion(x, y) {
+                let count = window.innerWidth > 600 ? 50 : 30;
+                for(let i=0; i<count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 8 + 2;
+                    particles.push({
+                        x: x, y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        size: Math.random() * 5 + 3,
+                        color: `hsl(${Math.random()*360}, 100%, 60%)`,
+                        life: 1,
+                        decay: Math.random() * 0.015 + 0.015
+                    });
+                }
             }
+
+            let timer = setInterval(() => {
+                const startX = Math.random() * canvas.width;
+                const startY = Math.random() * (canvas.height * 0.6);
+                createExplosion(startX, startY);
+                playSfx(Math.random()*200+600, 'triangle', 0.1);
+            }, 700);
+
             function loop() {
+                ctx.fillStyle = 'rgba(0,0,0,0.1)'; 
                 ctx.clearRect(0,0,canvas.width,canvas.height);
-                particles.forEach(p => {
-                    p.y += p.speed; p.x += Math.sin(p.angle);
-                    if(p.y > canvas.height) p.y = -20;
+                
+                for(let i=particles.length-1; i>=0; i--) {
+                    let p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.15;
+                    p.life -= p.decay;
+                    
+                    ctx.globalAlpha = p.life > 0 ? p.life : 0;
                     ctx.fillStyle = p.color;
-                    ctx.fillRect(p.x, p.y, p.size, p.size);
-                });
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                    ctx.fill();
+
+                    if(p.life <= 0) particles.splice(i, 1);
+                }
+                ctx.globalAlpha = 1;
                 requestAnimationFrame(loop);
             }
             loop();
+            setTimeout(() => clearInterval(timer), 6000);
         }
+
+        window.addEventListener('resize', () => {
+            if(mgIsActive && mgCanvas) resizeCanvas();
+        });
 
         window.onload = initRound;
     </script>

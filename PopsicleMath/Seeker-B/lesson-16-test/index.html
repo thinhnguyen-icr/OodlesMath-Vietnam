@@ -324,44 +324,7 @@
   </style>
 </head>
 
-<style>
-  /* --- CSS MÀN HÌNH KHÓA --- */
-  #security-overlay { 
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(31, 42, 68, 0.98); z-index: 9999; 
-    display: flex; align-items: center; justify-content: center; 
-  }
-  .lock-card { 
-    background: white; padding: 40px; border-radius: 30px; 
-    text-align: center; border: 4px solid #F72585; width: 90%; max-width: 400px; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  }
-  .lock-input { 
-    padding: 15px; font-size: 18px; border: 3px solid #E2E8F0; 
-    border-radius: 15px; margin: 20px 0; width: 100%; text-align: center; 
-    outline: none; font-weight: bold; color: #1F2A44;
-  }
-  .lock-input:focus { border-color: #4CC9F0; }
-  .lock-btn { 
-    background: linear-gradient(135deg, #F72585 0%, #B5179E 100%); 
-    color: white; padding: 15px 40px; border-radius: 50px; 
-    font-weight: 800; cursor: pointer; border: none; font-size: 18px;
-    box-shadow: 0 10px 20px rgba(247, 37, 133, 0.4);
-    transition: transform 0.2s;
-  }
-  .lock-btn:active { transform: scale(0.95); }
-</style>
-
 <body>
-  <div id="security-overlay">
-  <div class="lock-card">
-    <h2 style="font-size:24px; font-weight:900; color:#1F2A44">🔒 Restricted Access</h2>
-    <input type="password" id="passcode-input" class="lock-input" placeholder="Magic Code..." />
-    <p id="lock-error" style="color:red; display:none; font-weight:bold; margin-bottom:10px;">Wrong code!</p>
-    <button onclick="checkPasscode()" class="lock-btn">Unlock 🔓</button>
-    <div style="margin-top:20px"><a href="../index.html" style="color:#999; font-weight:bold">&larr; Go Back</a></div>
-  </div>
-</div>
   <img src="../assets/logo-oodles-math.png" class="oodles-logo">
   <div class="oodles-logo-container">
     <div class="oodles-logo-icon">🍭</div>
@@ -493,25 +456,6 @@
   </div>
 
 <script>
-  // --- CODE BẢO MẬT (Dán vào đây) ---
-  const SECRET_CODE = "oodlesmathvietnam";
-  document.body.style.overflow = "hidden"; // Khóa không cho cuộn trang
-
-  function checkPasscode() {
-    const val = document.getElementById('passcode-input').value.trim();
-    
-    if (val === SECRET_CODE) {
-      // Đúng mật khẩu -> Ẩn màn hình khóa
-      document.getElementById('security-overlay').style.display = 'none';
-      document.body.style.overflow = 'auto'; // Cho phép cuộn lại
-    } else {
-      // Sai mật khẩu -> Hiện báo lỗi
-      document.getElementById('lock-error').style.display = 'block';
-    }
-  }
-  // ----------------------------------
-
-  // (Các code cũ của bài học nằm ở dưới này...)
   // --- Audio System ---
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   
@@ -946,6 +890,5 @@
   window.onload = () => { if(window.innerWidth > 0) resizeCanvas(); dom.chipStatus.textContent = "🧩 0/10"; };
   window.onresize = resizeCanvas;
 </script>
-
 </body>
 </html>

@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Space Pattern Explorer V7 - Bright Odyssey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ship-teal: #00b5ad;
+            --ship-pink: #ff4d94;
+            --ship-yellow: #ffcc00;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --sky-top: #2e1065;
+            --sky-mid: #3b82f6;
+            --sky-bottom: #93c5fd;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom, var(--sky-top), var(--sky-mid), var(--sky-bottom));
+            color: white;
+            overflow: hidden;
+            touch-action: manipulation;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* --- BRIGHT SPACE BACKGROUND --- */
+        .universe-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .nebula-glow {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 77, 148, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(0, 181, 173, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 50% 60%, rgba(255, 204, 0, 0.1) 0%, transparent 50%);
+            filter: blur(50px);
+        }
+
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.2);
+            animation: floatPlanet 20s infinite ease-in-out;
+        }
+
+        @keyframes floatPlanet {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(20px, -20px) rotate(5deg); }
+        }
+
+        .cloud {
+            position: absolute;
+            bottom: -50px;
+            width: 300px; height: 200px;
+            background: rgba(255, 255, 255, 0.3);
+            filter: blur(40px);
+            border-radius: 50%;
+            animation: moveCloud 30s infinite linear;
+        }
+        @keyframes moveCloud {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(400%); }
+        }
+
+        /* --- LIGHT HUD DESIGN --- */
+        .hud-glass {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .number-box {
+            width: clamp(65px, 12vw, 90px);
+            height: clamp(65px, 12vw, 90px);
+            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 900;
+            border-radius: 1.5rem;
+            background: white;
+            color: #1e3a8a;
+            box-shadow: 0 8px 0 #cbd5e1, 0 15px 25px rgba(0,0,0,0.1);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+        }
+
+        .number-box.blank {
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
+            color: rgba(255, 255, 255, 0.6);
+            border: 3px dashed white;
+        }
+
+        .number-box.filled {
+            background: #4ade80;
+            color: white;
+            box-shadow: 0 8px 0 #16a34a;
+            animation: bounceIn 0.5s;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* --- ROCKET DESIGN (FROM IMAGE 2) --- */
+        .rocket-container {
+            width: 100%; height: 100%;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+        }
+
+        .shield-effect {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 130%; height: 130%;
+            border: 4px solid white;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            box-shadow: 0 0 30px white;
+            animation: shieldPulse 1.5s infinite;
+        }
+        @keyframes shieldPulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.2; }
+            50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.2; }
+        }
+
+        .shield-warning { border-color: #ff4d94; background: rgba(255, 77, 148, 0.2); box-shadow: 0 0 30px #ff4d94; }
+
+        .hidden { display: none !important; }
+
+        .shake { animation: screenShake 0.4s ease-in-out; }
+        @keyframes screenShake {
+            0%, 100% { transform: translate(0,0); }
+            20% { transform: translate(-10px, 10px); }
+            40% { transform: translate(10px, -10px); }
+            60% { transform: translate(-10px, -10px); }
+            80% { transform: translate(10px, 10px); }
+        }
+
+        #fireworks-canvas { position: fixed; top: 0; left: 0; z-index: 100; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <div class="universe-canvas">
+        <div class="nebula-glow"></div>
+        <!-- Colorful Planets -->
+        <div class="planet" style="width: 100px; height: 100px; background: #fbbf24; top: 15%; left: 10%; box-shadow: 0 0 40px rgba(251, 191, 36, 0.4);"></div>
+        <div class="planet" style="width: 150px; height: 150px; background: #4ade80; bottom: 20%; right: 15%; box-shadow: 0 0 50px rgba(74, 222, 128, 0.3);"></div>
+        <div class="planet" style="width: 60px; height: 60px; background: #f87171; top: 40%; right: 25%;"></div>
+        <!-- Clouds -->
+        <div class="cloud" style="left: 0; animation-delay: 0s;"></div>
+        <div class="cloud" style="left: 30%; animation-delay: -10s;"></div>
+        <div class="cloud" style="left: 70%; animation-delay: -20s;"></div>
+    </div>
+
+    <button id="btn-audio" class="fixed top-6 right-6 z-50 hud-glass p-4 rounded-full text-2xl" onclick="toggleAudio()">🔊</button>
+
+    <div id="app" class="max-w-5xl mx-auto min-h-screen flex flex-col relative px-4 md:px-8">
+        
+        <!-- SCREEN: START -->
+        <div id="screen-start" class="flex-1 flex flex-col items-center justify-center text-center space-y-10 z-10">
+            <div class="w-44 h-56 animate-bounce">
+                <!-- Custom SVG Rocket Based on Image 2 -->
+                <svg viewBox="0 0 200 260" class="rocket-container">
+                    <!-- Boosters -->
+                    <path d="M50 120 Q35 150 35 210 L75 210 L75 120 Z" fill="var(--ship-teal)" stroke="#fff" stroke-width="2"/>
+                    <path d="M150 120 Q165 150 165 210 L125 210 L125 120 Z" fill="var(--ship-teal)" stroke="#fff" stroke-width="2"/>
+                    <!-- Wings (Yellow) -->
+                    <path d="M35 170 L10 210 L35 210 Z" fill="var(--ship-yellow)"/>
+                    <path d="M165 170 L190 210 L165 210 Z" fill="var(--ship-yellow)"/>
+                    <!-- Main Body -->
+                    <path d="M100 20 Q65 80 65 210 L135 210 Q135 80 100 20 Z" fill="var(--ship-teal)" stroke="#fff" stroke-width="2"/>
+                    <!-- Nose Cone (Pink) -->
+                    <path d="M100 20 Q80 50 72 75 L128 75 Q120 50 100 20 Z" fill="var(--ship-pink)"/>
+                    <!-- Windows -->
+                    <circle cx="100" cy="110" r="14" fill="#fff" stroke="var(--ship-pink)" stroke-width="3"/>
+                    <circle cx="100" cy="110" r="10" fill="#93c5fd"/>
+                    <!-- Engine Accents (Pink) -->
+                    <rect x="70" y="210" width="60" height="15" rx="5" fill="var(--ship-pink)"/>
+                    <rect x="35" y="210" width="40" height="10" rx="3" fill="var(--ship-pink)"/>
+                    <rect x="125" y="210" width="40" height="10" rx="3" fill="var(--ship-pink)"/>
+                </svg>
+            </div>
+            <div class="space-y-4">
+                <h1 class="text-6xl md:text-8xl font-black tracking-tight text-white drop-shadow-xl">
+                    PATTERN<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-yellow-300">EXPLORER</span>
+                </h1>
+                <p class="text-xl md:text-2xl font-bold text-white/90 max-w-lg mx-auto">Help the cute rocket fly through the colorful galaxy!</p>
+            </div>
+            <button onclick="startGame()" class="hud-glass px-14 py-6 text-white font-black text-3xl md:text-5xl hover:scale-110 transition-all active:scale-95 shadow-2xl">LET'S FLY! 🚀</button>
+        </div>
+
+        <!-- SCREEN: GAME AREA -->
+        <div id="screen-game" class="hidden flex-1 flex flex-col py-6 z-10">
+            <div class="hud-glass p-6 flex justify-between items-center mb-8">
+                <div class="flex items-center gap-4">
+                    <div class="bg-white/30 p-3 rounded-2xl">
+                        <span class="text-4xl">⭐</span>
+                    </div>
+                    <span id="score-display" class="text-4xl font-black text-white">0</span>
+                </div>
+                <div class="text-center hidden sm:block">
+                    <div id="level-name" class="text-lg font-black text-white uppercase tracking-widest mb-2">Binary Space</div>
+                    <div class="h-3 w-44 bg-white/20 rounded-full overflow-hidden border border-white/30">
+                        <div id="progress-bar-fill" class="h-full bg-gradient-to-r from-yellow-300 to-pink-400 transition-all duration-500 w-0"></div>
+                    </div>
+                </div>
+                <button onclick="resetGame()" class="bg-white/20 hover:bg-white/40 text-white font-bold px-6 py-3 rounded-2xl transition-all border border-white/30">QUIT</button>
+            </div>
+
+            <div class="flex-1 flex flex-col items-center justify-center hud-glass rounded-[3rem] p-10 relative shadow-2xl">
+                <div id="pattern-container" class="flex flex-wrap justify-center gap-6 md:gap-10 mb-20"></div>
+                <div id="choices-container" class="flex flex-wrap justify-center gap-6 md:gap-10"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN: MINI-GAME (SPACESHIP ACTION) -->
+        <div id="screen-minigame" class="hidden flex-1 flex flex-col py-6 z-10">
+            <div class="hud-glass p-6 flex justify-between items-center mb-6">
+                <div>
+                    <span class="text-xs font-black text-white/70 uppercase">Shield Power</span>
+                    <div id="shield-bars" class="flex gap-2 mt-2">
+                        <div class="w-12 h-4 bg-white rounded-full shadow-lg"></div>
+                        <div class="w-12 h-4 bg-white rounded-full shadow-lg"></div>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="bg-white/20 px-6 py-3 rounded-2xl text-center border border-white/30">
+                        <div class="text-[10px] font-bold uppercase">Time Left</div>
+                        <div id="mg-timer" class="text-3xl font-black">60</div>
+                    </div>
+                    <div class="bg-white/20 px-6 py-3 rounded-2xl text-center border border-white/30">
+                        <div class="text-[10px] font-bold uppercase">Stars</div>
+                        <div id="mg-score" class="text-3xl font-black">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mg-area" class="flex-1 relative bg-white/10 rounded-[4rem] border-2 border-white/30 overflow-hidden shadow-inner">
+                <div id="mg-player" class="absolute bottom-12 w-24 h-32 z-30" style="left: 50%; transform: translateX(-50%);">
+                    <div id="shield-ui" class="shield-effect"></div>
+                    <!-- The Rocket (Image 2 Style) -->
+                    <svg viewBox="0 0 200 260" class="rocket-container">
+                        <path d="M50 120 Q35 150 35 210 L75 210 L75 120 Z" fill="var(--ship-teal)" stroke="#fff" stroke-width="2"/>
+                        <path d="M150 120 Q165 150 165 210 L125 210 L125 120 Z" fill="var(--ship-teal)" stroke="#fff" stroke-width="2"/>
+                        <path d="M35 170 L10 210 L35 210 Z" fill="var(--ship-yellow)"/>
+                        <path d="M165 170 L190 210 L165 210 Z" fill="var(--ship-yellow)"/>
+                        <path d="M100 20 Q65 80 65 210 L135 210 Q135 80 100 20 Z" fill="var(--ship-teal)" stroke="#fff" stroke-width="2"/>
+                        <path d="M100 20 Q80 50 72 75 L128 75 Q120 50 100 20 Z" fill="var(--ship-pink)"/>
+                        <circle cx="100" cy="110" r="14" fill="#fff" stroke="var(--ship-pink)" stroke-width="3"/>
+                        <circle cx="100" cy="110" r="10" fill="#93c5fd"/>
+                        <rect x="70" y="210" width="60" height="15" rx="5" fill="var(--ship-pink)"/>
+                        <rect x="35" y="210" width="40" height="10" rx="3" fill="var(--ship-pink)"/>
+                        <rect x="125" y="210" width="40" height="10" rx="3" fill="var(--ship-pink)"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- CONTROLS -->
+            <div class="flex gap-8 mt-6 pb-4">
+                <button id="btn-left" class="flex-1 hud-glass py-10 rounded-[3rem] text-5xl active:bg-white/30">⬅️</button>
+                <button id="btn-right" class="flex-1 hud-glass py-10 rounded-[3rem] text-5xl active:bg-white/30">➡️</button>
+            </div>
+        </div>
+
+        <!-- SCREEN: MISSION COMPLETE -->
+        <div id="screen-end" class="hidden flex-1 flex flex-col items-center justify-center text-center z-10">
+            <canvas id="fireworks-canvas"></canvas>
+            <div class="relative z-50 animate-bounce text-9xl mb-10">🌟</div>
+            <h2 class="text-7xl md:text-9xl font-black text-white mb-4 tracking-tighter uppercase drop-shadow-2xl">YEAH!</h2>
+            <p class="text-3xl font-bold text-white/90 mb-12">You are the Best Captain!</p>
+            
+            <div class="hud-glass p-12 md:p-16 rounded-[4rem] mb-12 border-white/50 shadow-2xl">
+                <div class="text-xl font-black text-white/70 uppercase tracking-widest mb-4">Final Stars Collected</div>
+                <div id="final-score" class="text-9xl font-black text-yellow-300 drop-shadow-[0_0_30px_rgba(253,224,71,0.8)]">0</div>
+            </div>
+
+            <button onclick="startGame()" class="hud-glass px-16 py-8 text-white font-black text-4xl rounded-full hover:scale-110 transition-all shadow-2xl">PLAY AGAIN! 🌈</button>
+        </div>
+
+        <!-- FEEDBACK OVERLAY -->
+        <div id="feedback-overlay" class="fixed bottom-32 left-0 right-0 flex justify-center pointer-events-none z-[60] hidden">
+            <div id="feedback-msg" class="hud-glass px-16 py-6 rounded-full text-4xl font-black scale-0 transition-transform duration-300 text-white">GREAT!</div>
+        </div>
+    </div>
+
+    <script>
+        // --- AUDIO ENGINE ---
+        let audioEnabled = true;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audio;
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            document.getElementById('btn-audio').innerText = audioEnabled ? '🔊' : '🔇';
+        }
+
+        function playSound(f, t, d, v=0.1) {
+            if (!audioEnabled) return;
+            if (!audio) audio = new AudioCtx();
+            const o = audio.createOscillator();
+            const g = audio.createGain();
+            o.type = t; o.frequency.setValueAtTime(f, audio.currentTime);
+            g.gain.setValueAtTime(v, audio.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + d);
+            o.connect(g); g.connect(audio.destination);
+            o.start(); o.stop(audio.currentTime + d);
+        }
+
+        const SFX = {
+            win: () => { playSound(600, 'sine', 0.1); setTimeout(() => playSound(800, 'sine', 0.2), 100); },
+            fail: () => playSound(200, 'sawtooth', 0.4, 0.2),
+            hit: () => playSound(100, 'square', 0.5, 0.3),
+            star: () => playSound(1200, 'sine', 0.1, 0.05),
+            click: () => playSound(800, 'sine', 0.05, 0.05)
+        };
+
+        // --- GAME LOGIC ---
+        const STATE = {
+            lvl: 1, score: 0, qIdx: 0, totalQ: 5,
+            seq: [], missing: [], lastP: -1
+        };
+
+        const rInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+        function showScreen(id) {
+            ['screen-start','screen-game','screen-minigame','screen-end'].forEach(s => document.getElementById(s).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function getSequence(lvl) {
+            let a = rInt(1, 15), b = rInt(1, 15), c = rInt(1, 15);
+            while(a===b) b = rInt(1, 15);
+            while(c===a || c===b) c = rInt(1, 15);
+
+            let res = [];
+            let name = "";
+            
+            if (lvl === 1) {
+                res = [a, b, a, b, a, b];
+                name = "Binary Space";
+            } else if (lvl === 2) {
+                if (Math.random() > 0.5) {
+                    res = [a, a, b, b, a, a];
+                    name = "Twin Planets";
+                } else {
+                    res = [a, b, b, a, b, b];
+                    name = "Mirror Galaxy";
+                }
+            } else {
+                res = [a, b, c, a, b, c];
+                name = "Triple Comet Loop";
+            }
+
+            document.getElementById('level-name').innerText = name;
+            STATE.missing = lvl === 1 ? [5] : lvl === 2 ? [4] : [rInt(3, 5)];
+            return res;
+        }
+
+        function renderQuestion() {
+            const cont = document.getElementById('pattern-container');
+            const ch = document.getElementById('choices-container');
+            cont.innerHTML = ''; ch.innerHTML = '';
+
+            STATE.seq = getSequence(STATE.lvl);
+            const uniques = Array.from(new Set(STATE.seq));
+            const colors = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981'];
+
+            STATE.seq.forEach((val, i) => {
+                const box = document.createElement('div');
+                const isBlank = STATE.missing.includes(i);
+                box.className = isBlank ? 'number-box blank' : 'number-box';
+                box.innerText = isBlank ? '?' : val;
+                if (!isBlank) box.style.color = colors[uniques.indexOf(val) % colors.length];
+                if (isBlank) box.dataset.val = val;
+                cont.appendChild(box);
+            });
+
+            const correct = STATE.missing.map(m => STATE.seq[m]);
+            let opts = new Set(correct);
+            while(opts.size < 3) opts.add(rInt(1, 30));
+            
+            Array.from(opts).sort(() => Math.random() - 0.5).forEach(opt => {
+                const b = document.createElement('button');
+                b.className = 'number-box hover:scale-110 active:scale-90';
+                b.innerText = opt;
+                b.onclick = () => {
+                    SFX.click();
+                    const blank = document.querySelector('.number-box.blank');
+                    if (opt == blank.dataset.val) {
+                        SFX.win();
+                        blank.innerText = opt;
+                        blank.classList.replace('blank', 'filled');
+                        showFeedback("AMAZING! 🌟", "text-yellow-300");
+                        setTimeout(nextQuestion, 1200);
+                    } else {
+                        SFX.fail();
+                        document.getElementById('screen-game').classList.add('shake');
+                        showFeedback("TRY AGAIN! 🚀", "text-pink-300");
+                        setTimeout(() => document.getElementById('screen-game').classList.remove('shake'), 400);
+                    }
+                };
+                ch.appendChild(b);
+            });
+        }
+
+        function showFeedback(txt, cls) {
+            const el = document.getElementById('feedback-msg');
+            el.innerText = txt;
+            el.className = `hud-glass px-12 py-5 rounded-full text-4xl font-black transition-transform duration-300 ${cls}`;
+            document.getElementById('feedback-overlay').classList.remove('hidden');
+            setTimeout(() => el.classList.add('scale-100'), 10);
+            setTimeout(() => {
+                el.classList.remove('scale-100');
+                setTimeout(() => document.getElementById('feedback-overlay').classList.add('hidden'), 300);
+            }, 1000);
+        }
+
+        function nextQuestion() {
+            STATE.qIdx++;
+            STATE.score += STATE.lvl * 30;
+            document.getElementById('score-display').innerText = STATE.score;
+            document.getElementById('progress-bar-fill').style.width = `${((STATE.lvl-1)*5 + STATE.qIdx) / 15 * 100}%`;
+
+            if (STATE.qIdx >= STATE.totalQ) {
+                STATE.lvl++; STATE.qIdx = 0;
+                startMiniGame(STATE.lvl > 3);
+            } else { renderQuestion(); }
+        }
+
+        // --- MINI-GAME ENGINE ---
+        let mgL, mgS, mgT=60, px=50, obs=[], isFinal=false, shieldH=2;
+        let mvL=false, mvR=false;
+
+        window.onkeydown = (e) => { if(e.key=="ArrowLeft") mvL=true; if(e.key=="ArrowRight") mvR=true; };
+        window.onkeyup = (e) => { if(e.key=="ArrowLeft") mvL=false; if(e.key=="ArrowRight") mvR=false; };
+
+        function startMiniGame(fin) {
+            isFinal = fin; showScreen('screen-minigame');
+            mgT=60; px=50; obs.forEach(o => o.el.remove()); obs=[]; shieldH=2;
+            updateShieldUI();
+            
+            const timer = setInterval(() => {
+                mgT--; document.getElementById('mg-timer').innerText = mgT;
+                if(mgT <= 0) {
+                    clearInterval(timer); clearInterval(mgS); cancelAnimationFrame(mgL);
+                    setTimeout(() => isFinal ? endGame() : showScreen('screen-game') || renderQuestion(), 800);
+                }
+            }, 1000);
+
+            mgS = setInterval(spawnObj, 450);
+            updateMG();
+        }
+
+        function updateShieldUI() {
+            const bars = document.getElementById('shield-bars');
+            const shieldUi = document.getElementById('shield-ui');
+            bars.innerHTML = '';
+            for(let i=0; i<shieldH; i++) {
+                const b = document.createElement('div');
+                b.className = "w-12 h-4 bg-white rounded-full shadow-lg";
+                bars.appendChild(b);
+            }
+            if(shieldH === 1) shieldUi.classList.add('shield-warning');
+            else if(shieldH === 0) shieldUi.style.display = 'none';
+            else { 
+                shieldUi.style.display = 'block';
+                shieldUi.classList.remove('shield-warning'); 
+            }
+        }
+
+        function spawnObj() {
+            const area = document.getElementById('mg-area');
+            const el = document.createElement('div');
+            const isStar = Math.random() > 0.45;
+            el.className = 'absolute z-10 transition-transform duration-100';
+            el.style.top = '-10%';
+            let x = rInt(10, 90); el.style.left = x + '%';
+            
+            if(isStar) {
+                el.innerHTML = `<svg width="50" height="50" viewBox="0 0 50 50"><path d="M25,5 L32,18 L45,18 L35,28 L41,42 L25,32 L9,42 L15,28 L5,18 L18,18 Z" fill="#fbbf24" stroke="#fff" stroke-width="2"/></svg>`;
+            } else {
+                el.innerHTML = `<svg width="55" height="55" viewBox="0 0 60 60"><path d="M15,10 Q35,0 50,15 Q60,35 45,50 Q20,60 10,45 Z" fill="#64748b" stroke="#fff" stroke-width="2"/><circle cx="25" cy="25" r="4" fill="#1e293b" opacity="0.3"/></svg>`;
+            }
+            area.appendChild(el);
+            obs.push({ el, x, y: -10, type: isStar ? 'star' : 'rock', speed: isStar ? 1.4 : 2.5 });
+        }
+
+        function updateMG() {
+            if(mvL) px -= 2.2; if(mvR) px += 2.2;
+            px = Math.max(10, Math.min(90, px));
+            document.getElementById('mg-player').style.left = px + '%';
+            const pRect = document.getElementById('mg-player').getBoundingClientRect();
+
+            for(let i=obs.length-1; i>=0; i--) {
+                let o = obs[i]; o.y += o.speed; o.el.style.top = o.y + '%';
+                if(o.y > 110) { o.el.remove(); obs.splice(i, 1); continue; }
+                let oRect = o.el.getBoundingClientRect();
+                if(checkHit(pRect, oRect)) {
+                    if(o.type === 'star') { SFX.star(); STATE.score += 20; }
+                    else {
+                        SFX.hit();
+                        if(shieldH > 0) {
+                            shieldH--;
+                            updateShieldUI();
+                        } else {
+                            mgT = 1; // Collision without shield
+                        }
+                        document.body.classList.add('shake');
+                        setTimeout(() => document.body.classList.remove('shake'), 400);
+                    }
+                    document.getElementById('mg-score').innerText = STATE.score;
+                    o.el.remove(); obs.splice(i, 1);
+                }
+            }
+            if(mgT > 0) mgL = requestAnimationFrame(updateMG);
+        }
+
+        function checkHit(a, b) { 
+            const pad = 15;
+            return !(a.right-pad < b.left+pad || a.left+pad > b.right-pad || a.bottom-pad < b.top+pad || a.top+pad > b.bottom-pad); 
+        }
+
+        document.getElementById('btn-left').onmousedown = () => mvL=true;
+        document.getElementById('btn-left').onmouseup = () => mvL=false;
+        document.getElementById('btn-left').ontouchstart = (e) => { e.preventDefault(); mvL=true; };
+        document.getElementById('btn-left').ontouchend = () => mvL=false;
+
+        document.getElementById('btn-right').onmousedown = () => mvR=true;
+        document.getElementById('btn-right').onmouseup = () => mvR=false;
+        document.getElementById('btn-right').ontouchstart = (e) => { e.preventDefault(); mvR=true; };
+        document.getElementById('btn-right').ontouchend = () => mvR=false;
+
+        // --- FIREWORKS ---
+        function startFireworks() {
+            const canvas = document.getElementById('fireworks-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            let parts = [];
+
+            function Particle(x,y) {
+                this.x = x; this.y = y;
+                this.c = `hsl(${rInt(0,360)}, 100%, 70%)`;
+                this.vx = (Math.random() - 0.5) * 15;
+                this.vy = (Math.random() - 0.5) * 15;
+                this.life = 100;
+            }
+
+            function draw() {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                if(Math.random() < 0.15) {
+                    let fx = Math.random() * canvas.width;
+                    let fy = Math.random() * canvas.height;
+                    playSound(rInt(300, 700), 'sine', 0.1, 0.05);
+                    for(let i=0; i<50; i++) parts.push(new Particle(fx, fy));
+                }
+                for(let i=parts.length-1; i>=0; i--) {
+                    let p = parts[i]; p.x += p.vx; p.y += p.vy; p.life -= 2;
+                    ctx.fillStyle = p.c; ctx.globalAlpha = p.life/100;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill();
+                    if(p.life <= 0) parts.splice(i,1);
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        function startGame() {
+            STATE.lvl = 1; STATE.score = 0; STATE.qIdx = 0;
+            document.getElementById('score-display').innerText = '0';
+            document.getElementById('progress-bar-fill').style.width = '0%';
+            showScreen('screen-game'); renderQuestion();
+        }
+
+        function endGame() {
+            document.getElementById('final-score').innerText = STATE.score;
+            showScreen('screen-end'); startFireworks();
+        }
+
+        function resetGame() { SFX.click(); showScreen('screen-start'); }
+
+        showScreen('screen-start');
+    </script>
+</body>
+</html>

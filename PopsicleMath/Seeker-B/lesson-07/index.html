@@ -1,681 +1,641 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
- <head>
-  <link rel="stylesheet" href="../assets/brand.css">
-  <!-- Link CSS bên ngoài -->
-  <link rel="stylesheet" href="../assets/brand.css">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Animal Addition Adventure</title>
-  
-  <!-- FIX FONT: Nhúng font Poppins từ Google -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<head>
+    <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Animal Addition Adventure - Ver 7</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF5A5F;
+            --secondary: #08D9D6;
+            --accent: #FFD369;
+            --bg-top: #AEE1F9;
+            --bg-bottom: #F0F9FF;
+            --text-main: #2D3748;
+            --bond-part: #48DBFB;
+            --bond-whole: #FF9F43;
+            --success: #2ED573;
+            --danger: #FF4757;
+        }
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-        body {
+        * {
             box-sizing: border-box;
             margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #FFE5F1, #E5F3FF, #F0FFE5);
-            /* FIX FONT: Thay đổi thành Poppins */
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        body {
             font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom));
+            color: var(--text-main);
             min-height: 100vh;
-            font-weight: 600; /* Tăng độ đậm một chút cho dễ đọc */
-        }
-        .game-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-        .title {
-            text-align: center;
-            font-size: 2.2em;
-            color: #FF6B9D;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-            font-weight: 700;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 15px;
-            background: #E0E0E0;
-            border-radius: 10px;
-            margin-bottom: 25px;
+            width: 100vw;
             overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #FF6B9D, #4ECDC4);
-            border-radius: 10px;
-            transition: width 0.5s ease;
-        }
-        .question-area {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .question-text {
-            font-size: 1.8em;
-            color: #333;
-            margin-bottom: 20px;
-            font-weight: 700;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-        .animals-display {
-            font-size: 3em;
-            margin: 20px 0;
-            min-height: 80px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: nowrap;
-            gap: 15px;
-        }
-        .plus-sign {
-            font-size: 4em;
-            color: #FF6B9D;
-            margin: 0 15px;
-            font-weight: bold;
-        }
-        .number-bonds {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: 20px 0;
-            gap: 15px;
+            position: relative;
         }
-        .bonds-top {
-            display: flex;
-            gap: 40px;
-            align-items: center;
-        }
-        .bond-connector {
-            width: 3px;
-            height: 30px;
-            background: #FF6B9D;
-        }
-        .bond-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5em;
-            font-weight: bold;
-            color: white;
-        }
-        .part-circle {
-            background: #4ECDC4;
-        }
-        .whole-circle {
-            background: #FF6B9D;
-            width: 80px;
-            height: 80px;
-            font-size: 2em;
-        }
-        .answer-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin: 25px 0;
-        }
-        .answer-btn, .action-btn {
-            padding: 15px 25px;
-            font-size: 1.5em;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            font-weight: 700;
-            transition: all 0.3s ease;
-            min-width: 80px;
-            font-family: 'Poppins', sans-serif; /* Đảm bảo nút bấm cũng nhận font */
-        }
-        .answer-btn {
-            background: linear-gradient(135deg, #FFE066, #FF9A56);
-            color: #333;
-        }
-        .answer-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        .action-btn {
-            background: linear-gradient(135deg, #4ECDC4, #44A08D);
-            color: white;
-            margin: 10px;
-        }
-        .action-btn:hover {
-            transform: scale(1.05);
-        }
-        .feedback {
-            font-size: 1.4em;
-            font-weight: bold;
-            margin: 15px 0;
-            min-height: 30px;
-        }
-        .correct { color: #4CAF50; }
-        .incorrect { color: #FF5722; }
 
-        .celebration {
-            text-align: center;
-            animation: bounce 1s infinite;
+        .decoration { position: absolute; z-index: 1; pointer-events: none; opacity: 0.5; }
+        .mountain { bottom: 0; width: 100%; height: 20vh; background: linear-gradient(to top, #78E08F, transparent); clip-path: polygon(0 100%, 15% 40%, 30% 80%, 50% 20%, 70% 70%, 85% 35%, 100% 100%); }
+
+        .sun-wrapper { position: absolute; top: 2vh; left: 2vw; z-index: 5; width: 12vmin; height: 12vmin; min-width: 60px; min-height: 60px; }
+        .sun {
+            width: 100%; height: 100%; background: #FFD369; border-radius: 50%;
+            box-shadow: 0 0 4vmin #FF9800, 0 0 8vmin #FFD369;
+            animation: pulseSun 3s infinite alternate; position: relative;
         }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        .sun-eyes { position: absolute; top: 35%; left: 20%; width: 60%; display: flex; justify-content: space-between; }
+        .sun-eye { width: 1.2vmin; height: 1.2vmin; background: #D35400; border-radius: 50%; }
+        .sun-smile { position: absolute; top: 55%; left: 35%; width: 30%; height: 1.5vmin; border-bottom: 0.5vmin solid #D35400; border-radius: 50%; }
+
+        @keyframes pulseSun { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+
+        .cloud {
+            position: absolute; background: white; border-radius: 50px; opacity: 0.9;
+            z-index: 2; animation: floatClouds linear infinite; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.05));
         }
-        .hidden { display: none; }
-        .listen-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1em;
-            margin-left: 5px;
-            padding: 5px;
-            border-radius: 50%;
-            transition: transform 0.2s ease;
+        .cloud::before, .cloud::after { content: ''; position: absolute; background: white; border-radius: 50%; }
+        .c1 { width: 20vw; height: 6vh; top: 15%; left: -25vw; animation-duration: 40s; }
+        .c1::before { width: 10vw; height: 10vw; top: -50%; left: 15%; }
+        .c1::after { width: 8vw; height: 8vw; top: -40%; right: 15%; }
+
+        @keyframes floatClouds { from { left: -30vw; } to { left: 110vw; } }
+
+        #top-bar {
+            width: 100%; max-width: 900px; padding: 2vh 4vw;
+            display: flex; justify-content: space-between; align-items: center; z-index: 100;
         }
-        .listen-btn:hover {
-            transform: scale(1.2);
+        .icon-btn {
+            background: white; border: 0.5vmin solid #EDF2F7; border-radius: 50%;
+            width: 10vmin; height: 10vmin; max-width: 55px; max-height: 55px; font-size: 5vmin; 
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0.8vmin 0 #CBD5E0; transition: transform 0.1s;
+        }
+        .icon-btn:active { transform: translateY(0.8vmin); box-shadow: 0 0 0 #CBD5E0; }
+        #score-display {
+            background: linear-gradient(135deg, var(--accent), #FFB142); padding: 1vh 4vw; border-radius: 40px;
+            border: 0.6vmin solid #F6B93B; font-weight: 900; font-size: 1.5rem; color: #B33939;
+            display: flex; align-items: center; gap: 1.5vmin; box-shadow: 0 0.8vmin 0 #F6B93B;
+        }
+
+        #game-container {
+            flex: 1; width: 100%; max-width: 850px; position: relative;
+            display: flex; flex-direction: column; align-items: center; padding: 1vh 2vw;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .screen {
+            display: none; flex-direction: column; align-items: center; width: 100%; height: 100%;
+            animation: fadeIn 0.6s ease-out; text-align: center;
+            justify-content: center;
+        }
+        .screen.active { display: flex; }
+
+        h1, .colorful-title {
+            font-size: clamp(1.8rem, 7vw, 3.2rem); font-weight: 900; line-height: 1.1; margin-bottom: 2vh;
+            background: linear-gradient(45deg, #FF3E4D, #FFA502, #2ED573, #1E90FF);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(3px 3px 0px white);
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #FF5A5F, #E23123); color: white; border: none;
+            padding: clamp(1rem, 3vh, 2vh) 8vw; font-size: clamp(1.1rem, 4vw, 1.8rem); font-weight: 900;
+            border-radius: 50px; cursor: pointer; box-shadow: 0 1vh 0 #A52A2A;
+            transition: all 0.1s; text-transform: uppercase; margin: 2vh;
+        }
+        .btn:active { transform: translateY(1vh); box-shadow: 0 0 0 #A52A2A; }
+
+        .progress-bg { width: 90%; height: 1.5vh; background: #E2E8F0; border-radius: 15px; margin: 1vh auto; overflow: hidden; border: 0.4vmin solid white; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #FF6B9D, #A29BFE, #6C5CE7); width: 0%; transition: width 0.5s ease; }
+
+        .animals-display {
+            font-size: clamp(2rem, 8vw, 4rem); margin: 1.5vh 0; min-height: 12vh;
+            display: flex; justify-content: center; align-items: center; gap: 2vw;
+            width: 100%;
+        }
+        .animal-group {
+            display: flex; flex-wrap: wrap; justify-content: center; max-width: 48%; gap: 0.5vmin;
+            padding: 1.5vmin; background: rgba(255, 255, 255, 0.7); border-radius: 20px; 
+            border: 2px solid white; box-shadow: 0 0.5vh 1vh rgba(0,0,0,0.05); backdrop-filter: blur(5px);
+        }
+
+        .number-bonds { position: relative; width: clamp(180px, 45vw, 220px); height: clamp(150px, 35vh, 190px); margin: 1vh auto; }
+        .bond-circle {
+            position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; color: white; box-shadow: 0 0.8vh 1.5vh rgba(0,0,0,0.15); border: 0.5vmin solid white;
+        }
+        .part-circle { width: clamp(45px, 11vw, 65px); height: clamp(45px, 11vw, 65px); font-size: clamp(1.2rem, 3vw, 1.6rem); background: linear-gradient(135deg, var(--bond-part), #2bcbba); top: 0; }
+        .part-left { left: 0; }
+        .part-right { right: 0; }
+        .whole-circle { background: linear-gradient(135deg, var(--bond-whole), #fa8231); width: clamp(75px, 18vw, 95px); height: clamp(75px, 18vw, 95px); font-size: clamp(2rem, 5vw, 2.8rem); bottom: 0; left: 50%; transform: translateX(-50%); }
+
+        .answer-buttons { display: flex; justify-content: center; gap: 2vw; flex-wrap: wrap; margin-top: 2vh; width: 100%; padding-bottom: 2vh; }
+        .answer-btn {
+            background: white; border: 0.5vmin solid var(--secondary); color: var(--secondary);
+            font-size: clamp(1.3rem, 4.5vw, 2rem); font-weight: 900; padding: 1vh 5vw; border-radius: 18px;
+            box-shadow: 0 0.8vh 0 #06A5A3; cursor: pointer; transition: all 0.1s;
+            min-width: 80px;
+        }
+        .answer-btn:active { transform: translateY(0.8vh); box-shadow: 0 0 0 #06A5A3; }
+
+        .speaker-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: clamp(35px, 9vmin, 45px); height: clamp(35px, 9vmin, 45px); margin-left: 10px; cursor: pointer;
+            background: white; border-radius: 50%; border: 2px solid var(--accent);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1); transition: transform 0.2s;
+            vertical-align: middle;
+        }
+        .speaker-icon:hover { transform: scale(1.1); }
+        .speaker-icon svg { width: 60%; height: 60%; fill: var(--primary); }
+
+        /* MARIO RUN REALISTIC V7 */
+        #run-screen-container {
+            width: 100%; max-width: 800px; height: clamp(220px, 40vh, 380px); background: linear-gradient(to bottom, #5C94FC 0%, #B0E0E6 100%);
+            position: relative; border-radius: 24px; border: 0.8vmin solid #5D4037; overflow: hidden;
+            margin-top: 1.5vh; box-shadow: 0 1.5vh 3vh rgba(0,0,0,0.3); cursor: pointer;
+        }
+        .mario-floor {
+            position: absolute; bottom: 0; width: 200%; height: 5vh;
+            background: repeating-linear-gradient(90deg, #E76D3B, #E76D3B 30px, #B8522A 30px, #B8522A 60px);
+            border-top: 0.5vmin solid #8C4124; z-index: 5;
+        }
+        #mario-player {
+            position: absolute; left: 10%; bottom: 5vh; width: 9vmin; height: 12vmin;
+            z-index: 10; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.25));
         }
         
-        /* Styles for Shell Game */
-        .mystery-box {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            text-align: center;
-            z-index: 1000;
-            animation: popIn 0.5s ease;
-            width: 90%;
-            max-width: 500px;
-            font-family: 'Poppins', sans-serif;
+        /* Realistic Lower Pipe */
+        .mario-pipe {
+            position: absolute; bottom: 5vh; width: 10vmin; height: 11vmin; /* Lowered height */
+            background: linear-gradient(90deg, #145a32 0%, #1e8449 20%, #2ecc71 45%, #58d68d 50%, #2ecc71 55%, #1e8449 80%, #0b3d1f 100%);
+            border: 0.5vmin solid #0b3d1f; border-radius: 4px 4px 0 0; z-index: 4;
+            box-shadow: inset -4px 0 8px rgba(0,0,0,0.3), 4px 0 12px rgba(0,0,0,0.15);
         }
-        .mystery-box h3 {
-            color: #FF6B9D;
-            margin-bottom: 20px;
-            font-size: 1.8em;
-            font-weight: 700;
-        }
-        /* Container needs relative positioning for absolute children */
-        .mystery-gifts-container {
-            position: relative;
-            height: 120px; /* Space for the boxes */
-            width: 100%;
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-        }
-        .mystery-gift {
-            position: absolute; /* Absolute for animation */
-            font-size: 3.5em;
-            cursor: pointer;
-            width: 80px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 15px;
-            background: rgba(255, 107, 157, 0.1);
-            /* Updated transition to include 'left' for smooth shuffling */
-            transition: left 0.6s ease-in-out, background 0.2s; 
-            user-select: none;
-        }
-        .mystery-gift:hover {
-            background: rgba(255, 107, 157, 0.3);
-        }
-        .mystery-gift.disabled {
-            cursor: default;
-            pointer-events: none;
-        }
-        .mystery-message {
-            min-height: 1.5em;
-            font-size: 1.2em;
-            color: #555;
-            margin-top: 10px;
-            font-weight: 600;
+        .mario-pipe::before {
+            content: ''; position: absolute; top: -1px; left: -1.5vmin; width: 13vmin; height: 4vmin;
+            background: linear-gradient(90deg, #145a32 0%, #1e8449 20%, #2ecc71 45%, #58d68d 50%, #2ecc71 55%, #1e8449 80%, #0b3d1f 100%);
+            border: 0.5vmin solid #0b3d1f; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
-        @keyframes popIn {
-            0% { transform: translate(-50%, -50%) scale(0); }
-            100% { transform: translate(-50%, -50%) scale(1); }
+        .mario-coin {
+            position: absolute; width: 6.5vmin; height: 6.5vmin; background: linear-gradient(135deg, #F4D03F, #FFD32D 60%, #B7950B);
+            border: 0.4vmin solid #9A7D0A; border-radius: 50%; z-index: 6;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; color: #7D6608; font-size: 3.2vmin;
+            box-shadow: 0 0 15px rgba(244, 208, 63, 0.7), inset 0 0 8px white;
+            animation: coinSpin 0.7s infinite linear;
         }
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-   </style>
- </head>
- <body>
-  <img src="../assets/logo-oodles-math.png" class="oodles-logo">
-  <img src="../assets/logo-oodles-math.png" class="oodles-logo" onerror="this.style.display='none'">
-  <div class="game-container">
-   <h1 class="title" id="gameTitle">Animal Addition Adventure!</h1>
-   <div class="progress-bar">
-    <div class="progress-fill" id="progressFill"></div>
-   </div>
-   <div id="gameScreen">
-    <div class="question-area">
-     <div class="question-text" id="questionText"></div>
-     <div class="animals-display" id="animalsDisplay"></div>
-     <div class="number-bonds hidden" id="numberBonds"></div>
-     <div class="answer-buttons" id="answerButtons"></div>
-     <div class="feedback" id="feedback"></div>
-    </div>
-   </div>
-   <div id="overlay" class="overlay hidden"></div>
-   
-   <div id="mysteryBox" class="mystery-box hidden">
-    <h3 id="mysteryTitle">Find the Trophy! 🏆</h3>
-    <div class="mystery-gifts-container" id="mysteryGiftsContainer">
-        <!-- Boxes will be injected here via JS -->
-    </div>
-    <div id="mysteryResult" class="mystery-message">Watch closely...</div>
-   </div>
 
-   <div id="celebrationScreen" class="celebration hidden">
-    <h2>You are an Animal Addition Superstar!</h2>
-    <div style="font-size: 3em; margin: 20px 0;">
-     🐶💃🐱🕺🐘💃🐸🕺
-    </div><button class="action-btn" id="playAgainBtn">Play Again!</button>
-   </div>
-  </div>
-  <script>
+        #celebration-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1000;
+        }
+
+        #mascot-area { position: absolute; bottom: 1.5vh; left: 2vw; display: flex; align-items: flex-end; gap: 1.5vmin; z-index: 50; pointer-events: none; }
+        #mascot { font-size: clamp(35px, 11vmin, 70px); animation: bounce 2s infinite; }
+        .bubble {
+            background: white; padding: 1vh 3vw; border-radius: 18px; border: 3px solid var(--secondary);
+            font-size: clamp(0.8rem, 2vw, 1.1rem); font-weight: 800; color: #2C3E50; position: relative; box-shadow: 0 0.8vh 1.5vh rgba(0,0,0,0.1); max-width: 220px;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @keyframes coinSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+        .hidden { display: none !important; }
+
+        /* Responsive Fix for small screens (Mobile) */
+        @media (max-height: 600px) {
+            .animals-display { margin: 1vh 0; min-height: 10vh; }
+            .number-bonds { width: 160px; height: 130px; }
+            .answer-buttons { margin-top: 1vh; }
+            h1 { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <div class="decoration mountain"></div>
+    <div class="sun-wrapper">
+        <div class="sun"><div class="sun-eyes"><div class="sun-eye"></div><div class="sun-eye"></div></div><div class="sun-smile"></div></div>
+    </div>
+    <div class="cloud c1"></div>
+
+    <canvas id="celebration-canvas"></canvas>
+
+    <div id="top-bar">
+        <button class="icon-btn" onclick="location.reload()">🏠</button>
+        <div id="score-display">⭐ <span id="score-val">0</span></div>
+        <button class="icon-btn" onclick="toggleMute()" id="mute-btn">🔊</button>
+    </div>
+
+    <div id="game-container">
+        <!-- Start Screen -->
+        <div id="screen-start" class="screen active">
+            <div style="font-size: clamp(70px, 18vmin, 110px); animation: bounce 2s infinite; margin-bottom: 2vh;">🦁</div>
+            <h1 class="colorful-title">Animal Addition Adventure</h1>
+            <p style="font-size: clamp(0.9rem, 3vw, 1.3rem); color: #718096; margin-bottom: 3vh; font-weight: 600;">Play & Learn on all your devices!</p>
+            <button class="btn" onclick="startGame()">Start Quest!</button>
+        </div>
+
+        <!-- Math Game Screen -->
+        <div id="screen-math" class="screen">
+            <h2 id="math-header" style="color: var(--secondary); text-shadow: 1px 1px white; font-weight: 900; font-size: clamp(1rem, 4vw, 1.5rem);">Counting with Oodles!</h2>
+            <div class="progress-bg"><div class="progress-fill" id="p-bar"></div></div>
+            <div id="question-text-area" style="font-size: clamp(1.1rem, 3.8vw, 1.6rem); font-weight: 800; margin: 1vh 0; color: var(--text-main); min-height: 2.5rem;"></div>
+            
+            <div class="animals-display" id="animals-display"></div>
+            
+            <div class="number-bonds hidden" id="number-bonds">
+                <svg style="position:absolute; top:0; left:0; width:100%; height:100%;">
+                    <line x1="25%" y1="20%" x2="50%" y2="80%" stroke="#FF6B9D" stroke-width="5" stroke-linecap="round" />
+                    <line x1="75%" y1="20%" x2="50%" y2="80%" stroke="#FF6B9D" stroke-width="5" stroke-linecap="round" />
+                </svg>
+                <div class="bond-circle part-circle part-left" id="bond-p1">?</div>
+                <div class="bond-circle part-circle part-right" id="bond-p2">?</div>
+                <div class="bond-circle whole-circle" id="bond-whole">?</div>
+            </div>
+
+            <div class="answer-buttons" id="answer-buttons"></div>
+            <div id="feedback" style="height: 3vh; margin-top: 1vh; font-weight: 900; font-size: 1.3rem; min-height: 1.5rem;"></div>
+        </div>
+
+        <!-- Mario Run Screen -->
+        <div id="screen-run" class="screen">
+            <h1 class="colorful-title" style="font-size: clamp(1.5rem, 5vw, 2.2rem); margin-bottom: 0.5vh;">MARIO DASH 🍄</h1>
+            <p style="font-weight: 800; color: #2D3748; margin-bottom: 0.5vh; font-size: clamp(0.8rem, 2.5vw, 1rem);">Tap or Press SPACE to JUMP!</p>
+            <div id="run-screen-container" onpointerdown="marioJump()">
+                <div class="mario-floor"></div>
+                <div id="mario-player">
+                    <!-- Enhanced Realistic Mario SVG -->
+                    <svg viewBox="0 0 60 80" width="100%" height="100%">
+                        <defs>
+                            <linearGradient id="marioShirt" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FF3E4D;" />
+                                <stop offset="100%" style="stop-color:#C0392B;" />
+                            </linearGradient>
+                            <linearGradient id="marioFace" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FFD7BA;" />
+                                <stop offset="100%" style="stop-color:#FFC999;" />
+                            </linearGradient>
+                            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
+                                <feOffset dx="1" dy="2" result="offsetblur" />
+                                <feComponentTransfer><feFuncA type="linear" slope="0.3"/></feComponentTransfer>
+                                <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                        </defs>
+                        <g filter="url(#shadow)">
+                            <!-- Shoes -->
+                            <rect x="8" y="70" width="20" height="12" fill="#3D2012" rx="5" />
+                            <rect x="32" y="70" width="20" height="12" fill="#3D2012" rx="5" />
+                            <!-- Legs (Overalls) -->
+                            <rect x="15" y="55" width="30" height="22" fill="#0D47A1" rx="6" />
+                            <!-- Body -->
+                            <rect x="15" y="40" width="30" height="25" fill="url(#marioShirt)" rx="6" />
+                            <!-- Straps -->
+                            <rect x="15" y="45" width="10" height="18" fill="#0D47A1" /> 
+                            <rect x="35" y="45" width="10" height="18" fill="#0D47A1" /> 
+                            <!-- Buttons -->
+                            <circle cx="21" cy="55" r="3.8" fill="#FFEB3B" stroke="#FBC02D" stroke-width="1.2" /> 
+                            <circle cx="39" cy="55" r="3.8" fill="#FFEB3B" stroke="#FBC02D" stroke-width="1.2" /> 
+                            <!-- Hands -->
+                            <circle cx="5" cy="52" r="7.5" fill="white" stroke="#D1D1D1" stroke-width="1.5"/>
+                            <circle cx="55" cy="52" r="7.5" fill="white" stroke="#D1D1D1" stroke-width="1.5"/>
+                            <!-- Head -->
+                            <rect x="15" y="10" width="30" height="34" fill="url(#marioFace)" rx="16" />
+                            <!-- Nose -->
+                            <circle cx="43" cy="28" r="6.5" fill="#FFC999" stroke="#E6B08F" stroke-width="1.2" />
+                            <!-- Hat -->
+                            <path d="M5,18 Q30,-3 55,18 L55,27 L5,27 Z" fill="#E23123" stroke="#B02A1E" stroke-width="1" />
+                            <circle cx="30" cy="18" r="8.5" fill="white" />
+                            <text x="25.5" y="22.5" font-family="Arial" font-size="12" font-weight="bold" fill="#E23123">M</text>
+                            <!-- Mustache & Eye -->
+                            <path d="M35,35 Q41,31 49,36" stroke="#3D2012" stroke-width="4.5" fill="none" stroke-linecap="round" />
+                            <circle cx="40" cy="22" r="4.5" fill="#222" />
+                        </g>
+                    </svg>
+                </div>
+                <div id="mario-objects"></div>
+                <div id="mario-timer" style="position: absolute; top: 12px; right: 15px; font-weight: 900; font-size: clamp(1rem, 4vw, 1.4rem); color: white; background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: 12px; border: 2px solid white; z-index: 10;">30s</div>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="screen-end" class="screen">
+            <h1 class="colorful-title" style="margin-bottom: 2vh;">MISSION COMPLETE! 🌟</h1>
+            <div style="font-size: clamp(70px, 15vmin, 100px); animation: bounce 2s infinite; margin-bottom: 2vh;">🤴</div>
+            <div style="background: white; padding: 2vh 8vw; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 5px solid var(--accent); margin-bottom: 3vh; width: 80%;">
+                <h2 style="margin:0; color: var(--text-main); font-size: clamp(1rem, 4vw, 1.5rem);">Final Score</h2>
+                <div style="font-size: clamp(3rem, 12vw, 5rem); font-weight: 900; color: var(--primary);"><span id="final-score">0</span></div>
+                <p style="font-weight: 700; color: #718096; font-size: clamp(0.8rem, 2.5vw, 1rem);">Hero Rank: <span style="color: var(--success);">MASTER</span></p>
+            </div>
+            <button class="btn" onclick="location.reload()">Play Again!</button>
+        </div>
+    </div>
+
+    <div id="mascot-area" style="display:none;">
+        <div id="mascot">🦁</div>
+        <div class="bubble" id="mascot-text">Oodles is ready!</div>
+    </div>
+
+    <script>
         const animals = ['🐶', '🐱', '🐘', '🐸', '🦁', '🐰', '🐼', '🐯'];
         const animalNames = ['dogs', 'cats', 'elephants', 'frogs', 'lions', 'rabbits', 'pandas', 'tigers'];
-        const WIN_ITEM = '🏆';
-        const LOSE_ITEM = '💨'; 
         
-        let currentQuestion = 0;
-        let currentStep = 1;
-        let animal1, animal2, count1, count2, correctAnswer;
-        let currentSpeechText = "";
-        
-        // --- SHELL GAME VARIABLES ---
-        let boxes = []; 
-        const BOX_SPACING = 110; 
-        
-        let config = {
-            game_title: "Animal Addition Adventure!",
-            encouragement_text: "Fantastic! You got it right!"
-        };
+        let score = 0, questionIndex = 0, currentStep = 1;
+        const totalQuestions = 5;
+        let count1, count2, animal1, animal2, correctAnswer;
+        let soundEnabled = true, audioCtx = null, currentSpeech = "";
 
-        const defaultConfig = {
-            game_title: "Animal Addition Adventure!",
-            encouragement_text: "Fantastic! You got it right!"
-        };
-
-        // --- AUDIO SYSTEM (Cheerful Sounds) ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        function playTone(freq, type, duration, startTime, volume = 0.2) {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.value = freq;
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            osc.start(startTime);
-            gain.gain.setValueAtTime(volume, startTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-            osc.stop(startTime + duration);
+        // --- AUDIO ENGINE ---
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+        function playTone(f, t, d, v=0.1) {
+            if(!soundEnabled || !audioCtx) return;
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
+            g.gain.setValueAtTime(v, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + d);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(); o.stop(audioCtx.currentTime + d);
+        }
+        function speak() {
+            if(!soundEnabled || !window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(currentSpeech);
+            u.lang = 'en-US'; u.rate = 1.0; window.speechSynthesis.speak(u);
+        }
+        function toggleMute() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('mute-btn').innerText = soundEnabled ? '🔊' : '🔇';
+            if(!soundEnabled) window.speechSynthesis.cancel();
         }
 
-        function playCheer() {
-            const now = audioCtx.currentTime;
-            playTone(523.25, 'sine', 0.3, now);       // C5
-            playTone(659.25, 'sine', 0.3, now + 0.1); // E5
-            playTone(783.99, 'sine', 0.4, now + 0.2); // G5
+        // --- NAVIGATION ---
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
         }
 
-        function playCorrectMath() {
-            const now = audioCtx.currentTime;
-            playTone(523.25, 'triangle', 0.1, now, 0.1);
-            playTone(1046.50, 'sine', 0.4, now + 0.05, 0.3); // High C
+        function startGame() {
+            initAudio(); score = 0; questionIndex = 0;
+            document.getElementById('score-val').innerText = score;
+            document.getElementById('mascot-area').style.display = 'flex';
+            startMathQuestion();
         }
 
-        function playWrong() {
-            const now = audioCtx.currentTime;
-            playTone(300, 'sawtooth', 0.3, now, 0.1);
-            playTone(200, 'sawtooth', 0.4, now + 0.2, 0.1);
-        }
-
-        function playShuffleSound() {
-            const now = audioCtx.currentTime;
-            playTone(400, 'square', 0.05, now, 0.05);
-        }
-
-        function playFanfare() {
-            const now = audioCtx.currentTime;
-            playTone(523.25, 'triangle', 0.2, now);       // C
-            playTone(659.25, 'triangle', 0.2, now + 0.15); // E
-            playTone(783.99, 'triangle', 0.2, now + 0.30); // G
-            playTone(1046.50, 'triangle', 0.8, now + 0.45); // High C
-        }
-
-        // --- GAME LOGIC ---
-
-        function startNewQuestion() {
-            currentStep = 1;
-            const indices = [];
-            while (indices.length < 2) {
-                const idx = Math.floor(Math.random() * animals.length);
-                if (!indices.includes(idx)) indices.push(idx);
-            }
-            animal1 = animals[indices[0]];
-            animal2 = animals[indices[1]];
-            
-            do {
-                count1 = Math.floor(Math.random() * 10) + 1;
-                count2 = Math.floor(Math.random() * 10) + 1;
-            } while (count1 + count2 > 20);
-
-            updateProgress();
-            showStep1();
-        }
-
-        function showStep1() {
-            currentSpeechText = `How many ${animalNames[animals.indexOf(animal1)]} do you see?`;
-            const questionHtml = `
-                <span>${currentSpeechText}</span>
-                <button class="listen-btn" onclick="speakQuestion()">🔊</button>
-            `;
-            document.getElementById('questionText').innerHTML = questionHtml;
-            document.getElementById('animalsDisplay').innerHTML = animal1.repeat(count1);
-            document.getElementById('numberBonds').classList.add('hidden');
-            correctAnswer = count1;
-            createAnswerButtons();
-        }
-
-        function showStep2() {
-            currentSpeechText = `How many ${animalNames[animals.indexOf(animal2)]} do you see?`;
-            const questionHtml = `
-                <span>${currentSpeechText}</span>
-                <button class="listen-btn" onclick="speakQuestion()">🔊</button>
-            `;
-            document.getElementById('questionText').innerHTML = questionHtml;
-            document.getElementById('animalsDisplay').innerHTML = animal2.repeat(count2);
-            correctAnswer = count2;
-            createAnswerButtons();
-        }
-
-        function showStep3() {
-            currentSpeechText = 'How many animals altogether?';
-            const questionHtml = `
-                <span>${currentSpeechText}</span>
-                <button class="listen-btn" onclick="speakQuestion()">🔊</button>
-            `;
-            document.getElementById('questionText').innerHTML = questionHtml;
-            document.getElementById('animalsDisplay').innerHTML = 
-                `${animal1.repeat(count1)}<span class="plus-sign">+</span>${animal2.repeat(count2)}`;
-            
-            const bondsHtml = `
-                <div class="bonds-top">
-                    <div class="bond-circle part-circle">${count1}</div>
-                    <div class="bond-circle part-circle">${count2}</div>
-                </div>
-                <div class="bond-connector"></div>
-                <div class="bond-circle whole-circle">?</div>
-            `;
-            document.getElementById('numberBonds').innerHTML = bondsHtml;
-            document.getElementById('numberBonds').classList.remove('hidden');
-            
-            correctAnswer = count1 + count2;
-            createAnswerButtons();
-        }
-
-        function createAnswerButtons() {
-            const buttons = [];
-            buttons.push(correctAnswer);
-            while (buttons.length < 3) {
-                let wrong = correctAnswer + Math.floor(Math.random() * 6) - 3;
-                if (wrong > 0 && wrong !== correctAnswer && !buttons.includes(wrong)) {
-                    buttons.push(wrong);
-                }
-            }
-            buttons.sort(() => Math.random() - 0.5);
-            
-            const container = document.getElementById('answerButtons');
-            container.innerHTML = '';
-            buttons.forEach(num => {
-                const btn = document.createElement('button');
-                btn.className = 'answer-btn';
-                btn.textContent = num;
-                btn.onclick = () => checkAnswer(num);
-                container.appendChild(btn);
-            });
-            document.getElementById('feedback').textContent = '';
-        }
-
-        function checkAnswer(selected) {
-            const feedback = document.getElementById('feedback');
-            if (selected === correctAnswer) {
-                playCorrectMath(); 
-                feedback.textContent = config.encouragement_text || defaultConfig.encouragement_text;
-                feedback.className = 'feedback correct';
-                
-                if (currentStep === 3) {
-                    document.querySelector('.whole-circle').textContent = correctAnswer;
-                }
-                
-                setTimeout(() => {
-                    if (currentStep < 3) {
-                        currentStep++;
-                        if (currentStep === 2) showStep2();
-                        else if (currentStep === 3) showStep3();
-                    } else {
-                        initMysteryGame(); 
-                    }
-                }, 1500);
-            } else {
-                playWrong();
-                feedback.textContent = 'Try again!';
-                feedback.className = 'feedback incorrect';
-            }
-        }
-
-        // --- MYSTERY BOX SHELL GAME LOGIC ---
-
-        function initMysteryGame() {
-            document.getElementById('overlay').classList.remove('hidden');
-            document.getElementById('mysteryBox').classList.remove('hidden');
-            document.getElementById('mysteryResult').textContent = "Watch carefully!";
-            document.getElementById('mysteryTitle').textContent = "Find the Trophy! 🏆";
-            
-            const container = document.getElementById('mysteryGiftsContainer');
-            container.innerHTML = '';
-            boxes = [];
-            
-            const trophyIndex = Math.floor(Math.random() * 3); 
-
-            for (let i = 0; i < 3; i++) {
-                const boxEl = document.createElement('div');
-                boxEl.className = 'mystery-gift disabled'; 
-                boxEl.textContent = '🎁';
-                
-                // Position logic
-                const offset = (i - 1) * BOX_SPACING;
-                boxEl.style.left = `calc(50% + ${offset}px - 40px)`; 
-                
-                container.appendChild(boxEl);
-                
-                boxes.push({
-                    id: i,
-                    currentPos: i, // 0=left, 1=center, 2=right
-                    hasTrophy: (i === trophyIndex),
-                    element: boxEl
-                });
-            }
-
-            // 2. Reveal Phase
-            setTimeout(() => {
-                revealContents(true);
-                // 3. Hide and Start Shuffle after 1.5s
-                setTimeout(() => {
-                    revealContents(false);
-                    document.getElementById('mysteryResult').textContent = "Shuffling...";
-                    startShuffling(5); // 5 swaps
-                }, 1500);
-            }, 500);
-        }
-
-        function revealContents(show) {
-            boxes.forEach(box => {
-                if (show) {
-                    box.element.textContent = box.hasTrophy ? WIN_ITEM : '';
-                    if (!box.hasTrophy) box.element.style.background = 'rgba(0,0,0,0.05)';
-                } else {
-                    box.element.textContent = '🎁';
-                    box.element.style.background = 'rgba(255, 107, 157, 0.1)';
-                }
-            });
-            if(show && boxes.some(b => b.hasTrophy)) playCheer();
-        }
-
-        function startShuffling(swapsRemaining) {
-            if (swapsRemaining <= 0) {
-                // Done shuffling
-                enableSelection();
+        function startMathQuestion() {
+            if (questionIndex >= totalQuestions) {
+                endGame();
                 return;
             }
-
-            // Pick 2 distinct random indices (positions 0, 1, 2) to swap
-            let posA = Math.floor(Math.random() * 3);
-            let posB = Math.floor(Math.random() * 3);
-            while (posA === posB) { posB = Math.floor(Math.random() * 3); }
-
-            // Find the box objects currently at these positions
-            let boxA = boxes.find(b => b.currentPos === posA);
-            let boxB = boxes.find(b => b.currentPos === posB);
-
-            // Swap their logical positions
-            boxA.currentPos = posB;
-            boxB.currentPos = posA;
-
-            // Update visual positions
-            const offsetA = (boxA.currentPos - 1) * BOX_SPACING;
-            const offsetB = (boxB.currentPos - 1) * BOX_SPACING;
-
-            playShuffleSound();
+            currentStep = 1;
+            const i1 = Math.floor(Math.random() * animals.length);
+            let i2 = Math.floor(Math.random() * animals.length);
+            while(i1 === i2) i2 = Math.floor(Math.random() * animals.length);
             
-            boxA.element.style.left = `calc(50% + ${offsetA}px - 40px)`;
-            boxB.element.style.left = `calc(50% + ${offsetB}px - 40px)`;
+            animal1 = animals[i1]; animal2 = animals[i2];
+            count1 = Math.floor(Math.random() * 5) + 2; // Reduced slightly for better mobile fit
+            count2 = Math.floor(Math.random() * 5) + 2;
 
-            // Wait for transition to finish before next swap
-            // Transition is 0.6s, so wait 0.7s
-            setTimeout(() => {
-                startShuffling(swapsRemaining - 1);
-            }, 700); 
+            document.getElementById('p-bar').style.width = (questionIndex / totalQuestions) * 100 + "%";
+            showScreen('screen-math');
+            loadMathStep();
         }
 
-        function enableSelection() {
-            document.getElementById('mysteryResult').textContent = "Where is the trophy?";
-            boxes.forEach(box => {
-                box.element.classList.remove('disabled');
-                box.element.onclick = () => checkMysteryChoice(box);
+        function loadMathStep() {
+            const display = document.getElementById('animals-display');
+            const bonds = document.getElementById('number-bonds');
+            const qText = document.getElementById('question-text-area');
+            const feedback = document.getElementById('feedback');
+            
+            feedback.innerText = "";
+            bonds.classList.add('hidden');
+
+            if (currentStep === 1) {
+                currentSpeech = `How many ${animalNames[animals.indexOf(animal1)]} do you see?`;
+                display.innerHTML = `<div class="animal-group">${animal1.repeat(count1)}</div>`;
+                correctAnswer = count1;
+                setMascot("Count the first group of animals!");
+            } else if (currentStep === 2) {
+                currentSpeech = `How many ${animalNames[animals.indexOf(animal2)]} do you see?`;
+                display.innerHTML = `<div class="animal-group">${animal2.repeat(count2)}</div>`;
+                correctAnswer = count2;
+                setMascot("Good job! Now, how many in the second group?");
+            } else {
+                currentSpeech = `How many animals are there altogether?`;
+                display.innerHTML = `<div class="animal-group">${animal1.repeat(count1)}</div><div class="plus-sign" style="font-weight:900; color:var(--primary); font-size:1.5rem;">+</div><div class="animal-group">${animal2.repeat(count2)}</div>`;
+                bonds.classList.remove('hidden');
+                document.getElementById('bond-p1').innerText = count1;
+                document.getElementById('bond-p2').innerText = count2;
+                document.getElementById('bond-whole').innerText = "?";
+                correctAnswer = count1 + count2;
+                setMascot("Fantastic! Add them all together for the total!");
+            }
+
+            const speakerSVG = `<div class="speaker-icon" onclick="speak()"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></div>`;
+            qText.innerHTML = `<span>${currentSpeech}</span> ${speakerSVG}`;
+            generateButtons();
+        }
+
+        function generateButtons() {
+            const container = document.getElementById('answer-buttons');
+            container.innerHTML = "";
+            let opts = [correctAnswer];
+            while(opts.length < 3) {
+                let r = correctAnswer + (Math.floor(Math.random() * 6) - 3);
+                if (r > 0 && !opts.includes(r)) opts.push(r);
+            }
+            opts.sort((a,b) => a - b).forEach(opt => {
+                const b = document.createElement('button');
+                b.className = 'answer-btn';
+                b.innerText = opt;
+                b.onclick = () => checkMath(opt);
+                container.appendChild(b);
             });
         }
 
-        function checkMysteryChoice(box) {
-            // Disable all to prevent double clicks
-            boxes.forEach(b => b.element.classList.add('disabled'));
-
-            if (box.hasTrophy) {
-                box.element.textContent = WIN_ITEM;
-                playFanfare();
-                document.getElementById('mysteryResult').textContent = "You found it! 🎉";
-                document.getElementById('mysteryTitle').textContent = "WINNER!";
-                
-                setTimeout(() => {
-                    closeMysteryBox(true);
-                }, 2000);
+        function checkMath(val) {
+            const f = document.getElementById('feedback');
+            if (val === correctAnswer) {
+                playTone(600, 'sine', 0.2);
+                f.innerText = "🌟 CORRECT! 🌟"; f.style.color = "var(--success)";
+                if (currentStep < 3) {
+                    currentStep++; setTimeout(loadMathStep, 1000);
+                } else {
+                    document.getElementById('bond-whole').innerText = correctAnswer;
+                    score += 15; document.getElementById('score-val').innerText = score;
+                    setTimeout(initMarioRun, 1200);
+                }
             } else {
-                box.element.textContent = LOSE_ITEM;
-                playWrong();
-                document.getElementById('mysteryResult').textContent = "Oh no! Empty!";
+                playTone(150, 'sawtooth', 0.3);
+                f.innerText = "Try counting again!"; f.style.color = "var(--danger)";
+            }
+        }
+
+        function setMascot(t) { document.getElementById('mascot-text').innerText = t; }
+
+        // --- MARIO ENGINE v7 (Progressive Acceleration) ---
+        let runActive = false, marioY = 0, marioVelocity = 0, isJumping = false, gameTime = 30;
+        let baseSpeed = 0.8; 
+        let runInterval, spawnInterval, timerInterval;
+
+        function initMarioRun() {
+            showScreen('screen-run');
+            runActive = true; marioY = 0; marioVelocity = 0; isJumping = false; gameTime = 30;
+            baseSpeed = 0.8; 
+            document.getElementById('mario-objects').innerHTML = "";
+            document.getElementById('mario-timer').innerText = "30s";
+            setMascot("Quick! Jump over the pipes and collect coins!");
+
+            runInterval = setInterval(updateMario, 20);
+            
+            spawnInterval = setInterval(() => {
+                if(!runActive) return;
+                const type = Math.random() > 0.4 ? 'coin' : 'pipe';
+                spawnObject(type);
+            }, 1200); 
+
+            timerInterval = setInterval(() => {
+                gameTime--;
+                baseSpeed += 0.08; 
+                document.getElementById('mario-timer').innerText = gameTime + "s";
+                if(gameTime <= 0) { endMarioRun(); }
+            }, 1000);
+        }
+
+        function marioJump() {
+            if(!isJumping && runActive) {
+                isJumping = true; marioVelocity = 18;
+                playTone(450, 'square', 0.1);
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if(e.code === 'Space') {
+                e.preventDefault();
+                marioJump();
+            }
+        });
+
+        function spawnObject(type) {
+            const obj = document.createElement('div');
+            obj.className = type === 'pipe' ? 'mario-pipe' : 'mario-coin';
+            if(type === 'coin') {
+                obj.innerHTML = `<svg viewBox="0 0 40 40" width="100%" height="100%"><circle cx="20" cy="20" r="16" fill="#F1C40F" stroke="#B7950B" stroke-width="2"/><circle cx="20" cy="20" r="12" fill="none" stroke="#B7950B" stroke-width="1"/><text x="14" y="27" font-weight="900" font-size="20" fill="#7D6608" font-family="Arial">$</text></svg>`;
+            }
+            obj.style.right = "-15vw";
+            document.getElementById('mario-objects').appendChild(obj);
+            
+            let pos = -15;
+            const moveInt = setInterval(() => {
+                if(!runActive) { clearInterval(moveInt); return; }
+                pos += (1.1 * baseSpeed); 
+                obj.style.right = pos + "vw";
                 
-                // Show where it actually was
-                setTimeout(() => {
-                    const actualBox = boxes.find(b => b.hasTrophy);
-                    actualBox.element.textContent = WIN_ITEM;
-                    actualBox.element.style.background = "#ffffaa";
-                    setTimeout(() => {
-                        closeMysteryBox(false); // Move on anyway
-                    }, 2000);
-                }, 800);
+                const mRect = document.getElementById('mario-player').getBoundingClientRect();
+                const oRect = obj.getBoundingClientRect();
+                
+                if (mRect.right > oRect.left + 15 && mRect.left < oRect.right - 15 && mRect.bottom > oRect.top + 15) {
+                    if(type === 'coin') {
+                        score += 5; document.getElementById('score-val').innerText = score;
+                        playTone(900, 'sine', 0.05); obj.remove(); clearInterval(moveInt);
+                    } else if(mRect.bottom > oRect.top + 20) {
+                        playTone(100, 'sawtooth', 0.3); endMarioRun();
+                    }
+                }
+                if(pos > 115) { obj.remove(); clearInterval(moveInt); }
+            }, 20);
+        }
+
+        function updateMario() {
+            if(!runActive) return;
+            const m = document.getElementById('mario-player');
+            if (isJumping) {
+                marioVelocity -= 0.85;
+                marioY += marioVelocity;
+                if (marioY <= 0) { marioY = 0; marioVelocity = 0; isJumping = false; }
             }
+            m.style.bottom = (5 + (marioY / 10)) + "vh";
         }
 
-        function closeMysteryBox(won) {
-            document.getElementById('overlay').classList.add('hidden');
-            document.getElementById('mysteryBox').classList.add('hidden');
-            nextQuestion();
+        function endMarioRun() {
+            if(!runActive) return;
+            runActive = false;
+            clearInterval(runInterval); clearInterval(spawnInterval); clearInterval(timerInterval);
+            setTimeout(() => { questionIndex++; startMathQuestion(); }, 800);
         }
 
-        function nextQuestion() {
-            currentQuestion++;
-            if (currentQuestion >= 5) {
-                showCelebration();
-            } else {
-                document.getElementById('gameScreen').classList.remove('hidden');
-                startNewQuestion();
+        // --- FIREWORKS & CELEBRATION ---
+        let fireworksActive = false;
+        function endGame() {
+            fireworksActive = true;
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('mascot-area').style.display = 'none';
+            showScreen('screen-end');
+            playTone(400, 'sine', 0.2);
+            setTimeout(() => playTone(500, 'sine', 0.2), 200);
+            setTimeout(() => playTone(600, 'sine', 0.4), 400);
+            startFireworks();
+        }
+
+        function startFireworks() {
+            const canvas = document.getElementById('celebration-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            function createFirework() {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * (canvas.height / 2);
+                const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                for(let i=0; i<30; i++) {
+                    particles.push({
+                        x, y,
+                        vx: (Math.random() - 0.5) * 10,
+                        vy: (Math.random() - 0.5) * 10,
+                        life: 1.0,
+                        color
+                    });
+                }
             }
-        }
 
-        function showCelebration() {
-            playCheer();
-            document.getElementById('celebrationScreen').classList.remove('hidden');
-        }
+            function update() {
+                if(!fireworksActive) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if(Math.random() < 0.05) createFirework();
 
-        function restartGame() {
-            currentQuestion = 0;
-            document.getElementById('celebrationScreen').classList.add('hidden');
-            document.getElementById('gameScreen').classList.remove('hidden');
-            startNewQuestion();
-        }
-
-        function updateProgress() {
-            const progress = (currentQuestion / 5) * 100;
-            document.getElementById('progressFill').style.width = progress + '%';
-        }
-
-        function speakQuestion() {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(currentSpeechText);
-                utterance.rate = 0.8;
-                utterance.pitch = 1.2;
-                window.speechSynthesis.speak(utterance);
+                particles.forEach((p, i) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.1;
+                    p.life -= 0.02;
+                    ctx.globalAlpha = p.life;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    if(p.life <= 0) particles.splice(i, 1);
+                });
+                requestAnimationFrame(update);
             }
+            update();
         }
-        document.getElementById('playAgainBtn').onclick = restartGame;
 
-        document.body.addEventListener('click', function() {
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }, {once:true});
-
-        startNewQuestion();
-  </script>
- </body>
+        window.onload = () => { document.querySelector('.c1').style.left = "-30vw"; };
+    </script>
+</body>
 </html>

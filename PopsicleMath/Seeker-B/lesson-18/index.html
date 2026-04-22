@@ -1,233 +1,379 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="../assets/brand.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fun Measurement Class</title>
+    <title>Fun Measurement Class - Version 5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800;900&display=swap');
+
+        :root {
+            --duo-green: #58CC02;
+            --duo-green-dark: #46A302;
+            --duo-sky: #1CB0F6;
+            --duo-sky-dark: #1899D6;
+            --duo-yellow: #FFC800;
+            --duo-yellow-dark: #E5B400;
+            --duo-red: #FF4B4B;
+            --duo-red-dark: #EA2B2B;
+            --duo-text: #4B4B4B;
+            --duo-bg: #E5E5E5;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         body {
-            font-family: 'Fredoka', sans-serif;
-            /* Thay đổi nền thành bầu trời xanh */
-            background: linear-gradient(to bottom, #7DD3FC, #E0F2FE);
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--duo-sky);
             overflow: hidden;
             touch-action: manipulation;
+            margin: 0;
+            padding: 0;
+            color: var(--duo-text);
         }
 
-        .wood-table {
-            background: linear-gradient(180deg, #FCD34D 0%, #F59E0B 100%);
-            border-top: 16px solid #D97706;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
-            border-radius: 20px 20px 0 0;
-            margin: 0 10px;
+        /* Duolingo Style Buttons */
+        .duo-btn {
+            background-color: var(--duo-green);
+            color: white;
+            border-radius: 1.5rem;
+            border-bottom: 6px solid var(--duo-green-dark);
+            transition: all 0.1s ease-in-out;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .duo-btn:active {
+            border-bottom-width: 0px;
+            transform: translateY(6px);
         }
 
+        /* Beautiful Flat Scenery */
+        .scenery {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .sun {
+            position: absolute;
+            top: 8%;
+            left: 8%; 
+            width: 100px;
+            height: 100px;
+            background-color: var(--duo-yellow);
+            border-radius: 50%;
+            animation: floatSun 4s infinite alternate ease-in-out;
+            box-shadow: 0 0 40px rgba(255, 200, 0, 0.4);
+        }
+        .hills-back {
+            position: absolute;
+            bottom: 12vh;
+            width: 150%;
+            left: -25%;
+            height: 45vh;
+            background-color: #58CC02;
+            border-radius: 50% 50% 0 0;
+            opacity: 0.9;
+        }
+        .hills-front {
+            position: absolute;
+            bottom: 10vh;
+            width: 120%;
+            left: -10%;
+            height: 35vh;
+            background-color: #46A302;
+            border-radius: 50% 50% 0 0;
+        }
+        
+        /* Flowers Decorative Elements */
+        .flower {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #FFC800; /* Yellow center */
+            border-radius: 50%;
+            /* 4 White petals */
+            box-shadow: 
+                0 -8px 0 white,
+                0 8px 0 white,
+                -8px 0 0 white,
+                8px 0 0 white;
+            animation: floatSun 3s infinite alternate ease-in-out;
+            animation-delay: calc(var(--delay) * 1s);
+        }
+        .flower.pink {
+            background-color: white; /* White center */
+            box-shadow: 
+                0 -8px 0 #FFA5A5,
+                0 8px 0 #FFA5A5,
+                -8px 0 0 #FFA5A5,
+                8px 0 0 #FFA5A5;
+        }
+
+        /* Clean Flat Desk */
+        .desk {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 15vh;
+            background-color: #D3A068;
+            border-top: 12px solid #B88550;
+            background-image: repeating-linear-gradient(
+                to right,
+                rgba(0,0,0,0.03) 0px,
+                rgba(0,0,0,0.03) 25px,
+                transparent 25px,
+                transparent 50px
+            );
+            box-shadow: inset 0 15px 15px -15px rgba(0,0,0,0.4);
+            z-index: 10;
+        }
+
+        /* Typography */
+        .kid-text {
+            color: var(--duo-text);
+            letter-spacing: 1px;
+        }
+
+        /* Game Objects */
         .game-object {
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
             cursor: pointer;
             position: relative;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+            transform-origin: bottom center;
+            filter: drop-shadow(0 15px 5px rgba(0,0,0,0.25));
         }
-
         .game-object:active {
-            transform: scale(0.95);
+            transform: scale(0.9) translateY(15px);
         }
-
         .game-object:hover {
-            filter: brightness(1.05) drop-shadow(0 6px 8px rgba(0,0,0,0.15));
-            transform: translateY(-5px);
+            transform: translateY(-15px) scale(1.05);
+            filter: drop-shadow(0 25px 8px rgba(0,0,0,0.3));
         }
 
         /* Animations */
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        @keyframes wiggle {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-5deg); }
-            75% { transform: rotate(5deg); }
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        @keyframes floatClouds {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-30px); }
-        }
-
-        .animate-bounce-happy {
-            animation: bounce 0.6s infinite;
-        }
-
-        .animate-wiggle {
-            animation: wiggle 0.4s ease-in-out;
-        }
-
-        .animate-pop {
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        .cloud-anim {
-            animation: floatClouds 4s infinite alternate ease-in-out;
-            position: absolute;
-            z-index: 0; /* Đặt mây ở dưới cùng */
-            pointer-events: none;
-        }
-
-        /* Star styling */
-        .star-icon {
-            filter: drop-shadow(0px 2px 0px rgba(0,0,0,0.2));
-        }
-
-        .speech-bubble {
-            position: relative;
-            background: #ffffff;
-            border-radius: 1em;
-            border: 4px solid #60A5FA;
-            z-index: 20;
-        }
-        .speech-bubble:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border: 12px solid transparent;
-            border-top-color: #60A5FA;
-            border-bottom: 0;
-            margin-left: -12px;
-            margin-bottom: -12px;
-        }
-
-        /* Mini-game Styles */
-        #mini-game-layer {
-            background: linear-gradient(180deg, #A5F3FC 0%, #E0F2FE 100%);
-        }
-        .basket {
-            bottom: 30px;
-            width: 110px;
-            height: 70px;
-            background: #A0522D; /* Sienna */
-            border-radius: 10px 10px 30px 30px;
-            border: 4px solid #8B4513;
-            position: absolute;
-            box-shadow: 0 8px 10px rgba(0,0,0,0.2);
-            z-index: 50;
-        }
-        /* Basket handle */
-        .basket:before {
-            content: '';
-            position: absolute;
-            top: -30px;
-            left: 10px;
-            width: 82px;
-            height: 40px;
-            border: 5px solid #8B4513;
-            border-bottom: none;
-            border-radius: 40px 40px 0 0;
-            z-index: -1;
-        }
+        @keyframes floatSun { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
+        @keyframes floatClouds { 0% { transform: translateX(-150px); } 100% { transform: translateX(110vw); } }
+        @keyframes bounceIn { 0% { transform: scale(0); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes wiggle { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-15deg); } 75% { transform: rotate(15deg); } }
+        @keyframes happyBounce { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-40px) scale(1.05); } }
         
+        .animate-bounce-in { animation: bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .animate-wiggle { animation: wiggle 0.4s ease-in-out; }
+        .animate-happy { animation: happyBounce 0.5s ease-in-out 2; }
+        .cloud-anim { animation: floatClouds linear infinite; position: absolute; z-index: 1; opacity: 0.9; }
+
+        /* Mini-game styling */
+        .basket {
+            position: absolute;
+            bottom: 5vh;
+            width: 130px;
+            height: 70px;
+            background-color: #D3A068;
+            border: 6px solid #B88550;
+            border-radius: 10px 10px 40px 40px;
+            box-shadow: 0 10px 0 rgba(0,0,0,0.1);
+            z-index: 50;
+            transform-origin: center;
+            transition: left 0.1s ease-out;
+        }
         .falling-item {
             position: absolute;
-            font-size: 45px;
-            top: -60px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            font-size: 60px;
+            top: -80px;
+            filter: drop-shadow(0 8px 5px rgba(0,0,0,0.25));
             z-index: 40;
+        }
+
+        #fireworks-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Pill styling */
+        .pill {
+            background: white;
+            border: 4px solid var(--duo-bg);
+            border-bottom: 6px solid var(--duo-bg);
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            font-weight: 800;
+            gap: 0.5rem;
         }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col select-none relative overflow-hidden">
-<img src="../assets/logo-oodles-math.png" class="oodles-logo">
-    <!-- Global Clouds Background -->
-    <div class="fixed inset-0 pointer-events-none overflow-hidden">
-        <div class="cloud-anim text-white/60 text-6xl" style="top: 10%; left: 10%; animation-duration: 6s;">☁️</div>
-        <div class="cloud-anim text-white/50 text-5xl" style="top: 20%; right: 15%; animation-duration: 7s; animation-delay: 1s;">☁️</div>
-        <div class="cloud-anim text-white/40 text-4xl" style="top: 40%; left: 25%; animation-duration: 8s; animation-delay: 2s;">☁️</div>
-        <div class="cloud-anim text-white/30 text-7xl" style="top: 5%; left: 50%; animation-duration: 9s;">☁️</div>
-        <div class="cloud-anim text-white/40 text-5xl" style="top: 30%; right: 5%; animation-duration: 6.5s;">☁️</div>
+<body class="h-screen w-screen flex flex-col select-none relative">
+
+    <!-- Start Overlay (Audio Context Initialization) -->
+    <div id="start-overlay" class="fixed inset-0 bg-[var(--duo-sky)] z-[200] flex flex-col items-center justify-center">
+        <div class="text-[120px] animate-bounce-in drop-shadow-xl mb-4">🦉</div>
+        <h1 class="kid-text text-white text-5xl md:text-7xl font-black mb-10 text-center drop-shadow-md">Measurement<br>Class</h1>
+        <button onclick="initGame()" class="duo-btn text-3xl md:text-4xl px-12 py-6 font-black w-3/4 max-w-md">START PLAYING!</button>
     </div>
 
-    <!-- Top Bar: Progress and Score -->
-    <div class="flex justify-between items-center p-4 z-30 absolute top-0 w-full pointer-events-none">
-        <div class="flex gap-4 items-center pointer-events-auto">
-            <div class="flex gap-2" id="star-container">
-                <!-- Stars will be injected here -->
+    <!-- Scenery Background -->
+    <div class="scenery">
+        <div class="sun"></div>
+        <!-- Puffy Vector Clouds -->
+        <div class="cloud-anim text-white" style="top: 15%; left: -10%; animation-duration: 40s;">
+            <svg width="180" height="90" viewBox="0 0 24 24" fill="currentColor"><path d="M18.5 7.5c-.22 0-.44.03-.65.08A6.002 6.002 0 0 0 7 6.5c-2.48 0-4.5 2.02-4.5 4.5 0 .38.05.74.14 1.09A4.498 4.498 0 0 0 0 16.5c0 2.48 2.02 4.5 4.5 4.5h14c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+        </div>
+        <div class="cloud-anim text-white" style="top: 25%; left: 30%; animation-duration: 55s; animation-direction: reverse; transform: scale(1.3);">
+            <svg width="220" height="110" viewBox="0 0 24 24" fill="currentColor"><path d="M18.5 7.5c-.22 0-.44.03-.65.08A6.002 6.002 0 0 0 7 6.5c-2.48 0-4.5 2.02-4.5 4.5 0 .38.05.74.14 1.09A4.498 4.498 0 0 0 0 16.5c0 2.48 2.02 4.5 4.5 4.5h14c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+        </div>
+        
+        <div class="hills-back">
+            <!-- SVG Trees Back Layer -->
+            <div style="position: absolute; left: 15%; top: 5%; transform: scale(0.8);">
+                <svg width="80" height="120" viewBox="0 0 80 120">
+                    <rect x="35" y="80" width="10" height="40" fill="#6B4423" />
+                    <polygon points="40,10 70,60 50,60 75,100 5,100 30,60 10,60" fill="#2E8B57" />
+                    <polygon points="40,10 70,60 50,60 75,100 40,100" fill="#1F633E" opacity="0.5"/>
+                </svg>
             </div>
-            <div class="bg-white/90 backdrop-blur px-5 py-2 rounded-full font-bold text-orange-500 shadow-md flex items-center gap-2 border-2 border-orange-200">
-                <span class="text-2xl">🍎</span> <span id="fruit-score" class="text-xl">0</span>
+            <div style="position: absolute; left: 60%; top: 10%; transform: scale(0.6);">
+                <svg width="80" height="120" viewBox="0 0 80 120">
+                    <rect x="35" y="80" width="10" height="40" fill="#6B4423" />
+                    <polygon points="40,10 70,60 50,60 75,100 5,100 30,60 10,60" fill="#3CB371" />
+                    <polygon points="40,10 70,60 50,60 75,100 40,100" fill="#2E8B57" opacity="0.5"/>
+                </svg>
+            </div>
+             <div style="position: absolute; left: 80%; top: -5%; transform: scale(0.9);">
+                 <svg width="100" height="140" viewBox="0 0 100 140">
+                    <rect x="42" y="90" width="16" height="50" fill="#6B4423" />
+                    <circle cx="50" cy="40" r="40" fill="#2E8B57" />
+                    <circle cx="25" cy="70" r="30" fill="#228B22" />
+                    <circle cx="75" cy="70" r="30" fill="#228B22" />
+                    <circle cx="50" cy="40" r="40" fill="white" opacity="0.1" />
+                </svg>
             </div>
         </div>
-        <button onclick="toggleSound()" id="sound-btn" class="pointer-events-auto bg-white p-3 rounded-full shadow-lg text-2xl hover:bg-gray-50 transition border-2 border-gray-100 text-gray-600">
-            🔊
-        </button>
-    </div>
-
-    <!-- Main Game Area (Comparison) -->
-    <div id="main-game-layer" class="flex-grow flex flex-col items-center justify-end relative pb-0 h-full z-10 transition-all duration-500">
         
-        <!-- Teacher/Prompt Area -->
-        <div class="absolute top-24 left-0 right-0 flex flex-col items-center z-20 transition-all duration-500" id="prompt-container">
-            <div onclick="speakCurrentPrompt()" class="cursor-pointer speech-bubble bg-white px-8 py-5 shadow-xl mb-4 transform hover:scale-105 transition max-w-lg w-[90%]">
-                <h1 id="question-text" class="text-3xl md:text-5xl font-bold text-gray-700 text-center tracking-wide leading-tight">Loading...</h1>
-                <div class="flex justify-center mt-2">
-                    <span id="speaker-icon" class="text-2xl text-blue-400 animate-pulse">🔈</span>
-                </div>
+        <div class="hills-front">
+            <!-- SVG Trees Front Layer -->
+            <div style="position: absolute; left: 5%; top: -10%; transform: scale(1);">
+                <svg width="100" height="140" viewBox="0 0 100 140">
+                    <rect x="42" y="90" width="16" height="50" fill="#8B5A2B" />
+                    <rect x="50" y="90" width="8" height="50" fill="#5C3A21" />
+                    <circle cx="50" cy="40" r="40" fill="#4CAF50" />
+                    <circle cx="25" cy="70" r="30" fill="#388E3C" />
+                    <circle cx="75" cy="70" r="30" fill="#388E3C" />
+                    <circle cx="50" cy="40" r="40" fill="white" opacity="0.15" />
+                </svg>
             </div>
             
-            <!-- Character Mascot -->
-            <div class="relative mt-2">
-                <!-- Owl sits directly on the sky background now -->
-                <div class="text-8xl filter drop-shadow-xl relative z-10">🦉</div>
+            <div style="position: absolute; left: 35%; top: 5%; transform: scale(0.7);">
+                <svg width="80" height="120" viewBox="0 0 80 120">
+                    <rect x="35" y="80" width="10" height="40" fill="#6B4423" />
+                    <polygon points="40,10 70,60 50,60 75,100 5,100 30,60 10,60" fill="#4CAF50" />
+                    <polygon points="40,10 70,60 50,60 75,100 40,100" fill="#388E3C" opacity="0.4"/>
+                </svg>
             </div>
-        </div>
 
-        <!-- The "Table" where objects sit -->
-        <div class="wood-table w-full h-[55%] flex items-end justify-center gap-6 md:gap-16 pb-12 px-4 relative">
-            <!-- Objects will be injected here -->
-            <div id="game-stage" class="flex items-end justify-center w-full gap-6 md:gap-20 h-full max-w-4xl"></div>
+            <div style="position: absolute; right: 10%; top: -15%; transform: scale(1.2);">
+                 <svg width="100" height="140" viewBox="0 0 100 140">
+                    <rect x="42" y="90" width="16" height="50" fill="#8B5A2B" />
+                    <rect x="50" y="90" width="8" height="50" fill="#5C3A21" />
+                    <circle cx="50" cy="40" r="40" fill="#8BC34A" />
+                    <circle cx="25" cy="70" r="30" fill="#689F38" />
+                    <circle cx="75" cy="70" r="30" fill="#689F38" />
+                    <circle cx="50" cy="40" r="40" fill="white" opacity="0.15" />
+                </svg>
+            </div>
+
+            <!-- Beautiful Flowers -->
+            <div class="flower" style="left: 25%; top: 40%; --delay: 0.2;"></div>
+            <div class="flower pink" style="left: 32%; top: 60%; transform: scale(0.8); --delay: 0.5;"></div>
+            <div class="flower" style="left: 45%; top: 35%; transform: scale(0.6); --delay: 0.1;"></div>
+            <div class="flower pink" style="right: 35%; top: 45%; transform: scale(0.9); --delay: 0.7;"></div>
+            <div class="flower" style="right: 28%; top: 65%; transform: scale(0.7); --delay: 0.3;"></div>
+            <div class="flower pink" style="left: 55%; top: 60%; transform: scale(0.6); --delay: 0.9;"></div>
+        </div>
+        <div class="desk"></div>
+    </div>
+
+    <!-- Centered Top Navigation Bar -->
+    <div class="flex justify-center items-center gap-3 sm:gap-6 p-4 sm:p-6 z-30 absolute top-0 w-full pointer-events-none">
+        
+        <!-- Stars -->
+        <div class="pill border-yellow-200 pointer-events-auto bg-white shadow-[0_4px_0_#fef08a] h-[50px] sm:h-[60px]" id="star-container">
+            <!-- Stars JS injected -->
+        </div>
+        
+        <!-- Speaker Icon -->
+        <button onclick="speakCurrentPrompt()" class="pill bg-[var(--duo-sky)] text-white border-[var(--duo-sky-dark)] border-2 shadow-[0_4px_0_var(--duo-sky-dark)] hover:scale-105 active:translate-y-1 transition h-[50px] sm:h-[60px] px-4 sm:px-6 pointer-events-auto">
+            <span class="text-3xl sm:text-4xl filter drop-shadow-md">🔊</span>
+        </button>
+        
+        <!-- Fruit Score -->
+        <div class="pill bg-white text-[var(--duo-text)] border-orange-200 shadow-[0_4px_0_#fed7aa] cursor-pointer hover:scale-105 transition-transform h-[50px] sm:h-[60px] px-4 sm:px-6 pointer-events-auto" onclick="startMiniGame()">
+            <span class="text-3xl sm:text-4xl filter drop-shadow-sm">🍎</span> 
+            <span id="fruit-score" class="ml-2 text-2xl sm:text-3xl font-black text-orange-500">0</span>
         </div>
 
     </div>
 
-    <!-- Mini-game Area (Fruit Catching) -->
-    <div id="mini-game-layer" class="absolute inset-0 z-20 hidden flex-col items-center pointer-events-none transition-opacity duration-500 opacity-0">
-        <div class="mt-28 text-center pointer-events-auto z-30">
-            <h2 class="text-5xl font-bold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)] mb-3">Fruit Party!</h2>
-            <!-- Removed the instruction text as requested -->
+    <!-- Main Game Layer -->
+    <div id="main-game-layer" class="flex-grow flex flex-col items-center relative h-full z-10 transition-all duration-500">
+        <!-- The Stage (Height increased to 60vh for taller items) -->
+        <div class="absolute bottom-[15vh] w-full max-w-5xl h-[60vh] flex items-end justify-center gap-6 sm:gap-16 px-4 z-20" id="game-stage">
+            <!-- Objects generated here -->
+        </div>
+    </div>
+
+    <!-- Mini-Game Layer -->
+    <div id="mini-game-layer" class="absolute inset-0 z-40 hidden flex-col items-center pointer-events-none transition-opacity duration-500 opacity-0 bg-[var(--duo-sky-dark)]">
+        <div class="mt-[15vh] text-center pointer-events-auto z-30">
+            <h2 class="text-white text-5xl md:text-7xl font-black mb-2 animate-bounce drop-shadow-lg">Fruit Party!</h2>
+            <div class="inline-block bg-white text-[var(--duo-text)] rounded-full px-6 py-2 text-xl md:text-2xl font-bold border-4 border-gray-200">
+                Catch the apples! 🍎
+            </div>
         </div>
         <div id="mini-game-area" class="w-full flex-grow relative overflow-hidden pointer-events-auto touch-none">
-            <div id="basket" class="basket left-1/2 -translate-x-1/2 transition-all duration-75 ease-out"></div>
+            <div id="basket" class="basket left-1/2 -translate-x-1/2"></div>
         </div>
     </div>
 
-    <!-- Victory Overlay -->
-    <div id="victory-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center backdrop-blur-md">
-        <div class="bg-white rounded-[2rem] p-10 flex flex-col items-center shadow-2xl animate-pop border-8 border-yellow-300 max-w-sm w-[90%] relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-4 bg-yellow-300"></div>
-            <div class="text-8xl mb-6 filter drop-shadow-md">🏆</div>
-            <h2 class="text-4xl font-bold text-yellow-500 mb-2">Great Job!</h2>
-            <p class="text-xl text-gray-500 mb-8 text-center font-medium">You are a measuring star!</p>
-            <div class="text-3xl font-bold text-orange-500 mb-8 bg-orange-50 px-8 py-3 rounded-2xl border-2 border-orange-100 flex items-center gap-3">
-                <span>🍎</span> <span id="final-fruit-score">0</span>
+    <!-- Victory Modal -->
+    <div id="victory-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm">
+        <canvas id="fireworks-canvas"></canvas>
+        <div class="bg-white rounded-[2rem] p-8 sm:p-12 flex flex-col items-center animate-bounce-in border-8 border-[var(--duo-bg)] max-w-sm w-[90%] relative z-10 text-center shadow-2xl">
+            <div class="text-[100px] -mt-24 mb-2 filter drop-shadow-[0_10px_0_rgba(0,0,0,0.1)]">🏆</div>
+            <h2 class="kid-text text-4xl sm:text-5xl font-black mb-6 text-[var(--duo-yellow-dark)]">AWESOME!</h2>
+            
+            <div class="w-full bg-[var(--duo-bg)] rounded-2xl p-5 mb-8 flex flex-col gap-4">
+                <div class="flex justify-between items-center bg-white rounded-xl p-3 border-2 border-gray-200">
+                    <span class="text-xl font-bold text-gray-400">STARS</span>
+                    <span class="text-2xl text-yellow-400 font-black">⭐⭐⭐⭐⭐</span>
+                </div>
+                <div class="flex justify-between items-center bg-white rounded-xl p-3 border-2 border-gray-200">
+                    <span class="text-xl font-bold text-gray-400">FRUITS</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-3xl">🍎</span> 
+                        <span id="final-fruit-score" class="text-3xl font-black text-orange-500">0</span>
+                    </div>
+                </div>
             </div>
-            <button onclick="restartGame()" class="w-full bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white text-2xl font-bold py-4 rounded-xl shadow-lg transform transition active:scale-95 border-b-4 border-green-600">
-                Play Again
+
+            <button onclick="restartGame()" class="w-full duo-btn text-2xl font-black py-4">
+                PLAY AGAIN
             </button>
         </div>
     </div>
 
     <script>
-        // --- Game State ---
+        // --- Game State & Config ---
         let score = 0;
         const maxScore = 5;
         let fruitScore = 0;
@@ -235,19 +381,48 @@
         let soundEnabled = true;
         let isProcessing = false;
         let isMiniGameActive = false;
+        let audioCtx;
 
-        // --- Audio Context ---
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
+        // --- Flat Vector Colors (Duolingo Style) ---
+        const flatColors = [
+            { id: 'red', main: '#FF4B4B', dark: '#EA2B2B', light: '#FF8A8A' },
+            { id: 'blue', main: '#1CB0F6', dark: '#1899D6', light: '#78C8F6' },
+            { id: 'green', main: '#58CC02', dark: '#46A302', light: '#89E23D' },
+            { id: 'yellow', main: '#FFC800', dark: '#E5B400', light: '#FFDE59' },
+            { id: 'purple', main: '#CE82FF', dark: '#A568CC', light: '#E4B8FF' },
+            { id: 'orange', main: '#FF9600', dark: '#E58700', light: '#FFB84D' }
+        ];
 
-        function playTone(freq, type, duration, volume = 0.1) {
-            if (!soundEnabled) return;
+        function getRandomColorObj() {
+            return flatColors[Math.floor(Math.random() * flatColors.length)];
+        }
+
+        // --- Init Audio Context cleanly ---
+        function initGame() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+            
+            let utter = new SpeechSynthesisUtterance('');
+            window.speechSynthesis.speak(utter);
+
+            document.getElementById('start-overlay').classList.add('hidden');
+            updateStars();
+            renderLevel();
+            playSuccessSound(); 
+        }
+
+        // --- Beautiful Audio Synth ---
+        function playTone(freq, type, duration, vol=0.1) {
+            if (!soundEnabled || !audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.type = type;
+            
+            osc.type = type; 
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+            
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start();
@@ -255,199 +430,222 @@
         }
 
         function playSuccessSound() {
-            // Happy major chord arpeggio
-            playTone(523.25, 'sine', 0.1, 0.1); // C5
-            setTimeout(() => playTone(659.25, 'sine', 0.1, 0.1), 100); // E5
-            setTimeout(() => playTone(783.99, 'sine', 0.3, 0.1), 200); // G5
-            speak("Correct!");
+            playTone(523.25, 'triangle', 0.3, 0.15); 
+            setTimeout(() => playTone(659.25, 'triangle', 0.3, 0.15), 100); 
+            setTimeout(() => playTone(783.99, 'triangle', 0.4, 0.15), 200); 
+            setTimeout(() => playTone(1046.50, 'triangle', 0.6, 0.15), 300); 
         }
 
         function playErrorSound() {
-            // Low error thud
-            playTone(150, 'triangle', 0.1, 0.2);
-            setTimeout(() => playTone(100, 'triangle', 0.2, 0.2), 100);
+            playTone(250, 'square', 0.3, 0.1);
+            setTimeout(() => playTone(200, 'square', 0.4, 0.1), 100);
         }
-        
-        function playCatchSound() { playTone(1200, 'sine', 0.08, 0.05); } // High ping
-        function playBombSound() { playTone(100, 'sawtooth', 0.4, 0.2); } // Low buzz
+
+        function playCatchSound() { 
+            playTone(880, 'sine', 0.15, 0.1); 
+            setTimeout(() => playTone(1200, 'sine', 0.2, 0.1), 50);
+        } 
+        function playBombSound() { 
+            playTone(150, 'sawtooth', 0.4, 0.2); 
+        }
+        function playCheerSound() {
+            [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, i) => {
+                setTimeout(() => playTone(freq, 'triangle', 0.4, 0.15), i * 150);
+            });
+            setTimeout(() => playSuccessSound(), 800);
+        }
 
         function speak(text) {
             if (!soundEnabled) return;
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US'; 
-            utterance.rate = 0.95;
-            utterance.pitch = 1.1;
+            utterance.rate = 0.85; 
+            utterance.pitch = 1.2; 
             window.speechSynthesis.speak(utterance);
         }
 
-        function toggleSound() {
-            soundEnabled = !soundEnabled;
-            document.getElementById('sound-btn').innerText = soundEnabled ? '🔊' : '🔇';
-            if(soundEnabled && audioCtx.state === 'suspended') audioCtx.resume();
-        }
-
-        // --- Asset Generators (SVGs) ---
-        // Enhanced colors
-        const colors = {
-            red: '#FF8FAB',      // Soft Pink/Red
-            blue: '#48CAE4',     // Cyan Blue
-            green: '#90BE6D',    // Pistachio Green
-            yellow: '#F9C74F',   // Maize Crayola
-            purple: '#CDB4DB',   // Lavender
-            orange: '#FFAFCC',   // Carnation Pink (used as variety)
-            teal: '#43AA8B'      // Jungle Green
-        };
-        const colorKeys = Object.keys(colors);
-        const getRandomColor = () => colors[colorKeys[Math.floor(Math.random() * colorKeys.length)]];
-
-        // 1. Pencil
-        function createPencil(length, color) {
-            const w = 60; const h = length;
+        // --- UPGRADED REALISTIC 3D FLAT VECTORS ---
+        
+        function createFlatPencil(h, c) {
             return `
-                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
-                    <rect x="10" y="40" width="40" height="${h - 40}" fill="${color}" stroke="#000" stroke-width="2" rx="4" />
-                    <!-- Tip -->
-                    <path d="M 10 40 L 30 0 L 50 40 Z" fill="#FDE68A" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
-                    <path d="M 23 26 L 30 12 L 37 26 Z" fill="#333" />
+                <svg viewBox="0 0 100 ${h}" preserveAspectRatio="xMidYMax meet" width="100%" height="100%" style="overflow:visible;">
+                    <!-- Wood Cone -->
+                    <polygon points="30,50 70,50 50,0" fill="#FDE047" />
+                    <!-- Lead -->
+                    <polygon points="43,18 57,18 50,0" fill="#374151" />
+                    <!-- Main Body with Hexagonal facets -->
+                    <rect x="30" y="50" width="40" height="${h-85}" fill="${c.main}" />
+                    <rect x="30" y="50" width="12" height="${h-85}" fill="white" opacity="0.3" />
+                    <rect x="58" y="50" width="12" height="${h-85}" fill="black" opacity="0.15" />
+                    <line x1="42" y1="50" x2="42" y2="${h-35}" stroke="rgba(0,0,0,0.1)" stroke-width="1" />
+                    <line x1="58" y1="50" x2="58" y2="${h-35}" stroke="rgba(0,0,0,0.1)" stroke-width="1" />
+                    <!-- Metal Ferrule (More realistic) -->
+                    <rect x="30" y="${h-35}" width="40" height="15" fill="#D1D5DB" />
+                    <rect x="30" y="${h-35}" width="12" height="15" fill="white" opacity="0.5" />
+                    <rect x="58" y="${h-35}" width="12" height="15" fill="black" opacity="0.2" />
+                    <line x1="30" y1="${h-30}" x2="70" y2="${h-30}" stroke="#9CA3AF" stroke-width="2" />
+                    <line x1="30" y1="${h-25}" x2="70" y2="${h-25}" stroke="#9CA3AF" stroke-width="2" />
                     <!-- Eraser -->
-                    <path d="M 10 ${h-15} L 10 ${h} Q 30 ${h+8} 50 ${h} L 50 ${h-15} Z" fill="#FCA5A5" stroke="#000" stroke-width="2"/>
-                    <!-- Metal Band -->
-                    <rect x="10" y="${h-25}" width="40" height="10" fill="#D1D5DB" stroke="#000" stroke-width="2"/>
+                    <path d="M 30 ${h-20} L 70 ${h-20} L 70 ${h-5} Q 70 ${h} 65 ${h} L 35 ${h} Q 30 ${h} 30 ${h-5} Z" fill="#FCA5A5" />
+                    <rect x="30" y="${h-20}" width="12" height="20" fill="white" opacity="0.3" />
                 </svg>
             `;
         }
 
-        // 2. Ballpoint Pen (Simplified & Prettier)
-        function createPen(length, color) {
-            const w = 50; const h = length;
+        function createFlatCrayon(h, c) {
             return `
-                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
-                    <!-- Body -->
-                    <rect x="12" y="10" width="26" height="${h-20}" fill="${color}" rx="13" stroke="#000" stroke-width="2"/>
-                    <!-- Cap area -->
-                    <path d="M 12 50 L 38 50" stroke="#000" stroke-width="2" stroke-opacity="0.2"/>
-                    <!-- Clicker -->
-                    <rect x="18" y="0" width="14" height="12" fill="#fff" stroke="#000" stroke-width="2" rx="2"/>
-                    <!-- Clip -->
-                    <path d="M 30 20 L 30 60 Q 30 70 34 65" stroke="#000" stroke-width="2" fill="none"/>
-                    <!-- Tip -->
-                    <path d="M 15 ${h-15} L 25 ${h+5} L 35 ${h-15} Z" fill="#D1D5DB" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
-                    <circle cx="25" cy="${h+2}" r="1.5" fill="#333"/>
+                <svg viewBox="0 0 100 ${h}" preserveAspectRatio="xMidYMax meet" width="100%" height="100%" style="overflow:visible;">
+                    <!-- Rounded Crayon Tip -->
+                    <path d="M 35 30 L 65 30 L 58 5 Q 50 0 42 5 Z" fill="${c.main}" />
+                    <path d="M 35 30 L 45 30 L 42 5 Q 40 3 40 5 Z" fill="white" opacity="0.25" />
+                    <!-- Wrapper Paper -->
+                    <rect x="30" y="30" width="40" height="${h-30}" fill="${c.light}" />
+                    <!-- Wrapper Shadows/Highlights for 3D cylinder look -->
+                    <rect x="30" y="30" width="10" height="${h-30}" fill="white" opacity="0.3" />
+                    <rect x="60" y="30" width="10" height="${h-30}" fill="black" opacity="0.1" />
+                    <!-- Wrapper Waves Design -->
+                    <path d="M 30 40 Q 40 35 50 40 T 70 40 L 70 48 Q 60 43 50 48 T 30 48 Z" fill="#111827" opacity="0.8" />
+                    <path d="M 30 ${h-25} Q 40 ${h-30} 50 ${h-25} T 70 ${h-25} L 70 ${h-17} Q 60 ${h-22} 50 ${h-17} T 30 ${h-17} Z" fill="#111827" opacity="0.8" />
+                    <!-- Center Oval Logo -->
+                    <ellipse cx="50" cy="${(h/2)+10}" rx="12" ry="20" fill="#111827" opacity="0.9" />
+                    <ellipse cx="50" cy="${(h/2)+10}" rx="10" ry="18" fill="${c.main}" />
                 </svg>
             `;
         }
 
-        // 3. Ruler (Classic)
-        function createRuler(length, color) {
-            const w = 70; const h = length;
+        function createFlatRuler(h, c) {
             let ticks = '';
-            for(let i=10; i<h-10; i+=15) {
-                let text = (i % 30 === 10) ? `<text x="38" y="${i+4}" font-family="Fredoka" font-weight="bold" font-size="12" fill="#78350F" text-anchor="start">${Math.round((h-i)/15)}</text>` : '';
-                 ticks += `<line x1="10" y1="${i}" x2="${(i % 30 === 10) ? 32 : 22}" y2="${i}" stroke="#78350F" stroke-width="2" stroke-linecap="round"/> ${text}`;
+            for(let i=30; i<h-20; i+=15) {
+                ticks += `<line x1="25" y1="${i}" x2="${(i % 30 === 0) ? 45 : 35}" y2="${i}" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.8"/>`;
             }
             return `
-                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
-                    <rect x="5" y="0" width="60" height="${h}" fill="#FDE047" rx="6" stroke="#B45309" stroke-width="3"/>
-                    <rect x="10" y="5" width="50" height="${h-10}" fill="#FEF08A" rx="4" opacity="0.5"/>
+                <svg viewBox="0 0 100 ${h}" preserveAspectRatio="xMidYMax meet" width="100%" height="100%" style="overflow:visible;">
+                    <!-- Main Body (Slightly transparent plastic) -->
+                    <rect x="25" y="0" width="50" height="${h}" fill="${c.main}" rx="4" opacity="0.9" />
+                    <!-- Beveled Edge (3D effect) -->
+                    <rect x="60" y="5" width="10" height="${h-10}" fill="black" opacity="0.1" rx="2" />
+                    <line x1="60" y1="5" x2="60" y2="${h-5}" stroke="white" stroke-width="2" opacity="0.4" />
+                    <!-- Hang Hole -->
+                    <circle cx="50" cy="15" r="5" fill="var(--duo-sky)" />
+                    <!-- Beautiful Highlight Strip -->
+                    <rect x="28" y="5" width="8" height="${h-10}" fill="white" opacity="0.3" rx="2" />
+                    <!-- Measurement Ticks -->
                     ${ticks}
                 </svg>
             `;
         }
 
-        // 4. Paintbrush (New Item to replace Car)
-        function createPaintbrush(length, color) {
-            const w = 60; const h = length;
-            const handleH = h * 0.7;
-            const ferruleH = h * 0.15;
-            const bristleH = h * 0.15;
+        function createFlatPaintbrush(h, c) {
             return `
-                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
-                    <!-- Handle -->
-                    <path d="M 20 ${h} L 20 ${bristleH + ferruleH} L 40 ${bristleH + ferruleH} L 40 ${h} Q 30 ${h+5} 20 ${h} Z" fill="${color}" stroke="#000" stroke-width="2"/>
-                    <!-- Ferrule (Metal part) -->
-                    <rect x="20" y="${bristleH}" width="20" height="${ferruleH}" fill="#9CA3AF" stroke="#000" stroke-width="2"/>
-                    <line x1="20" y1="${bristleH + 5}" x2="40" y2="${bristleH + 5}" stroke="#000" opacity="0.2"/>
-                    <line x1="20" y1="${bristleH + ferruleH - 5}" x2="40" y2="${bristleH + ferruleH - 5}" stroke="#000" opacity="0.2"/>
-                    <!-- Bristles -->
-                    <path d="M 20 ${bristleH} Q 20 0 30 0 Q 40 0 40 ${bristleH} Z" fill="#D97706" stroke="#000" stroke-width="2"/>
-                    <!-- Paint Dip -->
-                    <path d="M 20 ${bristleH/2} Q 20 0 30 0 Q 40 0 40 ${bristleH/2} Q 30 ${bristleH} 20 ${bristleH/2}" fill="${color}" opacity="0.8"/>
+                <svg viewBox="0 0 100 ${h}" preserveAspectRatio="xMidYMax meet" width="100%" height="100%" style="overflow:visible;">
+                    <!-- Bristles Texture (Multi-layer) -->
+                    <path d="M 35 45 Q 30 -5 50 0 Q 70 -5 65 45 Z" fill="#D97706" />
+                    <path d="M 38 45 Q 35 5 50 5 Q 65 5 62 45 Z" fill="#FBBF24" />
+                    <path d="M 42 45 Q 40 10 50 10 Q 60 10 58 45 Z" fill="#FDE68A" />
+                    <!-- Paint Dip (Match Color) -->
+                    <path d="M 36 30 Q 30 -5 50 0 Q 70 -5 64 30 Q 58 40 50 30 Q 42 20 36 30 Z" fill="${c.main}" />
+                    <!-- Metal Ferrule -->
+                    <rect x="33" y="45" width="34" height="20" fill="#9CA3AF" rx="2"/>
+                    <rect x="33" y="45" width="10" height="20" fill="white" opacity="0.5" />
+                    <rect x="57" y="45" width="10" height="20" fill="black" opacity="0.2" />
+                    <!-- Crimp lines -->
+                    <line x1="33" y1="50" x2="67" y2="50" stroke="#4B5563" stroke-width="2" />
+                    <line x1="33" y1="55" x2="67" y2="55" stroke="#4B5563" stroke-width="2" />
+                    <!-- Wood Handle -->
+                    <path d="M 36 65 L 64 65 L 60 ${h-10} Q 50 ${h} 40 ${h-10} Z" fill="#92400E" /> 
+                    <!-- Painted Tip of Handle -->
+                    <path d="M 37 ${h-30} L 63 ${h-30} L 60 ${h-10} Q 50 ${h} 40 ${h-10} Z" fill="${c.dark}" />
+                    <!-- Handle Highlight -->
+                    <path d="M 40 65 L 45 65 L 43 ${h-15} Z" fill="white" opacity="0.2" />
                 </svg>
             `;
         }
 
-        // 5. Cube Tower
-        function createCubeTower(length, color) {
-            const w = 50; const h = length;
-            const cubeSize = 40;
-            const numCubes = Math.floor(h / cubeSize);
-            let cubes = '';
-            for(let i=0; i<numCubes; i++) {
-                const y = h - (i+1)*cubeSize;
-                const c = i % 2 === 0 ? color : '#FCD34D'; // Alternating main color and yellow
-                cubes += `
-                    <rect x="5" y="${y}" width="${cubeSize}" height="${cubeSize}" fill="${c}" stroke="#000" stroke-width="2" rx="6"/>
-                    <circle cx="${5 + cubeSize/2}" cy="${y + cubeSize/2}" r="5" fill="rgba(0,0,0,0.1)"/>
+        function createFlatBlocks(h, c) {
+            const blockH = 26;
+            const count = Math.floor(h / blockH);
+            let blocks = '';
+            for(let i=0; i<count; i++) {
+                let y = h - (i + 1) * blockH;
+                let color = i % 2 === 0 ? c.main : c.light;
+                let darkColor = i % 2 === 0 ? c.dark : c.main;
+                blocks += `
+                    <g transform="translate(0, ${y})">
+                        <!-- Connecting Studs with Light/Shadow -->
+                        <rect x="35" y="0" width="8" height="6" fill="${color}" rx="1"/>
+                        <rect x="46" y="0" width="8" height="6" fill="${color}" rx="1"/>
+                        <rect x="57" y="0" width="8" height="6" fill="${color}" rx="1"/>
+                        <rect x="35" y="0" width="3" height="6" fill="white" opacity="0.3" rx="1"/>
+                        <rect x="46" y="0" width="3" height="6" fill="white" opacity="0.3" rx="1"/>
+                        <rect x="57" y="0" width="3" height="6" fill="white" opacity="0.3" rx="1"/>
+                        
+                        <!-- Main Block Body -->
+                        <rect x="30" y="5" width="40" height="${blockH-5}" fill="${color}" rx="3" />
+                        <!-- 3D Bottom & Right Shadows -->
+                        <rect x="30" y="${blockH-4}" width="40" height="4" fill="${darkColor}" rx="2" />
+                        <rect x="66" y="5" width="4" height="${blockH-5}" fill="${darkColor}" rx="2" />
+                        <!-- Top & Left Highlight -->
+                        <rect x="30" y="5" width="40" height="4" fill="white" opacity="0.3" rx="2" />
+                        <rect x="30" y="5" width="4" height="${blockH-5}" fill="white" opacity="0.3" rx="2" />
+                    </g>
                 `;
             }
             return `
-                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
-                    ${cubes}
+                <svg viewBox="0 0 100 ${h}" preserveAspectRatio="xMidYMax meet" width="100%" height="100%" style="overflow:visible;">
+                    ${blocks}
                 </svg>
             `;
         }
 
 
-        // --- Main Game Logic ---
-        const generators = [createPencil, createPen, createRuler, createPaintbrush, createCubeTower];
+        // --- Core Game Logic ---
+        const generators = [createFlatPencil, createFlatCrayon, createFlatRuler, createFlatPaintbrush, createFlatBlocks];
         
-        // Definitions for comparative vs superlative
         const prompts = {
             superlative: [
-                { type: 'longest', text: "Which one is the LONGEST?", compare: (a, b) => b.val - a.val },
-                { type: 'shortest', text: "Which one is the SHORTEST?", compare: (a, b) => a.val - b.val }
+                { text: "Which one is the longest?", compare: (a, b) => b.val - a.val },
+                { text: "Which one is the shortest?", compare: (a, b) => a.val - b.val }
             ],
             comparative: [
-                { type: 'longer', text: "Which one is LONGER?", compare: (a, b) => b.val - a.val },
-                { type: 'shorter', text: "Which one is SHORTER?", compare: (a, b) => a.val - b.val }
+                { text: "Which one is longer?", compare: (a, b) => b.val - a.val },
+                { text: "Which one is shorter?", compare: (a, b) => a.val - b.val }
             ]
         };
 
         function generateLevel() {
             const numObjects = score < 2 ? 2 : 3;
             const isComparative = numObjects === 2;
-            
-            // Randomly select one item type for consistency
-            const objectTypeIdx = Math.floor(Math.random() * generators.length);
-            const generator = generators[objectTypeIdx];
+            const generator = generators[Math.floor(Math.random() * generators.length)];
             
             let items = [];
-            const baseUnit = 40; 
+            const maxUnits = 12; // Tăng base height để icons cao hơn
             
             for (let i = 0; i < numObjects; i++) {
                 let units;
                 let isUnique = false;
                 while (!isUnique) {
-                    units = Math.floor(Math.random() * 5) + 4; // 4 to 8 units
-                    const tooClose = items.some(item => Math.abs(item.units - units) < 1);
+                    units = Math.floor(Math.random() * 6) + 6; // 6 to 11 units
+                    const tooClose = items.some(item => Math.abs(item.units - units) < 1.5);
                     if (!tooClose) isUnique = true;
                 }
+
+                const heightPct = (units / maxUnits) * 100;
+                const svgHeight = units * 25; // Scale up the SVG coordinates
 
                 items.push({
                     id: i,
                     units: units,
-                    height: units * baseUnit,
-                    color: getRandomColor(),
-                    svg: generator(units * baseUnit, getRandomColor())
+                    heightPct: heightPct,
+                    val: units,
+                    svg: generator(svgHeight, getRandomColorObj())
                 });
             }
 
-            // Select question based on number of items
             const questionPool = isComparative ? prompts.comparative : prompts.superlative;
             const question = questionPool[Math.floor(Math.random() * questionPool.length)];
             
-            const sorted = [...items].sort((a, b) => question.compare({val: a.height}, {val: b.height}));
+            const sorted = [...items].sort((a, b) => question.compare(a, b));
             const correctId = sorted[0].id;
 
             return { items, question, correctId };
@@ -458,21 +656,14 @@
             isProcessing = false;
             currentLevelData = generateLevel();
             const stage = document.getElementById('game-stage');
-            const promptText = document.getElementById('question-text');
-            
             stage.innerHTML = '';
-            
-            let qText = currentLevelData.question.text;
-            // Stylize the keyword
-            const keyword = qText.split(' ').pop().replace('?', '');
-            const colorClass = (keyword.includes('LONG')) ? 'text-green-500' : 'text-red-500';
-            qText = qText.replace(keyword, `<span class="${colorClass}">${keyword}</span>`);
-            
-            promptText.innerHTML = qText;
 
             currentLevelData.items.forEach(item => {
                 const container = document.createElement('div');
-                container.className = 'flex items-end gap-2 group game-object';
+                container.className = 'game-object flex-1 flex justify-center items-end';
+                container.style.height = item.heightPct + '%';
+                // Container width reduced greatly to enforce the slim new look
+                container.style.maxWidth = '100px'; 
                 container.onclick = () => handleInput(item.id, container);
                 container.innerHTML = item.svg;
                 stage.appendChild(container);
@@ -491,25 +682,23 @@
             if (isProcessing || isMiniGameActive) return;
 
             if (id === currentLevelData.correctId) {
-                // Correct
                 isProcessing = true;
                 playSuccessSound();
-                element.classList.add('animate-bounce-happy');
-                createConfetti(element);
+                speak("Correct!");
+                element.classList.add('animate-happy');
+                createConfettiExplosion(element);
                 
                 score++;
                 updateStars();
 
-                // Start mini-game after 1.5s
                 setTimeout(() => {
                     startMiniGame();
                 }, 1500);
 
             } else {
-                // Incorrect
                 playErrorSound();
                 element.classList.add('animate-wiggle');
-                speak("Try again!");
+                speak("Oops! Try again.");
                 setTimeout(() => {
                     element.classList.remove('animate-wiggle');
                 }, 500);
@@ -521,33 +710,40 @@
             container.innerHTML = '';
             for(let i=0; i<maxScore; i++) {
                 if (i < score) {
-                    container.innerHTML += `<div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-white text-2xl shadow-lg border-2 border-white animate-pop star-icon">★</div>`;
+                    container.innerHTML += `<div class="text-3xl sm:text-4xl filter drop-shadow-sm animate-bounce-in">⭐</div>`;
                 } else {
-                    container.innerHTML += `<div class="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center text-white/50 text-xl border-2 border-transparent">★</div>`;
+                    container.innerHTML += `<div class="text-3xl sm:text-4xl opacity-20 grayscale">⭐</div>`;
                 }
             }
         }
 
-        function createConfetti(target) {
+        // --- Visual Effects ---
+        function createConfettiExplosion(target) {
             const rect = target.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top;
-            for (let i = 0; i < 25; i++) {
+            const centerY = rect.top + rect.height / 2;
+            
+            for (let i = 0; i < 40; i++) {
                 const conf = document.createElement('div');
-                conf.classList.add('fixed', 'w-3', 'h-3', 'rounded-full');
-                conf.style.backgroundColor = getRandomColor();
+                conf.className = 'fixed w-3 h-3 sm:w-4 sm:h-4 rounded-sm z-[100]';
+                conf.style.backgroundColor = flatColors[Math.floor(Math.random()*flatColors.length)].main;
                 conf.style.left = centerX + 'px';
                 conf.style.top = centerY + 'px';
-                conf.style.transition = 'all 0.8s ease-out';
-                conf.style.zIndex = 100;
+                conf.style.transition = 'all 1s cubic-bezier(0.1, 0.8, 0.3, 1)';
                 document.body.appendChild(conf);
-                setTimeout(() => {
-                    const x = (Math.random() - 0.5) * 250;
-                    const y = (Math.random() - 1) * 250;
-                    conf.style.transform = `translate(${x}px, ${y}px) scale(0)`;
-                    conf.style.opacity = 0;
-                }, 10);
-                setTimeout(() => conf.remove(), 800);
+                
+                conf.getBoundingClientRect(); // Reflow
+                
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 100 + Math.random() * 200;
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance + 50; 
+                const rot = Math.random() * 720;
+                
+                conf.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg)`;
+                conf.style.opacity = 0;
+                
+                setTimeout(() => conf.remove(), 1000);
             }
         }
 
@@ -563,34 +759,23 @@
             isMiniGameActive = true;
             miniGameStartTime = Date.now();
             
-            // UI Transition
             document.getElementById('main-game-layer').classList.add('opacity-0', 'pointer-events-none');
             document.getElementById('mini-game-layer').classList.remove('hidden', 'opacity-0', 'pointer-events-none');
             document.getElementById('mini-game-layer').classList.add('flex');
             
-            speak("Fruit party! Catch apples!");
+            speak("Fruit party! Catch the apples!");
 
-            // Reset
             basketPosition = 50;
             updateBasketPosition();
-
-            // Initial Spawn
             scheduleNextSpawn();
-
-            // Listen to inputs
             setupMiniGameControls();
         }
 
         function scheduleNextSpawn() {
             if(!isMiniGameActive) return;
-            
             const elapsed = Date.now() - miniGameStartTime;
-            // Level 0 (0-5s), Level 1 (5-10s), Level 2 (10-15s)...
-            const level = Math.floor(elapsed / 5000); 
-
-            // Base delay decreases as level increases (faster spawning)
-            // L0: 700ms, L1: 600ms, L2: 500ms... Min 300ms
-            let delay = Math.max(300, 700 - (level * 100));
+            const level = Math.floor(elapsed / 3000); 
+            let delay = Math.max(350, 800 - (level * 100));
 
             itemSpawnInterval = setTimeout(() => {
                 spawnItem();
@@ -605,54 +790,45 @@
 
             isMiniGameActive = false;
             
-            // Transition back
             document.getElementById('mini-game-layer').classList.add('opacity-0', 'pointer-events-none');
             setTimeout(() => {
                  document.getElementById('mini-game-layer').classList.add('hidden');
                  document.getElementById('mini-game-layer').classList.remove('flex');
                  document.getElementById('main-game-layer').classList.remove('opacity-0', 'pointer-events-none');
             }, 500);
-           
+            
             if (score >= maxScore) {
                 setTimeout(() => {
                     document.getElementById('final-fruit-score').innerText = fruitScore;
                     document.getElementById('victory-modal').classList.remove('hidden');
-                    playTone(523.25, 'square', 0.1);
-                    playTone(698.46, 'square', 0.1); // F5
-                    playTone(880.00, 'square', 0.4); // A5
-                    speak("Congratulations! You are amazing!");
-                }, 1500);
+                    playCheerSound();
+                    speak("Awesome! You are a measurement star!");
+                    startFireworks();
+                }, 800);
             } else {
-                speak("Oh no, a bomb! Next round.");
-                setTimeout(renderLevel, 1500);
+                speak("Next level! Get ready!");
+                setTimeout(renderLevel, 800);
             }
         }
 
         function spawnItem() {
             const elapsed = Date.now() - miniGameStartTime;
-            const level = Math.floor(elapsed / 5000); 
+            const level = Math.floor(elapsed / 4000); 
 
-            let items = ['🍎', '🍊', '🍇', '🍓', '🍎']; 
+            let items = ['🍎', '🍎', '🍊', '🍇', '🍓', '🍌']; 
+            let speed = Math.min(18, 6 + level * 2);
             
-            // Speed increases with level
-            // L0: 4, L1: 5, L2: 6... Max 12
-            let speed = Math.min(12, 4 + level);
-
-            // Bomb count increases with level
-            // L0: 1 bomb, L1: 2 bombs, L2: 3 bombs...
-            const bombCount = 1 + level;
-            for(let i=0; i<bombCount; i++) {
-                items.push('💣');
-            }
+            const bombCount = 1 + Math.floor(level/2);
+            for(let i=0; i<bombCount; i++) items.push('💣');
 
             const item = items[Math.floor(Math.random() * items.length)];
             const el = document.createElement('div');
             el.classList.add('falling-item');
             el.innerText = item;
-            el.style.left = Math.random() * 85 + 5 + '%'; // Keep within bounds
+            el.style.left = Math.random() * 80 + 10 + '%'; 
             miniGameArea.appendChild(el);
 
-            let posY = -60;
+            let posY = -100;
             
             const fallInterval = setInterval(() => {
                 if(!isMiniGameActive) {
@@ -664,13 +840,10 @@
                 posY += speed;
                 el.style.top = posY + 'px';
 
-                // Collision
                 const basketRect = basket.getBoundingClientRect();
                 const itemRect = el.getBoundingClientRect();
 
-                // Improved Hitbox
-                const hitY = posY > miniGameArea.offsetHeight - 130; 
-                if(hitY && 
+                if(posY > miniGameArea.offsetHeight - 120 && 
                    itemRect.right > basketRect.left + 20 && 
                    itemRect.left < basketRect.right - 20) {
                     
@@ -680,20 +853,25 @@
                     if(item === '💣') {
                         playBombSound();
                         basket.classList.add('animate-wiggle');
+                        speak("Oh no! A bomb!");
                         setTimeout(() => basket.classList.remove('animate-wiggle'), 500);
                         endMiniGame();
                     } else {
                         playCatchSound();
                         fruitScore++;
-                        // Visual Pop
+                        
                         const plusOne = document.createElement('div');
                         plusOne.innerText = '+1';
-                        plusOne.className = 'absolute text-yellow-500 font-bold text-3xl animate-pop';
-                        plusOne.style.left = basketRect.left + 40 + 'px';
-                        plusOne.style.top = basketRect.top - 40 + 'px';
+                        plusOne.className = 'absolute text-[var(--duo-yellow)] font-black text-4xl animate-bounce-in drop-shadow-md z-50';
+                        plusOne.style.left = (itemRect.left - miniGameArea.getBoundingClientRect().left) + 'px';
+                        plusOne.style.top = (basketRect.top - miniGameArea.getBoundingClientRect().top - 40) + 'px';
                         miniGameArea.appendChild(plusOne);
-                        setTimeout(()=>plusOne.remove(), 500);
+                        setTimeout(()=>plusOne.remove(), 600);
+                        
                         fruitScoreEl.innerText = fruitScore;
+                        
+                        basket.style.transform = 'translateX(-50%) scale(1.1) translateY(10px)';
+                        setTimeout(()=> basket.style.transform = 'translateX(-50%) scale(1) translateY(0)', 100);
                     }
 
                 } else if (posY > miniGameArea.offsetHeight) {
@@ -707,12 +885,10 @@
             miniGameArea.addEventListener('touchmove', handleMove, {passive: false});
             miniGameArea.addEventListener('mousemove', handleMove);
         }
-
         function teardownMiniGameControls() {
             miniGameArea.removeEventListener('touchmove', handleMove);
             miniGameArea.removeEventListener('mousemove', handleMove);
         }
-
         function handleMove(e) {
             if(!isMiniGameActive) return;
             e.preventDefault();
@@ -722,13 +898,13 @@
             basketPosition = (relativeX / rect.width) * 100;
             updateBasketPosition();
         }
-
         function updateBasketPosition() {
             basketPosition = Math.max(10, Math.min(90, basketPosition)); 
-            basket.style.left = basketPosition + '%';
+            basket.style.left = `${basketPosition}%`; 
         }
 
         function restartGame() {
+            stopFireworks();
             score = 0;
             fruitScore = 0;
             fruitScoreEl.innerText = '0';
@@ -737,17 +913,79 @@
             renderLevel();
         }
 
-        // Initialize
-        window.onload = () => {
-            updateStars();
-            renderLevel();
-            document.body.addEventListener('click', function() {
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-            }, {once:true});
-        };
+        // --- Canvas Fireworks System ---
+        const canvas = document.getElementById('fireworks-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let fireworksAnimId;
 
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x; this.y = y; this.color = color;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 10 + 3;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.friction = 0.96; this.gravity = 0.15;
+                this.alpha = 1; this.decay = Math.random() * 0.015 + 0.01;
+                this.size = Math.random() * 6 + 3;
+            }
+            update() {
+                this.vx *= this.friction; this.vy *= this.friction;
+                this.vy += this.gravity;
+                this.x += this.vx; this.y += this.vy;
+                this.alpha -= this.decay;
+            }
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.alpha);
+                ctx.beginPath();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.vx * 0.5);
+                ctx.rect(-this.size/2, -this.size/2, this.size, this.size);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function startFireworks() {
+            resizeCanvas();
+            particles = [];
+            
+            function loop() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                if(Math.random() < 0.1) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * (canvas.height * 0.6); 
+                    const color = flatColors[Math.floor(Math.random()*flatColors.length)].main;
+                    for(let i=0; i<60; i++) particles.push(new Particle(x, y, color));
+                    
+                    if(Math.random() < 0.4) playTone(500 + Math.random()*500, 'triangle', 0.1, 0.05);
+                }
+
+                particles.forEach((p, index) => {
+                    p.update();
+                    p.draw(ctx);
+                    if(p.alpha <= 0) particles.splice(index, 1);
+                });
+
+                fireworksAnimId = requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        function stopFireworks() {
+            cancelAnimationFrame(fireworksAnimId);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
     </script>
 </body>
 </html>

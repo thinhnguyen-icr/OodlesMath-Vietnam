@@ -1,723 +1,1093 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="../assets/brand.css">
+    <link rel="stylesheet" href="../assets/brand.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tens and Ones Game</title>
-    
-    <!-- Tải Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Tải Tone.js cho hiệu ứng âm thanh --><script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-    
-    <!-- Tải Google Font 'Nunito' --><link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
-    
+    <title>Number Line Math Adventure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-bg: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --pastel-red: #ff8a80;
+            --pastel-orange: #ffd180;
+            --pastel-green: #b9f6ca;
+            --pastel-blue: #80d8ff;
+            --text-color: #455a64;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
-            font-family: 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #FFD700 0%, #FF69B4 100%); /* Nền gradient tươi sáng */
-            touch-action: none;
-            overflow: hidden; /* Ngăn cuộn */
-        }
-        
-        #game-container {
-            max-width: 900px; /* Giảm chiều rộng tối đa */
-            max-height: 95vh; /* Giới hạn chiều cao */
-            overflow: hidden; /* SỬA LỖI: Đổi từ 'auto' sang 'hidden' để tắt cuộn trên di động */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            background-color: #fcfcfc; /* Màu nền trắng nhẹ */
-        }
-
-        /* -- Khu vực kéo thả -- */
-        .tens-and-ones-frame {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            border: 4px solid #6b46c1; /* Màu tím đậm */
-            border-radius: 8px;
-            background-color: #fefcbf; /* Màu vàng nhạt */
-            min-height: 120px; 
-        }
-        
-        .dropzone {
-            min-height: 100px; 
-            padding: 8px;
+            background: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
             display: flex;
-            flex-wrap: wrap; /* Cho phép các khối gói lại */
-            align-content: flex-start; /* Sắp xếp từ trên xuống */
-            gap: 4px;
-        }
-        
-        .dropzone-tens {
-            border-right: 4px solid #6b46c1;
-            max-height: 120px; 
-            overflow-y: auto;
-        }
-        .dropzone-ones {
-             max-height: 120px; 
-             overflow-y: auto;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
         }
 
-        /* -- Kiểu dáng cho các khối Unifix -- */
-        .cube {
-            cursor: grab;
-            user-select: none;
-            border-radius: 4px;
-            box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-            border: 1px solid rgba(0,0,0,0.2);
-            transition: transform 0.1s ease-out; /* Thêm chuyển động nhỏ */
-        }
-        .cube:active {
-            cursor: grabbing;
-            transform: scale(1.05);
-        }
-        
-        /* Khối đơn vị (One-Cube) */
-        .one-cube {
-            width: 30px; 
-            height: 30px;
-            background-color: #4299e1; /* Blue */
-            border-color: #2b6cb0;
-        }
-        
-        /* Khối hàng chục (Ten-Rod) - NẰM NGANG VÀ NHỎ HƠN */
-        .ten-rod {
-            width: 300px; /* Chiều rộng */
-            height: 30px; /* Chiều cao */
-            background-color: #e53e3e; /* Red */
-            border-color: #c53030;
-            display: flex;
-            flex-direction: row; /* Nằm ngang */
-            gap: 0px; 
-            margin: 2px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-            border-radius: 4px;
-        }
-        .ten-rod-segment {
-            width: 30px; /* Mỗi phân đoạn rộng 30px */
-            height: 100%;
-            background-color: #e53e3e;
-            border-right: 1px solid #c53030; /* Viền bên phải */
-        }
-        .ten-rod-segment:last-child {
-            border-right: none;
-        }
-
-
-        /* -- Kiểu dáng cho bộ bài -- */
-        #flashcard-deck {
-            width: 90px; 
-            height: 90px; 
-            position: relative; 
-            cursor: pointer;
-            perspective: 1000px;
-        }
-        .card-face {
-            position: absolute;
+        /* --- UI Elements --- */
+        .game-header {
             width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            transition: transform 0.6s;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .card-back {
-            background: linear-gradient(135deg, #a78bfa 0%, #6d28d9 100%); /* Màu tím mộng mơ */
-            color: white;
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            font-size: 2rem; 
-            transform: rotateY(0deg);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 4px solid #fff;
         }
-        .card-front {
-            background: white;
-            color: #2d3748;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem; 
+
+        .score-board {
+            font-size: 1.6rem;
             font-weight: 900;
-            transform: rotateY(180deg);
-        }
-        
-        #flashcard-deck.is-flipped .card-back {
-            transform: rotateY(-180deg);
-        }
-        #flashcard-deck.is-flipped .card-front {
-            transform: rotateY(0deg);
-        }
-        
-        /* -- Kiểu dáng cho đối tượng đang kéo -- */
-        .drag-clone {
-            position: absolute;
-            pointer-events: none;
-            z-index: 9999;
-            opacity: 0.8;
-            transform: translate(-50%, -50%);
+            color: #ff5252;
+            background: white;
+            padding: 8px 25px;
+            border-radius: 50px;
+            border: 4px solid var(--pastel-red);
+            box-shadow: 0 4px 0 var(--pastel-red);
         }
 
-        /* Hiệu ứng rung lắc */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-        .shake {
-            animation: shake 0.4s ease-in-out; 
+        .controls {
+            display: flex;
+            gap: 12px;
         }
 
-        /* Hiệu ứng nảy lên */
-        @keyframes bounce-in {
-            0% { transform: scale(0.5); opacity: 0; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); }
-        }
-        .bounce-in {
-            animation: bounce-in 0.3s ease-out; 
-        }
-        
-        /* Nút */
-        button {
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.07);
-        }
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* CSS cho Hộp quà Bí ẩn (Bonus Modal) */
-        .mystery-box {
-            transition: all 0.3s ease;
+        .icon-btn {
+            background: white;
+            border: 3px solid #eceff1;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
             cursor: pointer;
-        }
-        .mystery-box:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #eceff1;
         }
 
+        .icon-btn:active { 
+            transform: translateY(4px); 
+            box-shadow: 0 0 0 #eceff1; 
+        }
+
+        /* --- Screens --- */
+        .screen {
+            max-width: 900px;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            flex-grow: 1;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { font-size: 2.8rem; margin-bottom: 5px; color: #1e88e5; text-shadow: 2px 2px 0px #fff; font-weight: 900; }
+        p.subtitle { font-size: 1.4rem; color: #546e7a; font-weight: 700; margin-top: 0;}
+
+        /* --- Range Selector --- */
+        .range-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .range-btn {
+            background: #fff;
+            border: 4px solid #4fc3f7;
+            border-radius: 20px;
+            padding: 15px 30px;
+            font-size: 2rem;
+            font-weight: 900;
+            color: #0277bd;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #4fc3f7;
+            transition: all 0.1s;
+        }
+        .range-btn:hover { background: #e1f5fe; transform: translateY(-3px); box-shadow: 0 9px 0 #4fc3f7; }
+        .range-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #4fc3f7; }
+
+        /* --- Number Line Area --- */
+        .problem-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin: 20px 0;
+            width: 100%;
+        }
+
+        .equation-text {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #ffa726;
+            text-shadow: 3px 3px 0px #fff;
+            background: rgba(255,255,255,0.6);
+            padding: 10px 40px;
+            border-radius: 30px;
+            border: 4px dashed #ffb74d;
+        }
+
+        .number-line-container {
+            width: 100%;
+            overflow-x: auto;
+            background: rgba(255, 255, 255, 0.9);
+            border: 6px solid #81c784;
+            border-radius: 20px;
+            padding: 100px 20px 40px 20px; 
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            position: relative;
+            scroll-behavior: smooth; /* Cho phép cuộn mượt mà */
+        }
+
+        /* Hide scrollbar for cleaner look but keep functionality */
+        .number-line-container::-webkit-scrollbar { height: 10px; }
+        .number-line-container::-webkit-scrollbar-thumb { background: #81c784; border-radius: 10px; }
+
+        .number-line {
+            position: relative;
+            height: 80px;
+            display: flex;
+            align-items: flex-end;
+            min-width: max-content;
+            padding: 0 50px; 
+        }
+
+        .main-line {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: #b0bec5;
+            border-radius: 4px;
+            z-index: 1;
+        }
+
+        .jump-highlight {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            height: 8px;
+            background: #ff7043; /* Màu cam nổi bật chặng đường đã nhảy */
+            border-radius: 4px;
+            transition: width 0.5s ease-in-out;
+            z-index: 2;
+            width: 0; /* Khởi tạo bằng 0 */
+        }
+
+        .tick {
+            position: relative;
+            width: 60px; /* Thu nhỏ khoảng cách giữa các số (cũ: 90px) */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            z-index: 3;
+        }
+
+        .tick::after {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: #455a64;
+            position: absolute;
+            bottom: 8px;
+        }
+
+        .tick-label {
+            font-weight: 800;
+            font-size: 1.2rem; /* Giảm font size một chút cho vừa vặn */
+            color: #37474f;
+            transform: translateY(30px);
+        }
+
+        /* The Frog */
+        .frog {
+            position: absolute;
+            font-size: 4rem;
+            bottom: 35px;
+            left: 0;
+            transform: translateX(-50%);
+            transition: left 0.5s ease-in-out, bottom 0.25s ease-out;
+            z-index: 10;
+        }
+
+        .frog.jumping {
+            bottom: 100px; 
+        }
+
+        /* Jump Button */
+        .jump-btn {
+            background: #66bb6a;
+            border: 4px solid #43a047;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 2rem;
+            font-weight: 900;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #43a047;
+            transition: all 0.1s;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .jump-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #43a047; }
+        .jump-btn:disabled { background: #bdbdbd; border-color: #9e9e9e; box-shadow: 0 6px 0 #9e9e9e; cursor: not-allowed; }
+
+        /* --- Answers --- */
+        .answers-grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+        
+        .answers-grid.hidden-answers {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .answer-btn {
+            background-color: #fff;
+            border: 5px solid #ab47bc;
+            border-radius: 25px;
+            padding: 15px 45px;
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #7b1fa2;
+            cursor: pointer;
+            transition: all 0.1s;
+            min-width: 120px;
+            box-shadow: 0 8px 0 #ab47bc;
+        }
+
+        .answer-btn:hover { background-color: #f3e5f5; }
+        .answer-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #ab47bc; }
+
+        .answer-btn.correct { 
+            background-color: #69f0ae; border-color: #00e676; color: #1b5e20; box-shadow: 0 8px 0 #00e676; animation: bounce 0.5s; 
+        }
+        .answer-btn.wrong { 
+            background-color: #ff8a80; border-color: #d50000; color: white; box-shadow: 0 8px 0 #d50000; animation: shake 0.4s; 
+        }
+
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+
+        /* --- Feedback --- */
+        .feedback-text {
+            height: 40px;
+            margin-top: 10px;
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #d81b60;
+        }
+
+        /* --- Overlays & Fireworks --- */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 1000; text-align: center;
+        }
+
+        .win-card {
+            background: white; padding: 40px; border-radius: 30px;
+            border: 8px solid #69f0ae; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-width: 500px; z-index: 1001; position: relative;
+        }
+
+        .win-title { font-size: 3.5rem; color: #ff3d00; margin: 0; text-shadow: 2px 2px 0px #ffd54f; font-weight: 900; }
+        
+        .stats-box { background: #f1f8e9; border: 4px solid #c5e1a5; border-radius: 20px; padding: 20px; margin: 20px 0; text-align: left; }
+        .stats-box p { font-size: 1.4rem; font-weight: 700; margin: 8px 0; color: #33691e; display: flex; align-items: center; gap: 10px; }
+
+        #fireworksCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; display: none; }
+
+        /* --- Bonus Game Styles --- */
+        #marioBonus {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #e1f5fe; display: none; flex-direction: column; align-items: center;
+            z-index: 2000; overflow: hidden; touch-action: none;
+        }
+
+        #marioCanvas { display: block; margin: auto; border-radius: 0 0 10px 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+
+        .bonus-ui { position: absolute; top: 20px; left: 0; width: 100%; display: flex; justify-content: space-around; color: white; font-size: 2.2rem; font-weight: 900; text-shadow: 3px 3px 0 #1565c0; pointer-events: none; z-index: 10;}
+        .bonus-start-msg { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); color: #fff59d; font-size: 3rem; font-weight: 900; text-align: center; text-shadow: 4px 4px 0 #d84315; animation: pulse 1s infinite alternate; z-index: 10;}
+        .flash-red { animation: flashRed 0.3s; }
+        
+        @keyframes flashRed { 0%, 100% { background: #e1f5fe; } 50% { background: #ffcdd2; } }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .equation-text { font-size: 3rem; padding: 10px 20px; }
+            .jump-btn { font-size: 1.5rem; padding: 10px 20px; }
+            .answer-btn { padding: 10px 25px; font-size: 2.2rem; }
+            .bonus-ui { font-size: 1.5rem; }
+            .bonus-start-msg { font-size: 1.8rem; }
+            .tick { width: 40px; } /* Closer ticks on mobile */
+            .frog { font-size: 3rem; bottom: 35px; }
+        }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
-<img src="../assets/logo-oodles-math.png" class="oodles-logo">
-    <div id="game-container" class="w-full bg-white rounded-2xl p-6 md:p-8 relative">
-        
-        <!-- Tiêu đề và Thẻ bài --><div class="flex flex-col items-center mb-4">
-            <!-- SỬA LỖI: Tiêu đề căn giữa và giảm khoảng cách dưới (mb-2) --><h1 class="text-2xl md:text-3xl font-black text-purple-700 text-center mb-2">Tens and Ones Game</h1>
+<body>
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <div class="game-header">
+        <div style="display: flex; align-items: center;">
+            <div class="score-board" id="scoreBoard">Score: 0</div>
+            <div id="timerDisplay" class="timer-display" style="display:none; margin-left:15px; font-size:1.4rem; font-weight: 900; color: #1e88e5;">⏱ 00:00</div>
+        </div>
+        <div class="controls">
+            <button class="icon-btn" id="soundToggle" title="Toggle Sound">🔊</button>
+            <button class="icon-btn" id="timerToggle" title="Toggle Timer">⏱</button>
+            <button class="icon-btn" id="resetBtn" title="Change Mode">⚙️</button>
+        </div>
+    </div>
+
+    <!-- Range Selector Screen -->
+    <div class="screen active" id="rangeScreen">
+        <h1>Number Line Adventure</h1>
+        <p class="subtitle">Choose a maximum number to start jumping!</p>
+        <div class="range-grid">
+            <button class="range-btn" onclick="startGame(5)">Up to 5</button>
+            <button class="range-btn" onclick="startGame(10)">Up to 10</button>
+            <button class="range-btn" onclick="startGame(20)">Up to 20</button>
+            <button class="range-btn" onclick="startGame(30)">Up to 30</button>
+            <button class="range-btn" onclick="startGame(40)">Up to 40</button>
+            <button class="range-btn" onclick="startGame(50)">Up to 50</button>
+            <button class="range-btn" onclick="startGame(100)">Up to 100</button>
+        </div>
+    </div>
+
+    <!-- Main Game Screen -->
+    <div class="screen" id="mathGameScreen">
+        <h1 id="gameTitle">Hop to Add!</h1>
+        <p class="subtitle">Help the frog jump to find the answer.</p>
+
+        <div class="problem-display">
+            <div class="equation-text" id="equationDisplay">0 + 0 = ?</div>
             
-            <div class="flex justify-center items-end w-full gap-4"> 
-                <!-- Thẻ bài (di chuyển xuống thấp hơn) --><div class="text-center flex flex-col items-center">
-                    <h2 class="text-base font-bold text-gray-700 mb-1">Click the card!</h2>
-                    <div id="flashcard-deck" title="Click to draw a new number">
-                        <div id="card-face-back" class="card-face card-back">?</div>
-                        <div id="card-face-front" class="card-face card-front"></div>
-                    </div>
-                </div>
+            <button class="jump-btn" id="jumpBtn">🐸 Jump! (<span id="jumpsLeft">0</span> left)</button>
 
-                <!-- Cube Bank (Giữ nguyên vị trí này) --><div class="flex items-center justify-center gap-6 p-3 bg-indigo-100 rounded-lg flex-grow">
-                    <p id="tens-first-warning" class="text-sm md:text-base text-red-600 font-bold hidden absolute -top-8 bg-yellow-100 p-2 rounded-md shadow-md">
-                        Please place the Ten rods first!
-                    </p>
-                    
-                    <!-- Nguồn kéo Ten-Rod --><div class="text-center">
-                        <p class="font-bold text-base text-gray-800">Ten Rod</p>
-                        <div id="source-ten-rod" class="cube ten-rod" data-type="ten">
-                            <script>
-                                for(let i = 0; i < 10; i++) {
-                                    document.write('<div class="ten-rod-segment"></div>');
-                                }
-                            </script>
-                        </div>
-                    </div>
-                    
-                    <!-- Nguồn kéo One-Cube --><div class="text-center">
-                        <p class="font-bold text-base text-gray-800">One Cube</p>
-                        <div id="source-one-cube" class="cube one-cube" data-type="one"></div>
-                    </div>
+            <div class="number-line-container" id="nlContainer">
+                <div class="number-line" id="numberLine">
+                    <div class="main-line"></div>
+                    <div class="jump-highlight" id="jumpHighlight"></div>
+                    <!-- Ticks and Frog inserted via JS -->
+                    <div class="frog" id="frogEl">🐸</div>
                 </div>
             </div>
         </div>
 
-        <!-- Khu vực Làm việc (Kéo thả) --><div class="flex flex-col lg:flex-row gap-4 mt-4"> 
-            <div class="w-full">
-                <div class="tens-and-ones-frame">
-                    <div class="text-center text-xl font-bold text-red-600 p-2 border-b-4 border-purple-800">TENS</div>
-                    <div class="text-center text-xl font-bold text-blue-600 p-2 border-b-4 border-purple-800">ONES</div>
-                    
-                    <div id="tens-column" class="dropzone dropzone-tens"></div>
-                    <div id="ones-column" class="dropzone dropzone-ones"></div>
-                </div>
+        <div class="feedback-text" id="feedback"></div>
+
+        <div class="answers-grid hidden-answers" id="answersGrid"></div>
+    </div>
+
+    <!-- Fireworks Canvas -->
+    <canvas id="fireworksCanvas"></canvas>
+
+    <!-- Win Modal (Used for Milestones) -->
+    <div class="overlay" id="winOverlay">
+        <div class="win-card">
+            <h2 class="win-title">AMAZING! 🏆</h2>
+            <p style="font-size: 1.6rem; margin-top: 10px; font-weight: 800; color: #ff9800;">You completed a stage!</p>
+            
+            <div class="stats-box">
+                <p>⭐ <span>Score: <span id="finalScore" style="color:#d32f2f;">0</span></span></p>
+                <p>🪙 <span>Bonus Coins: <span id="finalCoins" style="color:#f57c00;">0</span></span></p>
+                <p id="finalTimeLine" style="display: none;">⏱ <span>Time: <span id="finalTime" style="color:#1976d2;">00:00</span></span></p>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
+                <button class="answer-btn" style="background-color: #b9f6ca; border-color: #69f0ae; color: #1b5e20; box-shadow: 0 8px 0 #69f0ae; font-size: 2rem;" onclick="continueGame()">🌟 Keep Playing 🌟</button>
+                <button class="answer-btn" style="background-color: #fff; border-color: #bdbdbd; color: #757575; box-shadow: 0 8px 0 #bdbdbd; font-size: 1.5rem;" onclick="goToMenu()">Change Mode</button>
             </div>
         </div>
-        
-        <!-- Khu vực Điều khiển (Submit) --><!-- SỬA LỖI: Giảm khoảng cách trên (mt-4) --><div class="flex justify-center items-center gap-4 mt-4">
-            <button id="reset-board-button" class="px-5 py-2 bg-gray-400 text-white text-lg font-bold rounded-lg hover:bg-gray-500">
-                Reset Board
-            </button>
-            <button id="submit-button" class="px-8 py-3 bg-green-500 text-white text-xl font-bold rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed">
-                Submit
-            </button>
+    </div>
+
+    <!-- Bonus Game Section -->
+    <div id="marioBonus">
+        <div class="bonus-ui">
+            <div>💰 <span id="bonusCoins">0</span></div>
+            <div>⏱ <span id="bonusTime">12</span>s</div>
         </div>
-
+        <div id="bonusMsg" class="bonus-start-msg">Avoid Cactus 🌵 & Collect Coins!</div>
+        <canvas id="marioCanvas"></canvas>
     </div>
-
-    <!-- Modal Phản hồi --><div id="feedback-modal" class="hidden absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div id="feedback-content" class="text-6xl md:text-7xl font-black text-white p-8 md:p-10 rounded-lg bounce-in">
-            <!-- "Correct!" hoặc "Try Again!" --></div>
-    </div>
-    
-    <!-- BỔ SUNG: Modal Hộp Quà (Bonus Modal) --><div id="bonus-modal" class="hidden absolute inset-0 bg-gradient-to-br from-yellow-400 to-orange-500 flex flex-col items-center justify-center z-40 p-4">
-        <h2 class="text-5xl md:text-6xl font-black text-white mb-4 animate-bounce">BONUS!</h2>
-        <p class="text-2xl text-white mb-6">Choose a mystery box!</p>
-        <div id="box-container" class="flex flex-wrap justify-center gap-6 md:gap-10 mb-6">
-            <!-- Các hộp quà sẽ được tạo bằng JS --></div>
-        <p id="bonus-result" class="text-3xl text-white font-bold mt-6 hidden"></p>
-    </div>
-    
-    <!-- BỔ SUNG: Modal Kết Thúc Trò Chơi (Game Over) --><div id="game-over-modal" class="hidden absolute inset-0 bg-gradient-to-br from-green-400 to-blue-500 flex flex-col items-center justify-center z-40 p-4">
-        <h2 class="text-6xl md:text-8xl font-black text-white mb-4 bounce-in">Great Job!</h2>
-        <p class="text-3xl text-white mb-6">You finished all the cards!</p>
-        <p id="final-score" class="text-4xl text-yellow-300 font-bold mb-8">Final Score: 0</p>
-        <button id="play-again-button" class="px-8 py-3 bg-white text-blue-600 text-xl font-bold rounded-lg shadow-lg hover:bg-gray-100">
-            Play Again
-        </button>
-    </div>
-
 
     <script>
-        // --- SỬA LỖI: Khai báo biến DOM bằng let ---
-        let gameContainer, scoreEl, cardDeckEl, cardBackEl, cardFrontEl, 
-            submitButton, resetButton, feedbackModal, feedbackContent, 
-            tensFirstWarning, bonusModal, boxContainer, bonusResult, 
-            gameOverModal, finalScoreEl, playAgainButton, sourceTenRod, 
-            sourceOneCube, tensColumn, onesColumn;
-        
-        // --- Trạng thái Trò chơi ---
+        // --- State ---
+        let maxRange = 10;
         let score = 0;
-        let currentNumber = 0;
-        let cardDeck = [];
-        let isChecking = false;
-        let isBonusChecking = false;
-        let isDragging = false;
-        let dragClone = null;
-        let dragSourceType = ''; 
+        let questionsCompleted = 0; // Tracks progress for mini-game
+        let num1 = 0, num2 = 0, currentCorrectAnswer = 0;
+        let jumpsRemaining = 0;
+        let currentPos = 0;
+        let eligibleForPoints = true;
         
-        // --- Cấu hình Âm thanh ---
-        let clickSynth, correctSynth, incorrectSynth, drawCardSynth, grabCubeSynth, dropCubeSynth, removeCubeSynth, warningSynth, bonusSound, winSound, backgroundMusic;
-        
-        // SỬA LỖI ÂM THANH: Đảm bảo Tone.start() được gọi và await
-        async function initAudio() {
-            if (!clickSynth) {
-                await Tone.start(); // <-- Chờ context khởi động
-                console.log("Audio Context Started"); // Ghi log để kiểm tra
-                
-                // Khởi tạo tất cả synths
-                clickSynth = new Tone.MembraneSynth({ pitchDecay: 0.01, envelope: { attack: 0.001, decay: 0.1, sustain: 0 } }).toDestination();
-                correctSynth = new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'triangle' }, envelope: { attack: 0.05, decay: 0.2, sustain: 0.3, release: 0.5 } }).toDestination();
-                incorrectSynth = new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'square' }, envelope: { attack: 0.01, decay: 0.3, sustain: 0.1, release: 0.4 } }).toDestination();
-                drawCardSynth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.2 } }).toDestination();
-                grabCubeSynth = new Tone.FMSynth({ harmonicity: 3.01, modulationIndex: 14, envelope: { attack: 0.01, decay: 0.2, sustain: 0.0, release: 0.2}, modulationEnvelope: { attack: 0.001, decay: 0.2, sustain: 0.0, release: 0.2}, oscillator: { type: 'sine' }, modulation: { type: 'square' } }).toDestination();
-                dropCubeSynth = new Tone.PluckSynth({ attackNoise: 0.5, dampening: 4000, resonance: 0.9 }).toDestination();
-                removeCubeSynth = new Tone.NoiseSynth({ volume: -10, envelope: { attack: 0.001, decay: 0.1 } }).toDestination();
-                warningSynth = new Tone.Synth({ oscillator: { type: 'sawtooth' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2 } }).toDestination();
-                bonusSound = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.5 } }).toDestination();
-                winSound = new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'sine' } }).toDestination();
+        let isMuted = false;
+        let timerActive = false;
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        let totalBonusCoins = 0;
+        // Adjusted tick widths for smaller scale
+        let tickWidth = window.innerWidth <= 600 ? 40 : 60; 
+        let framesSinceLastObstacle = 0;
 
-                // NHẠC NỀN MỚI - SỬA LỖI: Đã tắt nhạc nền
-                /*
-                backgroundMusic = new Tone.Sequence(
-                    (time, note) => {
-                        // Sử dụng synth riêng cho nhạc nền để không xung đột
-                        if(!correctSynth) return;
-                        correctSynth.triggerAttackRelease(note, "8n", time);
-                    },
-                    ["C4", "E4", "G4", "C5", "G4", "E4"], // Melody vui tươi
-                    "4n"
-                ).start(0);
-                backgroundMusic.loop = true;
-                backgroundMusic.playbackRate = 1.2; 
-                Tone.Transport.bpm.value = 120; 
-                Tone.Master.volume.value = -15; 
-                
-                // Khởi động transport SAU KHI context đã start
-                Tone.Transport.start(); 
-                */
-            }
+        // --- DOM Elements ---
+        const rangeScreen = document.getElementById('rangeScreen');
+        const mathGameScreen = document.getElementById('mathGameScreen');
+        const equationDisplay = document.getElementById('equationDisplay');
+        const jumpBtn = document.getElementById('jumpBtn');
+        const jumpsLeftText = document.getElementById('jumpsLeft');
+        const nlContainer = document.getElementById('nlContainer');
+        const numberLine = document.getElementById('numberLine');
+        const jumpHighlight = document.getElementById('jumpHighlight');
+        const frogEl = document.getElementById('frogEl');
+        const answersGrid = document.getElementById('answersGrid');
+        const scoreBoard = document.getElementById('scoreBoard');
+        const feedback = document.getElementById('feedback');
+        
+        const winOverlay = document.getElementById('winOverlay');
+        const marioBonus = document.getElementById('marioBonus');
+        
+        // --- Audio Engine ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(freq, type, duration, volume = 0.1) {
+            if (isMuted) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain).connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
-        
-        // SỬA LỖI ÂM THANH: Gọi initAudio() một cách bất đồng bộ
-        document.body.addEventListener('mousedown', async () => {
-            await initAudio();
-        }, { once: true });
-        document.body.addEventListener('touchstart', async () => {
-            await initAudio();
-        }, { once: true });
 
+        const sounds = {
+            click: () => playTone(800, 'sine', 0.05, 0.05),
+            correct: () => { playTone(523, 'sine', 0.2); setTimeout(()=>playTone(659, 'sine', 0.2), 100); setTimeout(()=>playTone(783, 'sine', 0.3), 200); },
+            wrong: () => playTone(220, 'sawtooth', 0.3, 0.1),
+            hop: () => {
+                if (isMuted) return;
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                osc.connect(gain).connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+            },
+            jump: () => {
+                if (isMuted) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.connect(gain).connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            },
+            coin: () => { playTone(987, 'sine', 0.1, 0.1); setTimeout(()=>playTone(1318, 'sine', 0.2, 0.1), 50); },
+            hit: () => { playTone(150, 'sawtooth', 0.3, 0.2); setTimeout(()=>playTone(100, 'square', 0.4, 0.2), 100); },
+            gameOver: () => { [300, 250, 200, 150].forEach((f, i) => setTimeout(() => playTone(f, 'sawtooth', 0.3, 0.1), i * 200)); },
+            win: () => { [523, 659, 783, 1046].forEach((f, i) => setTimeout(() => playTone(f, 'sine', 0.3, 0.15), i * 150)); }
+        };
 
-        // --- Logic Trò chơi ---
-        
-        function initGame() {
-            // SỬA LỖI: Gán các biến DOM bên trong initGame
-            gameContainer = document.getElementById('game-container');
-            scoreEl = document.getElementById('score');
-            cardDeckEl = document.getElementById('flashcard-deck');
-            cardBackEl = document.getElementById('card-face-back');
-            cardFrontEl = document.getElementById('card-face-front');
-            submitButton = document.getElementById('submit-button');
-            resetButton = document.getElementById('reset-board-button');
-            feedbackModal = document.getElementById('feedback-modal');
-            feedbackContent = document.getElementById('feedback-content');
-            tensFirstWarning = document.getElementById('tens-first-warning');
-            bonusModal = document.getElementById('bonus-modal');
-            boxContainer = document.getElementById('box-container');
-            bonusResult = document.getElementById('bonus-result');
-            gameOverModal = document.getElementById('game-over-modal');
-            finalScoreEl = document.getElementById('final-score');
-            playAgainButton = document.getElementById('play-again-button');
-            sourceTenRod = document.getElementById('source-ten-rod'); 
-            sourceOneCube = document.getElementById('source-one-cube');
-            tensColumn = document.getElementById('tens-column');
-            onesColumn = document.getElementById('ones-column');
-            
+        // --- Game Flow ---
+        function goToMenu() {
+            sounds.click();
+            winOverlay.style.display = 'none';
+            mathGameScreen.classList.remove('active');
+            rangeScreen.classList.add('active');
+            stopFireworks();
+        }
+
+        function startGame(range) {
+            sounds.click();
+            maxRange = range;
             score = 0;
-            updateScore(); 
-            shuffleDeck();
-            drawCard();
-            setupDragEvents(); 
-            
-            submitButton.removeEventListener('click', handleSubmit);
-            resetButton.removeEventListener('click', resetBoard);
-            cardDeckEl.removeEventListener('click', drawCard);
-            playAgainButton.removeEventListener('click', initGame);
-
-            submitButton.addEventListener('click', handleSubmit);
-            resetButton.addEventListener('click', resetBoard);
-            cardDeckEl.addEventListener('click', drawCard);
-            playAgainButton.addEventListener('click', initGame);
-
-            gameOverModal.classList.add('hidden');
-            bonusModal.classList.add('hidden');
-            
-            // SỬA LỖI ÂM THANH: Tắt nhạc nền
-            /*
-            if (backgroundMusic && Tone.Transport.state !== 'started') {
-                Tone.Transport.start();
-            }
-            */
-        }
-
-        function shuffleDeck() {
-            cardDeck = Array.from({ length: 11 }, (_, i) => i + 10);
-            for (let i = cardDeck.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [cardDeck[i], cardDeck[j]] = [cardDeck[j], cardDeck[i]];
-            }
-        }
-
-        function drawCard() {
-            if (isChecking || isBonusChecking) return;
-            
-            if (cardDeck.length === 0) {
-                showGameEnd();
-                return;
-            }
-            
-            cardDeckEl.classList.remove('is-flipped');
-            submitButton.disabled = true;
-            tensFirstWarning.classList.add('hidden'); 
-            
-            setTimeout(() => {
-                currentNumber = cardDeck.pop();
-                cardFrontEl.textContent = currentNumber;
-                cardBackEl.textContent = "?"; 
-                
-                cardDeckEl.classList.add('is-flipped');
-                if(drawCardSynth) drawCardSynth.triggerAttackRelease("G4", "8n");
-                
-                resetBoard();
-                submitButton.disabled = false;
-            }, 300);
-        }
-        
-        function resetBoard() {
-            tensColumn.innerHTML = '';
-            onesColumn.innerHTML = '';
-            tensFirstWarning.classList.add('hidden');
-        }
-
-        function updateScore() {
-            // SỬA LỖI: Thêm kiểm tra null
-            if (scoreEl) {
-                scoreEl.textContent = `Score: ${score}`;
-            }
-        }
-        
-        function handleSubmit() {
-            if (isChecking || !currentNumber) return;
-            
-            const targetTens = Math.floor(currentNumber / 10);
-            const targetOnes = currentNumber % 10;
-            
-            const placedTens = tensColumn.querySelectorAll('.ten-rod').length;
-            const placedOnes = onesColumn.querySelectorAll('.one-cube').length;
-            
-            if (placedTens === targetTens && placedOnes === targetOnes) {
-                handleCorrectAnswer();
-            } else {
-                handleIncorrectAnswer();
-            }
-        }
-
-        function handleCorrectAnswer() {
-            isChecking = true;
-            if(correctSynth) correctSynth.triggerAttackRelease(["C5", "E5", "G5"], "0.2");
-            
-            showFeedback("Correct!", "bg-green-500");
-            
-            setTimeout(() => {
-                feedbackModal.classList.add('hidden');
-                showBonusRound(); 
-            }, 1200); 
-        }
-
-        function handleIncorrectAnswer() {
-            isChecking = true;
-            if(incorrectSynth) incorrectSynth.triggerAttackRelease(["C4", "B3"], "0.3");
-            
-            gameContainer.classList.add('shake');
-            showFeedback("Try Again!", "bg-red-500");
-            
-            setTimeout(() => {
-                gameContainer.classList.remove('shake');
-                feedbackModal.classList.add('hidden');
-                isChecking = false;
-            }, 1500);
-        }
-
-        function showFeedback(message, bgColor) {
-            feedbackContent.textContent = message;
-            feedbackContent.className = `text-6xl md:text-7xl font-black text-white p-8 md:p-10 rounded-lg bounce-in ${bgColor}`;
-            feedbackModal.classList.remove('hidden');
-        }
-        
-        // --- LOGIC HỘP QUÀ MỚI ---
-        const doorPrizes = [5, 10, 15]; 
-        
-        function showBonusRound() {
-            isBonusChecking = true;
-            bonusModal.classList.remove('hidden');
-            bonusResult.classList.add('hidden');
-            
-            const shuffledPrizes = [...doorPrizes].sort(() => Math.random() - 0.5);
-            
-            boxContainer.innerHTML = ''; 
-            
-            shuffledPrizes.forEach((prize) => {
-                const box = document.createElement('button');
-                box.className = 'mystery-box w-32 h-32 md:w-40 md:h-40 bg-purple-500 rounded-lg shadow-xl flex items-center justify-center text-purple-100 transition-all duration-300 hover:scale-105 hover:bg-purple-600';
-                box.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 4.5A2.5 2.5 0 0 0 18 2H6a2.5 2.5 0 0 0-2.5 2.5v4.61c.4.19.76.44 1.09.75L7 12.27V9h10v3.27l2.41-2.41c.33-.31.69-.56 1.09-.75V4.5zM6 14.5c0 1.2.54 2.26 1.38 2.96L6 18.5V14.5zM18 14.5v4l-1.38-1.04A3.503 3.503 0 0 0 18 14.5zM12 7c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zM9 14.13c.64.41 1.41.67 2.25.67h1.5c.84 0 1.61-.26 2.25-.67l.63-.4V10c0-2.21-1.79-4-4-4s-4 1.79-4 4v3.73l.63.4zM9 15.5v3A2.5 2.5 0 0 0 11.5 21h1A2.5 2.5 0 0 0 15 18.5v-3c-1 .8-2.16 1.3-3.5 1.3S10 16.3 9 15.5z"/></svg>`;
-                box.dataset.prize = prize;
-                box.addEventListener('click', handleBoxClick, { once: true });
-                boxContainer.appendChild(box);
-            });
-        }
-        
-        function handleBoxClick(e) {
-            if (!isBonusChecking) return;
-            
-            const clickedBox = e.currentTarget;
-            const prize = parseInt(clickedBox.dataset.prize);
-            
-            score += prize; 
+            questionsCompleted = 0;
+            totalBonusCoins = 0;
             updateScore();
             
-            if(bonusSound) bonusSound.triggerAttackRelease("C5", "0.1", Tone.now() + 0.1);
-            if(bonusSound) bonusSound.triggerAttackRelease("G5", "0.3", Tone.now() + 0.2);
+            rangeScreen.classList.remove('active');
+            mathGameScreen.classList.add('active');
+            
+            // Reset timer if active
+            if(timerActive) {
+                clearInterval(timerInterval);
+                secondsElapsed = 0;
+                document.getElementById('timerDisplay').textContent = `⏱ 00:00`;
+                timerInterval = setInterval(() => { 
+                    secondsElapsed++; 
+                    document.getElementById('timerDisplay').textContent = `⏱ ${formatTime(secondsElapsed)}`;
+                }, 1000);
+            }
+            generateQuestion();
+        }
 
-            const allBoxes = boxContainer.querySelectorAll('.mystery-box');
-            allBoxes.forEach(box => {
-                const boxPrize = parseInt(box.dataset.prize);
-                box.innerHTML = `<span class="text-5xl font-black bounce-in">+${boxPrize}</span>`;
-                box.disabled = true;
-                
-                if (box !== clickedBox) {
-                    box.classList.remove('bg-purple-500', 'hover:bg-purple-600');
-                    box.classList.add('bg-gray-400', 'opacity-60');
-                } else {
-                    box.classList.remove('bg-purple-500');
-                    box.classList.add('bg-yellow-400');
-                    box.style.transform = 'scale(1.1)';
+        function generateQuestion() {
+            eligibleForPoints = true;
+            feedback.textContent = '';
+            answersGrid.classList.add('hidden-answers');
+            answersGrid.innerHTML = '';
+            
+            // Generate valid num1, num2
+            num1 = Math.floor(Math.random() * maxRange);
+            // Ensure at least 1 jump, and sum <= maxRange
+            let maxNum2 = maxRange - num1;
+            if (maxNum2 < 1) { // Fallback if num1 = maxRange
+                num1 = maxRange - 2; 
+                maxNum2 = 2;
+            }
+            num2 = Math.floor(Math.random() * maxNum2) + 1;
+            
+            currentCorrectAnswer = num1 + num2;
+            jumpsRemaining = num2;
+            currentPos = num1;
+            
+            equationDisplay.textContent = `${num1} + ${num2} = ?`;
+            updateJumpBtn();
+            
+            renderNumberLine();
+            generateAnswers();
+        }
+
+        function renderNumberLine() {
+            // Clear old ticks except main line, highlight and frog
+            Array.from(numberLine.children).forEach(c => {
+                if(c.id !== 'frogEl' && c.id !== 'jumpHighlight' && !c.classList.contains('main-line')) {
+                    numberLine.removeChild(c);
                 }
             });
+
+            // Calculate start and end display
+            let startTick = Math.max(0, num1 - 2);
+            let endTick = Math.min(maxRange, currentCorrectAnswer + 3);
             
-            const resultText = `You won ${prize} bonus points!`;
-            bonusResult.textContent = resultText;
-            bonusResult.classList.remove('hidden');
+            // For small ranges, just show 0 to maxRange
+            if(maxRange <= 20) { startTick = 0; endTick = maxRange; }
+
+            for(let i = startTick; i <= endTick; i++) {
+                const tick = document.createElement('div');
+                tick.className = 'tick';
+                
+                const label = document.createElement('div');
+                label.className = 'tick-label';
+                label.textContent = i;
+                
+                tick.appendChild(label);
+                numberLine.insertBefore(tick, frogEl);
+            }
+
+            // Adjust width based on number of ticks
+            numberLine.style.width = `${(endTick - startTick + 1) * tickWidth + 100}px`;
+            
+            // Save startTick globally to calculate frog position easily later
+            numberLine.dataset.startTick = startTick;
+
+            // Update positions
+            updateFrogPosition();
+            centerFrog();
+        }
+
+        function updateFrogPosition() {
+            const startTick = parseInt(numberLine.dataset.startTick);
+            
+            // Calculate Frog position
+            const relativeIndex = currentPos - startTick;
+            const leftPos = 50 + (relativeIndex * tickWidth) + (tickWidth/2);
+            frogEl.style.left = `${leftPos}px`;
+
+            // Calculate Path Highlight length
+            const originIndex = num1 - startTick;
+            const originLeftPos = 50 + (originIndex * tickWidth) + (tickWidth/2);
+            jumpHighlight.style.left = `${originLeftPos}px`;
+            jumpHighlight.style.width = `${(currentPos - num1) * tickWidth}px`;
+        }
+
+        function centerFrog() {
+            setTimeout(() => {
+                // Scroll container to smoothly center the frog
+                const targetScroll = frogEl.offsetLeft - nlContainer.clientWidth/2 + 30;
+                nlContainer.scrollTo({
+                    left: Math.max(0, targetScroll),
+                    behavior: 'smooth'
+                });
+            }, 50);
+        }
+
+        function updateJumpBtn() {
+            if (jumpsRemaining > 0) {
+                jumpBtn.disabled = false;
+                jumpsLeftText.textContent = jumpsRemaining;
+            } else {
+                jumpBtn.disabled = true;
+                jumpBtn.textContent = "Great jumping!";
+                answersGrid.classList.remove('hidden-answers');
+            }
+        }
+
+        jumpBtn.onclick = () => {
+            if(jumpsRemaining <= 0) return;
+            
+            jumpsRemaining--;
+            currentPos++;
+            sounds.hop();
+            
+            // Animate
+            frogEl.classList.add('jumping');
+            updateFrogPosition();
+            
+            // Keep frog in focus smoothly
+            centerFrog();
             
             setTimeout(() => {
-                bonusModal.classList.add('hidden');
-                isChecking = false;
-                isBonusChecking = false;
-                drawCard(); 
+                frogEl.classList.remove('jumping');
+            }, 250);
+            
+            updateJumpBtn();
+        };
+
+        function generateAnswers() {
+            let opts = [currentCorrectAnswer];
+            while(opts.length < 3) {
+                // Generate nearby wrong answers
+                let variation = Math.floor(Math.random() * 5) - 2;
+                let w = currentCorrectAnswer + variation;
+                if(w !== currentCorrectAnswer && w >= 0 && w <= maxRange && !opts.includes(w)) {
+                    opts.push(w);
+                } else {
+                    // Fallback random
+                    w = Math.floor(Math.random() * (maxRange+1));
+                    if(!opts.includes(w)) opts.push(w);
+                }
+            }
+            
+            opts.sort(()=>Math.random()-0.5).forEach(val => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = val;
+                btn.onclick = () => checkAnswer(btn, val);
+                answersGrid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(btn, val) {
+            // Prevent clicking if jumps not done
+            if (jumpsRemaining > 0) return;
+
+            if(val === currentCorrectAnswer) {
+                btn.classList.add('correct');
+                equationDisplay.textContent = `${num1} + ${num2} = ${currentCorrectAnswer}`;
+                feedback.textContent = `🌟 Awesome! The frog landed on ${currentCorrectAnswer}! 🌟`;
+                sounds.correct();
+                
+                // Disable all buttons
+                Array.from(answersGrid.children).forEach(b => b.style.pointerEvents = 'none');
+                
+                if (eligibleForPoints) score++;
+                updateScore();
+                questionsCompleted++;
+                
+                setTimeout(() => {
+                    // Milestone & Bonus Check
+                    if (questionsCompleted > 0 && questionsCompleted % 10 === 0) {
+                        showWinScreen();
+                    } else if (questionsCompleted > 0 && questionsCompleted % 3 === 0) {
+                        startBonusLevel();
+                    } else {
+                        generateQuestion();
+                    }
+                }, 1500);
+
+            } else {
+                btn.classList.add('wrong');
+                btn.style.pointerEvents = 'none'; // Can't click this wrong one again
+                eligibleForPoints = false;
+                feedback.textContent = "Oops! Try another number.";
+                sounds.wrong();
+            }
+        }
+
+        function updateScore() { scoreBoard.textContent = `Score: ${score}`; }
+        
+        document.getElementById('resetBtn').onclick = goToMenu;
+
+        function formatTime(secs) {
+            const m = Math.floor(secs/60).toString().padStart(2,'0');
+            const s = (secs%60).toString().padStart(2,'0');
+            return `${m}:${s}`;
+        }
+
+        function showWinScreen() {
+            sounds.win();
+            winOverlay.style.display = 'flex';
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalCoins').textContent = totalBonusCoins;
+            if(timerActive) {
+                document.getElementById('finalTimeLine').style.display = 'block';
+                document.getElementById('finalTime').textContent = formatTime(secondsElapsed);
+            } else {
+                document.getElementById('finalTimeLine').style.display = 'none';
+            }
+            startFireworks();
+        }
+
+        function continueGame() {
+            winOverlay.style.display = 'none';
+            stopFireworks();
+            generateQuestion();
+        }
+
+        // --- Bonus Game Engine (Upgraded) ---
+        const canvas = document.getElementById('marioCanvas');
+        const ctx = canvas.getContext('2d');
+        let bonusActive = false, currentBonusCoins = 0, bonusTimeLeft = 12;
+        let marioY = 0, marioVY = 0, groundY = 0;
+        let clouds = [], coins = [], obstacles = [];
+        let scenery = [];
+
+        function startBonusLevel() {
+            sounds.win();
+            mathGameScreen.style.opacity = '0';
+            marioBonus.style.display = 'flex';
+            canvas.width = window.innerWidth;
+            canvas.height = Math.min(window.innerHeight * 0.7, 500);
+            
+            groundY = canvas.height - 50; 
+            marioY = groundY;
+            
+            currentBonusCoins = 0; bonusTimeLeft = 12;
+            bonusActive = true;
+            framesSinceLastObstacle = 0;
+            document.getElementById('bonusMsg').style.display = 'block';
+            document.getElementById('bonusMsg').style.color = '#fff59d';
+            document.getElementById('bonusMsg').textContent = "Avoid Cactus 🌵 & Collect Coins!";
+            marioBonus.classList.remove('flash-red');
+            
+            coins = []; clouds = []; obstacles = []; scenery = [];
+            for(let i=0; i<6; i++) clouds.push({x: Math.random()*canvas.width, y: Math.random()*120 + 20, s: 0.5+Math.random()*1.5});
+            // Mountains for parallax
+            for(let i=0; i<3; i++) scenery.push({x: i*400, type: 'mountain'});
+            
+            document.getElementById('bonusCoins').textContent = currentBonusCoins;
+            document.getElementById('bonusTime').textContent = bonusTimeLeft;
+
+            const timer = setInterval(() => {
+                if(!bonusActive) return clearInterval(timer);
+                bonusTimeLeft--;
+                document.getElementById('bonusTime').textContent = bonusTimeLeft;
+                if(bonusTimeLeft <= 0) endBonus();
+            }, 1000);
+
+            requestAnimationFrame(bonusLoop);
+        }
+
+        function endBonus() {
+            bonusActive = false;
+            totalBonusCoins += currentBonusCoins;
+            document.getElementById('bonusMsg').textContent = `BONUS OVER! +${currentBonusCoins} Coins! ➔`;
+            document.getElementById('bonusMsg').style.display = 'block';
+            
+            setTimeout(() => {
+                marioBonus.style.display = 'none';
+                mathGameScreen.style.opacity = '1';
+                generateQuestion(); 
             }, 2000);
         }
-        
-        // --- LOGIC KẾT THÚC GAME MỚI ---
-        function showGameEnd() {
-            // SỬA LỖI: Tắt nhạc nền
-            /*
-            if (backgroundMusic) {
-                Tone.Transport.stop();
-            }
-            */
 
-            finalScoreEl.textContent = `Final Score: ${score}`;
-            gameOverModal.classList.remove('hidden');
-            
-            if(winSound) {
-                const now = Tone.now();
-                winSound.triggerAttackRelease("C5", "8n", now);
-                winSound.triggerAttackRelease("E5", "8n", now + 0.2);
-                winSound.triggerAttackRelease("G5", "8n", now + 0.4);
-                winSound.triggerAttackRelease("C6", "4n", now + 0.6);
+        function jump(e) {
+            if(bonusActive && e.type === 'touchstart') e.preventDefault(); 
+            if(marioY >= groundY - 5 && bonusActive) {
+                marioVY = -16; 
+                sounds.jump();
+                document.getElementById('bonusMsg').style.display = 'none';
             }
         }
 
-        // --- Logic Kéo và Thả (KHÔNG THAY ĐỔI) ---
-        
-        function setupDragEvents() {
-            [sourceTenRod, sourceOneCube].forEach(source => {
-                source.addEventListener('mousedown', startDrag);
-                source.addEventListener('touchstart', startDrag, { passive: false });
+        window.addEventListener('mousedown', jump);
+        window.addEventListener('touchstart', jump, {passive: false});
+
+        function bonusLoop() {
+            if(!bonusActive) return;
+
+            // --- Draw Rich Sky ---
+            let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, "#1976d2");   // Deep blue sky top
+            gradient.addColorStop(0.5, "#4fc3f7"); // Vibrant light blue middle
+            gradient.addColorStop(1, "#e1f5fe");   // Soft horizon
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // --- Draw Glowing Sun ---
+            const sunX = canvas.width - 90;
+            const sunY = 90;
+            
+            // Soft outer radial glow
+            let sunGlow = ctx.createRadialGradient(sunX, sunY, 20, sunX, sunY, 80);
+            sunGlow.addColorStop(0, "rgba(255, 238, 88, 1)");
+            sunGlow.addColorStop(0.5, "rgba(255, 238, 88, 0.4)");
+            sunGlow.addColorStop(1, "rgba(255, 238, 88, 0)");
+            ctx.fillStyle = sunGlow;
+            ctx.beginPath(); ctx.arc(sunX, sunY, 80, 0, Math.PI*2); ctx.fill();
+            
+            // Solid inner sun
+            ctx.fillStyle = "#fff59d";
+            ctx.beginPath(); ctx.arc(sunX, sunY, 35, 0, Math.PI*2); ctx.fill();
+
+            // --- Scenery (Mountains) ---
+            ctx.fillStyle = "#81c784";
+            scenery.forEach(s => {
+                s.x -= 2; // slow parallax
+                if(s.x < -400) s.x = canvas.width + 100;
+                ctx.beginPath();
+                ctx.moveTo(s.x, groundY);
+                ctx.lineTo(s.x + 200, groundY - 180);
+                ctx.lineTo(s.x + 400, groundY);
+                ctx.fill();
             });
-            
-            document.addEventListener('mousemove', dragMove);
-            document.addEventListener('touchmove', dragMove, { passive: false });
-            
-            document.addEventListener('mouseup', endDrag);
-            document.addEventListener('touchend', endDrag);
-        }
-        
-        function startDrag(e) {
-            e.preventDefault();
-            if (isChecking || isBonusChecking) return;
-            
-            const sourceEl = e.currentTarget;
-            dragSourceType = sourceEl.dataset.type; 
-            
-            dragClone = sourceEl.cloneNode(true);
-            if (dragSourceType === 'ten') {
-                dragClone.innerHTML = sourceEl.innerHTML; 
-            }
-            
-            dragClone.classList.add('drag-clone');
-            document.body.appendChild(dragClone);
-            
-            isDragging = true;
-            
-            const pos = getEventPosition(e);
-            updateClonePosition(pos.x, pos.y);
-            
-            if(grabCubeSynth) grabCubeSynth.triggerAttackRelease("C4", "8n"); 
-        }
-        
-        function dragMove(e) {
-            if (!isDragging || isBonusChecking) return;
-            
-            e.preventDefault();
-            const pos = getEventPosition(e);
-            updateClonePosition(pos.x, pos.y);
-        }
-        
-        function updateClonePosition(x, y) {
-            if (!dragClone) return;
-            dragClone.style.left = `${x}px`;
-            dragClone.style.top = `${y}px`;
-        }
 
-        function endDrag(e) {
-            if (!isDragging || !dragClone || isBonusChecking) return;
-            
-            isDragging = false;
-            
-            dragClone.style.display = 'none';
-            const pos = getEventPosition(e);
-            const dropTarget = document.elementFromPoint(pos.x, pos.y);
-            
-            document.body.removeChild(dragClone);
-            dragClone = null;
-            
-            if (!dropTarget) {
-                if(dropCubeSynth) dropCubeSynth.triggerAttackRelease("C2", "8n");
-                return;
+            // --- Clouds with beautiful 2-layer shadows ---
+            clouds.forEach(c => {
+                c.x -= c.s;
+                if(c.x < -100) { c.x = canvas.width + 100; c.y = Math.random()*120 + 20; }
+                
+                // Shadow / Bottom layer
+                ctx.fillStyle = "rgba(180, 200, 220, 0.7)";
+                ctx.beginPath();
+                ctx.arc(c.x, c.y + 5, 30, 0, Math.PI*2);
+                ctx.arc(c.x+30, c.y-10, 35, 0, Math.PI*2);
+                ctx.arc(c.x+60, c.y + 5, 30, 0, Math.PI*2);
+                ctx.fill();
+
+                // Fluffy White Top Layer
+                ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, 30, 0, Math.PI*2);
+                ctx.arc(c.x+30, c.y-15, 35, 0, Math.PI*2);
+                ctx.arc(c.x+60, c.y, 30, 0, Math.PI*2);
+                ctx.fill();
+            });
+
+            // --- Ground ---
+            ctx.fillStyle = "#6d4c41"; // Dirt
+            ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+            ctx.fillStyle = "#4caf50"; // Grass top
+            ctx.fillRect(0, groundY, canvas.width, 20);
+            // Grass pattern
+            ctx.fillStyle = "#388e3c";
+            for(let i=0; i<canvas.width; i+=40) {
+                ctx.fillRect((i - (scenery[0].x*3)%40), groundY+5, 10, 5);
             }
 
-            if (dragSourceType === 'ten' && tensColumn.contains(dropTarget)) {
-                placeCube('ten');
-                if(dropCubeSynth) dropCubeSynth.triggerAttackRelease("E3", "8n");
-            } else if (dragSourceType === 'one' && onesColumn.contains(dropTarget)) {
-                
-                const targetTens = Math.floor(currentNumber / 10);
-                const placedTens = tensColumn.querySelectorAll('.ten-rod').length;
-                
-                if (placedTens < targetTens) {
-                    tensFirstWarning.classList.remove('hidden');
-                    if(warningSynth) warningSynth.triggerAttackRelease("A3", "8n");
-                    gameContainer.classList.add('shake');
-                    setTimeout(() => gameContainer.classList.remove('shake'), 400);
-                } else {
-                    tensFirstWarning.classList.add('hidden');
-                    placeCube('one');
-                    if(dropCubeSynth) dropCubeSynth.triggerAttackRelease("G3", "8n");
-                }
-                
-            } else {
-                if(dropCubeSynth) dropCubeSynth.triggerAttackRelease("C2", "8n");
-            }
-        }
-        
-        function placeCube(type) {
-            let newCube;
-            if (type === 'ten') {
-                newCube = sourceTenRod.cloneNode(true);
-                newCube.innerHTML = sourceTenRod.innerHTML; 
-                tensColumn.appendChild(newCube);
-            } else {
-                newCube = sourceOneCube.cloneNode(true);
-                onesColumn.appendChild(newCube);
+            // Gravity
+            marioVY += 0.8;
+            marioY += marioVY;
+            if(marioY > groundY) { marioY = groundY; marioVY = 0; }
+
+            const mx = 80;
+            const my = marioY - 50; 
+
+            // --- Obstacles (Cactus) ---
+            framesSinceLastObstacle++;
+            // Reduced obstacle spawn rate and enforced a minimum distance (frames)
+            if(Math.random() < 0.008 && framesSinceLastObstacle > 120) {
+                obstacles.push({x: canvas.width + 50, y: groundY - 40, w: 30, h: 40, active: true});
+                framesSinceLastObstacle = 0;
             }
             
-            newCube.addEventListener('click', () => {
-                newCube.remove();
-                if(removeCubeSynth) removeCubeSynth.triggerAttackRelease('8n', Tone.now(), 0.5);
-                if(type === 'ten') {
-                    tensFirstWarning.classList.add('hidden');
+            obstacles.forEach((ob, i) => {
+                ob.x -= 8;
+                
+                // Draw Cactus
+                ctx.fillStyle = "#2e7d32";
+                ctx.beginPath(); ctx.roundRect(ob.x, ob.y, ob.w, ob.h, 15); ctx.fill();
+                // Cactus arms
+                ctx.fillRect(ob.x - 10, ob.y + 10, 15, 8);
+                ctx.fillRect(ob.x - 10, ob.y + 2, 8, 15);
+                ctx.fillRect(ob.x + ob.w - 5, ob.y + 15, 15, 8);
+                ctx.fillRect(ob.x + ob.w + 2, ob.y + 7, 8, 15);
+
+                // Collision with character (approx bounding box)
+                if (ob.active && mx + 15 > ob.x && mx - 15 < ob.x + ob.w && my + 45 > ob.y) {
+                    ob.active = false; 
+                    sounds.gameOver();
+                    bonusActive = false; // Trigger Game Over
+                    
+                    document.getElementById('bonusMsg').textContent = "GAME OVER! 💥";
+                    document.getElementById('bonusMsg').style.display = 'block';
+                    document.getElementById('bonusMsg').style.color = '#ff5252';
+                    marioBonus.classList.add('flash-red');
+                    
+                    setTimeout(() => {
+                        endBonus();
+                    }, 2000);
                 }
             });
-        }
-        
-        function getEventPosition(e) {
-            // SỬA LỖI: Cập nhật hàm để xử lý chính xác 'touchend'
-            if (e.touches && e.touches.length > 0) {
-                // Dùng cho touchstart và touchmove
-                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            }
-            if (e.changedTouches && e.changedTouches.length > 0) {
-                // Dùng cho touchend (khi e.touches bị rỗng)
-                return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
-            }
-            // Dùng cho mouse events (dự phòng)
-            return { x: e.clientX, y: e.clientY };
-        }
-        
-        document.addEventListener('DOMContentLoaded', initGame);
+            obstacles = obstacles.filter(o => o.x > -100);
 
+            // --- Coins ---
+            if(Math.random() < 0.05) coins.push({x: canvas.width, y: groundY - 50 - Math.random()*130});
+            coins.forEach((c, i) => {
+                c.x -= 8;
+                // Draw Coin
+                ctx.fillStyle = "#ffb300";
+                ctx.beginPath(); ctx.arc(c.x, c.y, 18, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = "#ffeb3b";
+                ctx.beginPath(); ctx.arc(c.x, c.y, 13, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = "#f57f17"; 
+                ctx.font = "bold 18px Poppins"; 
+                ctx.fillText("$", c.x-6, c.y+6);
+
+                // Collision
+                const dx = c.x - mx; 
+                const dy = c.y - (marioY - 25); 
+                if(Math.sqrt(dx*dx + dy*dy) < 45) {
+                    coins.splice(i, 1);
+                    currentBonusCoins++;
+                    document.getElementById('bonusCoins').textContent = currentBonusCoins;
+                    sounds.coin();
+                }
+            });
+            coins = coins.filter(c => c.x > -50);
+
+            // --- Draw Character ---
+            ctx.fillStyle = "#5d4037"; ctx.beginPath(); ctx.roundRect(mx-14, my+42, 12, 8, 4); ctx.fill(); ctx.beginPath(); ctx.roundRect(mx+2, my+42, 12, 8, 4); ctx.fill();
+            ctx.fillStyle = "#1e88e5"; ctx.beginPath(); ctx.roundRect(mx-12, my+25, 24, 20, 6); ctx.fill();
+            ctx.fillStyle = "#e53935"; ctx.beginPath(); ctx.roundRect(mx-9, my+20, 18, 15, 6); ctx.fill();
+            ctx.fillStyle = "#ffccbc"; ctx.beginPath(); ctx.arc(mx, my+8, 15, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "#ffab91"; ctx.beginPath(); ctx.arc(mx+12, my+10, 6, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(mx+6, my+5, 3, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "#e53935"; ctx.beginPath(); ctx.arc(mx, my+3, 15, Math.PI, 0); ctx.fill(); ctx.fillRect(mx-5, my, 22, 5);
+            ctx.fillStyle = "#ffccbc"; ctx.beginPath(); ctx.arc(mx+15, my+30, 5, 0, Math.PI*2); ctx.fill();
+
+            requestAnimationFrame(bonusLoop);
+        }
+
+        // --- Fireworks System ---
+        const fwCanvas = document.getElementById('fireworksCanvas');
+        const fwCtx = fwCanvas.getContext('2d');
+        let fwParticles = [];
+        let fwActive = false;
+
+        function startFireworks() {
+            fwCanvas.style.display = 'block';
+            fwCanvas.width = window.innerWidth;
+            fwCanvas.height = window.innerHeight;
+            fwActive = true; fwParticles = []; fwLoop();
+        }
+
+        function stopFireworks() { fwActive = false; fwCanvas.style.display = 'none'; }
+
+        function createExplosion(x, y) {
+            const colors = ['#ff5252', '#ffd740', '#69f0ae', '#40c4ff', '#e040fb'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            for(let i=0; i<60; i++) {
+                fwParticles.push({
+                    x: x, y: y,
+                    vx: (Math.random()-0.5)*18, vy: (Math.random()-0.5)*18,
+                    life: 1, decay: Math.random() * 0.015 + 0.015,
+                    color: color, size: Math.random() * 5 + 2
+                });
+            }
+        }
+
+        function fwLoop() {
+            if(!fwActive) return;
+            fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+            for(let i = fwParticles.length - 1; i >= 0; i--) {
+                let p = fwParticles[i];
+                p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life -= p.decay;
+                if(p.life <= 0) { fwParticles.splice(i, 1); continue; }
+                fwCtx.globalAlpha = p.life; fwCtx.fillStyle = p.color;
+                fwCtx.beginPath(); fwCtx.arc(p.x, p.y, p.size, 0, Math.PI*2); fwCtx.fill();
+            }
+            fwCtx.globalAlpha = 1;
+            if(Math.random() < 0.08) createExplosion(Math.random() * fwCanvas.width, Math.random() * (fwCanvas.height / 2));
+            requestAnimationFrame(fwLoop);
+        }
+
+        // --- Setup Controls ---
+        document.getElementById('soundToggle').onclick = function() {
+            isMuted = !isMuted; this.textContent = isMuted ? '🔇' : '🔊';
+            if(!isMuted && audioCtx.state === 'suspended') audioCtx.resume();
+        };
+        document.getElementById('timerToggle').onclick = function() {
+            timerActive = !timerActive;
+            document.getElementById('timerDisplay').style.display = timerActive ? 'block' : 'none';
+            if(timerActive && mathGameScreen.classList.contains('active')) {
+                secondsElapsed = 0;
+                document.getElementById('timerDisplay').textContent = `⏱ 00:00`;
+                timerInterval = setInterval(() => { 
+                    secondsElapsed++; 
+                    document.getElementById('timerDisplay').textContent = `⏱ ${formatTime(secondsElapsed)}`;
+                }, 1000);
+            } else {
+                clearInterval(timerInterval);
+            }
+        };
+
+        // Resize Canvas dynamically
+        window.addEventListener('resize', () => {
+            if (bonusActive) {
+                canvas.width = window.innerWidth;
+                canvas.height = Math.min(window.innerHeight * 0.7, 500);
+                groundY = canvas.height - 50;
+                if (marioY > groundY) marioY = groundY;
+            }
+            
+            // Recalculate ticks and path based on screen width changes
+            tickWidth = window.innerWidth <= 600 ? 40 : 60; 
+            if (mathGameScreen.classList.contains('active') && numberLine.children.length > 0) {
+                 renderNumberLine();
+            }
+        });
+        
     </script>
 </body>
 </html>

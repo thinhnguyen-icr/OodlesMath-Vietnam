@@ -35,7 +35,7 @@
                 radial-gradient(circle at 90% 80%, rgba(255,255,255,0.6) 30px, transparent 31px);
             background-size: 100px 100px, 200px 200px, 300px 300px;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -46,16 +46,17 @@
         /* --- Header --- */
         header {
             width: 100%;
-            max-width: 850px;
+            max-width: 900px;
             background: rgba(255, 255, 255, 0.9);
             padding: 15px 25px;
             border-radius: 25px;
             box-shadow: 0 8px 0 rgba(0,0,0,0.1);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             backdrop-filter: blur(10px);
+            z-index: 10;
         }
 
         .title-group h1 {
@@ -67,53 +68,31 @@
             font-weight: 800;
         }
 
-        .controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .speaker-btn {
-            background: var(--c-yellow);
-            border: 3px solid #F1C40F;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            cursor: pointer;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.1s;
-            box-shadow: 0 4px 0 #D4AC0D;
-        }
-
-        .speaker-btn:active { transform: scale(0.9); box-shadow: 0 2px 0 #D4AC0D; }
-
         .score-board {
             background: var(--c-blue);
             color: white;
             padding: 10px 20px;
             border-radius: 15px;
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 800;
             box-shadow: 0 4px 0 #2A9D8F;
             text-align: center;
+            min-width: 120px;
         }
 
         /* --- Main Stage --- */
         #main-stage {
             width: 100%;
-            max-width: 850px;
+            max-width: 900px;
             background: rgba(255, 255, 255, 0.85);
             border-radius: 35px;
-            padding: 30px;
+            padding: 25px;
             box-shadow: var(--shadow-soft);
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
-            min-height: 550px;
+            min-height: 580px;
         }
 
         .screen {
@@ -129,21 +108,41 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .instruction-text {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             color: #2c3e50;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        /* --- Fruit Counting Area --- */
+        .mini-speaker-btn {
+            background: var(--c-yellow);
+            border: 2px solid #F1C40F;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 0 #D4AC0D;
+            transition: transform 0.1s;
+        }
+        .mini-speaker-btn:active { transform: scale(0.9); box-shadow: 0 1px 0 #D4AC0D; }
+
+        /* --- Fruits Area --- */
         .fruits-grid {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
             justify-content: center;
-            margin-bottom: 30px;
-            max-width: 600px;
+            margin-bottom: 25px;
+            max-width: 700px;
             padding: 20px;
             background: rgba(255,255,255,0.4);
             border-radius: 20px;
@@ -157,14 +156,13 @@
             filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.1));
         }
 
-        .fruit-item:hover { transform: scale(1.2) rotate(5deg); }
         .fruit-item.counted { opacity: 0.15; transform: scale(0.8); cursor: default; filter: grayscale(1); }
 
         /* --- Graph Styling --- */
         .graph-display {
             width: 100%;
             background: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: 25px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
@@ -173,65 +171,44 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+            transition: opacity 0.3s ease;
         }
 
-        .row-label { font-size: 2.2rem; width: 50px; text-align: center; }
+        .row-label { font-size: 2rem; width: 50px; text-align: center; }
 
         .bar-container {
             flex: 1;
             display: flex;
             gap: 6px;
-            height: 40px;
+            height: 36px;
             background: transparent;
             border-radius: 8px;
             padding: 2px;
         }
 
         .graph-box {
-            width: 36px; /* Fixed width to show difference */
-            height: 36px;
+            width: 32px;
+            height: 32px;
             background: transparent;
             border: 3px solid #e2e8f0;
             border-radius: 8px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .graph-box.filled {
             border-color: transparent;
-            transform: scale(1);
             animation: fillPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes fillPop {
-            0% { transform: scale(0.5); }
-            100% { transform: scale(1); }
-        }
-
-        .count-badge {
-            width: 45px;
-            font-weight: 800;
-            font-size: 1.3rem;
-            color: #475569;
-            text-align: right;
-        }
+        @keyframes fillPop { 0% { transform: scale(0.5); } 100% { transform: scale(1); } }
 
         /* --- Answer Buttons --- */
-        .answers-wrap {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-            width: 100%;
-            margin-top: 20px;
-        }
-
         .ans-btn {
             background: white;
             border: 3px solid #e2e8f0;
             border-radius: 20px;
-            padding: 15px 35px;
-            font-size: 1.8rem;
+            padding: 12px 30px;
+            font-size: 1.6rem;
             font-weight: 800;
             color: #2c3e50;
             cursor: pointer;
@@ -239,15 +216,14 @@
             transition: 0.1s;
         }
 
-        .ans-btn:hover { background: #f8fafc; transform: translateY(-2px); }
         .ans-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #cbd5e1; }
 
         /* --- Number Bond Styling --- */
         .bond-container {
             position: relative;
-            width: 300px;
+            width: 320px;
             height: 250px;
-            margin: 20px 0;
+            margin: 15px 0;
         }
 
         .bond-node {
@@ -258,6 +234,7 @@
             border: 4px solid var(--c-blue);
             border-radius: 50%;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             font-size: 2.2rem;
@@ -267,9 +244,25 @@
             z-index: 2;
         }
 
-        .bond-whole { top: 0; left: 50%; transform: translateX(-50%); width: 100px; height: 100px; font-size: 2.8rem; border-color: var(--c-purple); box-shadow: 0 6px 0 #9F7AEA;}
+        .bond-whole { top: 0; left: 50%; transform: translateX(-50%); width: 100px; height: 100px; border-color: var(--c-purple); box-shadow: 0 6px 0 #9F7AEA;}
         .bond-part-1 { bottom: 0; left: 0; }
         .bond-part-2 { bottom: 0; right: 0; }
+
+        .node-icon {
+            font-size: 1rem;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: white;
+            border: 2px solid #eee;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
 
         .bond-line {
             position: absolute;
@@ -279,7 +272,22 @@
             transform-origin: left center;
         }
 
-        /* --- Feedback Labels --- */
+        /* --- Trò chơi chém trái cây --- */
+        #slice-canvas {
+            background: 
+                linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                repeating-linear-gradient(90deg, #6d4c41 0px, #6d4c41 40px, #5d4037 40px, #5d4037 80px);
+            border: 10px solid #4e342e;
+            border-radius: 20px;
+            cursor: crosshair;
+            width: 100%;
+            max-width: 820px;
+            height: 480px;
+            touch-action: none;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5), 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        /* --- Phản hồi & Modal --- */
         .feedback-label {
             position: absolute;
             top: 50%;
@@ -293,61 +301,47 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             z-index: 100;
             display: none;
-            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes bounceIn { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
-
-        /* --- Victory --- */
-        #victory-modal {
+        #modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
             z-index: 200;
             align-items: center;
             justify-content: center;
         }
 
-        .victory-content {
+        .modal-content {
             background: white;
-            padding: 50px;
+            padding: 40px;
             border-radius: 40px;
             text-align: center;
-            max-width: 450px;
-            animation: bounceIn 0.6s;
+            max-width: 500px;
+            width: 90%;
         }
 
-        .victory-content h2 { font-size: 2.5rem; color: var(--c-purple); margin-bottom: 10px; font-weight: 800; }
-        .btn-restart {
+        .btn-action {
             background: var(--c-green);
             color: #2c3e50;
-            border: none;
             padding: 15px 40px;
             border-radius: 50px;
             font-size: 1.5rem;
             font-weight: 800;
             cursor: pointer;
             box-shadow: 0 6px 0 #6DBBAF;
+            border: none;
             margin-top: 25px;
-            transition: 0.1s;
         }
-        .btn-restart:active { transform: translateY(4px); box-shadow: 0 2px 0 #6DBBAF; }
 
-        #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 150; }
+        #fireworks-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 150; }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
+            #slice-canvas { height: 350px; }
+            #main-stage { min-height: auto; }
             .instruction-text { font-size: 1.1rem; }
-            .fruit-item { font-size: 2.2rem; }
-            .graph-display { padding: 15px; }
-            .row-label { font-size: 1.5rem; width: 35px; }
-            .graph-box { width: 28px; height: 28px; border-width: 2px; }
-            .bar-container { height: 32px; gap: 4px; }
-            .bond-container { width: 220px; height: 180px; }
-            .bond-node { width: 60px; height: 60px; font-size: 1.5rem; }
-            .bond-whole { width: 75px; height: 75px; font-size: 1.8rem; }
-            .ans-btn { padding: 10px 25px; font-size: 1.3rem; }
         }
     </style>
 </head>
@@ -355,57 +349,72 @@
     <img src="../assets/logo-oodles-math.png" class="oodles-logo">
     <header>
         <div class="title-group">
-            <h1>Fruit Math! 🍓</h1>
+            <h1>Fruit Math Adventure! 🍓</h1>
         </div>
         <div class="controls">
-            <button class="speaker-btn" onclick="speakCurrentTask()" title="Listen">🔊</button>
-            <div class="score-board">Round: <span id="round-val">1</span> / 5</div>
+            <div class="score-board">
+                Round: <span id="round-val">1</span> / 5<br>
+                Score: <span id="score-val">0</span>
+            </div>
         </div>
     </header>
 
     <main id="main-stage">
-        <!-- Screen 1: Counting & Graphing -->
         <div id="counting-screen" class="screen active">
-            <div class="instruction-text">Click to count all fruits!</div>
-            <div id="fruits-area" class="fruits-grid"></div>
-            <div class="graph-display" id="graph-container">
-                <!-- Graph rows injected here -->
+            <div class="instruction-text">
+                Count the fruits to fill your graph!
+                <button class="mini-speaker-btn" onclick="speakCurrentTask()">🔊</button>
             </div>
+            <div id="fruits-area" class="fruits-grid"></div>
+            <div class="graph-display" id="graph-container"></div>
         </div>
 
-        <!-- Screen 2: Quiz -->
         <div id="quiz-screen" class="screen">
-            <div class="instruction-text" id="quiz-instr">How many apples?</div>
-            <div id="quiz-fruits-preview" class="fruits-grid" style="min-height: 120px;"></div>
+            <div class="instruction-text">
+                <span id="quiz-instr">How many?</span>
+                <button class="mini-speaker-btn" onclick="speakCurrentTask()">🔊</button>
+            </div>
+            <!-- Container for the Picture Graph in Quiz -->
+            <div id="quiz-graph-container" class="graph-display" style="margin-bottom: 25px; width: 100%;"></div>
             <div class="answers-wrap" id="quiz-answers"></div>
         </div>
 
-        <!-- Screen 3: Addition (Number Bond) -->
         <div id="addition-screen" class="screen">
-            <div class="instruction-text">Find the total number of fruits!</div>
+            <div class="instruction-text">
+                Find the total number!
+                <button class="mini-speaker-btn" onclick="speakCurrentTask()">🔊</button>
+            </div>
             <div class="bond-container">
                 <div class="bond-line" id="line1"></div>
                 <div class="bond-line" id="line2"></div>
                 <div class="bond-whole bond-node" id="node-whole">?</div>
-                <div class="bond-part-1 bond-node" id="node-part1">0</div>
-                <div class="bond-part-2 bond-node" id="node-part2">0</div>
+                <div class="bond-part-1 bond-node" id="node-part1">
+                    <span class="val">0</span>
+                    <span class="node-icon" id="icon-part1">🍎</span>
+                </div>
+                <div class="bond-part-2 bond-node" id="node-part2">
+                    <span class="val">0</span>
+                    <span class="node-icon" id="icon-part2">🍌</span>
+                </div>
             </div>
             <div class="answers-wrap" id="bond-answers"></div>
+            <div class="graph-display mini-graph" id="addition-graph-ref" style="margin-top:20px;"></div>
+        </div>
+
+        <div id="slice-screen" class="screen">
+            <div class="instruction-text">NINJA BONUS: Slice the fruits! NO BOMBS! 💣</div>
+            <canvas id="slice-canvas"></canvas>
+            <div style="margin-top: 15px; font-weight: 800; color: #e74c3c; font-size: 1.2rem;">Time: <span id="slice-timer">15</span>s</div>
         </div>
     </main>
 
     <div id="feedback" class="feedback-label"></div>
 
-    <div id="victory-modal">
-        <div class="victory-content">
-            <div style="font-size: 5rem;">🎉</div>
-            <h2>Math Master!</h2>
-            <p>You completed all the rounds perfectly!</p>
-            <button class="btn-restart" onclick="location.reload()">Play Again</button>
-        </div>
+    <div id="modal-overlay">
+        <div class="modal-content" id="modal-body"></div>
     </div>
 
-    <canvas id="confetti-canvas"></canvas>
+    <canvas id="fireworks-canvas"></canvas>
 
     <script>
         const FRUIT_TYPES = [
@@ -416,38 +425,38 @@
         ];
 
         let state = {
-            round: 1,
-            counts: {},
-            totalInRound: 0,
-            countedInRound: 0,
-            hasMistake: false,
+            round: 1, score: 0, counts: {}, totalInRound: 0,
+            countedInRound: 0, quizStep: 0, quizFruits: [], 
+            sliceActive: false,
             currentTask: ""
         };
 
         const screens = {
             counting: document.getElementById('counting-screen'),
             quiz: document.getElementById('quiz-screen'),
-            addition: document.getElementById('addition-screen')
+            addition: document.getElementById('addition-screen'),
+            slice: document.getElementById('slice-screen')
         };
 
-        // --- Utils ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playSfx(freq, type = 'sine', duration = 0.2) {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.start(); osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
         }
 
         function speakCurrentTask() {
             window.speechSynthesis.cancel();
             const ut = new SpeechSynthesisUtterance(state.currentTask);
             ut.lang = 'en-US';
-            ut.rate = 0.9;
+            ut.rate = 0.95;
             window.speechSynthesis.speak(ut);
         }
 
@@ -455,233 +464,359 @@
             Object.values(screens).forEach(s => s.classList.remove('active'));
             screens[name].classList.add('active');
             
-            if(name === 'counting') state.currentTask = "Click on each fruit to count them and fill the graph.";
-            if(name === 'quiz') state.currentTask = document.getElementById('quiz-instr').innerText;
-            if(name === 'addition') state.currentTask = "What is the total sum of these two groups?";
+            if(name === 'counting') state.currentTask = "Count all the fruits to fill your graph.";
+            if(name === 'slice') state.currentTask = "Ninja bonus round! Slice the fruits but avoid the bombs.";
         }
 
         function showFeedback(text, color) {
             const f = document.getElementById('feedback');
-            f.innerText = text;
-            f.style.color = color;
-            f.style.display = 'block';
+            f.innerText = text; f.style.color = color; f.style.display = 'block';
             setTimeout(() => { f.style.display = 'none'; }, 1000);
         }
 
-        // --- Core Logic ---
+        function updateScore(points) {
+            state.score += points;
+            document.getElementById('score-val').innerText = state.score;
+        }
+
         function initRound() {
             state.counts = { apple: 0, banana: 0, grape: 0, orange: 0 };
-            state.totalInRound = 0;
-            state.countedInRound = 0;
-            state.hasMistake = false;
+            state.totalInRound = 0; state.countedInRound = 0; state.quizStep = 0;
+            state.quizFruits = [...FRUIT_TYPES].sort(() => Math.random() - 0.5).slice(0, 2);
             document.getElementById('round-val').innerText = state.round;
 
-            const fruitsPool = [];
             const graphContainer = document.getElementById('graph-container');
             graphContainer.innerHTML = '';
+            const fruitsPool = [];
 
             FRUIT_TYPES.forEach(ft => {
-                const targetCount = Math.floor(Math.random() * 4) + 4; // 4 to 7
+                const targetCount = Math.floor(Math.random() * 4) + 4; 
                 state.counts[ft.type + "_target"] = targetCount;
                 state.totalInRound += targetCount;
-                
                 for(let i=0; i<targetCount; i++) fruitsPool.push(ft);
-
-                // Build Graph Rows (Always show 10 potential boxes)
-                const row = document.createElement('div');
-                row.className = 'graph-row';
-                row.innerHTML = `
-                    <div class="row-label">${ft.emoji}</div>
-                    <div class="bar-container" id="bar-${ft.type}">
-                        ${Array(10).fill(0).map((_, i) => `<div class="graph-box" id="box-${ft.type}-${i}"></div>`).join('')}
-                    </div>
-                    <div class="count-badge" id="count-${ft.type}">0</div>
-                `;
-                graphContainer.appendChild(row);
+                graphContainer.appendChild(createGraphRow(ft));
             });
 
-            // Shuffle & Render Fruits
-            fruitsPool.sort(() => Math.random() - 0.5);
             const area = document.getElementById('fruits-area');
             area.innerHTML = '';
-            fruitsPool.forEach(ft => {
+            fruitsPool.sort(() => Math.random() - 0.5).forEach(ft => {
                 const el = document.createElement('div');
-                el.className = 'fruit-item';
-                el.innerText = ft.emoji;
+                el.className = 'fruit-item'; el.innerText = ft.emoji;
                 el.onclick = () => handleFruitClick(el, ft);
                 area.appendChild(el);
             });
-
             showScreen('counting');
+        }
+
+        function createGraphRow(ft, suffix = '') {
+            const row = document.createElement('div');
+            row.className = 'graph-row';
+            row.innerHTML = `
+                <div class="row-label">${ft.emoji}</div>
+                <div class="bar-container">
+                    ${Array(10).fill(0).map((_, i) => `<div class="graph-box" id="box-${ft.type}-${i}${suffix}"></div>`).join('')}
+                </div>
+                <div class="count-badge" id="count-${ft.type}${suffix}">${suffix ? state.counts[ft.type] : '0'}</div>
+            `;
+            return row;
         }
 
         function handleFruitClick(el, ft) {
             if (el.classList.contains('counted')) return;
-            
-            el.classList.add('counted');
-            playSfx(600, 'sine', 0.1);
-            
-            const currentCount = state.counts[ft.type];
-            state.counts[ft.type]++;
-            state.countedInRound++;
-
-            // Update Graph (Fill the box at the current count index)
-            const box = document.getElementById(`box-${ft.type}-${currentCount}`);
-            if(box) {
-                box.classList.add('filled');
-                box.style.backgroundColor = ft.color;
-            }
+            el.classList.add('counted'); playSfx(600, 'sine', 0.1);
+            const cur = state.counts[ft.type]; state.counts[ft.type]++; state.countedInRound++;
+            const box = document.getElementById(`box-${ft.type}-${cur}`);
+            if(box) { box.classList.add('filled'); box.style.backgroundColor = ft.color; }
             document.getElementById(`count-${ft.type}`).innerText = state.counts[ft.type];
-
-            if (state.countedInRound === state.totalInRound) {
-                setTimeout(setupQuiz, 1000);
-            }
+            if (state.countedInRound === state.totalInRound) setTimeout(setupQuiz, 1000);
         }
 
         function setupQuiz() {
-            const types = FRUIT_TYPES.filter(t => state.counts[t.type] > 0);
-            const targetType = types[Math.floor(Math.random() * types.length)];
-            const correct = state.counts[targetType.type];
+            if (state.quizStep >= state.quizFruits.length) { setupAddition(); return; }
+            const target = state.quizFruits[state.quizStep];
+            const correct = state.counts[target.type];
             
-            document.getElementById('quiz-instr').innerText = `How many ${targetType.type}s are there?`;
+            // Set instruction text and task speech
+            const questionText = `Look at the graph. How many ${target.type}s?`;
+            document.getElementById('quiz-instr').innerText = questionText;
+            state.currentTask = questionText;
             
-            const preview = document.getElementById('quiz-fruits-preview');
-            preview.innerHTML = '';
-            for(let i=0; i<correct; i++) {
-                const e = document.createElement('div');
-                e.className = 'fruit-item';
-                e.innerText = targetType.emoji;
-                preview.appendChild(e);
-            }
+            // Render Picture Graph instead of individual emojis
+            const quizGraphContainer = document.getElementById('quiz-graph-container');
+            quizGraphContainer.innerHTML = '<div style="font-weight:800; text-align:center; color:#666; font-size:0.8rem; margin-bottom:10px;">Picture Graph:</div>';
+            
+            FRUIT_TYPES.forEach(ft => {
+                const row = createGraphRow(ft, '-quiz');
+                
+                // Highlight target row and fade others
+                if (ft.type === target.type) {
+                    row.style.background = 'rgba(255, 230, 109, 0.25)';
+                    row.style.borderRadius = '12px';
+                    row.style.opacity = '1';
+                } else {
+                    row.style.opacity = '0.3'; // Fading non-target rows
+                }
+
+                quizGraphContainer.appendChild(row);
+
+                // Fill the boxes based on counts
+                for(let i=0; i<state.counts[ft.type]; i++){
+                    const b = row.querySelector(`#box-${ft.type}-${i}-quiz`);
+                    if(b) { b.classList.add('filled'); b.style.backgroundColor = ft.color; }
+                }
+            });
 
             const answers = [correct];
             while(answers.length < 4) {
                 let w = correct + Math.floor(Math.random() * 5) - 2;
                 if(w > 0 && !answers.includes(w)) answers.push(w);
             }
-            renderAnswers('quiz-answers', answers, correct, setupAddition);
+            
+            renderAnswers('quiz-answers', answers, correct, () => {
+                updateScore(10); state.quizStep++;
+                setTimeout(state.quizStep < 2 ? setupQuiz : setupAddition, 800);
+            });
             showScreen('quiz');
         }
 
         function setupAddition() {
-            const types = FRUIT_TYPES.filter(t => state.counts[t.type] > 0).sort(() => Math.random() - 0.5);
-            const p1 = state.counts[types[0].type];
-            const p2 = state.counts[types[1].type];
-            const sum = p1 + p2;
+            const p1Type = state.quizFruits[0], p2Type = state.quizFruits[1];
+            const p1 = state.counts[p1Type.type], p2 = state.counts[p2Type.type], sum = p1 + p2;
+            
+            state.currentTask = `Look at the graph. Add the ${p1Type.type}s and ${p2Type.type}s to find the total sum.`;
 
-            document.getElementById('node-part1').innerText = p1;
-            document.getElementById('node-part2').innerText = p2;
+            document.querySelector('#node-part1 .val').innerText = p1;
+            document.querySelector('#node-part2 .val').innerText = p2;
+            document.getElementById('icon-part1').innerText = p1Type.emoji;
+            document.getElementById('icon-part2').innerText = p2Type.emoji;
             document.getElementById('node-whole').innerText = '?';
+
+            const ref = document.getElementById('addition-graph-ref');
+            ref.innerHTML = '<div style="font-weight:800; text-align:center; color:#666; font-size:0.75rem; margin-bottom:5px;">Reference Graph:</div>';
+            FRUIT_TYPES.forEach(ft => {
+                const row = createGraphRow(ft, '-ref'); 
+                // Fade out fruits not in addition
+                if (ft.type !== p1Type.type && ft.type !== p2Type.type) {
+                    row.style.opacity = '0.3';
+                } else {
+                    row.style.background = 'rgba(78, 205, 196, 0.1)';
+                    row.style.borderRadius = '8px';
+                }
+                ref.appendChild(row);
+                for(let i=0; i<state.counts[ft.type]; i++){
+                    const b = row.querySelector(`#box-${ft.type}-${i}-ref`);
+                    if(b) { b.classList.add('filled'); b.style.backgroundColor = ft.color; }
+                }
+            });
 
             const answers = [sum];
             while(answers.length < 3) {
                 let w = sum + Math.floor(Math.random() * 6) - 3;
                 if(w > 0 && !answers.includes(w)) answers.push(w);
             }
-
             positionLines();
-
             renderAnswers('bond-answers', answers, sum, () => {
-                document.getElementById('node-whole').innerText = sum;
-                setTimeout(handleRoundEnd, 1500);
+                updateScore(20); document.getElementById('node-whole').innerText = sum;
+                setTimeout(startBonusRound, 1500);
             });
             showScreen('addition');
         }
 
         function renderAnswers(containerId, list, correct, onWin) {
-            const wrap = document.getElementById(containerId);
-            wrap.innerHTML = '';
+            const wrap = document.getElementById(containerId); wrap.innerHTML = '';
             list.sort(() => Math.random() - 0.5).forEach(val => {
                 const btn = document.createElement('button');
-                const stateObj = { isLocked: false };
-                btn.className = 'ans-btn';
-                btn.innerText = val;
+                btn.className = 'ans-btn'; btn.innerText = val;
                 btn.onclick = () => {
-                    if(stateObj.isLocked) return;
-                    if(val === correct) {
-                        stateObj.isLocked = true;
-                        playSfx(800, 'sine', 0.4);
-                        showFeedback("Great Job! 🎉", "var(--c-green)");
-                        onWin();
-                    } else {
-                        playSfx(150, 'sawtooth', 0.2);
-                        showFeedback("Try Again! 💪", "var(--c-red)");
-                    }
+                    if(val === correct) { playSfx(800, 'sine', 0.4); showFeedback("Correct! 🌟", "var(--c-green)"); onWin(); }
+                    else { playSfx(150, 'sawtooth', 0.2); showFeedback("Try again! 🍎", "var(--c-red)"); }
                 };
                 wrap.appendChild(btn);
             });
         }
 
-        function handleRoundEnd() {
-            if(state.round < 5) {
-                state.round++;
-                initRound();
+        /* --- Ninja Slicing Game --- */
+        let sliceTimerInterval;
+        function startBonusRound() {
+            showScreen('slice');
+            initSliceGame();
+            let timeLeft = 15;
+            document.getElementById('slice-timer').innerText = timeLeft;
+            clearInterval(sliceTimerInterval);
+            sliceTimerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('slice-timer').innerText = timeLeft;
+                if(timeLeft <= 0) { clearInterval(sliceTimerInterval); endSliceGame(false); }
+            }, 1000);
+        }
+
+        function initSliceGame() {
+            const canvas = document.getElementById('slice-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            state.sliceActive = true;
+            let items = [];
+            let trail = [];
+            let isSlicing = false;
+
+            function spawn() {
+                if(!state.sliceActive) return;
+                const isBomb = Math.random() < 0.25;
+                const count = Math.floor(Math.random() * 2) + 1;
+                for(let i=0; i<count; i++) {
+                    items.push({
+                        x: Math.random() * (canvas.width - 100) + 50,
+                        y: canvas.height + 60,
+                        vx: (Math.random() - 0.5) * 6,
+                        vy: -Math.random() * 4 - 8,
+                        emoji: isBomb && i === 0 ? '💣' : FRUIT_TYPES[Math.floor(Math.random()*4)].emoji,
+                        isBomb: isBomb && i === 0,
+                        sliced: false,
+                        rot: 0, vrot: (Math.random() - 0.5) * 0.1
+                    });
+                }
+                setTimeout(spawn, 150 + Math.random() * 300);
+            }
+            spawn();
+
+            const getPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const ev = e.touches ? e.touches[0] : e;
+                return { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
+            };
+
+            canvas.onmousedown = canvas.ontouchstart = (e) => { isSlicing = true; trail = [getPos(e)]; };
+            canvas.onmousemove = canvas.ontouchmove = (e) => { 
+                if(!isSlicing) return;
+                const pos = getPos(e);
+                trail.push(pos);
+                if(trail.length > 8) trail.shift();
+                checkSlice(pos.x, pos.y);
+            };
+            canvas.onmouseup = canvas.ontouchend = () => { isSlicing = false; trail = []; };
+
+            function checkSlice(cx, cy) {
+                items.forEach(item => {
+                    if(!item.sliced) {
+                        const d = Math.hypot(item.x - cx, item.y - cy);
+                        if(d < 55) {
+                            item.sliced = true;
+                            if(item.isBomb) { playSfx(100, 'sawtooth', 0.5); endSliceGame(true); }
+                            else { playSfx(1200, 'sine', 0.05); updateScore(5); }
+                        }
+                    }
+                });
+            }
+
+            function render() {
+                if(!state.sliceActive) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                if(trail.length > 1) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = "rgba(255,255,255,0.8)";
+                    ctx.lineWidth = 5; ctx.lineJoin = "round";
+                    ctx.moveTo(trail[0].x, trail[0].y);
+                    for(let i=1; i<trail.length; i++) ctx.lineTo(trail[i].x, trail[i].y);
+                    ctx.stroke();
+                }
+
+                items = items.filter(it => !(it.sliced && !it.isBomb));
+                items.forEach((it, i) => {
+                    it.x += it.vx; it.y += it.vy; it.vy += 0.18; it.rot += it.vrot;
+                    ctx.save();
+                    ctx.translate(it.x, it.y); ctx.rotate(it.rot);
+                    ctx.font = "55px Poppins"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                    ctx.shadowColor = "rgba(0,0,0,0.5)"; ctx.shadowBlur = 10;
+                    ctx.fillText(it.emoji, 0, 0);
+                    ctx.restore();
+                    if(it.y > canvas.height + 150) items.splice(i, 1);
+                });
+                requestAnimationFrame(render);
+            }
+            render();
+        }
+
+        function endSliceGame(bomb) {
+            state.sliceActive = false; clearInterval(sliceTimerInterval);
+            if(bomb) {
+                showModal(`
+                    <h2 style="color:var(--c-red)">BOOM! 💣</h2>
+                    <p>You hit a bomb! Don't worry, try again!</p>
+                    <div style="font-size:1.5rem; font-weight:800;">Score: ${state.score}</div>
+                    <button class="btn-action" onclick="location.reload()">Try Again</button>
+                `);
             } else {
-                endGame();
+                if(state.round < 5) { state.round++; initRound(); }
+                else { victory(); }
             }
         }
 
-        function endGame() {
-            document.getElementById('victory-modal').style.display = 'flex';
-            startConfetti();
+        function victory() {
+            showModal(`
+                <h2 style="color:var(--c-purple)">🏆 Math Ninja Champion!</h2>
+                <p>Amazing! You are a master of fruits and numbers!</p>
+                <div style="font-size:2rem; font-weight:800; color:var(--c-blue); margin:20px 0;">Total: ${state.score}</div>
+                <button class="btn-action" onclick="location.reload()">Play Again</button>
+            `);
+            startFireworks();
+        }
+
+        function showModal(html) {
+            const o = document.getElementById('modal-overlay');
+            const b = document.getElementById('modal-body');
+            b.innerHTML = html; o.style.display = 'flex';
         }
 
         function positionLines() {
-            const container = document.querySelector('.bond-container');
-            const whole = document.getElementById('node-whole');
-            const p1 = document.getElementById('node-part1');
-            const p2 = document.getElementById('node-part2');
-            const l1 = document.getElementById('line1');
-            const l2 = document.getElementById('line2');
-
-            const updateLine = (line, from, to) => {
-                const fRect = from.getBoundingClientRect();
-                const tRect = to.getBoundingClientRect();
-                const cRect = container.getBoundingClientRect();
-
-                const x1 = fRect.left + fRect.width/2 - cRect.left;
-                const y1 = fRect.top + fRect.height/2 - cRect.top;
-                const x2 = tRect.left + tRect.width/2 - cRect.left;
-                const y2 = tRect.top + tRect.height/2 - cRect.top;
-
-                const length = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
-                const angle = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI;
-
-                line.style.width = length + 'px';
-                line.style.left = x1 + 'px';
-                line.style.top = y1 + 'px';
-                line.style.transform = `rotate(${angle}deg)`;
+            const cont = document.querySelector('.bond-container'), w = document.getElementById('node-whole');
+            const p1 = document.getElementById('node-part1'), p2 = document.getElementById('node-part2');
+            const l1 = document.getElementById('line1'), l2 = document.getElementById('line2');
+            const upd = (l, f, t) => {
+                const fr = f.getBoundingClientRect(), tr = t.getBoundingClientRect(), cr = cont.getBoundingClientRect();
+                const x1 = fr.left + fr.width/2 - cr.left, y1 = fr.top + fr.height/2 - cr.top;
+                const x2 = tr.left + tr.width/2 - cr.left, y2 = tr.top + tr.height/2 - cr.top;
+                l.style.width = Math.hypot(x2-x1, y2-y1) + 'px';
+                l.style.left = x1 + 'px'; l.style.top = y1 + 'px';
+                l.style.transform = `rotate(${Math.atan2(y2-y1, x2-x1)*180/Math.PI}deg)`;
             };
-
-            setTimeout(() => {
-                updateLine(l1, whole, p1);
-                updateLine(l2, whole, p2);
-            }, 50);
+            setTimeout(() => { upd(l1, w, p1); upd(l2, w, p2); }, 50);
         }
 
-        // --- Confetti ---
-        function startConfetti() {
-            const canvas = document.getElementById('confetti-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            let particles = [];
-            for(let i=0; i<150; i++) {
-                particles.push({
-                    x: Math.random()*canvas.width, y: Math.random()*canvas.height - canvas.height,
-                    size: Math.random()*8+4, color: `hsl(${Math.random()*360}, 70%, 50%)`,
-                    speed: Math.random()*3+2, angle: Math.random()*6.2
+        function startFireworks() {
+            const c = document.getElementById('fireworks-canvas');
+            const ctx = c.getContext('2d');
+            c.width = window.innerWidth; c.height = window.innerHeight;
+            let fws = [];
+            function create() {
+                fws.push({
+                    x: Math.random() * c.width, y: c.height,
+                    tx: Math.random() * c.width, ty: Math.random() * (c.height/2),
+                    color: `hsl(${Math.random()*360}, 100%, 60%)`, exp: false, pts: []
                 });
             }
             function loop() {
-                ctx.clearRect(0,0,canvas.width,canvas.height);
-                particles.forEach(p => {
-                    p.y += p.speed; p.x += Math.sin(p.angle);
-                    if(p.y > canvas.height) p.y = -20;
-                    ctx.fillStyle = p.color;
-                    ctx.fillRect(p.x, p.y, p.size, p.size);
+                ctx.fillStyle = 'rgba(0,0,0,0.15)'; ctx.fillRect(0,0,c.width,c.height);
+                if(Math.random() < 0.1) create();
+                fws.forEach((f, i) => {
+                    if(!f.exp) {
+                        f.y -= 7; if(f.y <= f.ty) {
+                            f.exp = true; playSfx(400+Math.random()*400, 'square', 0.1);
+                            for(let j=0; j<60; j++) f.pts.push({x:f.x,y:f.y,vx:(Math.random()-0.5)*12,vy:(Math.random()-0.5)*12,a:1});
+                        }
+                        ctx.fillStyle = f.color; ctx.beginPath(); ctx.arc(f.x, f.y, 4, 0, Math.PI*2); ctx.fill();
+                    } else {
+                        f.pts.forEach((p, j) => {
+                            p.x += p.vx; p.y += p.vy; p.vy += 0.1; p.a -= 0.015;
+                            ctx.fillStyle = f.color; ctx.globalAlpha = p.a; ctx.fillRect(p.x, p.y, 3, 3);
+                            if(p.a <= 0) f.pts.splice(j, 1);
+                        });
+                        if(f.pts.length === 0) fws.splice(i, 1);
+                    }
                 });
-                requestAnimationFrame(loop);
+                ctx.globalAlpha = 1; requestAnimationFrame(loop);
             }
             loop();
         }

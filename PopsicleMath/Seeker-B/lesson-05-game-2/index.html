@@ -1,233 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="../assets/brand.css">
+    <link rel="stylesheet" href="../assets/brand.css">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tens and Ones Game</title>
     
-    <!-- Tải Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Tải Tone.js cho hiệu ứng âm thanh --><script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Tone.js for Audio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <!-- Canvas Confetti for Fireworks -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <!-- Tải Google Font 'Nunito' --><link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Google Font 'Poppins' -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
     
     <style>
-        body {
-            font-family: 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #FFD700 0%, #FF69B4 100%); /* Nền gradient tươi sáng */
-            touch-action: none;
-            overflow: hidden; /* Ngăn cuộn */
+        :root {
+            /* Responsive sizes for cubes */
+            --cube-size: 26px; 
+            --rod-width: calc(var(--cube-size) * 10);
         }
-        
-        #game-container {
-            max-width: 900px; /* Giảm chiều rộng tối đa */
-            max-height: 95vh; /* Giới hạn chiều cao */
-            overflow: hidden; /* SỬA LỖI: Đổi từ 'auto' sang 'hidden' để tắt cuộn trên di động */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            background-color: #fcfcfc; /* Màu nền trắng nhẹ */
+        @media (min-width: 768px) {
+            :root {
+                --cube-size: 32px;
+            }
         }
 
-        /* -- Khu vực kéo thả -- */
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* Animated Candy Gradient Background */
+            background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            touch-action: none;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Bubbles Effect */
+        .bubbles {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .bubble {
+            position: absolute;
+            bottom: -20px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            animation: rise 10s infinite ease-in;
+        }
+        @keyframes rise {
+            0% { bottom: -20px; transform: translateX(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { bottom: 1080px; transform: translateX(-200px); opacity: 0; }
+        }
+
+        #game-container {
+            max-width: 900px;
+            max-height: 98vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 4px solid #fff;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Fun Text Gradient */
+        .kid-title {
+            background: linear-gradient(to right, #ff416c, #ff4b2b, #f6d365, #fda085);
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 1px;
+        }
+
+        /* -- Drag & Drop Area -- */
         .tens-and-ones-frame {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            border: 4px solid #6b46c1; /* Màu tím đậm */
-            border-radius: 8px;
-            background-color: #fefcbf; /* Màu vàng nhạt */
-            min-height: 120px; 
+            border: 6px solid #8B5CF6;
+            border-radius: 16px;
+            background-color: #FDF4FF;
+            min-height: 180px; 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
         }
         
         .dropzone {
-            min-height: 100px; 
-            padding: 8px;
+            min-height: 150px; 
+            padding: 12px;
             display: flex;
-            flex-wrap: wrap; /* Cho phép các khối gói lại */
-            align-content: flex-start; /* Sắp xếp từ trên xuống */
-            gap: 4px;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            justify-content: center; /* Center to make blocks perfectly neat */
+            gap: 6px;
+            position: relative;
         }
         
         .dropzone-tens {
-            border-right: 4px solid #6b46c1;
-            max-height: 120px; 
-            overflow-y: auto;
+            border-right: 6px dashed #C4B5FD;
+            background-color: #F5F3FF;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
         }
         .dropzone-ones {
-             max-height: 120px; 
-             overflow-y: auto;
+            background-color: #EFF6FF;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
         }
 
-        /* -- Kiểu dáng cho các khối Unifix -- */
+        /* -- 3D Realistic Unifix Cubes -- */
         .cube {
-            cursor: grab;
+            cursor: pointer; /* Change to pointer to show it's clickable */
             user-select: none;
-            border-radius: 4px;
-            box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-            border: 1px solid rgba(0,0,0,0.2);
-            transition: transform 0.1s ease-out; /* Thêm chuyển động nhỏ */
+            border-radius: 6px;
+            transition: transform 0.1s ease-out;
+            touch-action: none; /* Crucial for mobile drag */
         }
         .cube:active {
-            cursor: grabbing;
-            transform: scale(1.05);
+            transform: scale(1.1);
+            z-index: 50;
         }
         
-        /* Khối đơn vị (One-Cube) */
+        /* One Cube (Blue) */
         .one-cube {
-            width: 30px; 
-            height: 30px;
-            background-color: #4299e1; /* Blue */
-            border-color: #2b6cb0;
-        }
-        
-        /* Khối hàng chục (Ten-Rod) - NẰM NGANG VÀ NHỎ HƠN */
-        .ten-rod {
-            width: 300px; /* Chiều rộng */
-            height: 30px; /* Chiều cao */
-            background-color: #e53e3e; /* Red */
-            border-color: #c53030;
-            display: flex;
-            flex-direction: row; /* Nằm ngang */
-            gap: 0px; 
-            margin: 2px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            width: var(--cube-size); 
+            height: var(--cube-size);
+            background: radial-gradient(circle at 30% 30%, #60A5FA, #2563EB);
+            border: 2px solid #1E3A8A;
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.3), 
+                        inset 2px 2px 4px rgba(255,255,255,0.5), 
+                        2px 2px 5px rgba(0,0,0,0.3);
             border-radius: 4px;
         }
+        
+        /* Ten Rod (Red) */
+        .ten-rod {
+            width: var(--rod-width);
+            height: var(--cube-size);
+            background: radial-gradient(circle at 50% 30%, #F87171, #DC2626);
+            border: 2px solid #991B1B;
+            display: flex;
+            flex-direction: row;
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.3), 
+                        inset 2px 2px 4px rgba(255,255,255,0.4), 
+                        3px 3px 6px rgba(0,0,0,0.3);
+            border-radius: 4px;
+            overflow: hidden; /* Keep segments inside border */
+        }
         .ten-rod-segment {
-            width: 30px; /* Mỗi phân đoạn rộng 30px */
+            width: var(--cube-size);
             height: 100%;
-            background-color: #e53e3e;
-            border-right: 1px solid #c53030; /* Viền bên phải */
+            border-right: 1px solid rgba(153, 27, 27, 0.6);
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
         }
-        .ten-rod-segment:last-child {
-            border-right: none;
-        }
+        .ten-rod-segment:last-child { border-right: none; }
+        .ten-rod-segment:first-child { border-left: none; }
 
-
-        /* -- Kiểu dáng cho bộ bài -- */
+        /* -- Playful Flashcard -- */
         #flashcard-deck {
-            width: 90px; 
-            height: 90px; 
+            width: 100px; 
+            height: 120px; 
             position: relative; 
             cursor: pointer;
             perspective: 1000px;
+            margin: 0 auto;
         }
         .card-face {
             position: absolute;
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            transition: transform 0.6s;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border: 4px solid white;
         }
         .card-back {
-            background: linear-gradient(135deg, #a78bfa 0%, #6d28d9 100%); /* Màu tím mộng mơ */
+            background: repeating-linear-gradient(45deg, #A78BFA, #A78BFA 10px, #8B5CF6 10px, #8B5CF6 20px);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem; 
+            font-size: 3.5rem; 
+            font-weight: 900;
+            text-shadow: 2px 2px 0px #5B21B6;
             transform: rotateY(0deg);
         }
         .card-front {
-            background: white;
-            color: #2d3748;
+            background: #FFFBEB;
+            color: #D97706;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem; 
+            font-size: 3.5rem; 
             font-weight: 900;
             transform: rotateY(180deg);
+            background-image: radial-gradient(#FDE68A 10%, transparent 10%);
+            background-size: 10px 10px;
         }
         
-        #flashcard-deck.is-flipped .card-back {
-            transform: rotateY(-180deg);
-        }
-        #flashcard-deck.is-flipped .card-front {
-            transform: rotateY(0deg);
-        }
+        #flashcard-deck.is-flipped .card-back { transform: rotateY(-180deg); }
+        #flashcard-deck.is-flipped .card-front { transform: rotateY(0deg); }
         
-        /* -- Kiểu dáng cho đối tượng đang kéo -- */
+        /* -- Drag Clone -- */
         .drag-clone {
             position: absolute;
             pointer-events: none;
             z-index: 9999;
-            opacity: 0.8;
-            transform: translate(-50%, -50%);
+            opacity: 0.9;
+            transform: translate(-50%, -50%) scale(1.2);
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.3));
         }
 
-        /* Hiệu ứng rung lắc */
+        /* Animations */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px) rotate(-1deg); } 
+            20%, 40%, 60%, 80% { transform: translateX(8px) rotate(1deg); }
         }
-        .shake {
-            animation: shake 0.4s ease-in-out; 
-        }
+        .shake { animation: shake 0.5s ease-in-out; }
 
-        /* Hiệu ứng nảy lên */
         @keyframes bounce-in {
-            0% { transform: scale(0.5); opacity: 0; }
+            0% { transform: scale(0.3); opacity: 0; }
             50% { transform: scale(1.1); opacity: 1; }
+            70% { transform: scale(0.9); }
             100% { transform: scale(1); }
         }
-        .bounce-in {
-            animation: bounce-in 0.3s ease-out; 
-        }
+        .bounce-in { animation: bounce-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         
-        /* Nút */
-        button {
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.07);
+
+        /* Kid-Friendly Chunky Buttons */
+        .chunky-btn {
+            transition: all 0.1s;
+            border-bottom: 6px solid rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .chunky-btn:active {
+            transform: translateY(6px);
+            border-bottom: 0px solid rgba(0,0,0,0.2);
+            margin-top: 6px;
         }
-        
-        /* CSS cho Hộp quà Bí ẩn (Bonus Modal) */
+
+        /* Mystery Box */
         .mystery-box {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer;
+            font-size: 5rem;
+            animation: float 3s ease-in-out infinite;
         }
         .mystery-box:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 15px 15px rgba(0,0,0,0.3));
+            animation: none;
+        }
+        
+        /* Headers for columns */
+        .col-header {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.8);
         }
 
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
-<img src="../assets/logo-oodles-math.png" class="oodles-logo">
-    <div id="game-container" class="w-full bg-white rounded-2xl p-6 md:p-8 relative">
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-4">
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <!-- Decorative Background Bubbles -->
+    <div class="bubbles" id="bubbles"></div>
+
+    <div id="game-container" class="w-full rounded-3xl p-4 md:p-8 relative">
         
-        <!-- Tiêu đề và Thẻ bài --><div class="flex flex-col items-center mb-4">
-            <!-- SỬA LỖI: Tiêu đề căn giữa và giảm khoảng cách dưới (mb-2) --><h1 class="text-2xl md:text-3xl font-black text-purple-700 text-center mb-2">Tens and Ones Game</h1>
+        <!-- Score Display -->
+        <div class="absolute top-4 right-4 bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full font-black text-lg md:text-xl shadow-lg border-2 border-yellow-200 z-10 flex items-center gap-2">
+            ⭐ <span id="score">Score: 0</span>
+        </div>
+
+        <!-- Title and Cards Area -->
+        <div class="flex flex-col items-center pt-8 md:pt-0">
+            <h1 class="text-3xl md:text-5xl font-black kid-title text-center mb-6">Tens & Ones Game</h1>
             
-            <div class="flex justify-center items-end w-full gap-4"> 
-                <!-- Thẻ bài (di chuyển xuống thấp hơn) --><div class="text-center flex flex-col items-center">
-                    <h2 class="text-base font-bold text-gray-700 mb-1">Click the card!</h2>
-                    <div id="flashcard-deck" title="Click to draw a new number">
+            <div class="flex flex-col md:flex-row justify-center items-center w-full gap-8"> 
+                
+                <!-- Deck Area -->
+                <div class="text-center flex flex-col items-center">
+                    <div id="flashcard-deck" title="Click to draw a new number!">
                         <div id="card-face-back" class="card-face card-back">?</div>
                         <div id="card-face-front" class="card-face card-front"></div>
                     </div>
+                    <h2 class="text-lg font-bold text-gray-500 mt-4 animate-pulse">Tap the card!</h2>
                 </div>
 
-                <!-- Cube Bank (Giữ nguyên vị trí này) --><div class="flex items-center justify-center gap-6 p-3 bg-indigo-100 rounded-lg flex-grow">
-                    <p id="tens-first-warning" class="text-sm md:text-base text-red-600 font-bold hidden absolute -top-8 bg-yellow-100 p-2 rounded-md shadow-md">
-                        Please place the Ten rods first!
-                    </p>
+                <!-- Source Bank -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-6 p-4 md:p-6 bg-white border-4 border-blue-200 rounded-2xl shadow-inner relative w-full md:w-auto">
                     
-                    <!-- Nguồn kéo Ten-Rod --><div class="text-center">
-                        <p class="font-bold text-base text-gray-800">Ten Rod</p>
-                        <div id="source-ten-rod" class="cube ten-rod" data-type="ten">
+                    <div id="tens-first-warning" class="text-sm md:text-base text-white font-bold hidden absolute -top-12 bg-red-500 px-4 py-2 rounded-full shadow-lg border-2 border-white bounce-in">
+                        Oops! Put Tens first! 🦒
+                        <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-red-500"></div>
+                    </div>
+                    
+                    <!-- Ten Rod Source -->
+                    <div class="text-center flex flex-col items-center">
+                        <p class="font-black text-xl text-red-500 mb-2">Ten Rod</p>
+                        <div id="source-ten-rod" class="cube ten-rod hover:scale-105" data-type="ten" title="Click or Drag">
                             <script>
                                 for(let i = 0; i < 10; i++) {
                                     document.write('<div class="ten-rod-segment"></div>');
@@ -236,134 +333,147 @@
                         </div>
                     </div>
                     
-                    <!-- Nguồn kéo One-Cube --><div class="text-center">
-                        <p class="font-bold text-base text-gray-800">One Cube</p>
-                        <div id="source-one-cube" class="cube one-cube" data-type="one"></div>
+                    <!-- One Cube Source -->
+                    <div class="text-center flex flex-col items-center">
+                        <p class="font-black text-xl text-blue-500 mb-2">One Cube</p>
+                        <div id="source-one-cube" class="cube one-cube hover:scale-105" data-type="one" title="Click or Drag"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Khu vực Làm việc (Kéo thả) --><div class="flex flex-col lg:flex-row gap-4 mt-4"> 
-            <div class="w-full">
-                <div class="tens-and-ones-frame">
-                    <div class="text-center text-xl font-bold text-red-600 p-2 border-b-4 border-purple-800">TENS</div>
-                    <div class="text-center text-xl font-bold text-blue-600 p-2 border-b-4 border-purple-800">ONES</div>
-                    
-                    <div id="tens-column" class="dropzone dropzone-tens"></div>
-                    <div id="ones-column" class="dropzone dropzone-ones"></div>
+        <!-- NEW: Instruction Block updated -->
+        <div class="w-full flex justify-center my-4">
+            <div class="bg-white bg-opacity-80 px-6 py-2 rounded-full shadow-sm border-2 border-purple-200 text-center animate-bounce" style="animation-duration: 2s;">
+                <p class="text-purple-600 font-bold text-base md:text-lg">
+                    ✨ Click or drag the rods and cubes into the boxes below! 👇
+                </p>
+            </div>
+        </div>
+
+        <!-- Working Area (Dropzones) -->
+        <div class="w-full">
+            <div class="tens-and-ones-frame">
+                <div class="flex flex-col border-r-4 border-dashed border-purple-300">
+                    <div class="col-header text-red-600 bg-red-100 mx-2 mt-2">TENS</div>
+                    <div id="tens-column" class="dropzone dropzone-tens flex-grow"></div>
+                </div>
+                <div class="flex flex-col">
+                    <div class="col-header text-blue-600 bg-blue-100 mx-2 mt-2">ONES</div>
+                    <div id="ones-column" class="dropzone dropzone-ones flex-grow"></div>
                 </div>
             </div>
         </div>
         
-        <!-- Khu vực Điều khiển (Submit) --><!-- SỬA LỖI: Giảm khoảng cách trên (mt-4) --><div class="flex justify-center items-center gap-4 mt-4">
-            <button id="reset-board-button" class="px-5 py-2 bg-gray-400 text-white text-lg font-bold rounded-lg hover:bg-gray-500">
-                Reset Board
+        <!-- Controls -->
+        <div class="flex justify-center items-center gap-4 mt-8">
+            <button id="reset-board-button" class="chunky-btn px-6 py-3 bg-gray-300 text-gray-700 text-lg font-bold rounded-2xl hover:bg-gray-400">
+                Clear Board
             </button>
-            <button id="submit-button" class="px-8 py-3 bg-green-500 text-white text-xl font-bold rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed">
-                Submit
+            <button id="submit-button" class="chunky-btn px-10 py-3 bg-green-500 text-white text-2xl font-black rounded-2xl hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:border-b-0 disabled:translate-y-[6px]">
+                CHECK! ✓
             </button>
         </div>
 
     </div>
 
-    <!-- Modal Phản hồi --><div id="feedback-modal" class="hidden absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div id="feedback-content" class="text-6xl md:text-7xl font-black text-white p-8 md:p-10 rounded-lg bounce-in">
-            <!-- "Correct!" hoặc "Try Again!" --></div>
+    <!-- Feedback Modal (Correct/Incorrect) -->
+    <div id="feedback-modal" class="hidden fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50">
+        <div id="feedback-content" class="text-6xl md:text-8xl font-black text-white p-10 rounded-3xl border-8 shadow-2xl bounce-in flex flex-col items-center text-center">
+            <!-- Dynamic Content -->
+        </div>
     </div>
     
-    <!-- BỔ SUNG: Modal Hộp Quà (Bonus Modal) --><div id="bonus-modal" class="hidden absolute inset-0 bg-gradient-to-br from-yellow-400 to-orange-500 flex flex-col items-center justify-center z-40 p-4">
-        <h2 class="text-5xl md:text-6xl font-black text-white mb-4 animate-bounce">BONUS!</h2>
-        <p class="text-2xl text-white mb-6">Choose a mystery box!</p>
-        <div id="box-container" class="flex flex-wrap justify-center gap-6 md:gap-10 mb-6">
-            <!-- Các hộp quà sẽ được tạo bằng JS --></div>
-        <p id="bonus-result" class="text-3xl text-white font-bold mt-6 hidden"></p>
+    <!-- Bonus Round Modal -->
+    <div id="bonus-modal" class="hidden fixed inset-0 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex flex-col items-center justify-center z-50 p-4">
+        <h2 class="text-6xl md:text-8xl font-black text-yellow-300 mb-2 kid-title text-center shadow-none animate-pulse">BONUS TIME!</h2>
+        <p class="text-2xl md:text-3xl font-bold text-white mb-10 text-center">Tap a magic gift box! ✨</p>
+        
+        <div id="box-container" class="flex flex-wrap justify-center gap-8 md:gap-12 mb-8">
+            <!-- Boxes injected via JS -->
+        </div>
+        <div id="bonus-result" class="text-4xl md:text-5xl text-white font-black mt-8 hidden bounce-in bg-black bg-opacity-30 px-8 py-4 rounded-full"></div>
     </div>
     
-    <!-- BỔ SUNG: Modal Kết Thúc Trò Chơi (Game Over) --><div id="game-over-modal" class="hidden absolute inset-0 bg-gradient-to-br from-green-400 to-blue-500 flex flex-col items-center justify-center z-40 p-4">
-        <h2 class="text-6xl md:text-8xl font-black text-white mb-4 bounce-in">Great Job!</h2>
-        <p class="text-3xl text-white mb-6">You finished all the cards!</p>
-        <p id="final-score" class="text-4xl text-yellow-300 font-bold mb-8">Final Score: 0</p>
-        <button id="play-again-button" class="px-8 py-3 bg-white text-blue-600 text-xl font-bold rounded-lg shadow-lg hover:bg-gray-100">
-            Play Again
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="hidden fixed inset-0 bg-gradient-to-br from-blue-500 to-purple-600 flex flex-col items-center justify-center z-50 p-4 text-center">
+        <h2 class="text-7xl md:text-9xl font-black text-white mb-4 bounce-in" style="text-shadow: 0 10px 20px rgba(0,0,0,0.3)">AMAZING!</h2>
+        <p class="text-3xl md:text-4xl font-bold text-blue-100 mb-8">You finished all the cards!</p>
+        
+        <div class="bg-white p-8 rounded-3xl shadow-2xl border-8 border-yellow-400 mb-10 transform rotate-2">
+            <p class="text-2xl text-gray-500 font-bold mb-2">Your Final Score</p>
+            <p id="final-score" class="text-6xl md:text-8xl text-orange-500 font-black kid-title shadow-none">0</p>
+        </div>
+
+        <button id="play-again-button" class="chunky-btn px-10 py-4 bg-yellow-400 text-yellow-900 border-yellow-600 text-3xl font-black rounded-full shadow-xl hover:bg-yellow-300">
+            PLAY AGAIN 🚀
         </button>
     </div>
 
-
     <script>
-        // --- SỬA LỖI: Khai báo biến DOM bằng let ---
+        // -- Create Background Bubbles --
+        const bubblesContainer = document.getElementById('bubbles');
+        for (let i = 0; i < 15; i++) {
+            let bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            let size = Math.random() * 60 + 20 + 'px';
+            bubble.style.width = size;
+            bubble.style.height = size;
+            bubble.style.left = Math.random() * 100 + 'vw';
+            bubble.style.animationDuration = Math.random() * 5 + 5 + 's';
+            bubble.style.animationDelay = Math.random() * 5 + 's';
+            bubblesContainer.appendChild(bubble);
+        }
+
+        // --- DOM Elements ---
         let gameContainer, scoreEl, cardDeckEl, cardBackEl, cardFrontEl, 
             submitButton, resetButton, feedbackModal, feedbackContent, 
             tensFirstWarning, bonusModal, boxContainer, bonusResult, 
             gameOverModal, finalScoreEl, playAgainButton, sourceTenRod, 
             sourceOneCube, tensColumn, onesColumn;
         
-        // --- Trạng thái Trò chơi ---
+        // --- Game State ---
         let score = 0;
         let currentNumber = 0;
         let cardDeck = [];
         let isChecking = false;
         let isBonusChecking = false;
         let isDragging = false;
+        let hasMoved = false; // Flag to check if drag or click
+        let startPos = { x: 0, y: 0 };
         let dragClone = null;
         let dragSourceType = ''; 
+        let audioInitialized = false;
         
-        // --- Cấu hình Âm thanh ---
-        let clickSynth, correctSynth, incorrectSynth, drawCardSynth, grabCubeSynth, dropCubeSynth, removeCubeSynth, warningSynth, bonusSound, winSound, backgroundMusic;
+        // --- Audio Synths (Tone.js) ---
+        let popSynth, winChime, wrongSynth, cardSynth, dragSynth, dropSynth, bonusSynth, bigWinSynth;
         
-        // SỬA LỖI ÂM THANH: Đảm bảo Tone.start() được gọi và await
         async function initAudio() {
-            if (!clickSynth) {
-                await Tone.start(); // <-- Chờ context khởi động
-                console.log("Audio Context Started"); // Ghi log để kiểm tra
+            if (!audioInitialized) {
+                await Tone.start();
+                audioInitialized = true;
                 
-                // Khởi tạo tất cả synths
-                clickSynth = new Tone.MembraneSynth({ pitchDecay: 0.01, envelope: { attack: 0.001, decay: 0.1, sustain: 0 } }).toDestination();
-                correctSynth = new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'triangle' }, envelope: { attack: 0.05, decay: 0.2, sustain: 0.3, release: 0.5 } }).toDestination();
-                incorrectSynth = new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'square' }, envelope: { attack: 0.01, decay: 0.3, sustain: 0.1, release: 0.4 } }).toDestination();
-                drawCardSynth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.2 } }).toDestination();
-                grabCubeSynth = new Tone.FMSynth({ harmonicity: 3.01, modulationIndex: 14, envelope: { attack: 0.01, decay: 0.2, sustain: 0.0, release: 0.2}, modulationEnvelope: { attack: 0.001, decay: 0.2, sustain: 0.0, release: 0.2}, oscillator: { type: 'sine' }, modulation: { type: 'square' } }).toDestination();
-                dropCubeSynth = new Tone.PluckSynth({ attackNoise: 0.5, dampening: 4000, resonance: 0.9 }).toDestination();
-                removeCubeSynth = new Tone.NoiseSynth({ volume: -10, envelope: { attack: 0.001, decay: 0.1 } }).toDestination();
-                warningSynth = new Tone.Synth({ oscillator: { type: 'sawtooth' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2 } }).toDestination();
-                bonusSound = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.5 } }).toDestination();
-                winSound = new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'sine' } }).toDestination();
-
-                // NHẠC NỀN MỚI - SỬA LỖI: Đã tắt nhạc nền
-                /*
-                backgroundMusic = new Tone.Sequence(
-                    (time, note) => {
-                        // Sử dụng synth riêng cho nhạc nền để không xung đột
-                        if(!correctSynth) return;
-                        correctSynth.triggerAttackRelease(note, "8n", time);
-                    },
-                    ["C4", "E4", "G4", "C5", "G4", "E4"], // Melody vui tươi
-                    "4n"
-                ).start(0);
-                backgroundMusic.loop = true;
-                backgroundMusic.playbackRate = 1.2; 
-                Tone.Transport.bpm.value = 120; 
-                Tone.Master.volume.value = -15; 
-                
-                // Khởi động transport SAU KHI context đã start
-                Tone.Transport.start(); 
-                */
+                // Kid-friendly sounds
+                popSynth = new Tone.MembraneSynth({ pitchDecay: 0.05, envelope: { attack: 0.001, decay: 0.2, sustain: 0 } }).toDestination();
+                winChime = new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'triangle' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination();
+                wrongSynth = new Tone.Synth({ oscillator: { type: 'fmsawtooth', modulationType: 'sine' }, envelope: { attack: 0.1, decay: 0.2, sustain: 0.1, release: 0.2 } }).toDestination();
+                cardSynth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.1 } }).toDestination();
+                dragSynth = new Tone.FMSynth({ harmonicity: 2, modulationIndex: 5, oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.2 } }).toDestination();
+                dropSynth = new Tone.PluckSynth({ attackNoise: 1, dampening: 2000, resonance: 0.8 }).toDestination();
+                bonusSynth = new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'square' } }).toDestination();
+                bigWinSynth = new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'triangle' }, envelope: { attack: 0.05, decay: 0.3, sustain: 0.4, release: 1.5 } }).toDestination();
             }
         }
         
-        // SỬA LỖI ÂM THANH: Gọi initAudio() một cách bất đồng bộ
-        document.body.addEventListener('mousedown', async () => {
-            await initAudio();
-        }, { once: true });
-        document.body.addEventListener('touchstart', async () => {
-            await initAudio();
+        // Ensure Audio starts on first interaction
+        document.body.addEventListener('pointerdown', async () => {
+            if(!audioInitialized) await initAudio();
         }, { once: true });
 
-
-        // --- Logic Trò chơi ---
+        // --- Core Logic ---
         
         function initGame() {
-            // SỬA LỖI: Gán các biến DOM bên trong initGame
+            // Assign DOM
             gameContainer = document.getElementById('game-container');
             scoreEl = document.getElementById('score');
             cardDeckEl = document.getElementById('flashcard-deck');
@@ -391,6 +501,7 @@
             drawCard();
             setupDragEvents(); 
             
+            // Clean & re-add listeners
             submitButton.removeEventListener('click', handleSubmit);
             resetButton.removeEventListener('click', resetBoard);
             cardDeckEl.removeEventListener('click', drawCard);
@@ -403,17 +514,11 @@
 
             gameOverModal.classList.add('hidden');
             bonusModal.classList.add('hidden');
-            
-            // SỬA LỖI ÂM THANH: Tắt nhạc nền
-            /*
-            if (backgroundMusic && Tone.Transport.state !== 'started') {
-                Tone.Transport.start();
-            }
-            */
         }
 
         function shuffleDeck() {
-            cardDeck = Array.from({ length: 11 }, (_, i) => i + 10);
+            // Array from 11 to 20 for 4-5yo
+            cardDeck = Array.from({ length: 10 }, (_, i) => i + 11);
             for (let i = cardDeck.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [cardDeck[i], cardDeck[j]] = [cardDeck[j], cardDeck[i]];
@@ -438,7 +543,7 @@
                 cardBackEl.textContent = "?"; 
                 
                 cardDeckEl.classList.add('is-flipped');
-                if(drawCardSynth) drawCardSynth.triggerAttackRelease("G4", "8n");
+                if(audioInitialized) cardSynth.triggerAttackRelease("E5", "16n");
                 
                 resetBoard();
                 submitButton.disabled = false;
@@ -449,12 +554,16 @@
             tensColumn.innerHTML = '';
             onesColumn.innerHTML = '';
             tensFirstWarning.classList.add('hidden');
+            if(audioInitialized && !isChecking) dropSynth.triggerAttackRelease("C2", "16n");
         }
 
         function updateScore() {
-            // SỬA LỖI: Thêm kiểm tra null
             if (scoreEl) {
                 scoreEl.textContent = `Score: ${score}`;
+                // Pop animation
+                scoreEl.parentElement.classList.remove('bounce-in');
+                void scoreEl.parentElement.offsetWidth; // trigger reflow
+                scoreEl.parentElement.classList.add('bounce-in');
             }
         }
         
@@ -476,22 +585,51 @@
 
         function handleCorrectAnswer() {
             isChecking = true;
-            if(correctSynth) correctSynth.triggerAttackRelease(["C5", "E5", "G5"], "0.2");
+            if(audioInitialized) winChime.triggerAttackRelease(["C5", "E5", "G5", "C6"], "0.5");
             
-            showFeedback("Correct!", "bg-green-500");
+            // Bắn pháo giấy từ 2 góc 
+            const confettiColors = ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff'];
+            
+            // Từ bên trái qua phải
+            confetti({
+                particleCount: 60,
+                spread: 80,
+                angle: 60,
+                origin: { x: 0, y: 0.6 },
+                colors: confettiColors
+            });
+            
+            // Từ bên phải qua trái
+            confetti({
+                particleCount: 60,
+                spread: 80,
+                angle: 120,
+                origin: { x: 1, y: 0.6 },
+                colors: confettiColors
+            });
+
+            showFeedback("YAY! Correct! 🎉", "bg-green-500", "border-green-300");
             
             setTimeout(() => {
                 feedbackModal.classList.add('hidden');
-                showBonusRound(); 
-            }, 1200); 
+                // 30% chance for a bonus round to keep it exciting
+                if (Math.random() < 0.4) {
+                    showBonusRound(); 
+                } else {
+                    score += 10;
+                    updateScore();
+                    isChecking = false;
+                    drawCard();
+                }
+            }, 1800); 
         }
 
         function handleIncorrectAnswer() {
             isChecking = true;
-            if(incorrectSynth) incorrectSynth.triggerAttackRelease(["C4", "B3"], "0.3");
+            if(audioInitialized) wrongSynth.triggerAttackRelease("D3", "0.3");
             
             gameContainer.classList.add('shake');
-            showFeedback("Try Again!", "bg-red-500");
+            showFeedback("Oops! Try Again! 🤔", "bg-red-500", "border-red-300");
             
             setTimeout(() => {
                 gameContainer.classList.remove('shake');
@@ -500,32 +638,33 @@
             }, 1500);
         }
 
-        function showFeedback(message, bgColor) {
-            feedbackContent.textContent = message;
-            feedbackContent.className = `text-6xl md:text-7xl font-black text-white p-8 md:p-10 rounded-lg bounce-in ${bgColor}`;
+        function showFeedback(message, bgColor, borderColor) {
+            feedbackContent.innerHTML = message;
+            feedbackContent.className = `text-5xl md:text-7xl font-black text-white p-8 md:p-12 rounded-3xl border-8 shadow-2xl bounce-in flex flex-col items-center text-center ${bgColor} ${borderColor}`;
             feedbackModal.classList.remove('hidden');
         }
         
-        // --- LOGIC HỘP QUÀ MỚI ---
-        const doorPrizes = [5, 10, 15]; 
+        // --- BONUS ROUND (Mystery Boxes) ---
+        const doorPrizes = [5, 10, 15, 20]; 
         
         function showBonusRound() {
             isBonusChecking = true;
             bonusModal.classList.remove('hidden');
             bonusResult.classList.add('hidden');
             
-            const shuffledPrizes = [...doorPrizes].sort(() => Math.random() - 0.5);
+            const shuffledPrizes = [...doorPrizes].sort(() => Math.random() - 0.5).slice(0,3);
             
             boxContainer.innerHTML = ''; 
             
             shuffledPrizes.forEach((prize) => {
-                const box = document.createElement('button');
-                box.className = 'mystery-box w-32 h-32 md:w-40 md:h-40 bg-purple-500 rounded-lg shadow-xl flex items-center justify-center text-purple-100 transition-all duration-300 hover:scale-105 hover:bg-purple-600';
-                box.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 4.5A2.5 2.5 0 0 0 18 2H6a2.5 2.5 0 0 0-2.5 2.5v4.61c.4.19.76.44 1.09.75L7 12.27V9h10v3.27l2.41-2.41c.33-.31.69-.56 1.09-.75V4.5zM6 14.5c0 1.2.54 2.26 1.38 2.96L6 18.5V14.5zM18 14.5v4l-1.38-1.04A3.503 3.503 0 0 0 18 14.5zM12 7c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zM9 14.13c.64.41 1.41.67 2.25.67h1.5c.84 0 1.61-.26 2.25-.67l.63-.4V10c0-2.21-1.79-4-4-4s-4 1.79-4 4v3.73l.63.4zM9 15.5v3A2.5 2.5 0 0 0 11.5 21h1A2.5 2.5 0 0 0 15 18.5v-3c-1 .8-2.16 1.3-3.5 1.3S10 16.3 9 15.5z"/></svg>`;
+                const box = document.createElement('div');
+                box.className = 'mystery-box';
+                box.innerHTML = `🎁`;
                 box.dataset.prize = prize;
                 box.addEventListener('click', handleBoxClick, { once: true });
                 boxContainer.appendChild(box);
             });
+            if(audioInitialized) winChime.triggerAttackRelease(["C5", "F5"], "0.3");
         }
         
         function handleBoxClick(e) {
@@ -534,30 +673,33 @@
             const clickedBox = e.currentTarget;
             const prize = parseInt(clickedBox.dataset.prize);
             
-            score += prize; 
+            score += prize + 10; // Prize + base 10 points for correct answer
             updateScore();
             
-            if(bonusSound) bonusSound.triggerAttackRelease("C5", "0.1", Tone.now() + 0.1);
-            if(bonusSound) bonusSound.triggerAttackRelease("G5", "0.3", Tone.now() + 0.2);
+            if(audioInitialized) bonusSynth.triggerAttackRelease(["C5", "E5", "G5"], "0.3");
+
+            // Confetti burst on the clicked box
+            const rect = clickedBox.getBoundingClientRect();
+            const x = (rect.left + rect.width / 2) / window.innerWidth;
+            const y = (rect.top + rect.height / 2) / window.innerHeight;
+            confetti({ particleCount: 60, spread: 70, origin: { x, y } });
 
             const allBoxes = boxContainer.querySelectorAll('.mystery-box');
             allBoxes.forEach(box => {
                 const boxPrize = parseInt(box.dataset.prize);
-                box.innerHTML = `<span class="text-5xl font-black bounce-in">+${boxPrize}</span>`;
-                box.disabled = true;
+                box.style.animation = 'none'; // Stop floating
                 
                 if (box !== clickedBox) {
-                    box.classList.remove('bg-purple-500', 'hover:bg-purple-600');
-                    box.classList.add('bg-gray-400', 'opacity-60');
+                    box.innerHTML = `<span class="text-3xl font-bold text-white bg-gray-500 bg-opacity-50 p-4 rounded-full shadow-inner block">+${boxPrize}</span>`;
+                    box.style.transform = 'scale(0.8)';
+                    box.style.opacity = '0.7';
                 } else {
-                    box.classList.remove('bg-purple-500');
-                    box.classList.add('bg-yellow-400');
-                    box.style.transform = 'scale(1.1)';
+                    box.innerHTML = `<span class="text-6xl font-black text-yellow-300 drop-shadow-lg block bounce-in">+${boxPrize}</span>`;
+                    box.style.transform = 'scale(1.2)';
                 }
             });
             
-            const resultText = `You won ${prize} bonus points!`;
-            bonusResult.textContent = resultText;
+            bonusResult.innerHTML = `Awesome! <span class="text-yellow-300">+${prize}</span> Bonus Points!`;
             bonusResult.classList.remove('hidden');
             
             setTimeout(() => {
@@ -565,31 +707,49 @@
                 isChecking = false;
                 isBonusChecking = false;
                 drawCard(); 
-            }, 2000);
+            }, 2500);
         }
         
-        // --- LOGIC KẾT THÚC GAME MỚI ---
+        // --- GAME OVER & FIREWORKS ---
         function showGameEnd() {
-            // SỬA LỖI: Tắt nhạc nền
-            /*
-            if (backgroundMusic) {
-                Tone.Transport.stop();
-            }
-            */
-
-            finalScoreEl.textContent = `Final Score: ${score}`;
+            finalScoreEl.textContent = score;
             gameOverModal.classList.remove('hidden');
             
-            if(winSound) {
+            if(audioInitialized) {
                 const now = Tone.now();
-                winSound.triggerAttackRelease("C5", "8n", now);
-                winSound.triggerAttackRelease("E5", "8n", now + 0.2);
-                winSound.triggerAttackRelease("G5", "8n", now + 0.4);
-                winSound.triggerAttackRelease("C6", "4n", now + 0.6);
+                bigWinSynth.triggerAttackRelease(["C4", "E4", "G4"], "8n", now);
+                bigWinSynth.triggerAttackRelease(["E4", "G4", "C5"], "8n", now + 0.2);
+                bigWinSynth.triggerAttackRelease(["G4", "C5", "E5"], "8n", now + 0.4);
+                bigWinSynth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "2n", now + 0.6);
             }
+
+            fireworksSequence();
         }
 
-        // --- Logic Kéo và Thả (KHÔNG THAY ĐỔI) ---
+        function fireworksSequence() {
+            const duration = 5 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 60 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+                // since particles fall down, start a bit higher than random
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        // --- DRAG AND DROP & CLICK LOGIC ---
         
         function setupDragEvents() {
             [sourceTenRod, sourceOneCube].forEach(source => {
@@ -605,8 +765,13 @@
         }
         
         function startDrag(e) {
-            e.preventDefault();
+            if(e.type === 'touchstart') e.preventDefault();
+            
             if (isChecking || isBonusChecking) return;
+            
+            isDragging = true;
+            hasMoved = false;
+            startPos = getEventPosition(e);
             
             const sourceEl = e.currentTarget;
             dragSourceType = sourceEl.dataset.type; 
@@ -619,19 +784,27 @@
             dragClone.classList.add('drag-clone');
             document.body.appendChild(dragClone);
             
-            isDragging = true;
+            // Ban đầu để clone ngay tại chuột/tay
+            updateClonePosition(startPos.x, startPos.y);
             
-            const pos = getEventPosition(e);
-            updateClonePosition(pos.x, pos.y);
-            
-            if(grabCubeSynth) grabCubeSynth.triggerAttackRelease("C4", "8n"); 
+            if(audioInitialized) dragSynth.triggerAttackRelease("C5", "16n"); 
         }
         
         function dragMove(e) {
             if (!isDragging || isBonusChecking) return;
+            if(e.type === 'touchmove') e.preventDefault(); // Dừng cuộn trang khi đang kéo
             
-            e.preventDefault();
             const pos = getEventPosition(e);
+            
+            // Tính toán khoảng cách di chuyển để phân biệt Click và Kéo
+            if (!hasMoved) {
+                const dx = pos.x - startPos.x;
+                const dy = pos.y - startPos.y;
+                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+                    hasMoved = true;
+                }
+            }
+            
             updateClonePosition(pos.x, pos.y);
         }
         
@@ -645,40 +818,57 @@
             if (!isDragging || !dragClone || isBonusChecking) return;
             
             isDragging = false;
+            dragClone.style.display = 'none'; // Ẩn ngay để hàm lấy đúng element bên dưới
             
-            dragClone.style.display = 'none';
             const pos = getEventPosition(e);
             const dropTarget = document.elementFromPoint(pos.x, pos.y);
             
             document.body.removeChild(dragClone);
             dragClone = null;
             
+            // Xử lý Click (nếu không có sự di chuyển chuột/tay)
+            if (!hasMoved) {
+                handleClickPlace(dragSourceType);
+                return;
+            }
+            
+            // Xử lý Thả (Drop)
             if (!dropTarget) {
-                if(dropCubeSynth) dropCubeSynth.triggerAttackRelease("C2", "8n");
+                if(audioInitialized) dropSynth.triggerAttackRelease("C2", "16n");
                 return;
             }
 
-            if (dragSourceType === 'ten' && tensColumn.contains(dropTarget)) {
+            const isTensDrop = tensColumn.contains(dropTarget) || tensColumn === dropTarget;
+            const isOnesDrop = onesColumn.contains(dropTarget) || onesColumn === dropTarget;
+
+            if (dragSourceType === 'ten' && isTensDrop) {
+                handleClickPlace('ten');
+            } else if (dragSourceType === 'one' && isOnesDrop) {
+                handleClickPlace('one');
+            } else {
+                if(audioInitialized) dropSynth.triggerAttackRelease("C2", "16n"); // Dropped outside
+            }
+        }
+        
+        // Hàm dùng chung cho Click và Drop thành công
+        function handleClickPlace(type) {
+            if (type === 'ten') {
                 placeCube('ten');
-                if(dropCubeSynth) dropCubeSynth.triggerAttackRelease("E3", "8n");
-            } else if (dragSourceType === 'one' && onesColumn.contains(dropTarget)) {
-                
+                if(audioInitialized) popSynth.triggerAttackRelease("G3", "8n");
+            } else if (type === 'one') {
                 const targetTens = Math.floor(currentNumber / 10);
                 const placedTens = tensColumn.querySelectorAll('.ten-rod').length;
                 
                 if (placedTens < targetTens) {
                     tensFirstWarning.classList.remove('hidden');
-                    if(warningSynth) warningSynth.triggerAttackRelease("A3", "8n");
+                    if(audioInitialized) wrongSynth.triggerAttackRelease("C3", "8n");
                     gameContainer.classList.add('shake');
-                    setTimeout(() => gameContainer.classList.remove('shake'), 400);
+                    setTimeout(() => gameContainer.classList.remove('shake'), 500);
                 } else {
                     tensFirstWarning.classList.add('hidden');
                     placeCube('one');
-                    if(dropCubeSynth) dropCubeSynth.triggerAttackRelease("G3", "8n");
+                    if(audioInitialized) popSynth.triggerAttackRelease("C4", "8n");
                 }
-                
-            } else {
-                if(dropCubeSynth) dropCubeSynth.triggerAttackRelease("C2", "8n");
             }
         }
         
@@ -693,9 +883,15 @@
                 onesColumn.appendChild(newCube);
             }
             
+            // Chỉ thêm hiệu ứng nảy (không random xoay nghiêng nữa để block nằm hoàn toàn ngay ngắn)
+            newCube.classList.add('bounce-in');
+            
+            // Click to remove
             newCube.addEventListener('click', () => {
-                newCube.remove();
-                if(removeCubeSynth) removeCubeSynth.triggerAttackRelease('8n', Tone.now(), 0.5);
+                if(isChecking) return;
+                newCube.style.transform = 'scale(0)';
+                setTimeout(() => newCube.remove(), 100);
+                if(audioInitialized) dropSynth.triggerAttackRelease("G2", "16n");
                 if(type === 'ten') {
                     tensFirstWarning.classList.add('hidden');
                 }
@@ -703,16 +899,12 @@
         }
         
         function getEventPosition(e) {
-            // SỬA LỖI: Cập nhật hàm để xử lý chính xác 'touchend'
             if (e.touches && e.touches.length > 0) {
-                // Dùng cho touchstart và touchmove
                 return { x: e.touches[0].clientX, y: e.touches[0].clientY };
             }
             if (e.changedTouches && e.changedTouches.length > 0) {
-                // Dùng cho touchend (khi e.touches bị rỗng)
                 return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
             }
-            // Dùng cho mouse events (dự phòng)
             return { x: e.clientX, y: e.clientY };
         }
         

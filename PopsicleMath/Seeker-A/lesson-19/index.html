@@ -3,524 +3,784 @@
 <head>
     <link rel="stylesheet" href="../assets/brand.css">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Shape Adventure</title>
-    <!-- Font Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2D Shape Quest V5!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
+        :root {
+            /* Duolingo-inspired vibrant color palette */
+            --bg-sky-top: #1cb0f6;
+            --bg-sky-bottom: #8fe0ff;
+            --c-green: #58cc02;
+            --c-green-shadow: #58a700;
+            --c-blue: #1cb0f6;
+            --c-blue-shadow: #1899d6;
+            --c-yellow: #ffc800;
+            --c-yellow-shadow: #e5b400;
+            --c-red: #ff4b4b;
+            --c-red-shadow: #ea1515;
+            --c-purple: #ce82ff;
+            --c-purple-shadow: #a568cc;
+            --text-dark: #3c3c3c;
+            --text-light: #afafaf;
+            --font-main: 'Poppins', sans-serif;
+            --card-bg: #ffffff;
+            --card-border: #e5e5e5;
+        }
+
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+
         body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            overflow: hidden;
-            background: #a1c4fd;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            font-family: var(--font-main);
+            background: linear-gradient(180deg, var(--bg-sky-top) 0%, var(--bg-sky-bottom) 100%);
+            margin: 0; padding: 15px;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            height: 100vh; overflow: hidden; touch-action: none;
+            color: var(--text-dark);
         }
 
-        /* Playground Background */
-        .sky-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%);
-            z-index: -1;
+        /* Landscape Background Fixed to bottom */
+        .scenery {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            z-index: -2; pointer-events: none;
+            display: flex; flex-direction: column; justify-content: flex-end;
         }
-
-        .ground {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 25vh;
-            background: #91e462;
-            border-top: 8px solid #7ed348;
-            z-index: -1;
+        .hill-back {
+            position: absolute; bottom: 0; left: -10%; right: -10%; height: 50vh;
+            background: #64d115; border-radius: 50% 50% 0 0 / 15% 15% 0 0;
+            z-index: 1;
         }
-
+        .hill-front {
+            position: absolute; bottom: 0; left: -20%; right: -20%; height: 40vh;
+            background: #58cc02; border-radius: 50% 50% 0 0 / 15% 15% 0 0;
+            z-index: 2; border-top: 15px solid #71df1e;
+        }
+        
+        .clouds { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
         .cloud {
-            position: absolute;
-            background: white;
-            border-radius: 50px;
-            opacity: 0.9;
-            animation: float linear infinite;
+            position: absolute; background: rgba(255, 255, 255, 0.9); border-radius: 100px;
+            animation: float linear infinite; 
+        }
+        .cloud::before, .cloud::after { content: ''; position: absolute; background: rgba(255, 255, 255, 0.9); border-radius: 50%; }
+        @keyframes float { from { transform: translateX(-300px); } to { transform: translateX(calc(100vw + 300px)); } }
+
+        /* Chunky Header */
+        header {
+            width: 100%; max-width: 900px;
+            background: rgba(255, 255, 255, 0.95); padding: 12px 25px;
+            border-radius: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 3px solid var(--card-border);
+            border-bottom-width: 6px;
+            margin-bottom: 10px; z-index: 10;
         }
 
-        @keyframes float {
-            from { transform: translateX(-300px); }
-            to { transform: translateX(110vw); }
+        .title-text { font-weight: 900; color: var(--c-blue); font-size: 1.5rem; letter-spacing: 1px; text-transform: uppercase; }
+
+        .score-box {
+            background: var(--c-yellow); color: white; padding: 6px 20px;
+            border-radius: 16px; font-weight: 800; font-size: 1.2rem;
+            border-bottom: 4px solid var(--c-yellow-shadow);
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
         }
 
-        canvas { display: block; position: absolute; top: 0; left: 0; }
-        #fireworks-canvas { pointer-events: none; z-index: 60; }
-        
-        .game-ui {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 15px;
-            z-index: 10;
+        /* Main Game Area Perfectly Centered */
+        main {
+            width: 100%; max-width: 900px; flex: 1;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: relative; z-index: 10;
         }
 
-        @media (min-width: 768px) {
-            .game-ui { padding: 25px; }
+        .question-card {
+            background: white; width: 100%; border-radius: 24px; padding: 20px 30px;
+            border: 3px solid var(--card-border); border-bottom-width: 6px;
+            display: flex; align-items: center; justify-content: center; gap: 20px;
+            margin-bottom: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.05);
         }
 
-        .btn {
-            pointer-events: auto;
+        .question-text {
+            font-size: 2.2rem; font-weight: 800; color: var(--text-dark); text-align: center;
+        }
+
+        .speaker-btn {
+            background: var(--c-blue); border: none; border-radius: 18px;
+            width: 60px; height: 60px; font-size: 2rem; cursor: pointer; color: white;
+            border-bottom: 5px solid var(--c-blue-shadow);
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.1s; flex-shrink: 0;
+        }
+        .speaker-btn:active { transform: translateY(4px); border-bottom-width: 1px; }
+
+        #game-content {
+            width: 100%; display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;
+        }
+
+        /* Taller Choice Cards */
+        .choice-card {
+            background: var(--card-bg); border-radius: 24px; cursor: pointer;
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
+            border: 3px solid var(--card-border); border-bottom-width: 8px;
+            width: 260px; height: 320px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; position: relative;
         }
-        .btn:hover { transform: translateY(-3px) scale(1.03); }
-        .btn:active { transform: scale(0.95); }
-        
-        .shape-option {
-            background: white;
-            border-radius: 20px;
-            padding: 10px;
-            box-shadow: 0 6px 0 #cbd5e0, 0 10px 20px rgba(0,0,0,0.1);
-            border: 4px solid #fff;
-            width: 130px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            color: #2d3748;
-            text-align: center;
-            font-size: 0.9rem;
+        .choice-card:hover { transform: translateY(-5px); }
+        .choice-card:active { transform: translateY(5px); border-bottom-width: 3px; }
+
+        .choice-card.correct { border-color: var(--c-green); background: #e5f9d4; border-bottom-color: var(--c-green-shadow); }
+        .choice-card.wrong { border-color: var(--c-red); background: #ffdfdf; border-bottom-color: var(--c-red-shadow); opacity: 0.6; pointer-events: none;}
+
+        .choice-card canvas {
+            width: 220px !important; height: 220px !important;
+            filter: drop-shadow(0 15px 15px rgba(0,0,0,0.1));
         }
 
-        @media (min-width: 768px) {
-            .shape-option {
-                width: 170px;
-                height: 90px;
-                font-size: 1.2rem;
-                border-radius: 30px;
-                box-shadow: 0 10px 0 #cbd5e0, 0 15px 30px rgba(0,0,0,0.1);
-                border-width: 6px;
-            }
+        /* Overlays */
+        .overlay {
+            position: fixed; inset: 0; background: rgba(255,255,255,0.95);
+            z-index: 500; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center; padding: 20px;
+            backdrop-filter: blur(10px);
         }
 
-        .shape-option.correct { border-color: #48bb78; background: #f0fff4; color: #276749; box-shadow: 0 8px 0 #38a169; }
-        .shape-option.wrong { border-color: #f56565; background: #fff5f5; color: #9b2c2c; box-shadow: 0 8px 0 #e53e3e; }
-        
-        @keyframes pop {
-            0% { transform: scale(0); }
-            80% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .start-btn {
+            background: var(--c-green); color: white; border: none;
+            padding: 20px 60px; font-size: 2.2rem; font-weight: 800;
+            border-radius: 25px; cursor: pointer; border-bottom: 8px solid var(--c-green-shadow);
+            text-transform: uppercase; letter-spacing: 1px; transition: transform 0.1s;
         }
-        .pop-animation { animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .start-btn:active { transform: translateY(6px); border-bottom-width: 2px; }
 
-        /* Level 2 Balanced Card Design */
-        #real-world-card {
-            background: radial-gradient(circle at center, #ffffff 0%, #f7fafc 100%);
-            border-radius: 40px;
-            padding: 25px;
-            box-shadow: 0 20px 50px rgba(49, 130, 206, 0.2);
-            border: 8px solid #fff;
-            text-align: center;
-            max-width: 280px;
-            width: 85%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: visible;
+        .start-btn.blue { background: var(--c-blue); border-bottom-color: var(--c-blue-shadow); }
+
+        #bonus-overlay .container {
+            width: 100%; max-width: 800px;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        #real-world-card::after {
-            content: '';
-            position: absolute;
-            inset: -12px;
-            border-radius: 50px;
-            border: 4px dashed rgba(255, 255, 255, 0.5);
-            pointer-events: none;
+        #bonus-canvas {
+            background: linear-gradient(to bottom, #38bdf8, #bae6fd);
+            border-radius: 24px; border: 6px solid var(--card-border);
+            border-bottom-width: 12px; max-width: 100%; height: auto; width: 800px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            touch-action: none; /* prevent scrolling when playing */
         }
 
-        @media (min-width: 768px) {
-            #real-world-card {
-                border-radius: 60px;
-                padding: 40px;
-                max-width: 360px;
-            }
+        .feedback {
+            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 5rem; font-weight: 900; z-index: 1000; pointer-events: none; display: none;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            -webkit-text-stroke: 3px white;
         }
 
-        #real-world-object {
-            font-size: 7rem;
-            line-height: 1;
-            filter: drop-shadow(0 15px 20px rgba(0,0,0,0.15));
-            animation: floating 3s ease-in-out infinite;
-            margin-bottom: 10px;
-        }
+        .hidden { display: none !important; }
 
-        @media (min-width: 768px) {
-            #real-world-object { font-size: 10rem; }
-        }
+        #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 600; }
 
-        @keyframes floating {
-            0%, 100% { transform: translateY(0) rotate(0); }
-            50% { transform: translateY(-15px) rotate(3deg); }
+        /* Responsive Design */
+        @media (max-width: 850px) {
+            .choice-card { width: 30%; height: 260px; }
+            .choice-card canvas { width: 100% !important; height: auto !important; aspect-ratio: 1/1; }
         }
-
-        #object-label {
-            background: #ebf8ff;
-            color: #2b6cb0;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        @media (min-width: 768px) {
-            #object-label { font-size: 1.4rem; padding: 10px 30px; }
-        }
-
-        #question-box {
-            margin-top: 1vh;
-            background: #fff;
-            border-radius: 50px;
-            padding: 12px 25px;
-            border: 5px solid #3182ce;
-            box-shadow: 0 8px 0 #2c5282, 0 12px 20px rgba(0,0,0,0.1);
-        }
-
-        @media (min-width: 768px) {
-            #question-box {
-                border-radius: 100px;
-                padding: 15px 60px;
-                border-width: 8px;
-            }
+        @media (max-width: 600px) {
+            .question-text { font-size: 1.5rem; }
+            .question-card { padding: 15px; margin-bottom: 2vh; flex-direction: column; gap: 10px; }
+            .choice-card { width: 45%; height: 220px; border-bottom-width: 6px; }
+            .start-btn { font-size: 1.6rem; padding: 15px 40px; }
+            header { padding: 10px 15px; }
+            .title-text { font-size: 1.2rem; }
+            .hill-back { height: 60vh; }
+            .hill-front { height: 48vh; }
+            .speaker-btn { width: 50px; height: 50px; font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
     <img src="../assets/logo-oodles-math.png" class="oodles-logo">
-    <div class="sky-bg">
-        <div class="cloud" style="width: 200px; height: 60px; top: 10%; left: -100px; animation-duration: 35s;"></div>
-        <div class="cloud" style="width: 250px; height: 80px; top: 25%; left: -200px; animation-duration: 50s; animation-delay: 5s;"></div>
-        <div class="ground"></div>
+    <div class="scenery">
+        <div class="hill-back"></div>
+        <div class="hill-front"></div>
     </div>
+    <div class="clouds" id="clouds-container"></div>
 
-    <div id="game-container"></div>
-    <canvas id="fireworks-canvas"></canvas>
+    <header>
+        <div class="title-text">2D Shape Quest</div>
+        <div class="score-box">⭐ <span id="score-val">0</span></div>
+    </header>
 
-    <!-- Start Screen -->
-    <div id="start-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-blue-500 p-6 text-center">
-        <div class="bg-white p-8 md:p-12 rounded-[40px] md:rounded-[60px] shadow-2xl max-w-md w-full pop-animation border-[10px] md:border-[15px] border-yellow-400">
-            <div class="text-6xl md:text-8xl mb-6">🥳⚽🎲</div>
-            <h1 class="text-3xl md:text-4xl font-extrabold text-blue-600 mb-2">3D Shape Adventure</h1>
-            <p class="text-lg md:text-xl text-gray-500 mb-10 font-medium tracking-wide">Fun English Learning!</p>
-            <button onclick="startGame()" class="btn bg-orange-500 hover:bg-orange-600 text-white text-2xl md:text-3xl font-black py-5 md:py-6 px-10 md:px-14 rounded-full shadow-[0_12px_0_#9c4221] active:shadow-none active:translate-y-2 uppercase tracking-tighter">Play!</button>
-        </div>
-    </div>
-
-    <!-- Game UI -->
-    <div class="game-ui">
-        <!-- Header Left Side -->
-        <div class="flex flex-col gap-3 pointer-events-none items-start max-w-fit">
-            <div class="bg-yellow-400 p-3 px-6 md:px-10 rounded-full shadow-lg pointer-events-auto border-4 border-white">
-                <span class="text-blue-800 font-black text-xl md:text-3xl tracking-tighter">⭐ <span id="score">0</span></span>
-            </div>
-            <div id="level-badge" class="bg-purple-600 p-3 px-6 md:px-10 rounded-full shadow-lg pointer-events-auto text-white font-black text-lg md:text-2xl border-4 border-white">
-                LEVEL <span id="level-num">1</span>
-            </div>
+    <main>
+        <div class="question-card">
+            <div id="question" class="question-text">Loading...</div>
+            <button class="speaker-btn" onclick="speakTask()">🔊</button>
         </div>
 
-        <!-- Question Area -->
-        <div id="question-area" class="flex flex-col items-center pointer-events-none flex-grow justify-start pt-2 md:pt-4">
-            <div id="question-box" class="pointer-events-auto pop-animation">
-                <h3 class="text-lg md:text-2xl font-black text-blue-600 uppercase tracking-widest text-center">What is this 3D shape?</h3>
+        <div id="game-content"></div>
+
+        <div id="feedback" class="feedback"></div>
+    </main>
+
+    <div id="start-overlay" class="overlay">
+        <div style="font-size: 80px; margin-bottom: 10px;">🦘</div>
+        <h1 style="font-size: 4rem; color: var(--c-blue); margin-bottom: 5px; font-weight: 900; line-height: 1.1; text-transform: uppercase;">Shape Quest</h1>
+        <p style="font-size: 1.5rem; color: var(--text-dark); margin-bottom: 40px; font-weight: 700;">Find the shapes and play with Roo! 🦘</p>
+        <button class="start-btn" onclick="startGame()">LET'S PLAY</button>
+    </div>
+
+    <div id="bonus-overlay" class="overlay hidden">
+        <div class="container">
+            <h2 style="font-size: 3.5rem; color: var(--c-purple); font-weight: 900; text-transform: uppercase; margin-bottom: 10px;">BONUS TIME! 🦘</h2>
+            <p style="font-weight: 700; color: var(--text-dark); font-size: 1.3rem; margin-bottom: 20px;">Tap or press SPACE to jump over the obstacles!</p>
+            
+            <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px; font-weight: 800; font-size: 1.5rem;">
+                <div style="color: var(--c-blue);">TIME: <span id="timer-val">25</span>s</div>
+                <div style="color: var(--c-yellow); text-shadow: 1px 1px 0 rgba(0,0,0,0.1);">PTS: <span id="bonus-score">0</span></div>
             </div>
             
-            <!-- Balanced Level 2 Card -->
-            <div id="real-world-display" class="hidden pointer-events-none mt-10 md:mt-16 flex flex-col items-center w-full">
-                <div id="real-world-card" class="pop-animation mx-auto">
-                    <div id="real-world-object">🎲</div>
-                    <div id="object-label">A Dice!</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Options Container -->
-        <div id="options-container" class="flex flex-wrap justify-center gap-3 md:gap-6 w-full max-w-5xl mx-auto pb-10 md:pb-14 pointer-events-auto px-4">
-            <!-- Options injected by JS -->
+            <canvas id="bonus-canvas" width="800" height="300"></canvas>
+            <button id="bonus-start-btn" class="start-btn blue" style="margin-top: 30px;" onclick="startKangarooGame()">START RUNNING</button>
         </div>
     </div>
 
-    <!-- Feedback Overlay -->
-    <div id="feedback" class="fixed inset-0 pointer-events-none flex items-center justify-center z-40 hidden">
-        <div id="feedback-content" class="text-[8rem] md:text-[14rem] drop-shadow-2xl"></div>
+    <div id="win-overlay" class="overlay hidden">
+        <canvas id="confetti-canvas"></canvas>
+        <div style="font-size: 100px; margin-bottom: 10px; filter: drop-shadow(0 20px 20px rgba(0,0,0,0.2));">🏆</div>
+        <h1 style="font-size: 4rem; color: var(--c-green); font-weight: 900; text-transform: uppercase;">AMAZING JOB!</h1>
+        <div style="font-size: 2.5rem; font-weight: 800; color: var(--text-dark); margin-bottom: 50px;">Total Score: <span id="final-score" style="color: var(--c-yellow)">0</span> ⭐</div>
+        <button class="start-btn blue" onclick="location.reload()">PLAY AGAIN</button>
     </div>
 
     <script>
-        // --- SOUNDS ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playTone(freq, type, duration, vol=0.2) {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
-        }
-        const successSnd = () => { playTone(523, 'sine', 0.15); setTimeout(() => playTone(659, 'sine', 0.15), 100); setTimeout(() => playTone(783, 'sine', 0.4, 0.3), 200); };
-        const failSnd = () => { playTone(220, 'triangle', 0.2); setTimeout(() => playTone(140, 'triangle', 0.4), 150); };
-
-        // --- DATA ---
-        const shapes = [
-            { id: 'cube', name: 'Cube', color: 0xFF5733, geometry: new THREE.BoxGeometry(2.5, 2.5, 2.5), objects: [{e:'🎲', l:'Dice'}, {e:'📦', l:'Box'}] },
-            { id: 'cuboid', name: 'Cuboid', color: 0x33FFD1, geometry: new THREE.BoxGeometry(3.8, 2.2, 2), objects: [{e:'📕', l:'Closed Book'}, {e:'🧃', l:'Juice Box'}, {e:'🧱', l:'Brick'}] },
-            { id: 'sphere', name: 'Sphere', color: 0x33FF57, geometry: new THREE.SphereGeometry(2, 32, 32), objects: [{e:'⚽', l:'Soccer Ball'}, {e:'🏀', l:'Basketball'}, {e:'🍊', l:'Orange'}] },
-            { id: 'cylinder', name: 'Cylinder', color: 0x3357FF, geometry: new THREE.CylinderGeometry(1.4, 1.4, 3.2, 32), objects: [{e:'🥫', l:'Can'}, {e:'🔋', l:'Battery'}, {e:'🥁', l:'Drum'}] },
-            { id: 'cone', name: 'Cone', color: 0xF333FF, geometry: new THREE.ConeGeometry(2, 3.5, 32), objects: [{e:'📣', l:'Megaphone'}] },
-            { id: 'pyramid', name: 'Pyramid', color: 0xFFF333, geometry: new THREE.ConeGeometry(2.2, 3.5, 4), objects: [{e:'🗻', l:'Great Pyramid'}, {e:'⛰️', l:'Step Pyramid'}] },
-            { id: 'prism', name: 'Prism', color: 0xFF8C00, geometry: new THREE.CylinderGeometry(1.8, 1.8, 3.2, 3), objects: [{e:'🍰', l:'Cake Slice'}, {e:'🧀', l:'Cheese'}] }
+        // Flat 2D Geometries perfectly centered
+        const SHAPES = [
+            { id: 'square', name: 'Square', color: 0xff4b4b, geometry: () => new THREE.PlaneGeometry(4.5, 4.5) },
+            { id: 'circle', name: 'Circle', color: 0x1cb0f6, geometry: () => new THREE.CircleGeometry(2.6, 64) },
+            { id: 'triangle', name: 'Triangle', color: 0x58cc02, geometry: () => new THREE.CircleGeometry(3.6, 3, Math.PI/2) },
+            { id: 'rectangle', name: 'Rectangle', color: 0xffc800, geometry: () => new THREE.PlaneGeometry(6.5, 3.8) },
+            { id: 'semicircle', name: 'Semicircle', color: 0xce82ff, geometry: () => { const g = new THREE.CircleGeometry(3.5, 64, 0, Math.PI); g.translate(0, -1.2, 0); return g; } },
+            { id: 'quarter_circle', name: 'Quarter Circle', color: 0xff9600, geometry: () => { const g = new THREE.CircleGeometry(4.5, 64, 0, Math.PI/2); g.translate(-1.8, -1.8, 0); return g; } }
         ];
 
-        let score = 0;
-        let level = 1;
-        let questionIndex = 0;
-        let level1Shapes = [];
-        let level2Shapes = [];
-        let targetShape = null;
-        let hasMistake = false;
-        let scene, camera, renderer, currentMesh;
+        let state = {
+            score: 0,
+            currentIdx: 0,
+            questions: [],
+            isLocked: false,
+            soundInited: false
+        };
 
-        // --- FIREWORKS ---
-        const fwCanvas = document.getElementById('fireworks-canvas');
-        const fwCtx = fwCanvas.getContext('2d');
-        let fireworks = [];
+        let synth;
 
-        class Particle {
-            constructor(x, y, color) {
-                this.x = x; this.y = y; this.color = color;
-                this.speed = Math.random() * 7 + 3;
-                this.angle = Math.random() * Math.PI * 2;
-                this.friction = 0.96; this.gravity = 0.3;
-                this.vx = Math.cos(this.angle) * this.speed;
-                this.vy = Math.sin(this.angle) * this.speed;
-                this.opacity = 1;
-            }
-            update() {
-                this.vx *= this.friction; this.vy *= this.friction;
-                this.vy += this.gravity;
-                this.x += this.vx; this.y += this.vy;
-                this.opacity -= 0.015;
-            }
-            draw() {
-                fwCtx.globalAlpha = this.opacity;
-                fwCtx.fillStyle = this.color;
-                fwCtx.beginPath();
-                fwCtx.arc(this.x, this.y, 4, 0, Math.PI * 2);
-                fwCtx.fill();
+        function initClouds() {
+            const container = document.getElementById('clouds-container');
+            for(let i=0; i<8; i++) {
+                const c = document.createElement('div');
+                c.className = 'cloud';
+                const w = 150 + Math.random()*200;
+                c.style.width = w + 'px';
+                c.style.height = w*0.4 + 'px';
+                c.style.top = (5 + Math.random()*35) + '%';
+                c.style.left = '-400px';
+                c.style.animationDuration = (30 + Math.random()*40) + 's';
+                c.style.animationDelay = (Math.random()*25) + 's';
+                
+                const b1 = document.createElement('div');
+                b1.style.width = w*0.5 + 'px'; b1.style.height = w*0.5 + 'px';
+                b1.style.top = -w*0.2 + 'px'; b1.style.left = w*0.1 + 'px';
+                b1.style.borderRadius = '50%'; b1.style.background = 'rgba(255,255,255,0.9)'; b1.style.position = 'absolute';
+                
+                const b2 = document.createElement('div');
+                b2.style.width = w*0.4 + 'px'; b2.style.height = w*0.4 + 'px';
+                b2.style.top = -w*0.15 + 'px'; b2.style.right = w*0.15 + 'px';
+                b2.style.borderRadius = '50%'; b2.style.background = 'rgba(255,255,255,0.9)'; b2.style.position = 'absolute';
+
+                c.appendChild(b1); c.appendChild(b2);
+                container.appendChild(c);
             }
         }
+        initClouds();
 
-        function createFirework(x, y) {
-            const colors = ['#FFD700', '#FF1493', '#00BFFF', '#ADFF2F', '#FF4500', '#FFFFFF'];
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            for (let i = 0; i < 50; i++) fireworks.push(new Particle(x, y, color));
+        function startGame() {
+            if(!synth) {
+                synth = new Tone.PolySynth(Tone.Synth, {
+                    oscillator: { type: "triangle" },
+                    envelope: { attack: 0.05, decay: 0.2, sustain: 0.2, release: 1 }
+                }).toDestination();
+                synth.volume.value = -5;
+            }
+            Tone.start();
+            state.soundInited = true;
+            document.getElementById('start-overlay').classList.add('hidden');
+            startLevel1();
         }
 
-        function animateFireworks() {
-            fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
-            fireworks = fireworks.filter(p => p.opacity > 0);
-            fireworks.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateFireworks);
+        function startLevel1() {
+            state.currentIdx = 0;
+            state.questions = [...SHAPES].sort(() => Math.random() - 0.5);
+            loadNext();
         }
 
-        // --- THREE JS ---
-        function initThree() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.getElementById('game-container').appendChild(renderer.domElement);
-            scene.add(new THREE.AmbientLight(0xffffff, 1.2));
-            const light = new THREE.DirectionalLight(0xffffff, 0.6);
-            light.position.set(5, 10, 5);
-            scene.add(light);
-            camera.position.z = 8.5;
+        function loadNext() {
+            state.isLocked = false;
+            const target = state.questions[state.currentIdx];
+            const choices = [target];
+            while(choices.length < 3) {
+                const r = SHAPES[Math.floor(Math.random()*SHAPES.length)];
+                if(!choices.find(c => c.id === r.id)) choices.push(r);
+            }
+            choices.sort(() => Math.random() - 0.5);
+
+            document.getElementById('question').innerText = `Where is the ${target.name}?`;
+            const container = document.getElementById('game-content');
+            container.innerHTML = '';
+
+            // Use larger fixed canvas, CSS will downscale on mobile
+            const cSize = 250; 
+
+            choices.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'choice-card';
+                const canvas = document.createElement('canvas');
+                canvas.width = cSize; canvas.height = cSize;
+                card.appendChild(canvas);
+                container.appendChild(card);
+                initMiniThree(canvas, c);
+                card.onclick = () => handleChoice(c, card, target);
+            });
+
+            speakTask();
+        }
+
+        function initMiniThree(canvas, shapeData) {
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            camera.position.z = 11;
+            
+            // Basic Material for pure 2D look, no lighting required
+            const mat = new THREE.MeshBasicMaterial({ 
+                color: shapeData.color,
+                side: THREE.DoubleSide
+            });
+            
+            const mesh = new THREE.Mesh(shapeData.geometry(), mat);
+            
+            // Add prominent dark outlines
+            const edges = new THREE.EdgesGeometry(mesh.geometry);
+            const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ 
+                color: 0x3c3c3c, 
+                linewidth: 3 
+            }));
+            mesh.add(line);
+
+            // Make sure the shape faces the camera straight-on
+            mesh.rotation.x = 0;
+            mesh.rotation.y = 0;
+            scene.add(mesh);
+
+            let time = Math.random() * 100; // Randomize start phase so they don't bounce identically
+            function animate() {
+                if(!canvas.isConnected) return;
+                requestAnimationFrame(animate);
+                
+                time += 0.05;
+                // Cute floating and slight wobble effect for 2D
+                mesh.position.y = Math.sin(time) * 0.25;
+                mesh.rotation.z = Math.sin(time * 0.6) * 0.08;
+                
+                renderer.render(scene, camera);
+            }
             animate();
         }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            if (currentMesh) {
-                currentMesh.rotation.y += 0.015;
-                currentMesh.rotation.x += 0.005;
-            }
-            renderer.render(scene, camera);
-        }
+        function handleChoice(choice, card, target) {
+            if(state.isLocked) return;
+            state.isLocked = true;
 
-        // --- GAMEPLAY ---
-        function startGame() {
-            audioCtx.resume();
-            document.getElementById('start-screen').classList.add('hidden');
-            fwCanvas.width = window.innerWidth;
-            fwCanvas.height = window.innerHeight;
-            animateFireworks();
-
-            level1Shapes = [...shapes].sort(() => 0.5 - Math.random());
-            level2Shapes = [...shapes].sort(() => 0.5 - Math.random());
-            
-            initThree();
-            nextQuestion();
-        }
-
-        function nextQuestion() {
-            hasMistake = false;
-            if (level === 1 && questionIndex >= level1Shapes.length) {
-                level = 2; questionIndex = 0;
-            } 
-            
-            if (level === 2 && questionIndex >= level2Shapes.length) {
-                showGameEnd();
-                return;
-            }
-
-            document.getElementById('level-num').innerText = level;
-            
-            if (level === 1) {
-                targetShape = level1Shapes[questionIndex];
-                document.getElementById('real-world-display').classList.add('hidden');
-                showMesh(targetShape);
-            } else {
-                targetShape = level2Shapes[questionIndex];
-                if (currentMesh) scene.remove(currentMesh);
-                document.getElementById('real-world-display').classList.remove('hidden');
-                const randomObj = targetShape.objects[Math.floor(Math.random() * targetShape.objects.length)];
-                document.getElementById('real-world-object').innerText = randomObj.e;
-                document.getElementById('object-label').innerText = `A ${randomObj.l}!`;
-            }
-
-            generateOptions();
-        }
-
-        function showMesh(shapeData) {
-            if (currentMesh) scene.remove(currentMesh);
-            
-            const material = new THREE.MeshPhongMaterial({ 
-                color: shapeData.color, 
-                shininess: 120,
-                specular: 0xffffff
-            });
-            
-            currentMesh = new THREE.Mesh(shapeData.geometry, material);
-            
-            // EDGES FOR LEVEL 1
-            const edges = new THREE.EdgesGeometry(shapeData.geometry, 15);
-            const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 }));
-            currentMesh.add(line);
-            
-            currentMesh.scale.set(0,0,0);
-            scene.add(currentMesh);
-            
-            if (shapeData.id === 'pyramid' || shapeData.id === 'cone') currentMesh.position.y = -0.5;
-            else currentMesh.position.y = 0;
-
-            let s = 0;
-            const anim = setInterval(() => {
-                s += 0.1;
-                currentMesh.scale.set(s,s,s);
-                if (s >= 1) clearInterval(anim);
-            }, 20);
-        }
-
-        function generateOptions() {
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-            
-            let others = shapes.filter(s => s.id !== targetShape.id).sort(() => 0.5 - Math.random()).slice(0, 3);
-            let options = [...others, targetShape].sort(() => 0.5 - Math.random());
-
-            options.forEach(opt => {
-                const div = document.createElement('div');
-                div.className = 'shape-option btn pop-animation uppercase';
-                div.innerText = opt.name;
-                div.onclick = () => checkAnswer(opt.id, div);
-                container.appendChild(div);
-            });
-        }
-
-        function checkAnswer(selectedId, element) {
-            if (element.classList.contains('correct') || element.classList.contains('wrong')) return;
-
-            if (selectedId === targetShape.id) {
-                if (!hasMistake) {
-                    score += 10;
-                    document.getElementById('score').innerText = score;
-                }
+            if(choice.id === target.id) {
+                state.score += 10;
+                document.getElementById('score-val').innerText = state.score;
+                card.classList.add('correct');
+                showFeedback("AWESOME! ✨", "var(--c-green)");
                 
-                element.classList.add('correct');
-                showFeedback('🌟');
-                successSnd();
-                
-                const rect = element.getBoundingClientRect();
-                createFirework(rect.left + rect.width/2, rect.top);
+                // Happy pop sound
+                if(synth) synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "8n");
 
                 setTimeout(() => {
-                    questionIndex++;
-                    nextQuestion();
+                    state.currentIdx++;
+                    if(state.currentIdx >= state.questions.length) showBonusIntro();
+                    else loadNext();
                 }, 1500);
             } else {
-                hasMistake = true;
-                element.classList.add('wrong');
-                showFeedback('❌');
-                failSnd();
+                card.classList.add('wrong');
+                showFeedback("OOPS!", "var(--c-red)");
+                
+                // Sad boop sound
+                if(synth) synth.triggerAttackRelease("C3", "8n");
+                
+                setTimeout(() => {
+                    card.classList.remove('wrong');
+                    state.isLocked = false;
+                }, 800);
             }
         }
 
-        function showFeedback(emoji) {
+        function showFeedback(text, color) {
             const fb = document.getElementById('feedback');
-            const content = document.getElementById('feedback-content');
-            content.innerText = emoji;
-            fb.classList.remove('hidden');
-            setTimeout(() => fb.classList.add('hidden'), 1000);
+            fb.innerText = text;
+            fb.style.color = color;
+            fb.style.display = 'block';
+            fb.animate([
+                { transform: 'translate(-50%, -30%) scale(0.5)', opacity: 0 },
+                { transform: 'translate(-50%, -50%) scale(1.2)', opacity: 1, offset: 0.2 },
+                { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.8 },
+                { transform: 'translate(-50%, -70%) scale(0.8)', opacity: 0 }
+            ], { duration: 1500, easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' });
+            setTimeout(() => fb.style.display = 'none', 1400);
         }
 
-        function showGameEnd() {
-            const fwInterval = setInterval(() => {
-                createFirework(Math.random() * fwCanvas.width, Math.random() * fwCanvas.height);
-            }, 400);
-
-            const startScreen = document.getElementById('start-screen');
-            startScreen.innerHTML = `
-                <div class="bg-white p-8 md:p-12 rounded-[40px] md:rounded-[60px] shadow-2xl max-w-md w-full pop-animation relative z-[100] border-[10px] md:border-[15px] border-green-400">
-                    <div class="text-7xl md:text-9xl mb-6 text-center">🏆</div>
-                    <h1 class="text-3xl md:text-4xl font-extrabold text-blue-600 mb-2 text-center">Well Done!</h1>
-                    <p class="text-lg md:text-xl text-gray-500 mb-6 font-bold uppercase tracking-widest text-center">You know your shapes!</p>
-                    <div class="bg-blue-50 p-6 md:p-8 rounded-[30px] md:rounded-[40px] mb-10 border-4 border-dashed border-blue-200">
-                        <div class="text-md text-blue-400 font-black uppercase mb-1 text-center">Total Score</div>
-                        <div class="text-5xl md:text-7xl font-black text-blue-600 text-center">${score}</div>
-                    </div>
-                    <button onclick="location.reload()" class="btn bg-orange-500 hover:bg-orange-600 text-white text-2xl md:text-3xl font-black py-4 md:py-6 px-10 md:px-14 rounded-full shadow-[0_12px_0_#9c4221] active:shadow-none active:translate-y-2 uppercase tracking-tighter w-full">Play Again!</button>
-                </div>
-            `;
-            startScreen.classList.remove('hidden');
+        function speakTask() {
+            if(!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(document.getElementById('question').innerText);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9; 
+            utterance.pitch = 1.2; 
+            window.speechSynthesis.speak(utterance);
         }
 
-        window.onresize = () => {
-            if (camera && renderer) {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                fwCanvas.width = window.innerWidth;
-                fwCanvas.height = window.innerHeight;
+        // --- Kangaroo Mini Game ---
+        const bCanvas = document.getElementById('bonus-canvas');
+        const bCtx = bCanvas.getContext('2d');
+        let kId, kRunning = false, kangaroo = { x: 100, y: 215, dy: 0, grounded: true }, kObs = [], bScore = 0, kStart;
+        
+        let decor = [];
+        for(let i=0; i<25; i++) decor.push({x: Math.random()*800, type: Math.random() > 0.5 ? 'grass' : 'flower', s: 0.7+Math.random()*0.5});
+
+        function showBonusIntro() {
+            document.getElementById('bonus-overlay').classList.remove('hidden');
+        }
+
+        function startKangarooGame() {
+            document.getElementById('bonus-start-btn').classList.add('hidden');
+            bScore = 0; kObs = []; kStart = Date.now(); kRunning = true;
+            kangaroo.y = 215; kangaroo.dy = 0;
+            updateKangaroo();
+        }
+
+        // Super Cute Cuter Kangaroo with Joey
+        function drawKangaroo(x, y) {
+            bCtx.save(); bCtx.translate(x, y);
+            
+            // Shadow
+            bCtx.fillStyle = "rgba(0,0,0,0.15)";
+            bCtx.beginPath(); bCtx.ellipse(20, 45, 25, 6, 0, 0, Math.PI*2); bCtx.fill();
+
+            // Dynamic Tail (bobs up and down if jumping)
+            let tailLift = kangaroo.grounded ? 0 : 10;
+            bCtx.lineWidth = 14; bCtx.lineCap = "round"; bCtx.strokeStyle = "#d35400"; // slightly darker
+            bCtx.beginPath(); bCtx.moveTo(0, 30); bCtx.quadraticCurveTo(-45, 40 - tailLift, -35, 10 - tailLift/2); bCtx.stroke();
+
+            // Back leg
+            bCtx.fillStyle = "#d35400";
+            bCtx.beginPath(); bCtx.ellipse(25, 36, 12, 14, -0.2, 0, Math.PI*2); bCtx.fill();
+            // Back foot
+            bCtx.beginPath(); bCtx.ellipse(28, 46, 10, 5, 0, 0, Math.PI*2); bCtx.fill();
+
+            // Body (Chubby!)
+            bCtx.fillStyle = "#e67e22";
+            bCtx.beginPath(); bCtx.ellipse(15, 18, 22, 26, 0.1, 0, Math.PI*2); bCtx.fill();
+
+            // Pouch/Belly (Soft cream)
+            bCtx.fillStyle = "#fdebd0";
+            bCtx.beginPath(); bCtx.ellipse(20, 22, 14, 18, 0.1, 0, Math.PI*2); bCtx.fill();
+            // Pouch line
+            bCtx.strokeStyle = "#e67e22"; bCtx.lineWidth = 3;
+            bCtx.beginPath(); bCtx.moveTo(12, 15); bCtx.quadraticCurveTo(20, 22, 32, 16); bCtx.stroke();
+
+            // Joey (Baby kangaroo) peeking out!
+            bCtx.fillStyle = "#e67e22";
+            bCtx.beginPath(); bCtx.arc(22, 10, 6, 0, Math.PI*2); bCtx.fill(); // Joey head
+            bCtx.fillStyle = "white"; bCtx.beginPath(); bCtx.arc(24, 9, 2, 0, Math.PI*2); bCtx.fill(); // Joey eye
+            bCtx.fillStyle = "black"; bCtx.beginPath(); bCtx.arc(24.5, 9, 1, 0, Math.PI*2); bCtx.fill();
+            bCtx.fillStyle = "#d35400"; // Joey ear
+            bCtx.beginPath(); bCtx.ellipse(20, 5, 2, 5, -0.3, 0, Math.PI*2); bCtx.fill();
+            bCtx.beginPath(); bCtx.ellipse(24, 4, 2, 5, 0.1, 0, Math.PI*2); bCtx.fill();
+
+            // Front arms (Cute & small)
+            bCtx.fillStyle = "#e67e22";
+            bCtx.beginPath(); bCtx.ellipse(32, 12, 8, 4, 0.4, 0, Math.PI*2); bCtx.fill();
+
+            // Neck
+            bCtx.beginPath(); bCtx.ellipse(28, -2, 10, 12, 0.3, 0, Math.PI*2); bCtx.fill();
+
+            // Head (Bigger & Cuter)
+            bCtx.beginPath(); bCtx.ellipse(35, -12, 18, 16, -0.1, 0, Math.PI*2); bCtx.fill();
+            
+            // Snout (Puffy)
+            bCtx.fillStyle = "#fdebd0";
+            bCtx.beginPath(); bCtx.ellipse(48, -8, 10, 8, 0, 0, Math.PI*2); bCtx.fill();
+            
+            // Nose
+            bCtx.fillStyle = "#2c3e50"; 
+            bCtx.beginPath(); bCtx.ellipse(55, -10, 4.5, 3.5, 0, 0, Math.PI*2); bCtx.fill(); 
+            bCtx.fillStyle = "white"; // Nose shine
+            bCtx.beginPath(); bCtx.arc(54, -11, 1, 0, Math.PI*2); bCtx.fill();
+
+            // Blush
+            bCtx.fillStyle = "rgba(255, 105, 180, 0.4)";
+            bCtx.beginPath(); bCtx.ellipse(42, -2, 5, 3, -0.1, 0, Math.PI*2); bCtx.fill();
+
+            // Ears (Fluffy & expressive)
+            let earFlop = kangaroo.grounded ? 0 : 0.2;
+            bCtx.fillStyle = "#d35400"; // Back ear
+            bCtx.beginPath(); bCtx.ellipse(28, -26, 5, 14, -0.4 - earFlop, 0, Math.PI*2); bCtx.fill();
+            bCtx.fillStyle = "#e67e22"; // Front ear
+            bCtx.beginPath(); bCtx.ellipse(38, -24, 6, 16, 0.1 + earFlop, 0, Math.PI*2); bCtx.fill();
+            bCtx.fillStyle = "#f5b041"; // Inner ear
+            bCtx.beginPath(); bCtx.ellipse(38, -24, 3, 12, 0.1 + earFlop, 0, Math.PI*2); bCtx.fill();
+
+            // Cute Big Anime Eye
+            bCtx.fillStyle = "white";
+            bCtx.beginPath(); bCtx.ellipse(42, -14, 6, 7, 0, 0, Math.PI*2); bCtx.fill();
+            bCtx.fillStyle = "#2c3e50";
+            bCtx.beginPath(); bCtx.ellipse(44, -14, 4, 5, 0, 0, Math.PI*2); bCtx.fill();
+            // Eye highlights
+            bCtx.fillStyle = "white"; 
+            bCtx.beginPath(); bCtx.arc(45, -15.5, 1.5, 0, Math.PI*2); bCtx.fill(); // Big catchlight
+            bCtx.beginPath(); bCtx.arc(43, -12.5, 0.8, 0, Math.PI*2); bCtx.fill(); // Small catchlight
+
+            // Red Scarf (Dynamic trailing)
+            bCtx.fillStyle = "#e74c3c";
+            bCtx.beginPath(); bCtx.ellipse(30, 2, 14, 6, -0.2, 0, Math.PI*2); bCtx.fill(); // Neck wrap
+            // Trailing part of scarf
+            bCtx.beginPath(); bCtx.moveTo(20, 4); bCtx.quadraticCurveTo(10, 10 - tailLift, 5, 15); bCtx.lineTo(10, 18); bCtx.quadraticCurveTo(15, 12, 24, 8); bCtx.fill();
+
+            bCtx.restore();
+        }
+
+        // Beautiful & Clearer Obstacles
+        function drawObstacle(x, type) {
+            bCtx.save(); 
+            bCtx.translate(x, 260); // Align to ground level
+            
+            if(type === 0) { // Detail Rock
+                bCtx.fillStyle = "#7f8c8d";
+                bCtx.beginPath(); bCtx.arc(20, -18, 22, 0, Math.PI, true); bCtx.fill();
+                bCtx.fillStyle = "#95a5a6"; // Highlight
+                bCtx.beginPath(); bCtx.arc(16, -20, 15, 0, Math.PI, true); bCtx.fill();
+                bCtx.fillStyle = "#bdc3c7";
+                bCtx.beginPath(); bCtx.arc(32, -10, 12, 0, Math.PI, true); bCtx.fill();
+                // Grass base
+                bCtx.fillStyle = "#27ae60";
+                bCtx.beginPath(); bCtx.moveTo(0, 0); bCtx.lineTo(10, -10); bCtx.lineTo(15, 0); bCtx.fill();
+            } 
+            else if(type === 1) { // Detail Cactus
+                bCtx.fillStyle = "#2ecc71";
+                bCtx.beginPath(); bCtx.roundRect(15, -45, 16, 45, 8); bCtx.fill();
+                bCtx.beginPath(); bCtx.roundRect(5, -30, 14, 15, 7); bCtx.fill(); // Left branch
+                bCtx.beginPath(); bCtx.roundRect(27, -35, 14, 15, 7); bCtx.fill(); // Right branch
+                // Spines (Lighter contrast)
+                bCtx.fillStyle = "#f1c40f";
+                bCtx.fillRect(10, -35, 4, 2); bCtx.fillRect(32, -25, 4, 2); bCtx.fillRect(22, -15, 4, 2);
+                bCtx.fillRect(12, -20, 4, 2); bCtx.fillRect(28, -40, 4, 2);
+                // Flower
+                bCtx.fillStyle = "#ff7979";
+                bCtx.beginPath(); bCtx.arc(23, -45, 6, 0, Math.PI*2); bCtx.fill();
+            } 
+            else if(type === 2) { // Detail Mushroom
+                bCtx.fillStyle = "#ecf0f1"; // Stem
+                bCtx.beginPath(); bCtx.roundRect(16, -25, 12, 25, 6); bCtx.fill();
+                bCtx.beginPath(); bCtx.ellipse(22, -15, 10, 3, 0, 0, Math.PI*2); bCtx.fill(); // Collar
+                bCtx.fillStyle = "#e74c3c"; // Cap
+                bCtx.beginPath(); bCtx.arc(22, -22, 22, 0, Math.PI, true); bCtx.fill();
+                // Spots
+                bCtx.fillStyle = "white";
+                bCtx.beginPath(); bCtx.arc(12, -32, 5, 0, Math.PI*2); bCtx.fill();
+                bCtx.beginPath(); bCtx.arc(30, -28, 4, 0, Math.PI*2); bCtx.fill();
+                bCtx.beginPath(); bCtx.arc(22, -38, 3, 0, Math.PI*2); bCtx.fill();
+                bCtx.beginPath(); bCtx.arc(20, -26, 2.5, 0, Math.PI*2); bCtx.fill();
+                // Grass Base
+                bCtx.fillStyle = "#27ae60";
+                bCtx.beginPath(); bCtx.moveTo(10, 0); bCtx.lineTo(16, -8); bCtx.lineTo(22, 0); bCtx.fill();
+                bCtx.beginPath(); bCtx.moveTo(20, 0); bCtx.lineTo(28, -12); bCtx.lineTo(34, 0); bCtx.fill();
             }
-        };
+            bCtx.restore();
+        }
+
+        function drawBonusBackground() {
+            bCtx.clearRect(0, 0, 800, 300);
+            
+            // Ground
+            bCtx.fillStyle = "#58cc02"; bCtx.fillRect(0, 260, 800, 40);
+            bCtx.fillStyle = "#58a700"; bCtx.fillRect(0, 260, 800, 6);
+            
+            // Scenery decorations moving
+            decor.forEach(d => {
+                d.x -= 6; if(d.x < -40) d.x = 840;
+                bCtx.save(); bCtx.translate(d.x, 260);
+                if(d.type === 'grass') {
+                    bCtx.fillStyle = "#71df1e";
+                    bCtx.beginPath(); bCtx.moveTo(0,0); bCtx.lineTo(-5*d.s, -15*d.s); bCtx.lineTo(5*d.s, -15*d.s); bCtx.fill();
+                } else {
+                    bCtx.fillStyle = "#ff4b4b";
+                    bCtx.beginPath(); bCtx.arc(0, -12*d.s, 6*d.s, 0, Math.PI*2); bCtx.fill();
+                    bCtx.fillStyle = "#ffc800";
+                    bCtx.beginPath(); bCtx.arc(0, -12*d.s, 3*d.s, 0, Math.PI*2); bCtx.fill();
+                }
+                bCtx.restore();
+            });
+        }
+
+        function updateKangaroo() {
+            if(!kRunning) return;
+            const remaining = Math.max(0, 25 - Math.floor((Date.now() - kStart)/1000));
+            document.getElementById('timer-val').innerText = remaining;
+            if(remaining <= 0) { endKangaroo("FINISH!"); return; }
+
+            drawBonusBackground();
+
+            // Physics
+            kangaroo.dy += 1.0; // Gravity
+            kangaroo.y += kangaroo.dy;
+            if(kangaroo.y > 210) { kangaroo.y = 210; kangaroo.dy = 0; kangaroo.grounded = true; }
+            drawKangaroo(kangaroo.x, kangaroo.y);
+
+            // Obstacles Generation (Slightly more spaced out on wider screen)
+            if(Math.random() < 0.015 && (kObs.length === 0 || kObs[kObs.length-1].x < 450)) {
+                kObs.push({x: 850, type: Math.floor(Math.random()*3)});
+            }
+            
+            for(let i=kObs.length-1; i>=0; i--) {
+                const o = kObs[i]; o.x -= 7.5;
+                
+                drawObstacle(o.x, o.type);
+                
+                // Collision Box 
+                if(kangaroo.x + 20 < o.x + 40 && kangaroo.x + 45 > o.x + 5 && kangaroo.y + 40 > 220) {
+                    endKangaroo("CRASH!"); return;
+                } else if(o.x < -60) {
+                    kObs.splice(i, 1); 
+                    bScore += 5;
+                    document.getElementById('bonus-score').innerText = bScore;
+                }
+            }
+            kId = requestAnimationFrame(updateKangaroo);
+        }
+
+        // Action trigger for Jumping
+        function triggerJump(e) {
+            if (e) e.preventDefault();
+            if(kangaroo.grounded && kRunning) { 
+                kangaroo.dy = -18; 
+                kangaroo.grounded = false; 
+                if(synth) synth.triggerAttackRelease("G4", "16n");
+            }
+        }
+
+        // Touch / Click to Jump
+        bCanvas.addEventListener('pointerdown', triggerJump);
+
+        // Keyboard Space to Jump
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && kRunning) {
+                triggerJump(e);
+            }
+        });
+
+        function endKangaroo(reason) {
+            kRunning = false; cancelAnimationFrame(kId);
+            state.score += bScore;
+            document.getElementById('score-val').innerText = state.score;
+            
+            const btn = document.getElementById('bonus-start-btn');
+            btn.classList.remove('hidden');
+            btn.innerText = (reason === "CRASH!" ? "OUCH! CONTINUE" : "GREAT JOB! CONTINUE");
+            
+            btn.onclick = () => {
+                document.getElementById('bonus-overlay').classList.add('hidden');
+                showFinalWin();
+            };
+
+            if(synth) {
+                if(reason === "CRASH!") synth.triggerAttackRelease("C3", "4n");
+                else synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "4n");
+            }
+        }
+
+        function showFinalWin() {
+            kRunning = false;
+            cancelAnimationFrame(kId);
+            document.getElementById('bonus-overlay').classList.add('hidden');
+            document.getElementById('win-overlay').classList.remove('hidden');
+            document.getElementById('final-score').innerText = state.score;
+            startConfetti();
+        }
+
+        // Beautiful Paper Confetti Effect
+        function startConfetti() {
+            const fCanvas = document.getElementById('confetti-canvas');
+            const fCtx = fCanvas.getContext('2d');
+            fCanvas.width = window.innerWidth; fCanvas.height = window.innerHeight;
+            
+            let particles = [];
+            const colors = ['#58cc02', '#1cb0f6', '#ffc800', '#ff4b4b', '#ce82ff', '#ff9600'];
+
+            for(let i=0; i<150; i++) {
+                particles.push({
+                    x: Math.random() * fCanvas.width,
+                    y: Math.random() * fCanvas.height - fCanvas.height, // Start above screen
+                    w: Math.random() * 10 + 8,
+                    h: Math.random() * 15 + 8,
+                    vx: Math.random() * 3 - 1.5,
+                    vy: Math.random() * 4 + 3,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rot: Math.random() * 360,
+                    rotSpeed: Math.random() * 15 - 7.5
+                });
+            }
+
+            function loop() {
+                fCtx.clearRect(0,0,fCanvas.width,fCanvas.height);
+                let active = false;
+                
+                particles.forEach((p, i) => {
+                    p.x += p.vx; 
+                    p.y += p.vy; 
+                    p.rot += p.rotSpeed;
+                    
+                    // Add slight flutter
+                    p.vx += Math.sin(p.rot * 0.05) * 0.1;
+                    
+                    if(p.y < fCanvas.height + 20) active = true;
+
+                    fCtx.save();
+                    fCtx.translate(p.x, p.y);
+                    fCtx.rotate(p.rot * Math.PI / 180);
+                    fCtx.fillStyle = p.color;
+                    
+                    // 3D flip effect simulation using scale
+                    const scaleY = Math.abs(Math.sin(p.rot * 0.05));
+                    fCtx.scale(1, scaleY);
+                    
+                    // Draw paper rectangle
+                    fCtx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+                    fCtx.restore();
+                });
+                
+                if(active) {
+                    requestAnimationFrame(loop);
+                } else {
+                    // loop confetti for endless fun
+                    particles.forEach(p => {
+                        p.y = Math.random() * -fCanvas.height;
+                        p.x = Math.random() * fCanvas.width;
+                    });
+                    requestAnimationFrame(loop);
+                }
+            }
+            loop();
+        }
     </script>
 </body>
 </html>

@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lava Leap v4</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0b041c;
+            font-family: 'Poppins', sans-serif;
+            touch-action: none;
+            user-select: none;
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        #score-display {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 2px 2px 0px #004d4d;
+            pointer-events: none;
+            display: none;
+        }
+
+        .panel {
+            background: rgba(20, 5, 35, 0.7);
+            border: 1px solid rgba(0, 255, 255, 0.4);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 40px rgba(0, 255, 255, 0.2);
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            color: #fff;
+            pointer-events: auto;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: scale(1);
+            max-width: 550px;
+        }
+
+        .panel.hidden {
+            display: none !important;
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #00ffff;
+            text-shadow: 0 0 25px rgba(0, 255, 255, 0.9), 3px 3px 0px #005050;
+            font-size: 3.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.15rem;
+            color: #d8f8f8;
+            margin-bottom: 35px;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        .highlight {
+            color: #ff3366;
+            font-weight: 800;
+            font-size: 1.4rem;
+            text-shadow: 0 0 10px rgba(255, 51, 102, 0.6);
+        }
+
+        button {
+            background: linear-gradient(135deg, #00ffff, #0066ff);
+            border: none;
+            border-radius: 12px;
+            padding: 16px 50px;
+            font-size: 1.2rem;
+            color: #050208;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #003380, 0 15px 20px rgba(0,0,0,0.5);
+            transition: all 0.15s ease;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        button:hover {
+            filter: brightness(1.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #003380, 0 20px 25px rgba(0,0,0,0.6);
+        }
+
+        button:active {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0 #003380, 0 5px 10px rgba(0,0,0,0.5);
+        }
+
+        #instructions {
+            position: absolute;
+            bottom: 40px;
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 600;
+            pointer-events: none;
+            text-shadow: 0 2px 10px #000, 0 0 20px #00ffff;
+            animation: pulse 1.5s infinite alternate;
+            background: rgba(0,0,0,0.5);
+            padding: 12px 30px;
+            border-radius: 30px;
+            backdrop-filter: blur(8px);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; }
+        }
+
+        .title-lose { color: #ff3333; text-shadow: 0 0 25px rgba(255, 51, 51, 0.9), 3px 3px 0px #500000; }
+    </style>
+</head>
+<body>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="ui-layer">
+        <div id="score-display">Score: 0</div>
+
+        <div id="start-panel" class="panel">
+            <h1>Lava Leap v4</h1>
+            <p>Enter the glowing magical caverns.<br>Survive as long as you can across the ancient ruins.<br><br><b>How to play:</b><br>Hold to build jump power. Release to leap.</p>
+            <button onclick="startGame()">Start Journey</button>
+        </div>
+
+        <div id="game-over-panel" class="panel hidden">
+            <h1 class="title-lose">GAME OVER</h1>
+            <p>You survived for <span id="final-score" class="highlight">0</span> platforms!</p>
+            <button onclick="resetGame()">Try Again</button>
+        </div>
+        
+        <div id="instructions" class="hidden">Hold to charge jump...</div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Virtual resolution
+    const VW = 1600;
+    const VH = 900;
+    
+    let gameState = 'start'; 
+    let scale = 1, offsetX = 0, offsetY = 0;
+    
+    // Camera settings for infinite scrolling
+    let cameraX = 0;
+    let targetCameraX = 0;
+    let cameraShake = 0;
+
+    // Game stats
+    let score = 0;
+    let maxPlatformReached = 0;
+
+    // Constants
+    const gravity = 0.65;
+    
+    // Player object
+    let player = {
+        x: 0, y: 0, 
+        vx: 0, vy: 0,
+        width: 32, height: 95, 
+        state: 'idle', 
+        chargeTimer: 0,
+        maxCharge: 45,
+        currentPlatform: 0
+    };
+
+    let platforms = [];
+    let particles = [];
+    let backgroundElements = [];
+    let spores = [];
+    let backgroundTime = 0;
+    let nextPlatformX = 200;
+
+    // --- SETUP & RESIZE ---
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        scale = Math.min(canvas.width / VW, canvas.height / VH);
+        offsetX = (canvas.width - VW * scale) / 2;
+        offsetY = (canvas.height - VH * scale) / 2;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // --- PROCEDURAL GENERATION ---
+    function generateBackgroundElements() {
+        backgroundElements = [];
+        spores = [];
+        
+        // Beautiful Crystals
+        for(let i=0; i<18; i++) {
+            backgroundElements.push({
+                type: 'crystal',
+                x: Math.random() * VW * 3, 
+                y: VH/2 + Math.random() * 250 - 100,
+                size: 25 + Math.random() * 70,
+                hue: Math.random() > 0.5 ? 180 : 300, // Cyan or Magenta
+                parallax: 0.15 + Math.random() * 0.25
+            });
+        }
+        // Lava Falls
+        for(let i=0; i<8; i++) {
+            backgroundElements.push({
+                type: 'lavafall',
+                x: Math.random() * VW * 3,
+                width: 40 + Math.random() * 100,
+                parallax: 0.1
+            });
+        }
+        // Cave Pillars (Layer 1 - Back)
+        for(let i=0; i<12; i++) {
+            backgroundElements.push({
+                type: 'pillar_back',
+                x: Math.random() * VW * 3,
+                width: 150 + Math.random() * 250,
+                parallax: 0.2
+            });
+        }
+        // Cave Pillars (Layer 2 - Front)
+        for(let i=0; i<8; i++) {
+            backgroundElements.push({
+                type: 'pillar_front',
+                x: Math.random() * VW * 3,
+                width: 80 + Math.random() * 150,
+                parallax: 0.35
+            });
+        }
+        // Floating Magic Spores
+        for(let i=0; i<60; i++) {
+            spores.push({
+                x: Math.random() * VW * 2,
+                y: Math.random() * VH,
+                size: Math.random() * 2.5 + 0.5,
+                speedX: (Math.random() - 0.5) * 1.5,
+                speedY: (Math.random() - 0.5) * 1.5,
+                hue: Math.random() > 0.5 ? 180 : 60, // Cyan or Yellow
+                parallax: 0.4 + Math.random() * 0.4
+            });
+        }
+    }
+
+    function generatePlatform() {
+        let platWidth = 140 + Math.random() * 60;
+        let gap = 160 + Math.random() * 180; 
+        let platY = VH - 280 + (Math.random() * 160 - 80);
+        
+        let shape = [];
+        let segments = Math.floor(platWidth / 20);
+        for(let i = 0; i <= segments; i++) {
+            let px = (i / segments) * platWidth;
+            let py = (Math.random() * 15 - 5);
+            if(i === 0 || i === segments) py = 0; 
+            shape.push({ x: px, y: py });
+        }
+        
+        let runeTypes = [0, 1, 2, 3];
+        
+        // Vibrant flora generation
+        let flora = null;
+        if(Math.random() > 0.5) {
+            flora = {
+                x: platWidth * (0.2 + Math.random() * 0.6),
+                size: 10 + Math.random() * 15,
+                hue: Math.random() > 0.5 ? 180 : 320 // Bright cyan or pink mushrooms
+            };
+        }
+        
+        platforms.push({
+            index: platforms.length,
+            x: nextPlatformX,
+            y: platY,
+            w: platWidth,
+            h: 600, 
+            runeType: runeTypes[Math.floor(Math.random()*runeTypes.length)],
+            shape: shape,
+            mossColor: `hsl(${90 + Math.random()*20}, 80%, 45%)`, // Vibrant lime green
+            flora: flora
+        });
+        
+        nextPlatformX += platWidth + gap;
+    }
+
+    function initLevel() {
+        score = 0;
+        maxPlatformReached = 0;
+        document.getElementById('score-display').innerText = `Score: 0`;
+        
+        platforms = [];
+        particles = [];
+        nextPlatformX = 200; 
+        
+        for(let i=0; i<6; i++) {
+            generatePlatform();
+        }
+
+        generateBackgroundElements();
+
+        player.currentPlatform = 0;
+        player.x = platforms[0].x + platforms[0].w / 2;
+        player.y = platforms[0].y;
+        player.vx = 0;
+        player.vy = 0;
+        player.state = 'idle';
+        player.chargeTimer = 0;
+        
+        cameraX = 0;
+        targetCameraX = 0;
+        cameraShake = 0;
+    }
+
+    // --- INPUT HANDLING ---
+    let isPointerDown = false;
+
+    function handlePointerDown(e) {
+        if(e.type === 'touchstart') e.preventDefault();
+        if(gameState !== 'playing') return;
+        if(player.state === 'idle') {
+            isPointerDown = true;
+            player.state = 'charging';
+            player.chargeTimer = 0;
+        }
+    }
+
+    function handlePointerUp(e) {
+        if(e.type === 'touchend') e.preventDefault();
+        if(gameState !== 'playing') return;
+        if(isPointerDown && player.state === 'charging') {
+            isPointerDown = false;
+            jump();
+        }
+    }
+
+    window.addEventListener('mousedown', handlePointerDown);
+    window.addEventListener('mouseup', handlePointerUp);
+    canvas.addEventListener('touchstart', handlePointerDown, {passive: false});
+    canvas.addEventListener('touchend', handlePointerUp, {passive: false});
+
+    function jump() {
+        player.state = 'jumping';
+        const chargeRatio = Math.min(player.chargeTimer / player.maxCharge, 1);
+        const jumpPower = 13 + chargeRatio * 18; 
+        const angle = -Math.PI / 3.2; 
+        
+        player.vx = Math.cos(angle) * jumpPower * 1.5; 
+        player.vy = Math.sin(angle) * jumpPower * 1.5;
+        
+        createDust(player.x, player.y, 25);
+    }
+
+    function screenShake(amount) {
+        cameraShake = amount;
+    }
+
+    // --- GAME LOGIC ---
+    function update() {
+        backgroundTime += 0.03;
+        if(cameraShake > 0) cameraShake *= 0.85;
+
+        let desiredCamX = player.x - VW * 0.25; 
+        if(desiredCamX > targetCameraX) targetCameraX = desiredCamX; 
+        cameraX += (targetCameraX - cameraX) * 0.08; 
+
+        // Update Background Elements (Wrapping)
+        backgroundElements.forEach(bg => {
+            if(bg.x < cameraX * bg.parallax - VW) {
+                bg.x += VW * 2.5;
+                if(bg.type === 'crystal') bg.y = VH/2 + Math.random() * 250 - 100;
+            }
+        });
+
+        // Update Spores (Floating Magic Dust)
+        spores.forEach(s => {
+            s.x += s.speedX + Math.sin(backgroundTime*2 + s.y)*0.5;
+            s.y += s.speedY + Math.cos(backgroundTime*1.5 + s.x)*0.5;
+            // Wrap around screen
+            let px = s.x - cameraX * s.parallax;
+            if (px < -100) s.x += VW * 2;
+            if (s.y < -100) s.y += VH + 200;
+            if (s.y > VH + 100) s.y -= VH + 200;
+        });
+
+        if (gameState !== 'playing') return;
+
+        if (player.state === 'charging') {
+            player.chargeTimer += 1;
+            if (player.chargeTimer > player.maxCharge + 10) {
+                isPointerDown = false;
+                jump();
+            }
+        } 
+        else if (player.state === 'jumping') {
+            player.x += player.vx;
+            player.vy += gravity;
+            player.y += player.vy;
+
+            if (player.vy > 0) {
+                for (let i = Math.max(0, player.currentPlatform - 1); i < platforms.length; i++) {
+                    let p = platforms[i];
+                    if (player.x > p.x - 20 && player.x < p.x + p.w + 20) {
+                        let relativeX = Math.max(0, Math.min(player.x - p.x, p.w));
+                        let segment = Math.floor((relativeX / p.w) * (p.shape.length - 1));
+                        let surfaceY = p.y + (p.shape[segment]?.y || 0);
+
+                        if (player.y >= surfaceY - 15 && player.y - player.vy <= surfaceY + 30) {
+                            player.y = surfaceY;
+                            player.vx = 0;
+                            player.vy = 0;
+                            player.state = 'idle';
+                            player.currentPlatform = i;
+                            
+                            createDust(player.x, player.y, 30);
+                            screenShake(6);
+                            
+                            if (i > maxPlatformReached) {
+                                maxPlatformReached = i;
+                                score = maxPlatformReached;
+                                document.getElementById('score-display').innerText = `Score: ${score}`;
+                                
+                                while (platforms.length - 1 - i < 4) {
+                                    generatePlatform();
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (player.y > VH + 50) {
+                createSplash(player.x, VH - 50);
+                loseGame();
+            }
+        }
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= p.decay;
+            if(p.type === 'lava' || p.type === 'splash') {
+                p.vy += 0.15; 
+            } else if (p.type === 'ember') {
+                p.vy -= 0.05; 
+                p.vx += Math.sin(backgroundTime * 5 + p.y) * 0.5;
+            } else {
+                p.vy += 0.08; // Lighter dust
+                p.x += cameraX * 0.001; 
+            }
+            if (p.life <= 0) particles.splice(i, 1);
+            else if (p.x < cameraX - 200) particles.splice(i, 1); 
+        }
+
+        if(Math.random() < 0.5) {
+            particles.push({
+                x: cameraX + Math.random() * VW,
+                y: VH - Math.random() * 150,
+                vx: (Math.random() - 0.5) * 3,
+                vy: -Math.random() * 5 - 2,
+                size: Math.random() * 5 + 1.5,
+                color: Math.random() > 0.4 ? '#ffea00' : '#ff3300', // Brighter embers
+                life: 1,
+                decay: 0.005 + Math.random() * 0.015,
+                type: 'ember'
+            });
+        }
+        
+        if (platforms.length > 10 && platforms[0].x < cameraX - VW) {
+            platforms.shift();
+            player.currentPlatform--; 
+            maxPlatformReached--;
+        }
+    }
+
+    function createDust(x, y, amount) {
+        for(let i=0; i<amount; i++) {
+            particles.push({
+                x: x + (Math.random() - 0.5) * 50,
+                y: y,
+                vx: (Math.random() - 0.5) * 8,
+                vy: -Math.random() * 5 - 1,
+                size: Math.random() * 8 + 3,
+                color: `rgba(160, 200, 180, ${Math.random()*0.5 + 0.3})`, // Brighter, mystical dust
+                life: 1,
+                decay: 0.02 + Math.random()*0.02,
+                type: 'dust'
+            });
+        }
+    }
+
+    function createSplash(x, y) {
+        for(let i=0; i<45; i++) {
+            particles.push({
+                x: x + (Math.random() - 0.5) * 80,
+                y: y,
+                vx: (Math.random() - 0.5) * 12,
+                vy: -Math.random() * 14 - 4,
+                size: Math.random() * 12 + 5,
+                color: Math.random() > 0.4 ? '#ffff00' : '#ff6600', // Super bright splash
+                life: 1,
+                decay: 0.015,
+                type: 'splash'
+            });
+        }
+    }
+
+    // --- ENHANCED DRAWING ---
+    function darken(hex, percent) {
+        let num = parseInt(hex.replace("#",""),16),
+        amt = Math.round(2.55 * percent),
+        R = (num >> 16) - amt,
+        B = (num >> 8 & 0x00FF) - amt,
+        G = (num & 0x0000FF) - amt;
+        return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
+    }
+
+    function drawLimb(ctx, startX, startY, thickness, length, angle, color1, highlight1) {
+        ctx.save();
+        ctx.translate(startX, startY);
+        ctx.rotate(angle);
+        
+        let grad1 = ctx.createLinearGradient(-thickness/2, 0, thickness/2, 0);
+        grad1.addColorStop(0, darken(color1, 40));
+        grad1.addColorStop(0.3, color1);
+        grad1.addColorStop(0.7, highlight1);
+        grad1.addColorStop(1, darken(color1, 20));
+
+        ctx.fillStyle = grad1;
+        ctx.beginPath();
+        ctx.roundRect(-thickness/2, 0, thickness, length/2 + 3, thickness/2);
+        ctx.fill();
+
+        ctx.translate(0, length/2);
+        ctx.rotate(-angle * 0.35); 
+        
+        let grad2 = ctx.createLinearGradient(-thickness/2, 0, thickness/2, 0);
+        grad2.addColorStop(0, darken(color1, 40));
+        grad2.addColorStop(0.4, color1);
+        grad2.addColorStop(0.8, highlight1);
+        grad2.addColorStop(1, darken(color1, 20));
+
+        ctx.fillStyle = grad2;
+        ctx.beginPath();
+        ctx.roundRect(-thickness/2 + 1, 0, thickness - 2, length/2, thickness/2);
+        ctx.fill();
+
+        ctx.translate(0, length/2);
+        if(color1 === "#2f3640") { // Pants -> Boot
+            let bootGrad = ctx.createLinearGradient(-thickness/2, 0, thickness, 15);
+            bootGrad.addColorStop(0, "#111");
+            bootGrad.addColorStop(1, "#333");
+            ctx.fillStyle = bootGrad;
+            ctx.beginPath();
+            ctx.roundRect(-thickness/2 - 2, 0, thickness + 8, 14, 5);
+            ctx.fill();
+            ctx.fillStyle = "#000";
+            ctx.fillRect(-thickness/2 - 1, 12, thickness + 6, 4);
+        } else { // Hand
+            ctx.fillStyle = "#ffcc99";
+            ctx.beginPath();
+            ctx.arc(0, 4, thickness/2, 0, Math.PI*2);
+            ctx.fill();
+        }
+
+        ctx.restore();
+    }
+
+    function drawRealisticPlayer(ctx, px, py) {
+        ctx.save();
+        ctx.translate(px, py);
+        
+        const h = player.height;
+        const headR = 8.5;
+        const torsoH = 32;
+        const legH = 45;
+        
+        let legAngle1 = 0, legAngle2 = 0;
+        let armAngle1 = 0, armAngle2 = 0;
+        let bodyTilt = 0;
+
+        if (player.state === 'charging') {
+            let squat = (player.chargeTimer / player.maxCharge) * 18;
+            ctx.translate(0, squat);
+            legAngle1 = Math.PI / 3.2; 
+            legAngle2 = Math.PI / 4.5;
+            armAngle1 = -Math.PI / 3.5;
+            armAngle2 = -Math.PI / 2.5;
+            bodyTilt = Math.PI / 5.5; 
+        } else if (player.state === 'jumping') {
+            bodyTilt = Math.PI / 7;
+            if(player.vy < -5) {
+                legAngle1 = -Math.PI / 5; 
+                legAngle2 = Math.PI / 3.5;  
+                armAngle1 = Math.PI / 2.2;  
+                armAngle2 = -Math.PI / 3;
+            } else if (player.vy > 5) {
+                legAngle1 = Math.PI / 5; 
+                legAngle2 = Math.PI / 7;
+                armAngle1 = -Math.PI / 2.5;
+                armAngle2 = -Math.PI / 5;
+                bodyTilt = Math.PI / 15;
+            } else {
+                legAngle1 = -Math.PI / 12; 
+                legAngle2 = Math.PI / 5;
+                armAngle1 = Math.PI / 6; 
+                armAngle2 = -Math.PI / 4;
+            }
+        }
+
+        ctx.rotate(bodyTilt);
+
+        // Vibrant Color Palette
+        const skinColor = "#ffcc99";
+        const jacketColor = "#008080"; // Bright Teal
+        const jacketHi = "#00ced1";
+        const pantsColor = "#2f3640"; 
+        const pantsHi = "#57606f";
+        const backpackMain = "#ff6b81"; // Vibrant coral pink/orange
+        const backpackSub = "#ff4757";
+
+        ctx.shadowColor = "#ffea00";
+        ctx.shadowBlur = (player.y > VH - 250) ? 25 : 0; 
+
+        // Backpack
+        let packGrad = ctx.createLinearGradient(-26, -h, -10, -h+30);
+        packGrad.addColorStop(0, darken(backpackMain, 20));
+        packGrad.addColorStop(1, backpackSub);
+        ctx.fillStyle = packGrad;
+        ctx.beginPath();
+        ctx.roundRect(-26, -h + headR*2 + 4, 18, 30, 6);
+        ctx.fill();
+        ctx.fillStyle = darken(backpackMain, 10);
+        ctx.beginPath();
+        ctx.roundRect(-30, -h + headR*2 + 10, 8, 18, 3);
+        ctx.fill();
+        ctx.fillStyle = "#1e272e"; // Bedroll
+        ctx.beginPath();
+        ctx.roundRect(-28, -h + headR*2 + 32, 22, 14, 5);
+        ctx.fill();
+
+        // Limbs Back
+        drawLimb(ctx, 2, -legH, 14, legH, legAngle2, darken(pantsColor, 20), darken(pantsHi, 20));
+        drawLimb(ctx, -2, -h + headR*2 + 5, 10, 30, armAngle2, darken(jacketColor, 20), darken(jacketHi, 20));
+
+        // Torso
+        let torsoGrad = ctx.createLinearGradient(-12, 0, 12, 0);
+        torsoGrad.addColorStop(0, darken(jacketColor, 50));
+        torsoGrad.addColorStop(0.4, jacketColor);
+        torsoGrad.addColorStop(0.8, jacketHi);
+        torsoGrad.addColorStop(1, darken(jacketColor, 10));
+        ctx.fillStyle = torsoGrad;
+        ctx.beginPath();
+        ctx.roundRect(-11, -h + headR*2, 22, torsoH, 7);
+        ctx.fill();
+
+        ctx.fillStyle = darken(jacketColor, 30);
+        ctx.fillRect(-11, -h + headR*2, 22, 6); 
+        ctx.fillStyle = "#1a1a1a";
+        ctx.fillRect(-12, -h + headR*2 + torsoH - 6, 24, 6); 
+        ctx.fillStyle = "#f1c40f"; // Gold buckle
+        ctx.fillRect(5, -h + headR*2 + torsoH - 5, 5, 4);
+
+        ctx.beginPath();
+        ctx.moveTo(-6, -h + headR*2); ctx.lineTo(-11, -h + headR*2 + torsoH/2);
+        ctx.lineWidth = 4; ctx.strokeStyle = "#111"; ctx.stroke();
+
+        ctx.fillStyle = darken(skinColor, 20);
+        ctx.fillRect(-2, -h + headR*1.8, 6, 5);
+
+        // Head
+        let headGrad = ctx.createRadialGradient(2, -h+headR-2, 2, 0, -h+headR, headR+2);
+        headGrad.addColorStop(0, "#fff0e6");
+        headGrad.addColorStop(1, skinColor);
+        ctx.fillStyle = headGrad;
+        ctx.beginPath();
+        ctx.arc(0, -h + headR, headR+1.5, 0, Math.PI*2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(headR+1, -h + headR + 2, 2, 0, Math.PI*2);
+        ctx.fill();
+
+        // Hair
+        const hairColor = "#3e2723";
+        const hairHi = "#5d4037";
+        ctx.fillStyle = hairColor;
+        ctx.beginPath(); 
+        ctx.arc(-1, -h + headR - 2.5, headR + 2.5, Math.PI*0.7, Math.PI*2.5);
+        ctx.fill();
+        
+        ctx.lineWidth = 6;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        let hairSway = player.state === 'jumping' ? player.vy * 1.8 : (Math.sin(backgroundTime*2)*2.5);
+        
+        ctx.strokeStyle = hairColor;
+        ctx.beginPath();
+        ctx.moveTo(-headR, -h + headR + 2);
+        let controlX = -20 + hairSway*0.3;
+        let controlY = -h + headR + 15 + Math.abs(hairSway)*1.2;
+        ctx.quadraticCurveTo(-22, -h + headR + 12, controlX, controlY);
+        ctx.stroke();
+        
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = hairHi;
+        ctx.beginPath();
+        ctx.moveTo(-headR, -h + headR + 2);
+        ctx.quadraticCurveTo(-22, -h + headR + 12, controlX, controlY);
+        ctx.stroke();
+
+        // Limbs Front
+        drawLimb(ctx, 0, -legH, 15, legH, legAngle1, pantsColor, pantsHi);
+        drawLimb(ctx, 5, -h + headR*2 + 5, 11, 30, armAngle1, jacketColor, jacketHi);
+
+        ctx.restore();
+    }
+
+    function drawCaveBackground() {
+        // Vibrant Cave Background
+        let bgGrad = ctx.createLinearGradient(0, 0, 0, VH);
+        bgGrad.addColorStop(0, "#0b041c"); // Deep space purple
+        bgGrad.addColorStop(0.4, "#2a0845"); // Vibrant dark purple
+        bgGrad.addColorStop(0.8, "#641205"); // Fiery red transition
+        bgGrad.addColorStop(1, "#3a0000"); 
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, canvas.width/scale, canvas.height/scale); 
+
+        // Render Parallax Elements
+        backgroundElements.forEach(el => {
+            let px = el.x - cameraX * el.parallax;
+            if(px + 400 < 0 || px > VW + 400) return;
+
+            if (el.type === 'lavafall') {
+                let fallGrad = ctx.createLinearGradient(px, 0, px + el.width, 0);
+                fallGrad.addColorStop(0, "rgba(255, 69, 0, 0)");
+                fallGrad.addColorStop(0.3, "rgba(255, 140, 0, 0.8)");
+                fallGrad.addColorStop(0.5, "rgba(255, 255, 150, 0.9)"); // Bright core
+                fallGrad.addColorStop(0.7, "rgba(255, 140, 0, 0.8)");
+                fallGrad.addColorStop(1, "rgba(255, 69, 0, 0)");
+                
+                ctx.fillStyle = fallGrad;
+                ctx.beginPath();
+                ctx.moveTo(px, 0);
+                for(let y=0; y<VH; y+=50) {
+                    ctx.lineTo(px + Math.sin(y/30 + backgroundTime*3)*15, y);
+                }
+                ctx.lineTo(px + el.width, VH);
+                for(let y=VH; y>0; y-=50) {
+                    ctx.lineTo(px + el.width + Math.sin(y/30 + backgroundTime*3)*15, y);
+                }
+                ctx.fill();
+                
+                ctx.shadowBlur = 60;
+                ctx.shadowColor = "#ffaa00";
+                ctx.fillStyle = "rgba(255, 255, 200, 0.2)";
+                ctx.fillRect(px + el.width*0.4, 0, el.width*0.2, VH);
+                ctx.shadowBlur = 0;
+            } 
+            else if (el.type.startsWith('pillar')) {
+                let isFront = el.type === 'pillar_front';
+                let pGrad = ctx.createLinearGradient(px, 0, px+el.width, 0);
+                if (isFront) {
+                    pGrad.addColorStop(0, "#190529");
+                    pGrad.addColorStop(0.5, "#300b4a");
+                    pGrad.addColorStop(1, "#190529");
+                } else {
+                    pGrad.addColorStop(0, "#0d0217");
+                    pGrad.addColorStop(0.5, "#1a042e");
+                    pGrad.addColorStop(1, "#0d0217");
+                }
+                
+                ctx.fillStyle = pGrad;
+                ctx.beginPath();
+                ctx.moveTo(px, 0);
+                for(let y=0; y<=VH; y+=50) {
+                    ctx.lineTo(px + Math.sin(y/(isFront?60:90))* (isFront?25:15), y);
+                }
+                ctx.lineTo(px + el.width, VH);
+                for(let y=VH; y>=0; y-=50) {
+                    ctx.lineTo(px + el.width + Math.sin(y/(isFront?50:80))* (isFront?25:15), y);
+                }
+                ctx.fill();
+            }
+            else if (el.type === 'crystal') {
+                let pulse = Math.sin(backgroundTime*2 + el.x)*0.2 + 0.8;
+                ctx.shadowBlur = 50 * pulse;
+                ctx.shadowColor = `hsl(${el.hue}, 100%, 60%)`;
+                
+                // Outer Glow
+                ctx.fillStyle = `hsla(${el.hue}, 90%, 50%, 0.5)`;
+                ctx.beginPath();
+                ctx.moveTo(px, el.y - el.size*1.8);
+                ctx.lineTo(px + el.size*0.8, el.y);
+                ctx.lineTo(px, el.y + el.size*2.2);
+                ctx.lineTo(px - el.size*0.8, el.y);
+                ctx.fill();
+
+                // Bright Core
+                ctx.fillStyle = `hsla(${el.hue}, 100%, 90%, 0.95)`;
+                ctx.beginPath();
+                ctx.moveTo(px, el.y - el.size*1.2);
+                ctx.lineTo(px + el.size*0.4, el.y);
+                ctx.lineTo(px, el.y + el.size*1.5);
+                ctx.lineTo(px - el.size*0.4, el.y);
+                ctx.fill();
+                
+                ctx.shadowBlur = 0;
+            }
+        });
+
+        // Draw Floating Spores
+        spores.forEach(s => {
+            let px = s.x - cameraX * s.parallax;
+            if(px < -50 || px > VW + 50) return;
+            
+            let pulse = Math.sin(backgroundTime*3 + s.x)*0.5 + 0.5;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = `hsl(${s.hue}, 100%, 70%)`;
+            ctx.fillStyle = `hsla(${s.hue}, 100%, 80%, ${pulse})`;
+            ctx.beginPath();
+            ctx.arc(px, s.y, s.size, 0, Math.PI*2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        });
+
+        // Roof Stalactites
+        ctx.fillStyle = "#090214";
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        for(let x=0; x<=VW; x+=60) {
+            let rx = x + (cameraX * 0.4) % 120; 
+            let tipLength = 30 + Math.sin(rx/80) * 70 + Math.cos(rx/30) * 40;
+            if(tipLength < 15) tipLength = 15;
+            ctx.lineTo(x, tipLength);
+        }
+        ctx.lineTo(VW, 0);
+        ctx.fill();
+    }
+
+    function drawRealisticRune(ctx, x, y, type, pulse) {
+        let rx = x; let ry = y;
+        let paths = [];
+        
+        // Complex ancient shapes
+        if(type === 0) {
+            paths = [[rx-20, ry-28, rx-20, ry+28], [rx-20, ry-10, rx+20, ry-28], [rx+20, ry-28, rx+20, ry+28]];
+        } else if(type === 1) {
+            paths = [[rx-20, ry+28, rx, ry-28], [rx, ry-28, rx+20, ry+28], [rx-12, ry+10, rx+12, ry+10]];
+        } else if(type === 2) {
+            paths = [[rx-20, ry-28, rx+20, ry+28], [rx+20, ry-28, rx-20, ry+28]];
+        } else {
+            paths = [[rx-20, ry-28, rx+20, ry-28], [rx-20, ry-28, rx+20, ry+28], [rx+20, ry-28, rx-20, ry+28], [rx-20, ry+28, rx+20, ry+28]];
+        }
+
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        // 1. Deep Carved Shadow
+        ctx.lineWidth = 12;
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.85)";
+        ctx.beginPath();
+        paths.forEach(p => { ctx.moveTo(p[0], p[1]+4); ctx.lineTo(p[2], p[3]+4); });
+        ctx.stroke();
+
+        // 2. Neon Glow Base
+        ctx.shadowBlur = 35 * pulse;
+        ctx.shadowColor = "#00ffff"; // Glowing Cyan
+        ctx.lineWidth = 7;
+        ctx.strokeStyle = `rgba(0, 255, 255, ${0.7 * pulse + 0.3})`;
+        ctx.beginPath();
+        paths.forEach(p => { ctx.moveTo(p[0], p[1]); ctx.lineTo(p[2], p[3]); });
+        ctx.stroke();
+
+        // 3. Super Bright Core
+        ctx.shadowBlur = 15 * pulse;
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = `rgba(255, 255, 255, ${0.9 * pulse + 0.1})`;
+        ctx.beginPath();
+        paths.forEach(p => { ctx.moveTo(p[0], p[1]); ctx.lineTo(p[2], p[3]); });
+        ctx.stroke();
+        
+        ctx.shadowBlur = 0; 
+    }
+
+    function drawPlatform(p) {
+        let drawX = p.x;
+        if (drawX + p.w < cameraX - 150 || drawX > cameraX + VW + 150) return;
+
+        ctx.save();
+        ctx.translate(drawX, p.y);
+
+        let platGrad = ctx.createLinearGradient(0, 0, 0, 300);
+        platGrad.addColorStop(0, "#4a4a55");
+        platGrad.addColorStop(0.3, "#2a2a33");
+        platGrad.addColorStop(0.8, "#501500"); // Hot lava reflection
+        platGrad.addColorStop(1, "#1a0400"); 
+        
+        ctx.fillStyle = platGrad;
+        ctx.beginPath();
+        ctx.moveTo(p.shape[0].x, p.shape[0].y);
+        for(let i=1; i<p.shape.length; i++) {
+            ctx.lineTo(p.shape[i].x, p.shape[i].y);
+        }
+        ctx.lineTo(p.w - 5, p.h);
+        ctx.lineTo(5, p.h);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(0,0,0,0.6)";
+        ctx.beginPath();
+        ctx.moveTo(p.w * 0.7, 30);
+        ctx.lineTo(p.w, p.shape[p.shape.length-1].y);
+        ctx.lineTo(p.w - 15, p.h);
+        ctx.lineTo(p.w * 0.5, p.h);
+        ctx.lineTo(p.w * 0.6, 150);
+        ctx.fill();
+        
+        ctx.fillStyle = "rgba(0,0,0,0.4)";
+        ctx.beginPath();
+        ctx.moveTo(p.w * 0.2, 20);
+        ctx.lineTo(p.w * 0.3, 100);
+        ctx.lineTo(p.w * 0.1, p.h);
+        ctx.lineTo(0, p.h);
+        ctx.lineTo(0, p.shape[0].y);
+        ctx.fill();
+
+        // Vibrant Moss
+        let mossGrad = ctx.createLinearGradient(0, -15, 0, 50);
+        mossGrad.addColorStop(0, p.mossColor); // bright lime
+        mossGrad.addColorStop(0.4, "#2e5c15"); // deep forest green
+        mossGrad.addColorStop(1, "rgba(20, 40, 10, 0)");
+        ctx.fillStyle = mossGrad;
+        
+        ctx.beginPath();
+        ctx.moveTo(p.shape[0].x, p.shape[0].y);
+        for(let i=1; i<p.shape.length; i++) {
+            ctx.lineTo(p.shape[i].x, p.shape[i].y);
+        }
+        for(let i=p.shape.length-1; i>=0; i--) {
+            ctx.lineTo(p.shape[i].x, p.shape[i].y + 15 + Math.random()*30);
+        }
+        ctx.fill();
+        
+        // Moss Edge Highlight
+        ctx.strokeStyle = "rgba(200, 255, 100, 0.4)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(p.shape[0].x, p.shape[0].y);
+        for(let i=1; i<p.shape.length; i++) {
+            ctx.lineTo(p.shape[i].x, p.shape[i].y);
+        }
+        ctx.stroke();
+
+        // Flora (Glowing Mushrooms)
+        if(p.flora) {
+            let fx = p.flora.x;
+            let fs = p.flora.size;
+            let fPulse = Math.sin(backgroundTime*4 + p.index)*0.3 + 0.7;
+            
+            ctx.shadowBlur = 15 * fPulse;
+            ctx.shadowColor = `hsl(${p.flora.hue}, 100%, 60%)`;
+            
+            // Stem
+            ctx.fillStyle = "#b3ffcc";
+            ctx.fillRect(fx - fs/6, -fs, fs/3, fs);
+            
+            // Cap
+            ctx.fillStyle = `hsl(${p.flora.hue}, 90%, 65%)`;
+            ctx.beginPath();
+            ctx.arc(fx, -fs, fs/1.2, Math.PI, Math.PI*2);
+            ctx.fill();
+            
+            ctx.shadowBlur = 0;
+        }
+
+        // Ancient Realistic Runes
+        let runePulse = Math.sin(backgroundTime * 2.5 + p.index) * 0.4 + 0.6;
+        drawRealisticRune(ctx, p.w/2, 90, p.runeType, runePulse);
+
+        ctx.restore();
+    }
+
+    function render() {
+        let shakeX = (Math.random() - 0.5) * cameraShake;
+        let shakeY = (Math.random() - 0.5) * cameraShake;
+        
+        ctx.save(); 
+        ctx.translate(offsetX, offsetY);
+        ctx.scale(scale, scale);
+        
+        drawCaveBackground();
+
+        ctx.save();
+        ctx.translate(-cameraX + shakeX, shakeY);
+
+        // Vibrant Lava Sea
+        for(let j=0; j<3; j++) {
+            let lavaGrad = ctx.createLinearGradient(0, VH - 150 + j*45, 0, VH);
+            lavaGrad.addColorStop(0, j===0 ? '#fffb00' : '#ff6a00'); // Super bright yellow top
+            lavaGrad.addColorStop(0.2, '#ff3300'); 
+            lavaGrad.addColorStop(0.6, '#990000'); 
+            lavaGrad.addColorStop(1, '#330000'); 
+
+            ctx.fillStyle = lavaGrad;
+            ctx.beginPath();
+            
+            let startX = cameraX - 250;
+            let endX = cameraX + VW + 250;
+            
+            ctx.moveTo(startX, VH);
+            
+            let speed = backgroundTime * (1.5 + j*0.5);
+            let heightBase = VH - 110 + j * 45;
+            
+            for(let x = startX; x <= endX; x += 40) {
+                let wave = Math.sin((x + cameraX*0.2)/(80 + j*20) + speed) * (20 + j*8);
+                let wave2 = Math.cos((x + cameraX*0.1)/35 - speed*1.4) * 15;
+                ctx.lineTo(x, heightBase + wave + wave2);
+            }
+            ctx.lineTo(endX, VH);
+            ctx.fill();
+        }
+
+        platforms.forEach(p => drawPlatform(p));
+
+        particles.forEach(p => {
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.life;
+            if(p.type === 'ember' || p.type === 'splash') {
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = p.color;
+            }
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.globalAlpha = 1.0;
+        });
+
+        drawRealisticPlayer(ctx, player.x, player.y);
+
+        if (player.state === 'charging') {
+            const barWidth = 100;
+            const chargeRatio = Math.min(player.chargeTimer / player.maxCharge, 1);
+            
+            ctx.fillStyle = "rgba(0,0,0,0.8)";
+            ctx.beginPath();
+            ctx.roundRect(player.x - barWidth/2, player.y - player.height - 75, barWidth, 16, 8);
+            ctx.fill();
+            
+            let r = chargeRatio > 0.5 ? Math.floor(255 - (chargeRatio-0.5)*2*255) : 255;
+            let g = chargeRatio < 0.5 ? Math.floor(chargeRatio*2*255) : 255;
+            
+            ctx.fillStyle = `rgb(${r}, ${g}, 0)`;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.beginPath();
+            ctx.roundRect(player.x - barWidth/2 + 3, player.y - player.height - 72, (barWidth-6) * chargeRatio, 10, 5);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+
+        ctx.restore(); 
+        ctx.restore(); 
+    }
+
+    // --- GAME LOOP ---
+    function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        update();
+        render();
+        requestAnimationFrame(loop);
+    }
+
+    // --- UI CONTROLS ---
+    function startGame() {
+        document.getElementById('start-panel').classList.add('hidden');
+        document.getElementById('instructions').classList.remove('hidden');
+        document.getElementById('score-display').style.display = 'block';
+        initLevel();
+        gameState = 'playing';
+        
+        setTimeout(() => {
+            document.getElementById('instructions').classList.add('hidden');
+        }, 4000);
+    }
+
+    function loseGame() {
+        gameState = 'gameover';
+        document.getElementById('final-score').innerText = score;
+        setTimeout(() => {
+            document.getElementById('game-over-panel').classList.remove('hidden');
+            document.getElementById('score-display').style.display = 'none';
+        }, 1000);
+    }
+
+    function resetGame() {
+        document.getElementById('game-over-panel').classList.add('hidden');
+        document.getElementById('score-display').style.display = 'block';
+        initLevel();
+        gameState = 'playing';
+    }
+
+    initLevel();
+    requestAnimationFrame(loop);
+
+</script>
+</body>
+</html>

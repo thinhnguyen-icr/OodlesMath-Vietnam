@@ -1,398 +1,406 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PopsicleMath | Oodles Math</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PopsicleMath | Oodles Math</title>
 
-  <!-- Poppins -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
 
-  <style>
-    :root{
-      --ink:#1F2A44;
-      --muted: rgba(31,42,68,.70);
+    <!-- Poppins Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-      --bg1:#FFF7FB;
-      --bg2:#F2FBFF;
+    <style>
+        :root {
+            /* Mã màu chuẩn */
+            --navy: #1c3767;
+            --soft-white: rgba(255, 255, 255, 0.9);
+        }
 
-      --card:#ffffff;
-      --border: rgba(31,42,68,.10);
-      --shadow: 0 18px 40px rgba(31,42,68,.12);
-      --shadowHover: 0 26px 60px rgba(31,42,68,.18);
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--navy);
+            margin: 0;
+            overflow-x: hidden;
+            background: #FDFCF0;
+            min-height: 100vh;
+        }
 
-      --yellow:#FFF3C4;
-      --mint:#E9F9F1;
-      --blue:#EAF6FF;
-      --pink:#FFE8EC;
-      --purple:#F2E8FF;
+        /* Kid-friendly gradient background */
+        .bg-kids-world {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 15% 15%, #FFD1DC 0%, transparent 40%),
+                radial-gradient(circle at 85% 15%, #C1E1C1 0%, transparent 40%),
+                radial-gradient(circle at 50% 85%, #B2CEFE 0%, transparent 50%),
+                #FDFCF0;
+            filter: blur(40px);
+            transform: scale(1.1);
+        }
 
-      --btn:#1F2A44;
-      --btnText:#ffffff;
-    }
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 100px;
+            opacity: 0.7;
+            filter: blur(25px);
+            z-index: 0;
+            pointer-events: none;
+        }
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family:"Poppins", sans-serif;
-      color:var(--ink);
-      background:
-        radial-gradient(900px 420px at 12% 12%, var(--yellow), transparent 60%),
-        radial-gradient(700px 360px at 90% 18%, var(--mint), transparent 55%),
-        radial-gradient(800px 420px at 55% 92%, var(--blue), transparent 60%),
-        linear-gradient(180deg, var(--bg1), var(--bg2));
-      min-height:100vh;
-    }
+        /* Glass Card Effect */
+        .glass-card {
+            background: var(--soft-white);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 4px solid white;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+        
+        @media (min-width: 768px) {
+            .glass-card { border-width: 5px; }
+        }
 
-    .wrap{
-      max-width:1100px;
-      margin:0 auto;
-      padding:28px 20px 40px;
-    }
+        /* Hiệu ứng màu chữ Gradient cho tiêu đề PopsicleMath */
+        .text-gradient-candy {
+            background: linear-gradient(to right, #FF5E5E, #FF85A1, #4FACFE, #B39DDB);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s linear infinite;
+        }
 
-    /* Header */
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:18px;
-    }
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      user-select:none;
-    }
+        /* Unique Hover Themes cho từng Level */
+        .card-seeker:hover {
+            transform: scale(1.04) translateY(-8px);
+            border-color: #FACC15; /* Yellow */
+            box-shadow: 0 45px 90px -20px rgba(250, 204, 21, 0.4);
+        }
+        .card-pals:hover {
+            transform: scale(1.04) translateY(-8px);
+            border-color: #4ADE80; /* Mint */
+            box-shadow: 0 45px 90px -20px rgba(74, 222, 128, 0.4);
+        }
+        .card-pro:hover {
+            transform: scale(1.04) translateY(-8px);
+            border-color: #C084FC; /* Purple */
+            box-shadow: 0 45px 90px -20px rgba(192, 132, 252, 0.4);
+        }
 
-    .logo{
-      width:44px;
-      height:44px;
-      border-radius:14px;
-      background: linear-gradient(135deg, var(--pink), var(--blue));
-      box-shadow: 0 10px 20px rgba(31,42,68,.10);
-      display:grid;
-      place-items:center;
-      font-size:22px;
-    }
+        /* Nút bấm kẹo ngọt */
+        .btn-kids {
+            border-radius: 30px;
+            box-shadow: 0 8px 0px rgba(0,0,0,0.15);
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .btn-seeker { background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%); }
+        .btn-pals { background: linear-gradient(135deg, #6EE7B7 0%, #10B981 100%); }
+        .btn-pro { background: linear-gradient(135deg, #D8B4FE 0%, #8B5CF6 100%); }
+        .btn-back {
+            background: white;
+            color: var(--navy);
+            box-shadow: 0 8px 0px rgba(0,0,0,0.1);
+        }
 
-    .brandTitle{
-      margin:0;
-      font-size:16px;
-      font-weight:800;
-      letter-spacing:.2px;
-      line-height:1.1;
-    }
-    .brandSub{
-      font-size:12px;
-      font-weight:700;
-      opacity:.70;
-      margin-top:3px;
-    }
+        .btn-kids:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0px rgba(0,0,0,0.1);
+        }
 
-    .pill{
-      padding:10px 14px;
-      border-radius:999px;
-      background: rgba(255,255,255,.75);
-      border:1px solid rgba(31,42,68,.10);
-      backdrop-filter: blur(10px);
-      font-size:12px;
-      font-weight:700;
-      color: rgba(31,42,68,.85);
-      white-space:nowrap;
-    }
+        /* Hiệu ứng nhún nhảy cho icon */
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+        .icon-bounce {
+            animation: bounce-slow 4s ease-in-out infinite;
+        }
 
-    /* Hero */
-    .hero{
-      border-radius:28px;
-      background: rgba(255,255,255,.72);
-      border:1px solid rgba(31,42,68,.08);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 16px 35px rgba(31,42,68,.08);
-      padding:22px 22px 18px;
-      position:relative;
-      overflow:hidden;
-    }
-    .hero::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      background:
-        radial-gradient(140px 140px at 12% 22%, rgba(255,232,236,.90), transparent 60%),
-        radial-gradient(180px 180px at 88% 12%, rgba(234,246,255,.95), transparent 62%),
-        radial-gradient(240px 240px at 70% 120%, rgba(233,249,241,.95), transparent 60%);
-      pointer-events:none;
-      opacity:.95;
-    }
-    .hero > *{ position:relative; }
+        .oodles-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        }
+        
+        @media (min-width: 768px) {
+            .oodles-logo {
+                width: 90px;
+                height: 90px;
+                border-radius: 24px;
+            }
+        }
 
-    h1{
-      margin:0 0 8px 0;
-      font-size:40px;
-      font-weight:800;
-      letter-spacing:-0.6px;
-      line-height:1.1;
-    }
+        .tag-bubble {
+            font-size: 12px;
+            font-weight: 800;
+            padding: 8px 16px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.05);
+            white-space: nowrap;
+        }
+        
+        @media (min-width: 768px) {
+            .tag-bubble {
+                font-size: 14px;
+                padding: 10px 24px;
+                gap: 10px;
+            }
+        }
 
-    .subtitle{
-      margin:0;
-      font-size:15px;
-      font-weight:700;
-      color:var(--muted);
-      line-height:1.6;
-      max-width:720px;
-    }
-
-    /* Actions row */
-    .actions{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-top:14px;
-      flex-wrap:wrap;
-    }
-
-    .back{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 14px;
-      border-radius:14px;
-      text-decoration:none;
-      font-weight:800;
-      color:var(--ink);
-      background: rgba(255,255,255,.75);
-      border:1px solid rgba(31,42,68,.10);
-      box-shadow: 0 12px 22px rgba(31,42,68,.10);
-    }
-    .back:active{ transform: translateY(1px); }
-
-    .helper{
-      font-size:12px;
-      font-weight:700;
-      opacity:.70;
-    }
-
-    /* Grid */
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap:18px;
-      margin-top:18px;
-    }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:26px;
-      padding:18px;
-      box-shadow: var(--shadow);
-      transition: transform .22s ease, box-shadow .22s ease;
-      cursor:pointer;
-      position:relative;
-      overflow:hidden;
-      min-height:170px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-    }
-
-    .card:hover{
-      transform: translateY(-6px);
-      box-shadow: var(--shadowHover);
-    }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:800;
-      border:1px solid rgba(31,42,68,.08);
-      width:max-content;
-      margin-bottom:12px;
-    }
-
-    .b-seeker{ background: var(--yellow); }
-    .b-pals{ background: var(--mint); }
-    .b-pro{ background: var(--purple); }
-
-    .card h2{
-      margin:0 0 8px 0;
-      font-size:24px;
-      font-weight:800;
-      letter-spacing:-0.3px;
-    }
-
-    .desc{
-      margin:0 0 14px 0;
-      color:var(--muted);
-      font-weight:700;
-      line-height:1.5;
-      font-size:13px;
-    }
-
-    .ctaRow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:11px 13px;
-      border-radius:14px;
-      background:var(--btn);
-      color:var(--btnText);
-      text-decoration:none;
-      font-weight:800;
-      font-size:13px;
-      box-shadow: 0 12px 22px rgba(31,42,68,.18);
-      border:1px solid rgba(255,255,255,.16);
-      width:max-content;
-    }
-
-    .tiny{
-      font-size:12px;
-      font-weight:700;
-      opacity:.65;
-    }
-
-    /* Footer */
-    footer{
-      text-align:center;
-      margin-top:22px;
-      font-size:12px;
-      font-weight:700;
-      opacity:.65;
-    }
-
-    @media (max-width:480px){
-      h1{ font-size:32px; }
-      .subtitle{ font-size:14px; }
-      .card h2{ font-size:22px; }
-    }
-  </style>
+        /* Bỏ highlight mặc định trên mobile */
+        .focus-ring {
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
 </head>
 
-<body>
-  <div class="wrap">
+<body class="flex flex-col items-center">
+    <!-- Background Parallax -->
+    <div class="bg-kids-world" id="parallaxBg"></div>
 
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo">🍭</div>
-        <div>
-          <div class="brandTitle">Oodles Math</div>
-          <div class="brandSub">PopsicleMath</div>
-        </div>
-      </div>
-      <div class="pill">Ages 3–8 • Play-based Games</div>
-    </div>
+    <!-- Responsive clouds -->
+    <div class="cloud w-48 h-24 md:w-72 md:h-36 top-10 left-[-5%]"></div>
+    <div class="cloud w-64 h-32 md:w-96 md:h-48 bottom-20 right-[-10%]"></div>
 
-    <section class="hero">
-      <h1>PopsicleMath</h1>
-      <p class="subtitle">
-        Pick a learning path and start playing! Short, bright activities that build number sense and fluency.
-      </p>
+    <main class="w-full max-w-6xl px-4 sm:px-6 py-8 md:py-12 lg:py-20 relative z-10">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-8 mb-10 md:mb-16">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start md:items-center gap-4 sm:gap-6 text-center sm:text-left">
+                <!-- Logo -->
+                <div class="oodles-logo icon-bounce flex items-center justify-center text-4xl md:text-5xl border-2 border-white">🍭</div>
+                <div>
+                    <!-- Áp dụng màu #1c3767 -->
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-[#1c3767] tracking-tight">Oodles Math</h1>
+                    <p class="text-xs sm:text-sm font-black text-[#1c3767]/50 uppercase tracking-[0.2em] sm:tracking-[0.3em] mt-2">PopsicleMath</p>
+                </div>
+            </div>
+            <div class="self-center bg-white/70 border-2 border-white px-6 py-3 md:px-8 md:py-4 rounded-full md:rounded-[40px] shadow-sm">
+                <span class="text-sm sm:text-base md:text-lg font-black text-[#3D3B8E] whitespace-nowrap">Ages 3–8 • Play-based Games</span>
+            </div>
+        </header>
 
-      <div class="actions">
-        <a class="back" href="../">← Back Home</a>
-        <div class="helper">Tip: Use full screen for kids ✨</div>
-      </div>
-    </section>
+        <!-- Hero Section -->
+        <section class="glass-card rounded-[40px] md:rounded-[60px] p-8 sm:p-12 md:p-16 mb-12 md:mb-16 relative overflow-hidden">
+            <div class="relative z-10 max-w-4xl">
+                <!-- Đã thêm class text-gradient-candy để chữ PopsicleMath có màu gradient tuyệt đẹp -->
+                <h2 class="text-5xl sm:text-6xl md:text-[80px] lg:text-[100px] font-black mb-6 md:mb-8 tracking-tight leading-[1.1] text-gradient-candy">
+                    PopsicleMath
+                </h2>
+                <!-- Áp dụng màu #1c3767 -->
+                <p class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold leading-relaxed text-[#1c3767]/80 mb-10">
+                    Pick a learning path and start playing! Short, bright activities that build number sense and fluency.
+                </p>
+                
+                <!-- Action Row -->
+                <div class="flex flex-col sm:flex-row items-center gap-6 md:gap-8">
+                    <a href="../" onmousedown="playPopSound()" class="btn-kids btn-back px-8 py-4 sm:px-10 sm:py-5 border-2 border-white font-black text-lg md:text-xl flex items-center gap-3">
+                        ← Back Home
+                    </a>
+                    <span class="text-xs sm:text-sm md:text-base font-bold text-[#1c3767]/60">Tip: Use full screen for kids ✨</span>
+                </div>
+            </div>
+            
+            <!-- Decorative icons -->
+            <div class="absolute top-10 right-4 sm:right-10 text-[60px] md:text-[100px] icon-bounce opacity-80" style="animation-delay: 0.5s;">🍡</div>
+            <div class="absolute bottom-10 right-10 sm:right-32 text-[50px] md:text-[80px] icon-bounce opacity-80" style="animation-delay: 1.5s;">🍦</div>
+        </section>
 
-    <section class="grid">
+        <!-- Game Cards Grid -->
+        <!-- Responsive 1 cột (Mobile), 2 cột (Tablet), 3 cột (Desktop) -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+            
+            <!-- Seeker-A -->
+            <a href="./Seeker-A/" onmousedown="playPopSound()" class="focus-ring block">
+                <div class="group glass-card card-seeker rounded-[40px] p-8 flex flex-col h-full overflow-hidden">
+                    <div class="mb-6 flex justify-between items-start">
+                        <span class="tag-bubble bg-[#FFF3C4] text-[#B7950B]">🔎 Seeker • Level A</span>
+                    </div>
+                    <!-- Áp dụng màu #1c3767 -->
+                    <h3 class="text-3xl font-black mb-4 text-[#1c3767]">Seeker-A</h3>
+                    <p class="text-[15px] font-bold text-[#1c3767]/70 mb-10 flex-grow leading-relaxed">
+                        Easy start: counting, matching, and first number skills.
+                    </p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="btn-kids btn-seeker px-6 py-3 text-white font-black text-base flex items-center gap-2">
+                            Open <span class="text-xl">→</span>
+                        </span>
+                        <span class="text-[11px] font-black opacity-40 uppercase">Quick & fun</span>
+                    </div>
+                </div>
+            </a>
 
-      <!-- Seeker-A -->
-      <article class="card" onclick="location.href='./Seeker-A/'" role="link" aria-label="Open Seeker-A">
-        <div>
-          <div class="badge b-seeker">🔎 Seeker • Level A</div>
-          <h2>Seeker-A</h2>
-          <p class="desc">Easy start: counting, matching, and first number skills.</p>
-        </div>
-        <div class="ctaRow">
-          <a class="btn" href="./Seeker-A/" onclick="event.stopPropagation();">Open →</a>
-          <div class="tiny">Quick & fun</div>
-        </div>
-      </article>
+            <!-- Seeker-B -->
+            <a href="./Seeker-B/" onmousedown="playPopSound()" class="focus-ring block">
+                <div class="group glass-card card-seeker rounded-[40px] p-8 flex flex-col h-full overflow-hidden">
+                    <div class="mb-6 flex justify-between items-start">
+                        <span class="tag-bubble bg-[#FFF3C4] text-[#B7950B]">🔎 Seeker • Level B</span>
+                    </div>
+                    <!-- Áp dụng màu #1c3767 -->
+                    <h3 class="text-3xl font-black mb-4 text-[#1c3767]">Seeker-B</h3>
+                    <p class="text-[15px] font-bold text-[#1c3767]/70 mb-10 flex-grow leading-relaxed">
+                        A little more challenge: number bonds and early fluency.
+                    </p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="btn-kids btn-seeker px-6 py-3 text-white font-black text-base flex items-center gap-2">
+                            Open <span class="text-xl">→</span>
+                        </span>
+                        <span class="text-[11px] font-black opacity-40 uppercase">Build confidence</span>
+                    </div>
+                </div>
+            </a>
 
-      <!-- Seeker-B -->
-      <article class="card" onclick="location.href='./Seeker-B/'" role="link" aria-label="Open Seeker-B">
-        <div>
-          <div class="badge b-seeker">🔎 Seeker • Level B</div>
-          <h2>Seeker-B</h2>
-          <p class="desc">A little more challenge: number bonds and early fluency.</p>
-        </div>
-        <div class="ctaRow">
-          <a class="btn" href="./Seeker-B/" onclick="event.stopPropagation();">Open →</a>
-          <div class="tiny">Build confidence</div>
-        </div>
-      </article>
+            <!-- Pals-Starter -->
+            <a href="./Pals-Starter/" onmousedown="playPopSound()" class="focus-ring block">
+                <div class="group glass-card card-pals rounded-[40px] p-8 flex flex-col h-full overflow-hidden">
+                    <div class="mb-6 flex justify-between items-start">
+                        <span class="tag-bubble bg-[#D1F2EB] text-[#1D8348]">🤝 Pals • Starter</span>
+                    </div>
+                    <!-- Áp dụng màu #1c3767 -->
+                    <h3 class="text-3xl font-black mb-4 text-[#1c3767]">Pals-Starter</h3>
+                    <p class="text-[15px] font-bold text-[#1c3767]/70 mb-10 flex-grow leading-relaxed">
+                        Play together: turn-taking, quick answers, and teamwork.
+                    </p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="btn-kids btn-pals px-6 py-3 text-white font-black text-base flex items-center gap-2">
+                            Open <span class="text-xl">→</span>
+                        </span>
+                        <span class="text-[11px] font-black opacity-40 uppercase">Team play</span>
+                    </div>
+                </div>
+            </a>
 
-      <!-- Pals-Starter -->
-      <article class="card" onclick="location.href='./Pals-Starter/'" role="link" aria-label="Open Pals-Starter">
-        <div>
-          <div class="badge b-pals">🤝 Pals • Starter</div>
-          <h2>Pals-Starter</h2>
-          <p class="desc">Play together: turn-taking, quick answers, and teamwork.</p>
-        </div>
-        <div class="ctaRow">
-          <a class="btn" href="./Pals-Starter/" onclick="event.stopPropagation();">Open →</a>
-          <div class="tiny">Team play</div>
-        </div>
-      </article>
+            <!-- Pals-Solver -->
+            <a href="./Pals-Solver/" onmousedown="playPopSound()" class="focus-ring block">
+                <div class="group glass-card card-pals rounded-[40px] p-8 flex flex-col h-full overflow-hidden">
+                    <div class="mb-6 flex justify-between items-start">
+                        <span class="tag-bubble bg-[#D1F2EB] text-[#1D8348]">🤝 Pals • Solver</span>
+                    </div>
+                    <!-- Áp dụng màu #1c3767 -->
+                    <h3 class="text-3xl font-black mb-4 text-[#1c3767]">Pals-Solver</h3>
+                    <p class="text-[15px] font-bold text-[#1c3767]/70 mb-10 flex-grow leading-relaxed">
+                        Solve as a team: faster thinking and stronger fluency.
+                    </p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="btn-kids btn-pals px-6 py-3 text-white font-black text-base flex items-center gap-2">
+                            Open <span class="text-xl">→</span>
+                        </span>
+                        <span class="text-[11px] font-black opacity-40 uppercase">More challenge</span>
+                    </div>
+                </div>
+            </a>
 
-      <!-- Pals-Solver -->
-      <article class="card" onclick="location.href='./Pals-Solver/'" role="link" aria-label="Open Pals-Solver">
-        <div>
-          <div class="badge b-pals">🤝 Pals • Solver</div>
-          <h2>Pals-Solver</h2>
-          <p class="desc">Solve as a team: faster thinking and stronger fluency.</p>
-        </div>
-        <div class="ctaRow">
-          <a class="btn" href="./Pals-Solver/" onclick="event.stopPropagation();">Open →</a>
-          <div class="tiny">More challenge</div>
-        </div>
-      </article>
+            <!-- Pro-Starter -->
+            <a href="./Pro-Starter/" onmousedown="playPopSound()" class="focus-ring block">
+                <div class="group glass-card card-pro rounded-[40px] p-8 flex flex-col h-full overflow-hidden">
+                    <div class="mb-6 flex justify-between items-start">
+                        <span class="tag-bubble bg-[#F2E8FF] text-[#6B21A8]">⭐ Pro • Starter</span>
+                    </div>
+                    <!-- Áp dụng màu #1c3767 -->
+                    <h3 class="text-3xl font-black mb-4 text-[#1c3767]">Pro-Starter</h3>
+                    <p class="text-[15px] font-bold text-[#1c3767]/70 mb-10 flex-grow leading-relaxed">
+                        For confident kids: quick games to sharpen skills.
+                    </p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="btn-kids btn-pro px-6 py-3 text-white font-black text-base flex items-center gap-2">
+                            Open <span class="text-xl">→</span>
+                        </span>
+                        <span class="text-[11px] font-black opacity-40 uppercase">Fast & focused</span>
+                    </div>
+                </div>
+            </a>
 
-      <!-- Pro-Starter -->
-      <article class="card" onclick="location.href='./Pro-Starter/'" role="link" aria-label="Open Pro-Starter">
-        <div>
-          <div class="badge b-pro">⭐ Pro • Starter</div>
-          <h2>Pro-Starter</h2>
-          <p class="desc">For confident kids: quick games to sharpen skills.</p>
-        </div>
-        <div class="ctaRow">
-          <a class="btn" href="./Pro-Starter/" onclick="event.stopPropagation();">Open →</a>
-          <div class="tiny">Fast & focused</div>
-        </div>
-      </article>
+            <!-- Pro-Solver -->
+            <a href="./Pro-Solver/" onmousedown="playPopSound()" class="focus-ring block">
+                <div class="group glass-card card-pro rounded-[40px] p-8 flex flex-col h-full overflow-hidden">
+                    <div class="mb-6 flex justify-between items-start">
+                        <span class="tag-bubble bg-[#F2E8FF] text-[#6B21A8]">⭐ Pro • Solver</span>
+                    </div>
+                    <!-- Áp dụng màu #1c3767 -->
+                    <h3 class="text-3xl font-black mb-4 text-[#1c3767]">Pro-Solver</h3>
+                    <p class="text-[15px] font-bold text-[#1c3767]/70 mb-10 flex-grow leading-relaxed">
+                        The fun hard mode: stronger fluency and speed.
+                    </p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="btn-kids btn-pro px-6 py-3 text-white font-black text-base flex items-center gap-2">
+                            Open <span class="text-xl">→</span>
+                        </span>
+                        <span class="text-[11px] font-black opacity-40 uppercase">Try your best</span>
+                    </div>
+                </div>
+            </a>
 
-      <!-- Pro-Solver -->
-      <article class="card" onclick="location.href='./Pro-Solver/'" role="link" aria-label="Open Pro-Solver">
-        <div>
-          <div class="badge b-pro">⭐ Pro • Solver</div>
-          <h2>Pro-Solver</h2>
-          <p class="desc">The fun hard mode: stronger fluency and speed.</p>
-        </div>
-        <div class="ctaRow">
-          <a class="btn" href="./Pro-Solver/" onclick="event.stopPropagation();">Open →</a>
-          <div class="tiny">Try your best</div>
-        </div>
-      </article>
+        </section>
 
-    </section>
+        <!-- Footer Đã được thêm icon nhún nhảy và đổi màu chữ đẹp hơn -->
+        <footer class="mt-20 md:mt-32 py-12 md:py-16 text-center">
+            <!-- Icon dễ thương hấp dẫn bé (Chủ đề kẹo) -->
+            <div class="flex justify-center gap-6 md:gap-12 mb-8 md:mb-10 text-4xl md:text-5xl opacity-60">
+                <span class="icon-bounce">🍭</span>
+                <span class="icon-bounce" style="animation-delay: 1s;">🍦</span>
+                <span class="icon-bounce" style="animation-delay: 2s;">🍡</span>
+                <span class="icon-bounce" style="animation-delay: 3s;">🍬</span>
+            </div>
+            <!-- Chữ ở footer màu sắc tươi tắn hơn (#3D3B8E) -->
+            <p class="text-xs md:text-sm font-black text-[#3D3B8E]/70 tracking-[0.2em] md:tracking-[0.4em] uppercase px-4 leading-relaxed">
+                © Oodles Math • Built with Love for Little Geniuses
+            </p>
+        </footer>
+    </main>
 
-    <footer>© Oodles Math</footer>
-  </div>
+    <script>
+        // --- SOUND ENGINE ---
+        let audioCtx;
+        function playPopSound() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            // Đảm bảo audio chạy được trên trình duyệt sau khi click
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(400, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.1);
+        }
+
+        // --- Tối ưu hóa Parallax Effect ---
+        // Chỉ chạy hiệu ứng nền trên màn hình lớn để tránh giật lag cho điện thoại/tablet
+        document.addEventListener('mousemove', (e) => {
+            if (window.innerWidth > 768) {
+                const x = (e.clientX / window.innerWidth - 0.5) * 20;
+                const y = (e.clientY / window.innerHeight - 0.5) * 20;
+                const bg = document.getElementById('parallaxBg');
+                if (bg) bg.style.transform = `translate(${x}px, ${y}px) scale(1.1)`;
+            }
+        });
+    </script>
 </body>
 </html>

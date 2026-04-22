@@ -1,700 +1,621 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="../assets/brand.css">
+    <link rel="stylesheet" href="../assets/brand.css">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop the Smallest Number</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Find the Greatest or Smallest Number!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-sky: #87CEEB;
-            --font-main: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
-            
-            /* Brighter, Yummy Colors */
-            --c-red: #FF6B6B;
-            --c-blue: #4ECDC4;
-            --c-green: #95E1D3;
-            --c-yellow: #FFE66D;
-            --c-orange: #FFA500;
-            --c-purple: #C39BD3;
-            --c-white: #FFFFFF;
-        }
-
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         body {
-            font-family: var(--font-main);
-            background-color: var(--bg-sky);
-            /* Cute cloud background pattern */
-            background-image: 
-                radial-gradient(circle at 50% 50%, white 10px, transparent 11px),
-                radial-gradient(circle at 10% 20%, rgba(255,255,255,0.6) 20px, transparent 21px),
-                radial-gradient(circle at 90% 80%, rgba(255,255,255,0.6) 30px, transparent 31px);
-            background-size: 100px 100px, 200px 200px, 300px 300px;
-            margin: 0;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* --- Header --- */
-        header {
-            width: 100%;
-            max-width: 800px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px 25px;
-            border-radius: 25px;
-            box-shadow: 0 8px 0 rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .title-group h1 {
-            color: #2c3e50;
-            font-size: 1.5rem;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-top: 5px;
-        }
-
-        .speaker-btn {
-            background: var(--c-yellow);
-            border: 3px solid #F1C40F;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            cursor: pointer;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.1s;
-        }
-
-        .speaker-btn:active { transform: scale(0.9); }
-
-        .score-board {
-            background: var(--c-blue);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 15px;
-            font-size: 1.4rem;
-            font-weight: bold;
-            box-shadow: 0 4px 0 #2A9D8F;
-            white-space: nowrap;
-        }
-
-        /* --- Game Area --- */
-        #game-area {
-            width: 100%;
-            max-width: 900px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-        }
-
-        .question-label {
-            font-size: 2rem;
-            color: white;
-            text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
-            margin-bottom: 20px;
-            font-weight: bold;
-            background: rgba(0,0,0,0.2);
-            padding: 5px 20px;
-            border-radius: 20px;
-        }
-
-        .balloons-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: flex-end; /* Align bottom to make strings look grounded */
-            gap: 40px; /* Reduced gap slightly to fit 3 balloons */
-            min-height: 350px;
-            padding-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        /* --- Balloons --- */
-        .balloon-container {
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.2s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10 and IE 11 */
+            user-select: none; /* Standard syntax */
+            touch-action: manipulation; /* Prevent double-tap zoom on mobile */
         }
         
-        .balloon-container:hover { transform: translateY(-5px); }
-        .balloon-container:active { transform: scale(0.95); }
-
-        .balloon {
-            width: 120px; /* Slightly smaller to fit 3 */
-            height: 150px;
-            background: var(--c-red);
-            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 3.5rem;
-            font-weight: bold;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            position: relative;
-            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.1), 5px 10px 10px rgba(0,0,0,0.1);
-            z-index: 2;
+        .bubbly-bg {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
         }
 
-        /* Shine reflection */
-        .balloon::after {
-            content: '';
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            width: 20px;
-            height: 40px;
-            background: rgba(255,255,255,0.4);
-            border-radius: 50%;
-            transform: rotate(20deg);
+        .number-card {
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+            border-bottom: 8px solid rgba(0,0,0,0.1); /* 3D effect */
+        }
+        .number-card:hover {
+            transform: scale(1.05) translateY(-5px);
+        }
+        .number-card:active {
+            transform: scale(0.95) translateY(2px);
+            border-bottom-width: 4px;
         }
 
-        .string {
-            width: 4px;
-            height: 100px;
-            background: #fff;
-            margin-top: -5px;
-            position: relative;
-            z-index: 1;
-            filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.1));
+        .correct-answer {
+            animation: bounceIn 0.6s ease;
+            box-shadow: 0 0 30px 10px rgba(76, 175, 80, 0.7);
         }
-
-        /* --- Colors --- */
-        .b-red { background-color: var(--c-red); }
-        .b-blue { background-color: var(--c-blue); }
-        .b-green { background-color: var(--c-green); }
-        .b-yellow { background-color: var(--c-yellow); color: #665; }
-        .b-orange { background-color: var(--c-orange); }
-        .b-purple { background-color: var(--c-purple); }
-
-        /* --- Animations & Feedback --- */
-        
-        /* POP Animation */
-        @keyframes pop {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.8; }
-            100% { transform: scale(0); opacity: 0; }
-        }
-        .popped .balloon { animation: pop 0.3s forwards ease-in; }
-        .popped .string { opacity: 0; transition: 0.3s; }
-
-        /* Shake Animation */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px) rotate(-5deg); }
-            75% { transform: translateX(10px) rotate(5deg); }
-        }
-        .shake .balloon { animation: shake 0.4s ease-in-out; }
-
-        /* Stars Effect (Correct) */
-        .star-effect {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 5rem;
-            color: #FFD700;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 10;
-        }
-        .popped .star-effect { animation: starBurst 0.6s ease-out forwards; }
-        @keyframes starBurst {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(20deg); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5) rotate(45deg); }
-        }
-
-        /* Try Again Text */
-        .try-again {
-            position: absolute;
-            top: -40px;
-            width: 150%;
-            left: -25%;
-            text-align: center;
-            background: #fff;
-            color: var(--c-red);
-            padding: 5px 10px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 1.2rem;
-            opacity: 0;
-            transform: translateY(10px);
-            pointer-events: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .shake .try-again { animation: floatUp 1s ease-out; }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0); }
-            80% { opacity: 1; transform: translateY(-20px); }
-            100% { opacity: 0; transform: translateY(-30px); }
-        }
-
-        /* --- Mystery Box Section --- */
-        #mystery-area {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            animation: fadeIn 0.5s;
-        }
-        
-        .mystery-title {
-            font-size: 2rem;
-            color: white;
-            text-shadow: 2px 2px 0 #333;
-            margin-bottom: 40px;
-            text-align: center;
-        }
-
-        .boxes-container {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .mystery-box {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(to bottom, #FF9A9E 0%, #FECFEF 100%);
-            border-radius: 15px;
-            position: relative;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
-        }
-        
-        .mystery-box:hover { transform: translateY(-5px) scale(1.05); }
-
-        .lid {
-            position: absolute;
-            top: -10px;
-            left: -5px;
-            width: 130px;
-            height: 35px;
-            background: #FF6B6B;
-            border-radius: 8px;
-            z-index: 5;
-            transition: 0.5s;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.1);
-        }
-        /* Bow */
-        .lid::after {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: -15px;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 20px;
-            background: #FFD700;
-            border-radius: 5px;
-        }
-
-        .prize {
-            font-size: 3.5rem;
-            position: absolute;
-            bottom: 30px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: 0.5s;
-        }
-
-        .mystery-box.opened .lid { transform: translateY(-50px) rotate(-15deg); opacity: 0; }
-        .mystery-box.opened .prize { opacity: 1; transform: translateY(-10px) scale(1.2); }
-
-        /* --- Victory Modal --- */
-        #victory-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 40px;
-            border-radius: 30px;
-            text-align: center;
-            animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            max-width: 90%;
+        .incorrect-answer {
+            animation: shake 0.5s ease;
+            box-shadow: 0 0 30px 10px rgba(244, 67, 54, 0.7);
         }
 
         @keyframes bounceIn {
-            from { transform: scale(0.5); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
         }
 
-        .modal-content h2 { font-size: 2.5rem; color: var(--c-purple); margin: 0 0 10px 0; }
-        .modal-content p { font-size: 1.2rem; color: #555; }
-        
-        button.restart-btn {
-            background: var(--c-blue);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 1.3rem;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-top: 20px;
-            font-family: inherit;
-            box-shadow: 0 4px 0 #2A9D8F;
-        }
-        button.restart-btn:hover { transform: translateY(-2px); }
+        .hidden { display: none !important; }
 
-        /* --- Logo Styles --- */
-        .header-left {
+        /* Progress Bar Styles */
+        .progress-bar-fill {
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Balloon Minigame Styles */
+        #balloon-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Let clicks pass through if not on a balloon */
+            overflow: hidden;
+            z-index: 50;
+            border-radius: inherit;
+        }
+        .balloon-wrapper {
+            position: absolute;
+            bottom: -150px;
+            pointer-events: auto; /* Make balloons clickable */
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 15px;
+            animation: floatUpSlow 6s linear forwards;
+        }
+        .balloon {
+            width: 70px;
+            height: 90px;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.1s;
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.2);
+            /* Glossy reflection */
+            background-image: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 30%);
+        }
+        @media (min-width: 768px) {
+            .balloon { width: 90px; height: 120px; }
+        }
+        /* Balloon Knot */
+        .balloon::before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 14px;
+            height: 10px;
+            background-color: inherit;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            filter: brightness(0.8);
+        }
+        /* Balloon String */
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -48px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 40px;
+            background-color: #aaa;
+            z-index: -1;
         }
 
-        .game-logo {
-            height: 80px;
-            width: auto;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
-            transition: transform 0.3s;
-        }
-        .game-logo:hover { transform: scale(1.1) rotate(5deg); }
-
-        /* Mobile */
-        @media (max-width: 600px) {
-            .balloons-wrapper { gap: 15px; } /* Tighter gap for mobile */
-            .balloon { width: 90px; height: 110px; font-size: 2.5rem; }
-            .balloon::after { top: 15px; left: 20px; width: 15px; height: 30px; }
-            h1 { font-size: 1.1rem; }
-            .mystery-box { width: 90px; height: 90px; }
-            .lid { width: 100px; }
-            
-            /* Logo adjust for mobile */
-            .game-logo { height: 60px; }
-            header { padding: 10px; flex-direction: column; gap: 10px; }
-            .header-left { flex-direction: column; text-align: center; }
-            .controls { justify-content: center; }
+        @keyframes floatUpSlow {
+            0% { transform: translateY(0) rotate(-5deg); opacity: 1; }
+            50% { transform: translateY(-60vh) rotate(5deg); opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(-5deg); opacity: 0; }
         }
 
-        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99; }
+        .pop-effect {
+            animation: pop 0.15s ease-out forwards;
+        }
+        @keyframes pop {
+            0% { transform: scale(1); opacity: 1; filter: brightness(1); }
+            50% { transform: scale(1.3); opacity: 0.8; filter: brightness(1.5); }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        .pop-feedback {
+            position: absolute;
+            font-size: 2.5rem;
+            font-weight: 800;
+            animation: floatAway 1s ease-out forwards;
+            pointer-events: none;
+            text-shadow: 0px 3px 5px rgba(0,0,0,0.2);
+            z-index: 60;
+        }
+        @keyframes floatAway {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            20% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+            100% { transform: translateY(-60px) scale(1); opacity: 0; }
+        }
+
+        /* Fun Buttons */
+        .btn-fun {
+            border-bottom: 6px solid rgba(0,0,0,0.2);
+            transition: all 0.1s;
+        }
+        .btn-fun:active {
+            transform: translateY(4px);
+            border-bottom-width: 2px;
+        }
     </style>
 </head>
-<body>
-<img src="../assets/logo-oodles-math.png" class="oodles-logo">
-    <header>
-        <div class="header-left">
-            <!-- Logo Game -->
-            <img src="image_52de6d.png" alt="Logo" class="game-logo" onerror="this.style.display='none'">
-            <div class="title-group">
-                <h1>Pop the Smallest Number</h1>
-                <div class="controls">
-                    <div style="color: #555; font-size: 1rem;">Click the <b>smallest</b> number!</div>
-                    <button class="speaker-btn" onclick="speakQuestion()" title="Read Question">🔊</button>
+<body class="bubbly-bg flex items-center justify-center min-h-screen p-4 overflow-x-hidden">
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <div id="game-container" class="w-full max-w-4xl mx-auto bg-white/95 backdrop-blur-sm border-8 border-white rounded-[2rem] md:rounded-[3rem] shadow-2xl p-6 md:p-10 text-center relative overflow-hidden">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="py-10 relative z-10">
+            <h1 class="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 mb-6 drop-shadow-sm leading-tight">
+                Find the Number!
+            </h1>
+            <p class="text-xl md:text-3xl text-gray-600 font-semibold mb-12">Let's play and learn together! 🎈</p>
+            <button id="start-button" class="btn-fun bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white text-3xl md:text-4xl font-bold py-5 px-12 rounded-full shadow-xl">
+                PLAY NOW
+            </button>
+        </div>
+
+        <!-- Main Game Area -->
+        <div id="main-game" class="hidden flex flex-col h-full min-h-[60vh] justify-between relative z-10">
+            <!-- Progress Bar Section -->
+            <div class="w-full max-w-2xl mx-auto mb-6">
+                <div class="flex justify-between items-end mb-2 px-2">
+                    <div id="score-tracker" class="text-2xl tracking-widest text-yellow-500 drop-shadow-sm font-bold flex flex-wrap gap-1"></div>
+                    <div class="text-lg md:text-xl font-black text-gray-400">
+                        <span class="text-pink-500 text-2xl" id="progress-text">1</span> / 10
+                    </div>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4 md:h-5 shadow-inner overflow-hidden p-1">
+                    <div id="progress-bar" class="progress-bar-fill bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 h-full rounded-full w-0 shadow-sm relative overflow-hidden">
+                        <!-- Shiny effect on progress bar -->
+                        <div class="absolute top-0 left-0 w-full h-1/2 bg-white/30 rounded-full"></div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="score-board">Score: <span id="score">0</span> / 6</div>
-    </header>
+            
+            <div class="flex flex-col items-center justify-center flex-grow mt-4">
+                <div class="flex justify-center items-center gap-4 mb-6 md:mb-10 w-full">
+                    <button id="replay-audio-button" title="Hear again" class="p-3 bg-blue-100 rounded-full text-blue-500 hover:bg-blue-200 active:scale-95 transition-all shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 md:h-12 md:w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        </svg>
+                    </button>
+                    <h2 id="question-text" class="text-3xl md:text-5xl font-extrabold text-blue-600 tracking-wide drop-shadow-sm flex-1"></h2>
+                </div>
+                
+                <!-- Cards Container -->
+                <div id="number-options" class="flex flex-wrap justify-center items-center gap-4 md:gap-10 w-full min-h-[220px]">
+                    <!-- Number cards generated here -->
+                </div>
+            </div>
+            
+            <div class="mt-auto pt-6 flex flex-col items-center min-h-[120px] relative z-20">
+                 <div id="feedback-container" class="h-[60px] flex items-center justify-center mb-4">
+                     <p id="feedback-text" class="text-3xl md:text-4xl font-black tracking-wide"></p>
+                 </div>
 
-    <div id="game-area">
-        <!-- Question Section -->
-        <div id="question-wrapper" style="width: 100%; text-align: center;">
-            <div class="question-label" id="q-label">Question 1</div>
-            <div class="balloons-wrapper" id="balloons-wrapper">
-                <!-- Balloons injected here -->
+                <button id="next-button" class="hidden btn-fun bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white text-2xl md:text-3xl font-bold py-4 px-14 rounded-full shadow-lg">
+                    NEXT
+                </button>
             </div>
         </div>
 
-        <!-- Mystery Box Section -->
-        <div id="mystery-area">
-            <div class="mystery-title">Correct! Pick a Mystery Box! 🎁</div>
-            <div class="boxes-container" id="boxes-container">
-                <!-- Boxes injected here -->
-            </div>
+        <!-- Balloon Minigame Overlay (Absolute positioned over the whole game) -->
+        <div id="balloon-container" class="hidden">
+            <!-- Balloons generated here -->
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen" class="hidden py-10 relative z-10">
+             <h1 class="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 mb-6">WOW!</h1>
+             <p class="text-3xl md:text-4xl text-gray-700 font-bold mb-4">You are amazing!</p>
+             <div class="bg-gray-100 rounded-3xl p-6 md:p-8 inline-block mb-10 shadow-inner w-full max-w-lg">
+                 <p class="text-2xl md:text-3xl text-gray-500 font-semibold mb-4">Total Score</p>
+                 <div id="final-score" class="text-4xl md:text-6xl font-black text-yellow-500 flex flex-wrap justify-center gap-1 mx-auto"></div>
+             </div>
+             <br>
+             <button id="play-again-button" class="btn-fun bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 text-white text-3xl md:text-4xl font-bold py-5 px-12 rounded-full shadow-xl">
+                PLAY AGAIN
+            </button>
         </div>
     </div>
-
-    <!-- Victory Modal -->
-    <div id="victory-modal">
-        <div class="modal-content">
-            <h2>You are a Star! 🌟</h2>
-            <p>You answered all questions correctly!</p>
-            <button class="restart-btn" onclick="location.reload()">Play Again</button>
-        </div>
-    </div>
-
-    <canvas id="confetti-canvas"></canvas>
 
     <script>
-        // ==========================================
-        // TEACHER AREA
-        // ==========================================
-        // Changed logic: Now using array of 3 numbers
-        const gameData = [
-            { label: 'Question 1', values: [12, 5, 20] },   // Smallest: 5
-            { label: 'Question 2', values: [18, 9, 25] },   // Smallest: 9
-            { label: 'Question 3', values: [7, 3, 10] },    // Smallest: 3
-            { label: 'Question 4', values: [14, 11, 30] },  // Smallest: 11
-            { label: 'Question 5', values: [6, 2, 8] },     // Smallest: 2
-            { label: 'Question 6', values: [15, 22, 10] }   // Smallest: 10
-        ];
-
-        // Colors for balloons
-        const colors = ['b-red', 'b-blue', 'b-green', 'b-yellow', 'b-orange', 'b-purple'];
-
-        let currentQIndex = 0;
-        let score = 0;
-        
         // DOM Elements
-        const qWrapper = document.getElementById('question-wrapper');
-        const mysteryArea = document.getElementById('mystery-area');
-        const balloonsWrapper = document.getElementById('balloons-wrapper');
-        const boxesContainer = document.getElementById('boxes-container');
-        const qLabel = document.getElementById('q-label');
-        const scoreDisplay = document.getElementById('score');
-        const victoryModal = document.getElementById('victory-modal');
+        const startScreen = document.getElementById('start-screen');
+        const mainGame = document.getElementById('main-game');
+        const endScreen = document.getElementById('end-screen');
+        const startButton = document.getElementById('start-button');
+        const nextButton = document.getElementById('next-button');
+        const playAgainButton = document.getElementById('play-again-button');
+        const questionText = document.getElementById('question-text');
+        const replayAudioButton = document.getElementById('replay-audio-button');
+        const numberOptions = document.getElementById('number-options');
+        const balloonContainer = document.getElementById('balloon-container');
+        const scoreTracker = document.getElementById('score-tracker');
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+        const feedbackText = document.getElementById('feedback-text');
+        const finalScore = document.getElementById('final-score');
 
-        // --- AUDIO SYSTEM ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // Game State
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let currentQuestionText = '';
+        const totalQuestions = 10; // Updated to 10 questions
 
-        function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
+        // Colors for UI variation
+        const cardColors = ['bg-pink-100', 'bg-yellow-100', 'bg-green-100', 'bg-blue-100', 'bg-purple-100'];
+        const textColors = ['text-pink-600', 'text-orange-500', 'text-green-600', 'text-blue-600', 'text-purple-600'];
+        const balloonColors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF9F1C', '#D4A5A5', '#9B5DE5'];
 
-            const now = audioCtx.currentTime;
-
-            if (type === 'pop') {
-                // High pitch pop
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, now);
-                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
-                gain.gain.setValueAtTime(0.5, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now);
-                osc.stop(now + 0.1);
-            } else if (type === 'error') {
-                // Low buzz
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.linearRampToValueAtTime(100, now + 0.2);
-                gain.gain.setValueAtTime(0.5, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
-                osc.start(now);
-                osc.stop(now + 0.2);
-            } else if (type === 'win') {
-                // Magical chime
-                [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
-                    let o = audioCtx.createOscillator();
-                    let g = audioCtx.createGain();
-                    o.connect(g);
-                    g.connect(audioCtx.destination);
-                    o.type = 'triangle';
-                    o.frequency.value = freq;
-                    g.gain.setValueAtTime(0.1, now + i*0.1);
-                    g.gain.linearRampToValueAtTime(0, now + i*0.1 + 0.4);
-                    o.start(now + i*0.1);
-                    o.stop(now + i*0.1 + 0.4);
-                });
-            }
+        // Audio Synthesis
+        const synth = window.speechSynthesis;
+        let narratorVoice;
+        
+        function setVoice() {
+            const voices = synth.getVoices();
+            narratorVoice = voices.find(v => v.name.includes('Google US English')) || 
+                            voices.find(v => v.lang.startsWith('en-US')) ||
+                            voices.find(v => v.lang.startsWith('en'));
+        }
+        
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = setVoice;
         }
 
-        function speakQuestion() {
-            window.speechSynthesis.cancel();
-            const item = gameData[currentQIndex];
-            if (!item) return;
+        // Sound Effects with Tone.js
+        let correctSound, incorrectSound, bonusSound, popSound;
 
-            // Updated text for 3 numbers
-            const nums = item.values.join(", ");
-            const text = `Which number is the smallest? ${nums}?`;
-            const ut = new SpeechSynthesisUtterance(text);
-            ut.lang = 'en-US';
-            ut.rate = 0.9;
-            window.speechSynthesis.speak(ut);
-        }
-
-        // --- GAME LOGIC ---
-        function initGame() {
-            showQuestion(0);
-        }
-
-        function showQuestion(index) {
-            if (index >= gameData.length) {
-                endGame();
-                return;
-            }
-
-            // Reset UI
-            qWrapper.style.display = 'block';
-            mysteryArea.style.display = 'none';
-            balloonsWrapper.innerHTML = '';
+        function setupSounds() {
+            correctSound = new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.05, decay: 0.2, sustain: 0.2, release: 0.5 } }).toDestination();
+            incorrectSound = new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.05, decay: 0.3, sustain: 0, release: 0.2 } }).toDestination();
+            bonusSound = new Tone.PolySynth(Tone.Synth).toDestination();
             
-            balloonsWrapper.style.pointerEvents = 'auto';
-
-            const item = gameData[index];
-            qLabel.innerText = item.label;
-
-            // Calculate the smallest number
-            const winningNumber = Math.min(...item.values);
-
-            // Create 3 balloons
-            item.values.forEach((num, i) => {
-                // Cycle through colors
-                const colorClass = colors[(index * 3 + i) % colors.length];
-                balloonsWrapper.appendChild(createBalloon(num, winningNumber, colorClass));
-            });
+            popSound = new Tone.MembraneSynth({
+                pitchDecay: 0.01,
+                octaves: 5,
+                oscillator: { type: 'sine' },
+                envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.1 }
+            }).toDestination();
         }
 
-        function createBalloon(num, winningNumber, colorClass) {
-            const container = document.createElement('div');
-            container.className = 'balloon-container';
+        const encouragingFeedback = ["Super!", "Awesome!", "Wow!", "Great job!", "So smart!"];
+        
+        // Updated Cuter Icons
+        const numberEmojis = {
+            1: '🦄', // Unicorn
+            2: '🦋', // Butterfly
+            3: '🍓', // Strawberry
+            4: '🧸', // Teddy Bear
+            5: '🐬', // Dolphin
+            6: '🦖', // T-Rex
+            7: '🌻', // Sunflower
+            8: '🍎', // Apple
+            9: '🎈', // Balloon
+            10: '💎' // Diamond
+        };
+        
+        function speak(text) {
+            if (synth.speaking) synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            if(narratorVoice) utterance.voice = narratorVoice;
+            utterance.pitch = 1.3;
+            utterance.rate = 0.9;
+            synth.speak(utterance);
+        }
 
-            container.innerHTML = `
-                <div class="try-again">Try Again!</div>
-                <div class="balloon ${colorClass}">${num}</div>
-                <div class="string"></div>
-                <div class="star-effect">⭐</div>
-            `;
+        function generateQuestions() {
+            questions = [];
+            for (let i = 0; i < totalQuestions / 2; i++) questions.push({ type: 'greatest', numbers: generateUniqueNumbers() });
+            for (let i = 0; i < totalQuestions / 2; i++) questions.push({ type: 'smallest', numbers: generateUniqueNumbers() });
+            
+            // Shuffle
+            for (let i = questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questions[i], questions[j]] = [questions[j], questions[i]];
+            }
+        }
+        
+        function generateUniqueNumbers() {
+            const numbers = new Set();
+            while (numbers.size < 3) numbers.add(Math.floor(Math.random() * 10) + 1);
+            return Array.from(numbers);
+        }
 
-            container.onclick = (e) => {
-                if (balloonsWrapper.style.pointerEvents === 'none') return;
+        function startGame() {
+            startScreen.classList.add('hidden');
+            mainGame.classList.remove('hidden');
+            endScreen.classList.add('hidden');
+            currentQuestionIndex = 0;
+            score = 0;
+            updateScoreDisplay();
+            generateQuestions();
+            
+            if (Tone.context.state !== 'running') Tone.start();
+            setupSounds();
+            
+            displayQuestion();
+        }
 
-                if (num === winningNumber) {
-                    // CORRECT
-                    playSound('pop');
-                    container.classList.add('popped');
-                    // Disable all clicks immediately
-                    balloonsWrapper.style.pointerEvents = 'none';
+        function updateProgressBar() {
+            progressText.textContent = currentQuestionIndex + 1;
+            // Calculate percentage, maxing at 100%
+            const percentage = Math.min(((currentQuestionIndex) / totalQuestions) * 100, 100);
+            progressBar.style.width = `${percentage}%`;
+            
+            // Pulse the bar on update
+            progressBar.classList.remove('opacity-80');
+            progressBar.classList.add('opacity-100');
+        }
 
-                    setTimeout(() => {
-                        startMysteryPhase();
-                    }, 1200);
-                } else {
-                    // INCORRECT
-                    playSound('error');
-                    container.classList.add('shake');
-                    setTimeout(() => container.classList.remove('shake'), 500);
+        function displayQuestion() {
+            balloonContainer.classList.add('hidden');
+            numberOptions.classList.remove('hidden');
+            const question = questions[currentQuestionIndex];
+            
+            // Removed the underline and wavy styling
+            const targetWord = question.type === 'greatest' ? 'BIGGEST' : 'SMALLEST';
+            const questionString = `Find the ${targetWord} number!`;
+            currentQuestionText = `Find the ${question.type} number!`;
+            
+            questionText.innerHTML = `Find the <span class="text-pink-500 font-black">${targetWord}</span> number!`;
+            speak(currentQuestionText);
+            
+            numberOptions.innerHTML = '';
+            
+            // Shuffle card colors
+            const shuffledColors = [...cardColors].sort(() => 0.5 - Math.random());
+            const shuffledTextColors = [...textColors].sort(() => 0.5 - Math.random());
+
+            question.numbers.forEach((num, index) => {
+                const card = document.createElement('div');
+                const bgColor = shuffledColors[index % shuffledColors.length];
+                const txtColor = shuffledTextColors[index % shuffledTextColors.length];
+                
+                card.className = `number-card cursor-pointer ${bgColor} rounded-3xl p-4 md:p-6 w-32 h-44 md:w-48 md:h-60 flex flex-col justify-center items-center relative z-20`;
+                card.dataset.number = num;
+                
+                const numberText = document.createElement('span');
+                numberText.className = `text-7xl md:text-8xl font-black ${txtColor} drop-shadow-sm leading-none`;
+                numberText.textContent = num;
+                
+                const emojiContainer = document.createElement('div');
+                emojiContainer.className = 'text-xl md:text-2xl mt-3 flex flex-wrap justify-center items-center leading-tight max-w-[90%] gap-1';
+                
+                // Add emojis
+                for(let i=0; i<num; i++){
+                    const span = document.createElement('span');
+                    span.textContent = numberEmojis[num];
+                    emojiContainer.appendChild(span);
                 }
-            };
 
-            return container;
+                card.appendChild(numberText);
+                card.appendChild(emojiContainer);
+                card.addEventListener('click', handleAnswer);
+                numberOptions.appendChild(card);
+            });
+            
+            updateProgressBar();
+            nextButton.classList.add('hidden');
+            feedbackText.textContent = '';
+        }
+        
+        function handleAnswer(event) {
+            const selectedCard = event.currentTarget;
+            const selectedNumber = parseInt(selectedCard.dataset.number);
+            const question = questions[currentQuestionIndex];
+            const correctAnswer = question.type === 'greatest' ? Math.max(...question.numbers) : Math.min(...question.numbers);
+
+            document.querySelectorAll('.number-card').forEach(card => {
+                card.removeEventListener('click', handleAnswer);
+                card.style.cursor = 'default';
+                if (parseInt(card.dataset.number) !== correctAnswer) {
+                    card.style.opacity = '0.4';
+                    card.style.transform = 'scale(0.95)';
+                }
+            });
+
+            if (selectedNumber === correctAnswer) {
+                score++;
+                correctSound.triggerAttackRelease("C5", "0.2");
+                selectedCard.classList.add('correct-answer', 'border-4', 'border-green-500');
+                
+                const fb = encouragingFeedback[Math.floor(Math.random() * encouragingFeedback.length)];
+                feedbackText.textContent = fb;
+                feedbackText.className = "text-4xl md:text-5xl font-black text-green-500 drop-shadow-md";
+                
+                // Show balloons after correct answer
+                setTimeout(showBalloons, 1000);
+            } else {
+                incorrectSound.triggerAttackRelease("D3", "0.3");
+                selectedCard.classList.add('incorrect-answer', 'border-4', 'border-red-500');
+                
+                feedbackText.textContent = 'Oops! Try again!';
+                feedbackText.className = "text-3xl md:text-4xl font-black text-red-500";
+                
+                // Highlight the correct one
+                document.querySelector(`.number-card[data-number="${correctAnswer}"]`).classList.add('border-4', 'border-green-500', 'scale-110');
+                nextButton.classList.remove('hidden');
+            }
+            updateScoreDisplay();
         }
 
-        // --- MYSTERY PHASE ---
-        function startMysteryPhase() {
-            qWrapper.style.display = 'none';
-            mysteryArea.style.display = 'flex';
-            boxesContainer.innerHTML = '';
-            mysteryArea.setAttribute('data-locked', 'false');
+        function showBalloons() {
+            const prompt = "Pop the balloons!";
+            currentQuestionText = prompt;
+            questionText.innerHTML = `<span class="text-purple-500">${prompt} 🎈</span>`;
+            speak(prompt);
+            feedbackText.textContent = ''; 
+            
+            numberOptions.classList.add('hidden');
+            balloonContainer.classList.remove('hidden');
+            balloonContainer.innerHTML = '';
+            
+            const numBalloons = 6; // More balloons for the slow flying effect
+            const bonusIndex = Math.floor(Math.random() * numBalloons);
+            const shuffledBColors = [...balloonColors].sort(() => 0.5 - Math.random());
 
-            // Prizes: 1 Trophy, 2 Candies
-            let prizes = ['🏆', '🍬', '🍬'];
-            prizes.sort(() => Math.random() - 0.5);
+            for (let i = 0; i < numBalloons; i++) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'balloon-wrapper';
+                
+                // Random horizontal position (10% to 90%)
+                const randomLeft = Math.floor(Math.random() * 80) + 10;
+                wrapper.style.left = `${randomLeft}%`;
+                
+                // Random animation delay so they don't all come up at once
+                const randomDelay = Math.random() * 2;
+                wrapper.style.animationDelay = `${randomDelay}s`;
 
-            prizes.forEach(prize => {
-                const box = document.createElement('div');
-                box.className = 'mystery-box';
-                box.innerHTML = `
-                    <div class="lid"></div>
-                    <div class="prize">${prize}</div>
-                `;
+                const balloon = document.createElement('div');
+                balloon.className = 'balloon';
+                balloon.style.backgroundColor = shuffledBColors[i % shuffledBColors.length];
+                
+                if (i === bonusIndex) balloon.dataset.bonus = 'true';
+                
+                // We use mousedown/touchstart instead of click for better responsiveness on moving objects
+                balloon.addEventListener('mousedown', popBalloon, { once: true });
+                balloon.addEventListener('touchstart', (e) => {
+                    e.preventDefault(); // Prevent duplicate mouse event
+                    popBalloon({ currentTarget: balloon });
+                }, { once: true });
+                
+                wrapper.appendChild(balloon);
+                balloonContainer.appendChild(wrapper);
+            }
+            
+            // Ensure next button appears even if user doesn't pop balloons
+            setTimeout(() => {
+                nextButton.classList.remove('hidden');
+            }, 3500);
+        }
 
-                box.onclick = () => {
-                    if (box.classList.contains('opened')) return;
-                    if (mysteryArea.getAttribute('data-locked') === 'true') return;
+        function popBalloon(event) {
+            const balloon = event.currentTarget;
+            const isBonus = balloon.dataset.bonus === 'true';
+            
+            popSound.triggerAttackRelease("C6", "0.1");
+            
+            balloon.classList.add('pop-effect');
+            
+            const feedbackMsg = document.createElement('div');
+            feedbackMsg.className = `pop-feedback ${isBonus ? 'text-yellow-500' : 'text-blue-500'}`;
+            feedbackMsg.textContent = isBonus ? "⭐ +1" : "😊";
+            balloon.parentElement.appendChild(feedbackMsg);
 
-                    // Open box
-                    box.classList.add('opened');
-                    playSound('win');
-                    mysteryArea.setAttribute('data-locked', 'true');
+            if (isBonus) {
+                setTimeout(() => bonusSound.triggerAttackRelease(["C5", "E5", "G5"], "0.5"), 100);
+                score++;
+                updateScoreDisplay();
+            }
 
-                    score++;
-                    scoreDisplay.innerText = score;
+            // Immediately show next button upon popping a balloon
+            nextButton.classList.remove('hidden');
+        }
 
-                    // Wait then go to next
-                    setTimeout(() => {
-                        currentQIndex++;
-                        showQuestion(currentQIndex);
-                    }, 2500);
-                };
-                boxesContainer.appendChild(box);
-            });
+        function updateScoreDisplay() {
+            scoreTracker.innerHTML = '';
+            // If score is too big, just show a number instead of repeating stars
+            if (score > 15) {
+                scoreTracker.innerHTML = `⭐ x ${score}`;
+            } else {
+                for(let i=0; i<score; i++) scoreTracker.innerHTML += '⭐';
+            }
+        }
+        
+        function showNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < totalQuestions) {
+                displayQuestion();
+            } else {
+                // Fill bar to 100% on completion
+                progressBar.style.width = `100%`;
+                setTimeout(endGame, 500); // slight delay for visual effect
+            }
+        }
+
+        function triggerFireworks() {
+            const duration = 4 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+            function randomInRange(min, max) {
+              return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+              const timeLeft = animationEnd - Date.now();
+
+              if (timeLeft <= 0) {
+                return clearInterval(interval);
+              }
+
+              const particleCount = 50 * (timeLeft / duration);
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
         }
 
         function endGame() {
-            startConfetti();
-            victoryModal.style.display = 'flex';
-            playSound('win');
-        }
-
-        // --- CONFETTI ---
-        const canvas = document.getElementById('confetti-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function resizeC() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.onresize = resizeC;
-        resizeC();
-
-        function startConfetti() {
-            for(let i=0; i<200; i++) {
-                particles.push({
-                    x: Math.random()*canvas.width, y: Math.random()*canvas.height - canvas.height,
-                    w: Math.random()*10+5, h: Math.random()*10+5,
-                    color: `hsl(${Math.random()*360}, 100%, 50%)`,
-                    speed: Math.random()*5+2, angle: Math.random()*6.2, spin: Math.random()*0.2-0.1
-                });
+            mainGame.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            
+            finalScore.innerHTML = '';
+            // Display stars up to 10 max visually, or just numeric if large
+            const visualStars = Math.min(score, 15);
+            for(let i=0; i<visualStars; i++) {
+                const star = document.createElement('span');
+                star.textContent = '⭐';
+                star.className = 'inline-block drop-shadow-md';
+                star.style.animation = `bounceIn 0.5s ease ${i*50}ms backwards`; 
+                finalScore.appendChild(star);
             }
-            loopConfetti();
+            if(score > visualStars) {
+                const extra = document.createElement('span');
+                extra.textContent = `+${score - visualStars}`;
+                finalScore.appendChild(extra);
+            }
+            
+            const msg = `You got ${score} stars!`;
+            speak(`Hooray! ${msg}`);
+            triggerFireworks();
+            bonusSound.triggerAttackRelease(["C4", "E4", "G4", "C5"], "2n");
         }
 
-        function loopConfetti() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            particles.forEach(p => {
-                p.y += p.speed; p.angle += p.spin; p.x += Math.sin(p.angle);
-                if(p.y > canvas.height) { p.y = -20; p.x = Math.random()*canvas.width; }
-                ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.angle);
-                ctx.fillStyle = p.color; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctx.restore();
-            });
-            requestAnimationFrame(loopConfetti);
-        }
-
-        // Start
-        initGame();
-
+        // Event Listeners
+        startButton.addEventListener('click', startGame);
+        nextButton.addEventListener('click', showNextQuestion);
+        playAgainButton.addEventListener('click', startGame);
+        replayAudioButton.addEventListener('click', () => {
+            if(currentQuestionText) {
+                speak(currentQuestionText);
+            }
+        });
     </script>
 </body>
 </html>

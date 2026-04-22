@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="../assets/brand.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lesson 20 • Final Module Assessment Revision</title>
+  <!-- Font Nunito: Rounded and Friendly -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* --- VIBRANT THEME FOR KIDS (3-6YO) --- */
+    :root{
+      --bg-color: #fff9e6; /* Creamy yellow */
+      --card-bg: #ffffff;
+      --text: #4a4a4a;
+      
+      /* Kid Palette */
+      --c-blue: #4CC9F0;
+      --c-pink: #F72585;
+      --c-yellow: #FFD166;
+      --c-green: #06D6A0;
+      --c-purple: #7209B7;
+      
+      --shadow-color: rgba(0,0,0,0.15);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
+    
+    body{
+      font-family: "Nunito", sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background-color: var(--bg-color);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(247, 37, 133, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(76, 201, 240, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 50% 50%, rgba(255, 209, 102, 0.15) 0%, transparent 30%);
+      overflow-x: hidden;
+    }
+
+    /* Floating Header Logo */
+    .oodles-logo-container {
+        position: fixed; top: 12px; left: 16px; z-index: 10;
+        background: #fff; padding: 8px 16px; border-radius: 99px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        display: flex; align-items: center; gap: 8px;
+        border: 2px solid var(--c-blue);
+    }
+    .oodles-logo-icon { font-size: 24px; animation: bounce 2s infinite; }
+    .oodles-logo-text { font-size: 20px; font-weight: 900; color: var(--c-blue); letter-spacing: 1px; }
+    
+    @keyframes bounce { 0%, 100% {transform: translateY(0);} 50% {transform: translateY(-5px);} }
+
+    .wrap{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 20px 20px;
+      display:grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+      min-height: 100vh;
+    }
+
+    /* --- CARDS & PANELS --- */
+    .card{
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 25px var(--shadow-color);
+      border: 3px solid #fff;
+      overflow: hidden;
+      position: relative;
+      display: flex; flex-direction: column;
+    }
+
+    header{
+      padding: 16px 20px;
+      background: #fdfdfd;
+      border-bottom: 2px dashed #eee;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo {
+      width: 48px; height: 48px; border-radius: 16px;
+      background: #e0f7fa; color: var(--c-blue);
+      display: grid; place-items: center; font-size: 24px;
+      border: 2px solid var(--c-blue);
+    }
+    .t b { display: block; font-size: 16px; color: var(--c-purple); }
+    .t span { display: block; font-size: 13px; color: #888; font-weight: 700; }
+
+    .chips { display: flex; gap: 8px; }
+    .chip {
+      background: var(--c-yellow); color: #7a5c00;
+      border: 2px solid #f0b429;
+      border-radius: 99px; padding: 6px 12px;
+      font-size: 14px; font-weight: 800;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+    }
+
+    /* --- LEFT PANEL --- */
+    .left .body { padding: 20px; background: linear-gradient(to bottom, #fff, #f9f9f9); flex: 1; }
+    .big { font-size: 20px; color: var(--c-pink); margin-bottom: 8px; font-weight: 900; }
+    .sub { font-size: 14px; color: #666; font-weight: 600; line-height: 1.5; }
+
+    .btnrow { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+    .btn {
+      border: none; border-radius: 16px;
+      padding: 12px 20px; font-size: 16px; font-weight: 800;
+      cursor: pointer; transition: transform 0.1s;
+      display: inline-flex; align-items: center; gap: 8px;
+      position: relative;
+    }
+    .btn:active { transform: translateY(4px); box-shadow: none !important; }
+    
+    .btn.primary { background: var(--c-blue); color: white; box-shadow: 0 6px 0 #2a9ec2; }
+    .btn.ghost { background: #f1f5f9; color: #64748b; box-shadow: 0 6px 0 #cbd5e1; }
+    .btn.info { background: var(--c-purple); color: white; box-shadow: 0 6px 0 #560bad; }
+
+    .progress {
+      margin-top: 20px; background: #fff;
+      border: 2px solid #eee; border-radius: 20px; padding: 16px;
+    }
+    .meter {
+      height: 16px; background: #eee; border-radius: 99px; overflow: hidden;
+      border: 2px solid #e2e8f0;
+    }
+    .bar {
+      height: 100%; width: 0%;
+      background: repeating-linear-gradient(45deg, var(--c-green), var(--c-green) 10px, #4ade80 10px, #4ade80 20px);
+      transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .small { font-size: 13px; color: #64748b; font-weight: 700; }
+
+    /* Skills Grid */
+    .skills { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .skill {
+      background: #fff; border: 2px solid #e2e8f0; border-radius: 18px;
+      padding: 8px 10px; display: flex; align-items: center; gap: 10px;
+      cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 4px 0 #e2e8f0; min-width: 0;
+    }
+    .skill:hover { transform: translateY(-3px); border-color: var(--c-blue); }
+    
+    /* MODIFIED: Dimmed look and non-clickable state for completed skills */
+    .skill.done {
+        opacity: 0.5;
+        filter: grayscale(0.5);
+        pointer-events: none;
+        border-color: var(--c-green);
+        background: #f0fdf4;
+        box-shadow: none;
+        transform: none !important;
+    }
+    
+    .sico {
+      width: 36px; height: 36px; border-radius: 12px;
+      background: #fff0f6; color: var(--c-pink);
+      display: grid; place-items: center; font-size: 18px;
+      border: 2px solid #fcc2d7; flex-shrink: 0;
+    }
+    .skill div:last-child { flex: 1; min-width: 0; display:flex; flex-direction:column; justify-content:center; }
+    .skill b { font-size: 12px; color: #334155; display:block; line-height: 1.2; }
+    .skill span { font-size: 10px; font-weight: 700; color: #94a3b8; display:block; }
+
+    /* --- RIGHT PANEL --- */
+    .right .stage { padding: 20px; background: #ecfeff; flex: 1; display: flex; flex-direction: column;}
+    .panel {
+      background: #fff; border-radius: 24px; border: 4px solid var(--c-blue);
+      padding: 20px; flex: 1; position: relative;
+      box-shadow: 0 12px 0 rgba(76, 201, 240, 0.3);
+      overflow-y: auto;
+    }
+
+    .qtop { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .qtitle { font-size: 18px; color: var(--c-blue); font-weight: 800; }
+    .tag { background: var(--c-yellow); color: #854d0e; padding: 6px 12px; border-radius: 20px; font-weight: 800; font-size: 13px; }
+
+    .question { background: #fff; border: 3px dashed #cbd5e1; border-radius: 20px; padding: 20px; margin-bottom: 20px; }
+    .prompt { font-size: 24px; color: #1e293b; margin: 0; line-height: 1.3; font-weight: 800; }
+    .speak-btn {
+      width: 44px; height: 44px; background: var(--c-blue); color: white;
+      border-radius: 50%; display: grid; place-items: center; font-size: 20px;
+      cursor: pointer; box-shadow: 0 4px 0 #2a9ec2; flex-shrink: 0;
+    }
+
+    .choices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .choice {
+      background: #fff; border: 3px solid #e2e8f0; border-radius: 20px;
+      padding: 16px; font-size: 20px; color: #334155; font-weight: 900;
+      min-height: 70px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 6px 0 #cbd5e1; transition: 0.1s;
+    }
+    .choice.correct { background: #dcfce7; border-color: var(--c-green); color: var(--c-green); box-shadow: 0 6px 0 #16a34a; }
+    .choice.wrong { background: #fee2e2; border-color: var(--c-pink); color: var(--c-pink); box-shadow: 0 6px 0 #d90429; }
+
+    .feedback { margin-top: 20px; padding: 16px; border-radius: 16px; background: #fff; border: 4px solid; display: none; flex-direction: column; gap: 12px; }
+    .feedback.good { border-color: var(--c-green); background: #f0fdf4; }
+    .feedback.bad { border-color: var(--c-pink); background: #fff1f2; }
+
+    .explain-box { background: #fff; border: 2px dashed var(--c-blue); border-radius: 16px; padding: 14px; font-size: 15px; color: #334155; line-height: 1.4; }
+
+    /* --- Visual Utilities --- */
+    .vis-box { display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; padding: 15px; background: #f8fafc; border-radius: 15px; margin-top: 10px; }
+    
+    /* Better Clock Fixed Alignment */
+    .clock { width: 180px; height: 180px; border: 10px solid var(--c-blue); border-radius: 50%; position: relative; background: #fff; margin: 0 auto; box-shadow: 0 6px 0 rgba(76, 201, 240, 0.2); }
+    .clock-center { position: absolute; width: 14px; height: 14px; background: #334155; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; border: 2px solid white; }
+    .hand { position: absolute; left: 50%; top: 50%; transform-origin: 50% 100%; border-radius: 10px; z-index: 5; }
+    .hand.hour { width: 8px; height: 45px; background: #334155; transform: translate(-50%, -100%); }
+    .hand.minute { width: 5px; height: 70px; background: var(--c-blue); transform: translate(-50%, -100%); }
+    .clock-num { position: absolute; font-weight: 900; color: #334155; font-size: 16px; transform: translate(-50%, -50%); }
+    .clock-tick { position: absolute; width: 2px; height: 8px; background: #cbd5e1; left: 50%; top: 50%; }
+
+    /* Interactive Cakes */
+    .interactive-cake { font-size: 36px; cursor: pointer; transition: 0.3s; filter: opacity(1); user-select: none; display: inline-block; margin: 4px; }
+    .interactive-cake.hidden { filter: opacity(0.2) grayscale(1); transform: scale(0.8); }
+
+    /* Comparison Boxes */
+    .group-box { flex: 1; min-width: 100px; background: #fff; border: 2px solid #e2e8f0; border-radius: 15px; padding: 12px; text-align: center; box-shadow: 0 4px 0 #e2e8f0; }
+    .group-label { display: block; font-weight: 900; color: var(--c-purple); margin-bottom: 5px; font-size: 16px; }
+    .group-icons { font-size: 22px; letter-spacing: -3px; line-height: 1.1; display: block; min-height: 44px; word-break: break-all; }
+
+    /* Measure Objects */
+    .measure-item { display: flex; align-items: center; gap: 15px; width: 100%; margin-bottom: 10px; }
+    .measure-obj { font-size: 32px; display: inline-block; filter: drop-shadow(2px 2px 0px white); }
+
+    .summary-container { background: #fff; border: 3px solid var(--c-purple); border-radius: 16px; max-height: 250px; margin-top: 20px; width: 100%; overflow-y: auto; }
+    .sum-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+    .sum-table th { background: #f3e8ff; color: var(--c-purple); padding: 8px; position: sticky; top: 0; }
+    .sum-table td { padding: 8px; border-bottom: 1px solid #f3f4f6; }
+
+    #bonusGame { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.98); z-index: 20; display:none; flex-direction:column; }
+    #bonusCanvas { flex:1; cursor: crosshair; }
+
+    @media (max-width: 900px){
+      .wrap{ grid-template-columns: 1fr; padding-top: 70px;}
+      .choices { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+  <div class="oodles-logo-container">
+    <div class="oodles-logo-icon">🍭</div>
+    <div class="oodles-logo-text">OODLES FINAL</div>
+  </div>
+  
+  <div class="wrap">
+    <!-- LEFT SIDEBAR -->
+    <section class="card left">
+      <header>
+        <div class="brand">
+          <div class="logo">🏆</div>
+          <div class="t"><b>Final Review</b><span>Lesson 20 • Module End</span></div>
+        </div>
+        <div class="chips">
+          <div class="chip" id="chipScore">⭐ 0</div>
+          <div class="chip" id="chipQ">🧩 0/10</div>
+        </div>
+      </header>
+
+      <div class="body">
+        <div class="big">Final Challenge! 🎓</div>
+        <div class="sub">Finish all 10 topics to get your certificate!</div>
+
+        <div class="btnrow">
+          <button class="btn primary" id="startBtn">▶ Play</button>
+          <button class="btn ghost" onclick="location.reload()">🔄 Reset</button>
+        </div>
+
+        <div class="progress">
+          <div class="small"><b>Overall Progress</b></div>
+          <div class="meter"><div class="bar" id="bar"></div></div>
+        </div>
+
+        <div class="skills" id="skillGrid"></div>
+      </div>
+    </section>
+
+    <!-- MAIN GAME AREA -->
+    <section class="card right">
+      <div class="stage">
+        <div class="panel">
+          <!-- Welcome Screen -->
+          <div id="welcome" style="text-align:center; padding: 40px 0;">
+            <div style="font-size:80px; margin-bottom:10px;">🌈</div>
+            <h2 style="font-size: 32px; color: var(--c-purple);">Grand Final Exam</h2>
+            <p style="font-size: 18px; color: #666;">Prove your math skills across 10 topics!</p>
+          </div>
+
+          <!-- Quiz Screen -->
+          <div id="quiz" style="display:none;">
+            <div class="qtop">
+              <div class="qtitle" id="qTitle">Question 1</div>
+              <div class="tag" id="qTag">Topic Name</div>
+            </div>
+
+            <div class="question">
+              <div style="display:flex; align-items:start; gap:15px;">
+                <p class="prompt" id="qPrompt">Question text?</p>
+                <div class="speak-btn" id="speakBtn">🔊</div>
+              </div>
+              <div class="vis-box" id="visBox"></div>
+            </div>
+            
+            <div class="choices" id="choices"></div>
+
+            <div class="feedback" id="feedback">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <b id="fbMsg" style="font-size:20px;">Correct!</b>
+                <div id="fbBtns" style="display:flex; gap:10px;"></div>
+              </div>
+              <div class="explain-box" id="explainBox"></div>
+            </div>
+          </div>
+
+          <!-- Finish Screen -->
+          <div id="finish" style="display:none; text-align:center;">
+            <div style="font-size:80px;">👑</div>
+            <h2 style="font-size:36px; color: var(--c-blue);">Final Results!</h2>
+            <p id="finalText" style="font-size:18px; color:#555;"></p>
+            <div id="summary" class="summary-container"></div>
+            <div class="btnrow" style="justify-content:center; margin-top:20px;">
+              <button class="btn primary" id="bonusBtn">🎈 Pop Bubbles!</button>
+              <button class="btn ghost" onclick="location.reload()">🔄 Play Again</button>
+            </div>
+          </div>
+
+          <!-- Bonus Game Overlay -->
+          <div id="bonusGame">
+            <div style="padding:15px; display:flex; justify-content:space-between; align-items:center; background:#fff; border-bottom:1px solid #eee;">
+               <b style="color:var(--c-blue);">🎈 Pop Bubbles! Score: <span id="bScore">0</span></b>
+               <b id="bTimer" style="background:var(--c-pink); color:white; padding:4px 10px; border-radius:20px;">20s</b>
+               <button class="btn ghost" style="padding:5px 10px;" onclick="stopBonus()">Close</button>
+            </div>
+            <canvas id="bonusCanvas"></canvas>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+<script>
+  // --- Audio ---
+  const speak = (txt) => {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(txt);
+    u.rate = 0.9; window.speechSynthesis.speak(u);
+  };
+
+  // Global helper for interactive items
+  window.toggleItem = (el) => {
+      el.classList.toggle('hidden');
+  };
+
+  // --- Skill Data ---
+  const skills = [
+    { key:"compare", icon:"⚖️", name:"Compare", sub:"Group A, B, C" },
+    { key:"ordinal", icon:"🔢", name:"Ordinal", sub:"1st to 10th" },
+    { key:"pattern", icon:"🧩", name:"Patterns", sub:"ABC Sequences" },
+    { key:"add", icon:"➕", name:"Addition Story", sub:"Combine" },
+    { key:"sub", icon:"➖", name:"Subtraction Story", sub:"Take Away" },
+    { key:"mixed", icon:"📖", name:"Mixed Story", sub:"Combined Logic" },
+    { key:"shape", icon:"🧊", name:"Shapes", sub:"3D Geometry" },
+    { key:"graph", icon:"📊", name:"Graphs", sub:"Data Reading" },
+    { key:"time", icon:"⏰", name:"Clock", sub:"Hours & Minutes" },
+    { key:"measure", icon:"📏", name:"Measure", sub:"Length & Weight" }
+  ];
+
+  // --- Builders ---
+  const rand = (a, b) => Math.floor(Math.random()*(b-a+1))+a;
+  const shuffle = (arr) => arr.sort(()=>Math.random()-0.5);
+
+  const BUILDERS = {
+    compare: () => {
+      // UPDATED: bigger range (7–20) and no number shown under groups
+      let n1 = rand(7, 20), n2 = rand(7, 20), n3 = rand(7, 20);
+      // make them not all the same (simple re-roll)
+      while(n2 === n1) n2 = rand(7, 20);
+      while(n3 === n1 || n3 === n2) n3 = rand(7, 20);
+
+      const groups = [{id:"A", n:n1}, {id:"B", n:n2}, {id:"C", n:n3}];
+      const askMost = Math.random() > 0.5;
+      const sorted = [...groups].sort((a,b)=>b.n - a.n);
+      const target = askMost ? sorted[0] : sorted[2];
+
+      const vis = groups.map(g => `
+        <div class="group-box">
+          <span class="group-label">Group ${g.id}</span>
+          <span class="group-icons">${"⭐".repeat(g.n)}</span>
+        </div>
+      `).join("");
+
+      return {
+        tag: "Comparing",
+        text: `Which group has the ${askMost ? "MOST" : "LEAST"} stars?`,
+        vis: `<div style="display:flex; gap:10px; width:100%">${vis}</div>`,
+        choices: ["Group A", "Group B", "Group C"],
+        answer: `Group ${target.id}`,
+        explain: `Count the stars. Group ${target.id} has the ${askMost ? "most" : "least"}!`
+      };
+    },
+    ordinal: () => {
+      const row = ["🍎","🍌","🍇","🍒","🍓","🍊","🍐","🍍","🍉","🥝"];
+      const pos = rand(1, 10);
+      const names = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"];
+      return {
+        tag: "Ordinal", text: `Which fruit is in the ${names[pos-1]} position?`,
+        vis: `<div style="font-size:26px; letter-spacing:4px; background:white; padding:12px; border-radius:12px; border:2px solid #e2e8f0;">${row.join("")}</div>`,
+        choices: shuffle([row[pos-1], ...shuffle(row.filter(x=>x!==row[pos-1])).slice(0,3)]),
+        answer: row[pos-1],
+        explain: `Count from the left: 1, 2, 3... The ${names[pos-1]} item is ${row[pos-1]}!`
+      };
+    },
+    pattern: () => {
+      const type = rand(0, 2);
+      let seq, ans, patternDesc;
+      if(type === 0) {
+         const a = rand(1, 4), b = rand(5, 9); seq = [a, b, a, b, "?"]; ans = a; patternDesc = `${a}, ${b}, ${a}, ${b}`;
+      } else if(type === 1) {
+         const a = rand(1, 3), b = rand(4, 7); seq = [a, a, b, a, a, "?"]; ans = b; patternDesc = `${a}, ${a}, ${b}`;
+      } else {
+         const a = rand(1, 3), b = rand(4, 6), c = rand(7, 9); seq = [a, b, c, a, b, "?"]; ans = c; patternDesc = `${a}, ${b}, ${c}`;
+      }
+      return {
+        tag: "Patterns", text: "What number comes next in the pattern?",
+        vis: `<div style="font-size:42px; font-weight:900; color:var(--c-purple);">${seq.join(" , ")}</div>`,
+        choices: shuffle([ans, rand(0,9), rand(0,9), rand(0,9)]).filter((v,i,a)=>a.indexOf(v)===i).slice(0,4).map(String), 
+        answer: String(ans),
+        explain: `The pattern repeats: ${patternDesc}. So ${ans} must be next!`
+      };
+    },
+    add: () => {
+      const a = rand(6, 12), b = rand(4, 8);
+      const res = a + b;
+      return {
+        tag: "Addition Story", text: `There are ${a} birds 🦜 on a tree. ${b} more fly in. How many birds are there now?`,
+        vis: `<div style="font-size:32px; font-weight:900;">${a} + ${b} = ?</div>`,
+        choices: shuffle([res, res-1, a, b]).map(String), answer: String(res),
+        explain: `Start at ${a} and count forward ${b} steps. You reach ${res}!`
+      };
+    },
+    sub: () => {
+      const a = rand(10, 20);
+      const b = rand(2, 9);
+      const res = a - b;
+      let cakesHtml = "";
+      for(let i=0; i<a; i++) {
+          cakesHtml += `<span class="interactive-cake" onclick="toggleItem(this)">🧁</span>`;
+      }
+      return {
+        tag: "Subtraction Story", text: `Mia has ${a} cupcakes 🧁. She gives ${b} to her friends. How many are left?`,
+        vis: `<div>
+                <div style="background:#fff; padding:10px; border-radius:10px; border:2px dashed #eee; margin-bottom:12px; text-align:center;">
+                  ${cakesHtml}
+                  <div style="font-size:12px; color:#888; margin-top:6px;">Tap cupcakes to "eat" them!</div>
+                </div>
+                <div style="font-size:32px; font-weight:900; text-align:center;">${a} - ${b} = ?</div>
+              </div>`,
+        choices: shuffle([res, res+1, res-1, a]).map(String), answer: String(res),
+        explain: `If you take away ${b} cupcakes from ${a}, you have ${res} left!`
+      };
+    },
+    mixed: () => {
+      const start = rand(10, 15), lost = rand(2, 5), gain = rand(2, 6);
+      const res = start - lost + gain;
+      return {
+        tag: "Mixed Story", text: `I had ${start} balls ⚽. I lost ${lost}, but then I found ${gain} more. How many balls do I have now?`,
+        vis: `<div style="font-size:28px; font-weight:900;">${start} - ${lost} + ${gain} = ?</div>`,
+        choices: shuffle([res, start-lost, start+gain, res+2]).map(String), answer: String(res),
+        explain: `${start} - ${lost} = ${start-lost}. Then ${start-lost} + ${gain} = ${res}.`
+      };
+    },
+    shape: () => {
+      // UPDATED: clearer icons + real-world examples (matches your reference)
+      const shapes = [
+        { n: "Cube", ex: [{e:"🎲", l:"Dice"}, {e:"🧊", l:"Ice Cube"}] },
+        { n: "Cuboid", ex: [{e:"📦", l:"Box"}, {e:"📕", l:"Book"}] },
+        { n: "Sphere", ex: [{e:"⚽", l:"Ball"}, {e:"🍊", l:"Orange"}] },
+        { n: "Cylinder", ex: [{e:"🥫", l:"Can"}, {e:"🔋", l:"Battery"}] },
+        { n: "Cone", ex: [{e:"🍦", l:"Ice Cream"}, {e:"📣", l:"Megaphone"}] },
+        { n: "Pyramid", ex: [{e:"🗻", l:"Pyramid"}, {e:"🔺", l:"Pyramid"}] },
+        { n: "Prism", ex: [{e:"🍰", l:"Cake Slice"}, {e:"🧀", l:"Cheese"}] }
+      ];
+
+      const target = shapes[rand(0, shapes.length-1)];
+
+      const exHtml = target.ex.map(x => `
+        <div style="background:#fff; border:2px solid #e2e8f0; border-radius:16px; padding:12px 14px; min-width:140px; box-shadow:0 4px 0 #e2e8f0;">
+          <div style="font-size:54px; line-height:1;">${x.e}</div>
+          <div style="margin-top:6px; font-weight:900; color:#334155;">${x.l}</div>
+        </div>
+      `).join("");
+
+      return {
+        tag: "Geometry",
+        text: `Which 3D shape matches these examples?`,
+        vis: `<div style="display:flex; justify-content:center; gap:14px; flex-wrap:wrap; width:100%;">
+                ${exHtml}
+              </div>`,
+        // FIX: always include the correct answer in the 4 choices
+        choices: (() => {
+          const others = shuffle(shapes.map(x => x.n).filter(n => n !== target.n));
+          return shuffle([target.n, ...others.slice(0, 3)]);
+        })(),
+        answer: target.n,
+        explain: `These examples have the same 3D shape: ${target.n}.`
+      };
+    },
+    graph: () => {
+      const data = shuffle([ {l:"🐶", n:5}, {l:"🐱", n:8}, {l:"🐰", n:4} ]);
+      const sorted = [...data].sort((a,b)=>b.n - a.n);
+      return {
+        tag: "Graphing", text: "Which pet is the most popular in the graph?",
+        vis: `<div style="width:100%; max-width:400px; padding:15px; background:white; border-radius:15px; border:3px solid #e2e8f0;">
+                ${data.map(x=>`
+                  <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                    <div style="font-size:24px; min-width:40px;">${x.l}</div>
+                    <div style="flex:1; height:30px; background:#f1f5f9; border-radius:10px; overflow:hidden; border:1px solid #ddd;">
+                      <div style="width:${x.n*10}%; height:100%; background:linear-gradient(90deg, var(--c-blue), #9be8ff); display:flex; align-items:center; padding-left:10px; color:white; font-weight:900;">${x.n}</div>
+                    </div>
+                  </div>
+                `).join("")}
+              </div>`,
+        choices: ["🐶 Dog", "🐱 Cat", "🐰 Rabbit"], answer: sorted[0].l === "🐶" ? "🐶 Dog" : (sorted[0].l === "🐱" ? "🐱 Cat" : "🐰 Rabbit"),
+        explain: `The bar for ${sorted[0].l} is the longest one!`
+      };
+    },
+    time: () => {
+      const hr = rand(1, 12);
+      let numsHtml = "";
+      for(let i=1; i<=12; i++){
+        const angle = (i * 30) * (Math.PI / 180);
+        const x = 50 + 38 * Math.sin(angle);
+        const y = 50 - 38 * Math.cos(angle);
+        numsHtml += `<div class="clock-num" style="left:${x}%; top:${y}%">${i}</div>`;
+      }
+      let ticksHtml = "";
+      for(let i=0; i<12; i++) {
+          ticksHtml += `<div class="clock-tick" style="transform: translate(-50%, -50%) rotate(${i*30}deg) translateY(-76px)"></div>`;
+      }
+      return {
+        tag: "Time", text: "What time is shown on the clock?",
+        vis: `<div class="clock">
+                ${ticksHtml}
+                ${numsHtml}
+                <div class="hand hour" style="transform:translate(-50%, -100%) rotate(${hr*30}deg)"></div>
+                <div class="hand minute" style="transform:translate(-50%, -100%) rotate(0deg)"></div>
+                <div class="clock-center"></div>
+              </div>`,
+        choices: [`${hr}:00`, `${hr}:30`, `12:00`, `6:00`], answer: `${hr}:00`,
+        explain: `The hour hand points exactly at ${hr}. It is ${hr}:00!`
+      };
+    },
+    measure: () => {
+      const type = rand(0, 1);
+
+      /* =====================
+         PART A – LENGTH (Objects fixed A, B, C + nicer blocks)
+      ====================== */
+      if(type === 0) {
+        const askLongest = Math.random() > 0.5;
+
+        // FIXED ORDER A, B, C
+        const items = [
+          {id:"A", h:7},
+          {id:"B", h:9},
+          {id:"C", h:4}
+        ];
+
+        const sorted = [...items].sort((a,b)=>b.h - a.h);
+        const target = askLongest ? sorted[0] : sorted[2];
+
+        return {
+          tag:"Measurement",
+          text:`Which object is the ${askLongest ? "TALLEST" : "SHORTEST"}?`,
+          vis:`<div style="display:flex; justify-content:center; align-items:flex-end; gap:70px; width:100%; padding:25px 0;">
+                ${items.map(it=>`
+                  <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+                    <div style="display:flex; flex-direction:column-reverse; gap:6px;">
+                      ${Array.from({length:it.h}).map((_,i)=>
+                        `<div style="width:40px; height:40px; background:linear-gradient(145deg,#FFD166,#F4A261); border-radius:10px; box-shadow:0 4px 0 rgba(0,0,0,0.2); border:2px solid #fff;"></div>`
+                      ).join('')}
+                    </div>
+                    <div style="background:#fff; padding:6px 12px; border-radius:20px; font-weight:900; color:var(--c-purple); box-shadow:0 4px 0 rgba(0,0,0,0.1);">
+                      Object ${it.id}
+                    </div>
+                  </div>
+                `).join('')}
+               </div>`,
+          choices:["Object A","Object B","Object C"],
+          answer:`Object ${target.id}`,
+          explain:`Count the blocks. Object ${target.id} has the ${askLongest ? "most" : "fewest"} blocks.`
+        };
+      }
+
+      /* =====================
+         PART B – BEAUTIFUL DIGITAL SCALE (Fixed A, B, C order)
+      ====================== */
+
+      const fruits = [
+        {id:"A", emoji:"🍎", name:"Apple", w:210},
+        {id:"B", emoji:"🍌", name:"Banana", w:120},
+        {id:"C", emoji:"🍉", name:"Watermelon", w:900}
+      ];
+
+      const askHeaviest = Math.random() > 0.5;
+      const sorted = [...fruits].sort((a,b)=>b.w - a.w);
+      const target = askHeaviest ? sorted[0] : sorted[2];
+
+      return {
+        tag:"Measurement",
+        text:`Which fruit is the ${askHeaviest ? "HEAVIEST" : "LIGHTEST"}?`,
+        vis:`<div style="display:flex; justify-content:center; gap:50px; flex-wrap:wrap; width:100%; padding:20px 0;">
+              ${fruits.map(f=>`
+                <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+                  <div style="background:linear-gradient(145deg,#e2e8f0,#cbd5e1); padding:18px; border-radius:24px; box-shadow:0 8px 0 rgba(0,0,0,0.15); width:180px; text-align:center; border:3px solid #fff;">
+                    <div style="font-size:60px; margin-bottom:10px;">${f.emoji}</div>
+                    <div style="background:#111827; color:#22c55e; font-family:monospace; font-size:22px; padding:8px 12px; border-radius:10px; box-shadow: inset 0 0 10px rgba(0,255,100,0.4);">
+                      ${f.w} g
+                    </div>
+                  </div>
+                  <div style="background:#fff; padding:6px 12px; border-radius:20px; font-weight:900; color:var(--c-purple); box-shadow:0 4px 0 rgba(0,0,0,0.1);">
+                    Object ${f.id}
+                  </div>
+                </div>
+              `).join('')}
+             </div>`,
+        choices:["Apple","Banana","Watermelon"],
+        answer:target.name,
+        explain:`${target.name} is the ${askHeaviest ? "heaviest" : "lightest"} fruit.`
+      };
+    }
+  };
+
+  // --- Game Engine ---
+  let score = 0, currentIdx = 0, isLocked = false, qData = null, history = [], skillState = {};
+
+  const renderSkills = () => {
+    const grid = document.getElementById("skillGrid");
+    grid.innerHTML = "";
+    skills.forEach((s, i) => {
+      const div = document.createElement("div");
+      const isDone = skillState[s.key] === true;
+      div.className = `skill ${isDone ? 'done' : ''}`;
+      div.innerHTML = `<div class="sico">${isDone ? "✅" : s.icon}</div><div><b>${s.name}</b><span>${s.sub}</span></div>`;
+      div.onclick = () => { if (!isDone) jumpToSkill(i); };
+      grid.appendChild(div);
+    });
+  };
+
+  const jumpToSkill = (i) => {
+    if(document.getElementById("quiz").style.display === "none") return;
+    currentIdx = i;
+    loadQuestion();
+  };
+
+  const start = () => {
+    score = 0; currentIdx = 0; history = []; skillState = {};
+    document.getElementById("welcome").style.display = "none";
+    document.getElementById("finish").style.display = "none";
+    document.getElementById("quiz").style.display = "block";
+    loadQuestion();
+  };
+
+  const loadQuestion = () => {
+    isLocked = false;
+    const key = skills[currentIdx].key;
+    qData = BUILDERS[key]();
+    
+    document.getElementById("qTitle").textContent = `Question ${currentIdx + 1}/10`;
+    document.getElementById("qTag").textContent = qData.tag;
+    document.getElementById("qPrompt").textContent = qData.text;
+    document.getElementById("visBox").innerHTML = qData.vis;
+    document.getElementById("feedback").style.display = "none";
+    
+    const choiceBox = document.getElementById("choices");
+    choiceBox.innerHTML = "";
+    qData.choices.forEach(c => {
+      const div = document.createElement("div");
+      div.className = "choice";
+      div.textContent = c;
+      div.onclick = () => checkAns(div, c);
+      choiceBox.appendChild(div);
+    });
+
+    updateUI();
+  };
+
+  const checkAns = (el, val) => {
+    if(isLocked) return;
+    const isCorrect = val === qData.answer;
+    isLocked = true;
+    
+    if(isCorrect) {
+      score++;
+      el.classList.add("correct");
+      skillState[skills[currentIdx].key] = true;
+      showFeedback(true);
+    } else {
+      el.classList.add("wrong");
+      showFeedback(false);
+    }
+    history.push({ q: qData.text, a: qData.answer, ok: isCorrect });
+  };
+
+  const showFeedback = (ok) => {
+    const fb = document.getElementById("feedback");
+    fb.style.display = "flex";
+    fb.className = "feedback " + (ok ? "good" : "bad");
+    document.getElementById("fbMsg").textContent = ok ? "🎉 Excellent!" : "💡 Let's learn!";
+    document.getElementById("explainBox").textContent = qData.explain;
+    
+    const btns = document.getElementById("fbBtns");
+    btns.innerHTML = "";
+    
+    if(!ok) {
+       const retry = document.createElement("button");
+       retry.className = "btn primary"; retry.textContent = "Try Again";
+       retry.onclick = () => { isLocked = false; fb.style.display = "none"; document.querySelectorAll(".choice.wrong").forEach(x=>x.classList.remove("wrong")); };
+       btns.appendChild(retry);
+    }
+
+    const next = document.createElement("button");
+    next.className = "btn info";
+    next.textContent = "Continue ➜";
+    next.onclick = () => { 
+        const nextUndone = skills.findIndex((s, idx) => !skillState[s.key]);
+        if (nextUndone !== -1) {
+            currentIdx = nextUndone;
+            loadQuestion();
+        } else {
+            finish();
+        }
+    };
+    btns.appendChild(next);
+    renderSkills();
+  };
+
+  const updateUI = () => {
+    document.getElementById("chipScore").textContent = `⭐ ${score}`;
+    document.getElementById("chipQ").textContent = `🧩 ${Object.keys(skillState).length}/10`;
+    document.getElementById("bar").style.width = `${(Object.keys(skillState).length/10)*100}%`;
+    renderSkills();
+  };
+
+  const finish = () => {
+    document.getElementById("quiz").style.display = "none";
+    document.getElementById("finish").style.display = "block";
+    document.getElementById("finalText").innerHTML = `Awesome! You completed the review with <b>${score}/10</b> stars!`;
+    document.getElementById("bar").style.width = "100%";
+    
+    let table = `<table class="sum-table"><thead><tr><th>Result</th><th>Summary</th></tr></thead><tbody>`;
+    history.forEach(h => {
+      table += `<tr><td>${h.ok?'✅':'❌'}</td><td><b>Q:</b> ${h.q}<br><b>Ans:</b> ${h.a}</td></tr>`;
+    });
+    document.getElementById("summary").innerHTML = table + "</tbody></table>";
+  };
+
+  // --- Bonus Game ---
+  let bActive = false, bScore = 0, bTime = 20, bInt, bubbles = [];
+  const canvas = document.getElementById("bonusCanvas");
+  const ctx = canvas.getContext("2d");
+
+  const startBonus = () => {
+    document.getElementById("bonusGame").style.display = "flex";
+    canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+    bScore = 0; bTime = 20; bActive = true; bubbles = [];
+    document.getElementById("bScore").textContent = "0";
+    bInt = setInterval(() => { bTime--; document.getElementById("bTimer").textContent = bTime+'s'; if(bTime<=0) stopBonus(); }, 1000);
+    bonusLoop();
+  };
+
+  const stopBonus = () => { bActive = false; clearInterval(bInt); document.getElementById("bonusGame").style.display = "none"; };
+
+  const bonusLoop = () => {
+    if(!bActive) return;
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+    if(Math.random() < 0.05) bubbles.push({x: Math.random()*canvas.width, y: canvas.height+50, r: 25+Math.random()*20, s: 1+Math.random()*3, c: `hsl(${Math.random()*360},70%,70%)`});
+    bubbles.forEach((b, i) => {
+      b.y -= b.s;
+      ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+      ctx.fillStyle = b.c; ctx.fill(); ctx.strokeStyle="#fff"; ctx.stroke();
+      if(b.y < -50) bubbles.splice(i, 1);
+    });
+    requestAnimationFrame(bonusLoop);
+  };
+
+  canvas.onmousedown = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    bubbles.forEach((b, i) => {
+      if(Math.hypot(mx-b.x, my-b.y) < b.r) { bubbles.splice(i,1); bScore++; document.getElementById("bScore").textContent = bScore; }
+    });
+  };
+
+  document.getElementById("startBtn").onclick = start;
+  document.getElementById("bonusBtn").onclick = startBonus;
+  document.getElementById("speakBtn").onclick = () => speak(qData.text);
+  
+  renderSkills();
+</script>
+</body>
+</html>

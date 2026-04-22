@@ -1,753 +1,880 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="../assets/brand.css">
+    <link rel="stylesheet" href="../assets/brand.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fun Measurement Class</title>
+    <title>Bridge Master V7: Kids Counting</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
+        :root {
+            --sky-top: #1cb0f6;      
+            --sky-bottom: #89d4fb;   
+            --hill-back: #2ebd59;    
+            --hill-front: #58cc02;   
+            --water-main: #0284c7;   
+            --water-wave: #38bdf8;   
+            --btn-green: #58cc02;
+            --btn-green-shadow: #58a700;
+        }
 
         body {
-            font-family: 'Fredoka', sans-serif;
-            /* Thay đổi nền thành bầu trời xanh */
-            background: linear-gradient(to bottom, #7DD3FC, #E0F2FE);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
-            touch-action: manipulation;
+            touch-action: none;
+            user-select: none;
+            background: var(--sky-bottom);
         }
 
-        .wood-table {
-            background: linear-gradient(180deg, #FCD34D 0%, #F59E0B 100%);
-            border-top: 16px solid #D97706;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
-            border-radius: 20px 20px 0 0;
-            margin: 0 10px;
-        }
-
-        .game-object {
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            position: relative;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
-        }
-
-        .game-object:active {
-            transform: scale(0.95);
-        }
-
-        .game-object:hover {
-            filter: brightness(1.05) drop-shadow(0 6px 8px rgba(0,0,0,0.15));
-            transform: translateY(-5px);
-        }
-
-        /* Animations */
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        @keyframes wiggle {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-5deg); }
-            75% { transform: rotate(5deg); }
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        @keyframes floatClouds {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-30px); }
-        }
-
-        .animate-bounce-happy {
-            animation: bounce 0.6s infinite;
-        }
-
-        .animate-wiggle {
-            animation: wiggle 0.4s ease-in-out;
-        }
-
-        .animate-pop {
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        .cloud-anim {
-            animation: floatClouds 4s infinite alternate ease-in-out;
+        /* --- BACKGROUND --- */
+        #bg-container {
             position: absolute;
-            z-index: 0; /* Đặt mây ở dưới cùng */
-            pointer-events: none;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-bottom) 100%);
+            z-index: 0;
+            overflow: hidden;
         }
 
-        /* Star styling */
-        .star-icon {
-            filter: drop-shadow(0px 2px 0px rgba(0,0,0,0.2));
+        .hill {
+            position: absolute;
+            bottom: 10%; 
+            width: 150%;
+            height: 40%;
+            border-radius: 100% 100% 0 0;
+        }
+        .hill-back {
+            left: -20%;
+            background: var(--hill-back);
+            transform: rotate(-5deg);
+            z-index: 1;
+        }
+        .hill-front {
+            left: -10%;
+            background: var(--hill-front);
+            transform: rotate(3deg);
+            z-index: 2;
         }
 
-        .speech-bubble {
-            position: relative;
-            background: #ffffff;
-            border-radius: 1em;
-            border: 4px solid #60A5FA;
-            z-index: 20;
-        }
-        .speech-bubble:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border: 12px solid transparent;
-            border-top-color: #60A5FA;
-            border-bottom: 0;
-            margin-left: -12px;
-            margin-bottom: -12px;
-        }
-
-        /* Mini-game Styles */
-        #mini-game-layer {
-            background: linear-gradient(180deg, #A5F3FC 0%, #E0F2FE 100%);
-        }
-        .basket {
-            bottom: 30px;
-            width: 110px;
-            height: 70px;
-            background: #A0522D; /* Sienna */
-            border-radius: 10px 10px 30px 30px;
-            border: 4px solid #8B4513;
-            position: absolute;
-            box-shadow: 0 8px 10px rgba(0,0,0,0.2);
-            z-index: 50;
-        }
-        /* Basket handle */
-        .basket:before {
-            content: '';
-            position: absolute;
-            top: -30px;
-            left: 10px;
-            width: 82px;
-            height: 40px;
-            border: 5px solid #8B4513;
-            border-bottom: none;
-            border-radius: 40px 40px 0 0;
-            z-index: -1;
-        }
+        /* Trees and Flowers */
+        .tree { position: absolute; z-index: 1; }
+        .tree-trunk { width: 14px; height: 35px; background: #78350f; border-radius: 4px; position: absolute; bottom: -10px; left: -7px; }
+        .tree-top { width: 65px; height: 65px; background: #15803d; border-radius: 50%; position: absolute; bottom: 15px; left: -32.5px; box-shadow: inset -10px -10px 0 rgba(0,0,0,0.15); }
+        .tree-top.light { background: #16a34a; }
         
-        .falling-item {
-            position: absolute;
-            font-size: 45px;
-            top: -60px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-            z-index: 40;
+        .flower { 
+            position: absolute; width: 12px; height: 12px; background: #facc15; border-radius: 50%; z-index: 3;
+            box-shadow: 
+                0 -7px 0 -1.5px white, 0 7px 0 -1.5px white, 
+                -7px 0 0 -1.5px white, 7px 0 0 -1.5px white,
+                -5px -5px 0 -1.5px white, 5px 5px 0 -1.5px white,
+                -5px 5px 0 -1.5px white, 5px -5px 0 -1.5px white;
         }
+
+        .sun {
+            position: absolute;
+            top: 5vh; 
+            left: 5vw;
+            width: 120px; height: 120px;
+            background: #facc15;
+            border-radius: 50%;
+            box-shadow: 0 0 0 15px rgba(250, 204, 21, 0.3), 0 0 0 30px rgba(250, 204, 21, 0.1);
+            z-index: 1;
+            animation: pulse 4s infinite alternate;
+        }
+
+        .cloud-container { position: absolute; pointer-events: none; z-index: 2; }
+        .cloud-shape { width: 140px; height: 50px; background: white; border-radius: 50px; position: relative; }
+        .cloud-shape::after, .cloud-shape::before { content: ''; position: absolute; background: white; border-radius: 50%; }
+        .cloud-shape::after { width: 70px; height: 70px; top: -35px; left: 20px; }
+        .cloud-shape::before { width: 60px; height: 60px; top: -25px; right: 20px; }
+
+        .cloud-move-1 { animation: float 40s infinite linear; top: 15%; opacity: 0.9;}
+        .cloud-move-2 { animation: float 55s infinite linear reverse; top: 25%; opacity: 0.7;}
+
+        @keyframes float { from { transform: translateX(-20vw); } to { transform: translateX(120vw); } }
+        @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+
+        /* --- CANVAS --- */
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 10; background: transparent; }
+        #confettiCanvas { z-index: 60; pointer-events: none; }
+
+        /* --- UI LAYER --- */
+        .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; display: flex; flex-direction: column; align-items: center; }
+        .interactive { pointer-events: auto; }
+        .text-bubbly { text-shadow: 2px 4px 0px rgba(0,0,0,0.15); }
+        .card-bubbly { background: white; border-radius: 32px; box-shadow: 0 10px 0px rgba(0,0,0,0.1); }
+
+        .btn-duo { border-radius: 16px; text-transform: uppercase; font-weight: 900; transition: all 0.1s; position: relative; top: 0; cursor: pointer; }
+        .btn-duo-green { background-color: var(--btn-green); color: white; box-shadow: 0 8px 0 var(--btn-green-shadow); }
+        .btn-duo-green:active { top: 8px; box-shadow: 0 0px 0 var(--btn-green-shadow); }
+        .btn-duo-blue { background-color: #3b82f6; color: white; box-shadow: 0 8px 0 #1d4ed8; }
+        .btn-duo-blue:active { top: 8px; box-shadow: 0 0px 0 #1d4ed8; }
+        .btn-duo-yellow { background-color: #facc15; color: #854d0e; box-shadow: 0 8px 0 #ca8a04; }
+        .btn-duo-yellow:active { top: 8px; box-shadow: 0 0px 0 #ca8a04; }
+
+        .pop-in { animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* --- RESPONSIVE LENGTH PICKER --- */
+        .picker-container {
+            position: absolute; top: 12vh; width: 100%; display: flex; flex-direction: column; align-items: center; pointer-events: auto;
+        }
+
+        .length-picker {
+            display: flex; gap: 6px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px);
+            padding: 10px 14px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 4px solid white; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; max-width: 98%;
+        }
+        .length-picker::-webkit-scrollbar { display: none; }
+
+        .unit-square {
+            width: 44px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 900; font-size: 1.4rem; cursor: pointer; transition: all 0.1s;
+            flex-shrink: 0; text-shadow: 1px 2px 0px rgba(0,0,0,0.2); box-shadow: 0 5px 0px rgba(0,0,0,0.15);
+            position: relative; top: 0; border-bottom: 5px solid rgba(0,0,0,0.2);
+        }
+        .unit-square:active { top: 5px; box-shadow: 0 0px 0px rgba(0,0,0,0.15); border-bottom-width: 0px; transform: scale(0.95); }
+
+        /* Mobile Adjustments for UI Blocks */
+        @media (max-width: 600px) {
+            .unit-square { width: 8vw; height: 9vw; font-size: 1rem; border-radius: 8px; border-bottom-width: 3px; }
+            .length-picker { padding: 6px 10px; gap: 4px; border-width: 3px; border-radius: 18px; }
+            .sun { width: 80px; height: 80px; box-shadow: 0 0 0 10px rgba(250, 204, 21, 0.3), 0 0 0 20px rgba(250, 204, 21, 0.1); }
+        }
+
+        .star-svg { width: 50px; height: 50px; display: inline-block; animation: spinStar 10s linear infinite; }
+        @keyframes spinStar { 100% { transform: rotate(360deg); } }
+
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col select-none relative overflow-hidden">
+<body>
 <img src="../assets/logo-oodles-math.png" class="oodles-logo">
-    <!-- Global Clouds Background -->
-    <div class="fixed inset-0 pointer-events-none overflow-hidden">
-        <div class="cloud-anim text-white/60 text-6xl" style="top: 10%; left: 10%; animation-duration: 6s;">☁️</div>
-        <div class="cloud-anim text-white/50 text-5xl" style="top: 20%; right: 15%; animation-duration: 7s; animation-delay: 1s;">☁️</div>
-        <div class="cloud-anim text-white/40 text-4xl" style="top: 40%; left: 25%; animation-duration: 8s; animation-delay: 2s;">☁️</div>
-        <div class="cloud-anim text-white/30 text-7xl" style="top: 5%; left: 50%; animation-duration: 9s;">☁️</div>
-        <div class="cloud-anim text-white/40 text-5xl" style="top: 30%; right: 5%; animation-duration: 6.5s;">☁️</div>
-    </div>
-
-    <!-- Top Bar: Progress and Score -->
-    <div class="flex justify-between items-center p-4 z-30 absolute top-0 w-full pointer-events-none">
-        <div class="flex gap-4 items-center pointer-events-auto">
-            <div class="flex gap-2" id="star-container">
-                <!-- Stars will be injected here -->
-            </div>
-            <div class="bg-white/90 backdrop-blur px-5 py-2 rounded-full font-bold text-orange-500 shadow-md flex items-center gap-2 border-2 border-orange-200">
-                <span class="text-2xl">🍎</span> <span id="fruit-score" class="text-xl">0</span>
-            </div>
+    <!-- Background -->
+    <div id="bg-container">
+        <div class="sun"></div>
+        <div class="cloud-container cloud-move-1" style="left: 10%;">
+            <div class="cloud-shape"></div>
         </div>
-        <button onclick="toggleSound()" id="sound-btn" class="pointer-events-auto bg-white p-3 rounded-full shadow-lg text-2xl hover:bg-gray-50 transition border-2 border-gray-100 text-gray-600">
-            🔊
-        </button>
-    </div>
-
-    <!-- Main Game Area (Comparison) -->
-    <div id="main-game-layer" class="flex-grow flex flex-col items-center justify-end relative pb-0 h-full z-10 transition-all duration-500">
+        <div class="cloud-container cloud-move-2" style="right: 5%;">
+            <div class="cloud-shape" style="transform: scale(0.8); opacity: 0.8;"></div>
+        </div>
         
-        <!-- Teacher/Prompt Area -->
-        <div class="absolute top-24 left-0 right-0 flex flex-col items-center z-20 transition-all duration-500" id="prompt-container">
-            <div onclick="speakCurrentPrompt()" class="cursor-pointer speech-bubble bg-white px-8 py-5 shadow-xl mb-4 transform hover:scale-105 transition max-w-lg w-[90%]">
-                <h1 id="question-text" class="text-3xl md:text-5xl font-bold text-gray-700 text-center tracking-wide leading-tight">Loading...</h1>
-                <div class="flex justify-center mt-2">
-                    <span id="speaker-icon" class="text-2xl text-blue-400 animate-pulse">🔈</span>
-                </div>
-            </div>
+        <div class="hill hill-back">
+            <div class="tree" style="left: 15%; bottom: 95%;"><div class="tree-top"></div><div class="tree-trunk"></div></div>
+            <div class="tree" style="left: 45%; bottom: 90%; transform: scale(1.3);"><div class="tree-top"></div><div class="tree-trunk"></div></div>
+            <div class="tree" style="left: 75%; bottom: 100%; transform: scale(0.9);"><div class="tree-top"></div><div class="tree-trunk"></div></div>
+        </div>
+        <div class="hill hill-front">
+            <div class="tree" style="left: 25%; bottom: 95%; transform: scale(1.4);"><div class="tree-top light"></div><div class="tree-trunk"></div></div>
+            <div class="tree" style="left: 85%; bottom: 90%; transform: scale(1.1);"><div class="tree-top light"></div><div class="tree-trunk"></div></div>
             
-            <!-- Character Mascot -->
-            <div class="relative mt-2">
-                <!-- Owl sits directly on the sky background now -->
-                <div class="text-8xl filter drop-shadow-xl relative z-10">🦉</div>
-            </div>
-        </div>
-
-        <!-- The "Table" where objects sit -->
-        <div class="wood-table w-full h-[55%] flex items-end justify-center gap-6 md:gap-16 pb-12 px-4 relative">
-            <!-- Objects will be injected here -->
-            <div id="game-stage" class="flex items-end justify-center w-full gap-6 md:gap-20 h-full max-w-4xl"></div>
-        </div>
-
-    </div>
-
-    <!-- Mini-game Area (Fruit Catching) -->
-    <div id="mini-game-layer" class="absolute inset-0 z-20 hidden flex-col items-center pointer-events-none transition-opacity duration-500 opacity-0">
-        <div class="mt-28 text-center pointer-events-auto z-30">
-            <h2 class="text-5xl font-bold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)] mb-3">Fruit Party!</h2>
-            <!-- Removed the instruction text as requested -->
-        </div>
-        <div id="mini-game-area" class="w-full flex-grow relative overflow-hidden pointer-events-auto touch-none">
-            <div id="basket" class="basket left-1/2 -translate-x-1/2 transition-all duration-75 ease-out"></div>
+            <div class="flower" style="left: 10%; bottom: 80%;"></div>
+            <div class="flower" style="left: 35%; bottom: 85%;"></div>
+            <div class="flower" style="left: 55%; bottom: 75%;"></div>
+            <div class="flower" style="left: 70%; bottom: 88%;"></div>
+            <div class="flower" style="left: 92%; bottom: 82%;"></div>
         </div>
     </div>
 
-    <!-- Victory Overlay -->
-    <div id="victory-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center backdrop-blur-md">
-        <div class="bg-white rounded-[2rem] p-10 flex flex-col items-center shadow-2xl animate-pop border-8 border-yellow-300 max-w-sm w-[90%] relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-4 bg-yellow-300"></div>
-            <div class="text-8xl mb-6 filter drop-shadow-md">🏆</div>
-            <h2 class="text-4xl font-bold text-yellow-500 mb-2">Great Job!</h2>
-            <p class="text-xl text-gray-500 mb-8 text-center font-medium">You are a measuring star!</p>
-            <div class="text-3xl font-bold text-orange-500 mb-8 bg-orange-50 px-8 py-3 rounded-2xl border-2 border-orange-100 flex items-center gap-3">
-                <span>🍎</span> <span id="final-fruit-score">0</span>
+    <!-- Game Canvases -->
+    <canvas id="gameCanvas"></canvas>
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- UI Overlay -->
+    <div class="ui-layer">
+        
+        <!-- Top HUD -->
+        <div class="w-full flex justify-center items-center px-4 py-4 md:px-8 pointer-events-none">
+            <div id="scoreBox" class="bg-white border-4 border-yellow-400 rounded-3xl px-6 py-2 sm:px-8 sm:py-3 shadow-lg opacity-0 transition-opacity duration-500 card-bubbly flex items-center gap-2">
+                <svg viewBox="0 0 24 24" fill="#facc15" class="w-8 h-8 drop-shadow-md"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                <span class="text-yellow-500 font-black text-2xl sm:text-3xl text-bubbly"><span id="currentScore">0</span> / 10</span>
             </div>
-            <button onclick="restartGame()" class="w-full bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white text-2xl font-bold py-4 rounded-xl shadow-lg transform transition active:scale-95 border-b-4 border-green-600">
-                Play Again
-            </button>
+        </div>
+
+        <!-- Length Picker -->
+        <div class="picker-container">
+            <div id="lengthPicker" class="length-picker hidden">
+                <!-- Javascript will populate these blocks -->
+            </div>
+            <div id="hint" class="text-white font-black text-xl sm:text-2xl text-bubbly animate-bounce opacity-0 drop-shadow-lg mt-3 text-center">
+                CHOOSE BLOCKS! 👆
+            </div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="startScreen" class="absolute inset-0 flex items-center justify-center bg-sky-900/40 backdrop-blur-sm interactive z-50">
+            <div class="card-bubbly p-8 max-w-sm w-11/12 text-center border-8 border-white pop-in relative">
+                <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-yellow-400 rounded-full p-4 border-4 border-white shadow-lg animate-bounce">
+                    <svg viewBox="0 0 24 24" fill="white" class="w-12 h-12"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+                </div>
+                <h1 class="text-4xl sm:text-5xl font-black text-sky-500 mt-8 mb-2 text-bubbly">Bridge Builder</h1>
+                <p class="text-slate-500 mb-6 font-bold text-lg">Count the blocks to help the worker cross the river!</p>
+                <button id="startBtn" class="w-full btn-duo btn-duo-green text-2xl py-4 flex justify-center items-center gap-2">
+                    PLAY NOW <svg viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Math Revival Screen -->
+        <div id="mathRevivalScreen" class="hidden absolute inset-0 flex items-center justify-center bg-slate-900/60 backdrop-blur-md interactive z-50">
+            <div class="card-bubbly p-6 max-w-md w-11/12 text-center border-8 border-orange-400 pop-in relative">
+                 <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white rounded-full p-2 border-4 border-orange-400 animate-pulse"><span class="text-4xl">⚠️</span></div>
+                <h2 class="text-3xl font-black text-orange-500 mt-6 mb-2 text-bubbly">OH NO!</h2>
+                <p class="text-slate-600 mb-6 font-bold text-lg">Solve the math to save the worker!</p>
+                <div id="mathQuestion" class="text-5xl sm:text-6xl font-black text-sky-600 mb-8 py-6 bg-sky-50 rounded-3xl border-4 border-sky-200 shadow-inner">? + ? = ?</div>
+                <div id="mathOptions" class="grid grid-cols-2 gap-4"></div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="hidden absolute inset-0 flex items-center justify-center bg-red-900/60 backdrop-blur-sm interactive z-50">
+            <div class="card-bubbly p-8 max-w-sm w-11/12 text-center border-8 border-white pop-in">
+                <div class="text-7xl mb-4 animate-bounce">🐊</div>
+                <h1 class="text-4xl font-black text-red-500 mb-6 text-bubbly">TRY AGAIN!</h1>
+                <p class="text-slate-500 font-bold mb-6">The crocodile is hungry!</p>
+                <button id="retryBtn" class="w-full btn-duo btn-duo-blue text-2xl py-4">RETRY ↺</button>
+            </div>
+        </div>
+
+        <!-- Congrats Screen -->
+        <div id="congratsScreen" class="hidden absolute inset-0 flex items-center justify-center bg-yellow-400/20 backdrop-blur-md interactive z-50">
+            <div class="card-bubbly p-8 max-w-sm w-11/12 text-center border-8 border-white pop-in relative overflow-hidden shadow-[0_0_50px_rgba(250,204,21,0.5)]">
+                <h1 class="text-5xl font-black text-yellow-500 mb-4 text-bubbly relative z-10">YOU DID IT!</h1>
+                <div class="flex justify-center gap-2 mb-4 relative z-10">
+                    <svg viewBox="0 0 24 24" fill="#facc15" stroke="#ca8a04" stroke-width="1.5" class="star-svg" style="animation-delay: 0s;"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="#facc15" stroke="#ca8a04" stroke-width="1.5" class="star-svg" style="animation-delay: 0.2s; transform: scale(1.2); width: 60px; height: 60px;"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="#facc15" stroke="#ca8a04" stroke-width="1.5" class="star-svg" style="animation-delay: 0.4s;"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                </div>
+                <div class="text-xl font-bold text-slate-600 mb-8 relative z-10">Score: <span class="text-green-500 font-black text-3xl">10 / 10</span></div>
+                <button id="finalResetBtn" class="w-full btn-duo btn-duo-green text-2xl py-4 relative z-10">PLAY AGAIN</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- Game State ---
-        let score = 0;
-        const maxScore = 5;
-        let fruitScore = 0;
-        let currentLevelData = null;
-        let soundEnabled = true;
-        let isProcessing = false;
-        let isMiniGameActive = false;
+        // --- AUDIO SYSTEM ---
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
 
-        // --- Audio Context ---
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
-
-        function playTone(freq, type, duration, volume = 0.1) {
-            if (!soundEnabled) return;
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
-        function playSuccessSound() {
-            // Happy major chord arpeggio
-            playTone(523.25, 'sine', 0.1, 0.1); // C5
-            setTimeout(() => playTone(659.25, 'sine', 0.1, 0.1), 100); // E5
-            setTimeout(() => playTone(783.99, 'sine', 0.3, 0.1), 200); // G5
-            speak("Correct!");
-        }
-
-        function playErrorSound() {
-            // Low error thud
-            playTone(150, 'triangle', 0.1, 0.2);
-            setTimeout(() => playTone(100, 'triangle', 0.2, 0.2), 100);
-        }
-        
-        function playCatchSound() { playTone(1200, 'sine', 0.08, 0.05); } // High ping
-        function playBombSound() { playTone(100, 'sawtooth', 0.4, 0.2); } // Low buzz
-
-        function speak(text) {
-            if (!soundEnabled) return;
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US'; 
-            utterance.rate = 0.95;
-            utterance.pitch = 1.1;
-            window.speechSynthesis.speak(utterance);
-        }
-
-        function toggleSound() {
-            soundEnabled = !soundEnabled;
-            document.getElementById('sound-btn').innerText = soundEnabled ? '🔊' : '🔇';
-            if(soundEnabled && audioCtx.state === 'suspended') audioCtx.resume();
-        }
-
-        // --- Asset Generators (SVGs) ---
-        // Enhanced colors
-        const colors = {
-            red: '#FF8FAB',      // Soft Pink/Red
-            blue: '#48CAE4',     // Cyan Blue
-            green: '#90BE6D',    // Pistachio Green
-            yellow: '#F9C74F',   // Maize Crayola
-            purple: '#CDB4DB',   // Lavender
-            orange: '#FFAFCC',   // Carnation Pink (used as variety)
-            teal: '#43AA8B'      // Jungle Green
-        };
-        const colorKeys = Object.keys(colors);
-        const getRandomColor = () => colors[colorKeys[Math.floor(Math.random() * colorKeys.length)]];
-
-        // 1. Pencil
-        function createPencil(length, color) {
-            const w = 60; const h = length;
-            return `
-                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
-                    <rect x="10" y="40" width="40" height="${h - 40}" fill="${color}" stroke="#000" stroke-width="2" rx="4" />
-                    <!-- Tip -->
-                    <path d="M 10 40 L 30 0 L 50 40 Z" fill="#FDE68A" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
-                    <path d="M 23 26 L 30 12 L 37 26 Z" fill="#333" />
-                    <!-- Eraser -->
-                    <path d="M 10 ${h-15} L 10 ${h} Q 30 ${h+8} 50 ${h} L 50 ${h-15} Z" fill="#FCA5A5" stroke="#000" stroke-width="2"/>
-                    <!-- Metal Band -->
-                    <rect x="10" y="${h-25}" width="40" height="10" fill="#D1D5DB" stroke="#000" stroke-width="2"/>
-                </svg>
-            `;
-        }
-
-        // 2. Ballpoint Pen (Simplified & Prettier)
-        function createPen(length, color) {
-            const w = 50; const h = length;
-            return `
-                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
-                    <!-- Body -->
-                    <rect x="12" y="10" width="26" height="${h-20}" fill="${color}" rx="13" stroke="#000" stroke-width="2"/>
-                    <!-- Cap area -->
-                    <path d="M 12 50 L 38 50" stroke="#000" stroke-width="2" stroke-opacity="0.2"/>
-                    <!-- Clicker -->
-                    <rect x="18" y="0" width="14" height="12" fill="#fff" stroke="#000" stroke-width="2" rx="2"/>
-                    <!-- Clip -->
-                    <path d="M 30 20 L 30 60 Q 30 70 34 65" stroke="#000" stroke-width="2" fill="none"/>
-                    <!-- Tip -->
-                    <path d="M 15 ${h-15} L 25 ${h+5} L 35 ${h-15} Z" fill="#D1D5DB" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
-                    <circle cx="25" cy="${h+2}" r="1.5" fill="#333"/>
-                </svg>
-            `;
-        }
-
-        // 3. Ruler (Classic)
-        function createRuler(length, color) {
-            const w = 70; const h = length;
-            let ticks = '';
-            for(let i=10; i<h-10; i+=15) {
-                let text = (i % 30 === 10) ? `<text x="38" y="${i+4}" font-family="Fredoka" font-weight="bold" font-size="12" fill="#78350F" text-anchor="start">${Math.round((h-i)/15)}</text>` : '';
-                 ticks += `<line x1="10" y1="${i}" x2="${(i % 30 === 10) ? 32 : 22}" y2="${i}" stroke="#78350F" stroke-width="2" stroke-linecap="round"/> ${text}`;
+        const SFX = {
+            tap: () => playTone(600, 'sine', 0.1, 0.1),
+            place: () => playTone(300, 'square', 0.1, 0.05),
+            success: () => { playTone(400, 'sine', 0.1, 0.1); setTimeout(() => playTone(600, 'sine', 0.2, 0.1), 100); },
+            fail: () => { playTone(200, 'sawtooth', 0.3, 0.1); setTimeout(() => playTone(150, 'sawtooth', 0.4, 0.1), 200); },
+            walk: () => playTone(150, 'sine', 0.05, 0.05),
+            win: () => { const notes = [400, 500, 600, 800]; notes.forEach((freq, i) => setTimeout(() => playTone(freq, 'sine', 0.15, 0.1), i * 150)); },
+            fall: () => {
+                if(!audioCtx) return;
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 1);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 1);
             }
-            return `
-                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
-                    <rect x="5" y="0" width="60" height="${h}" fill="#FDE047" rx="6" stroke="#B45309" stroke-width="3"/>
-                    <rect x="10" y="5" width="50" height="${h-10}" fill="#FEF08A" rx="4" opacity="0.5"/>
-                    ${ticks}
-                </svg>
-            `;
-        }
-
-        // 4. Paintbrush (New Item to replace Car)
-        function createPaintbrush(length, color) {
-            const w = 60; const h = length;
-            const handleH = h * 0.7;
-            const ferruleH = h * 0.15;
-            const bristleH = h * 0.15;
-            return `
-                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
-                    <!-- Handle -->
-                    <path d="M 20 ${h} L 20 ${bristleH + ferruleH} L 40 ${bristleH + ferruleH} L 40 ${h} Q 30 ${h+5} 20 ${h} Z" fill="${color}" stroke="#000" stroke-width="2"/>
-                    <!-- Ferrule (Metal part) -->
-                    <rect x="20" y="${bristleH}" width="20" height="${ferruleH}" fill="#9CA3AF" stroke="#000" stroke-width="2"/>
-                    <line x1="20" y1="${bristleH + 5}" x2="40" y2="${bristleH + 5}" stroke="#000" opacity="0.2"/>
-                    <line x1="20" y1="${bristleH + ferruleH - 5}" x2="40" y2="${bristleH + ferruleH - 5}" stroke="#000" opacity="0.2"/>
-                    <!-- Bristles -->
-                    <path d="M 20 ${bristleH} Q 20 0 30 0 Q 40 0 40 ${bristleH} Z" fill="#D97706" stroke="#000" stroke-width="2"/>
-                    <!-- Paint Dip -->
-                    <path d="M 20 ${bristleH/2} Q 20 0 30 0 Q 40 0 40 ${bristleH/2} Q 30 ${bristleH} 20 ${bristleH/2}" fill="${color}" opacity="0.8"/>
-                </svg>
-            `;
-        }
-
-        // 5. Cube Tower
-        function createCubeTower(length, color) {
-            const w = 50; const h = length;
-            const cubeSize = 40;
-            const numCubes = Math.floor(h / cubeSize);
-            let cubes = '';
-            for(let i=0; i<numCubes; i++) {
-                const y = h - (i+1)*cubeSize;
-                const c = i % 2 === 0 ? color : '#FCD34D'; // Alternating main color and yellow
-                cubes += `
-                    <rect x="5" y="${y}" width="${cubeSize}" height="${cubeSize}" fill="${c}" stroke="#000" stroke-width="2" rx="6"/>
-                    <circle cx="${5 + cubeSize/2}" cy="${y + cubeSize/2}" r="5" fill="rgba(0,0,0,0.1)"/>
-                `;
-            }
-            return `
-                <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="drop-shadow-lg" style="overflow:visible">
-                    ${cubes}
-                </svg>
-            `;
-        }
-
-
-        // --- Main Game Logic ---
-        const generators = [createPencil, createPen, createRuler, createPaintbrush, createCubeTower];
-        
-        // Definitions for comparative vs superlative
-        const prompts = {
-            superlative: [
-                { type: 'longest', text: "Which one is the LONGEST?", compare: (a, b) => b.val - a.val },
-                { type: 'shortest', text: "Which one is the SHORTEST?", compare: (a, b) => a.val - b.val }
-            ],
-            comparative: [
-                { type: 'longer', text: "Which one is LONGER?", compare: (a, b) => b.val - a.val },
-                { type: 'shorter', text: "Which one is SHORTER?", compare: (a, b) => a.val - b.val }
-            ]
         };
 
-        function generateLevel() {
-            const numObjects = score < 2 ? 2 : 3;
-            const isComparative = numObjects === 2;
+        // --- CANVAS SETUP ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const cfCanvas = document.getElementById('confettiCanvas');
+        const cfCtx = cfCanvas.getContext('2d');
+        
+        let gw = window.innerWidth;
+        let gh = window.innerHeight;
+        let PLATFORM_Y_OFFSET = Math.max(150, gh * 0.25); 
+
+        const UNIT_SIZE = 45; 
+        const MIN_UNITS = 2;
+        const MAX_UNITS = 9;
+
+        const pickerColors = [
+            '#ef4444', '#f97316', '#facc15', '#4ade80', '#22c55e', 
+            '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef', '#f43f5e'
+        ];
+
+        // Game State
+        let score = 0;
+        let gameActive = false;
+        let state = 'waiting'; 
+        let platforms = [];
+        let placedSticks = []; 
+        let stick = { x: 0, length: 0, angle: 0 }; 
+        let character = { x: 0, targetX: 0, walkCycle: 0 }; 
+        let cameraX = 0;
+        let targetCameraX = 0;
+        let confettiParticles = [];
+        let time = 0;
+
+        function resize() {
+            const dpr = window.devicePixelRatio || 1;
+            gw = window.innerWidth;
+            gh = window.innerHeight;
             
-            // Randomly select one item type for consistency
-            const objectTypeIdx = Math.floor(Math.random() * generators.length);
-            const generator = generators[objectTypeIdx];
+            canvas.width = gw * dpr; canvas.height = gh * dpr;
+            canvas.style.width = gw + 'px'; canvas.style.height = gh + 'px';
             
-            let items = [];
-            const baseUnit = 40; 
+            cfCanvas.width = gw * dpr; cfCanvas.height = gh * dpr;
+            cfCanvas.style.width = gw + 'px'; cfCanvas.style.height = gh + 'px';
             
-            for (let i = 0; i < numObjects; i++) {
-                let units;
-                let isUnique = false;
-                while (!isUnique) {
-                    units = Math.floor(Math.random() * 5) + 4; // 4 to 8 units
-                    const tooClose = items.some(item => Math.abs(item.units - units) < 1);
-                    if (!tooClose) isUnique = true;
+            ctx.scale(dpr, dpr); cfCtx.scale(dpr, dpr);
+            
+            PLATFORM_Y_OFFSET = Math.max(150, gh * 0.25);
+            if (gameActive) draw();
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function createPicker() {
+            const picker = document.getElementById('lengthPicker');
+            picker.innerHTML = '';
+            for(let i=1; i<=10; i++) {
+                const square = document.createElement('div');
+                square.className = 'unit-square';
+                square.style.backgroundColor = pickerColors[i-1];
+                square.innerText = i;
+                
+                const handleSelect = (e) => {
+                    e.preventDefault();
+                    if(state !== 'waiting' || !gameActive) return;
+                    SFX.tap(); selectLength(i);
+                };
+                square.addEventListener('mousedown', handleSelect);
+                square.addEventListener('touchstart', handleSelect, {passive: false});
+                picker.appendChild(square);
+            }
+        }
+
+        function selectLength(units) {
+            stick.length = units * UNIT_SIZE; state = 'falling';
+            document.getElementById('lengthPicker').classList.add('hidden');
+            document.getElementById('hint').classList.add('opacity-0');
+        }
+
+        function initGame() {
+            score = 0; platforms = []; placedSticks = []; cameraX = 0; targetCameraX = 0;
+            platforms.push({ x: 100, width: 200 }); 
+            addPlatform();
+            character.x = platforms[0].x + platforms[0].width - 50;
+            character.targetX = character.x;
+            resetStick();
+            state = 'waiting';
+            updateUI(); createPicker();
+            document.getElementById('lengthPicker').classList.remove('hidden');
+            document.getElementById('hint').classList.remove('opacity-0');
+        }
+
+        function resetStick() {
+            stick.length = 0; stick.angle = -Math.PI / 2;
+            stick.x = platforms[0].x + platforms[0].width;
+        }
+
+        function addPlatform() {
+            const last = platforms[platforms.length - 1];
+            const unitsGap = MIN_UNITS + Math.floor(Math.random() * (MAX_UNITS - MIN_UNITS));
+            const gap = unitsGap * UNIT_SIZE;
+            let width;
+            if (score >= 9) width = 280; 
+            else width = 80 + Math.random() * 40;
+            platforms.push({ x: last.x + last.width + gap, width: width, unitsGoal: unitsGap });
+        }
+
+        function update() {
+            time += 0.016; 
+            
+            if (!gameActive && state !== 'congrats') {
+                draw(); // Giữ cho cảnh nền (sóng nước, cá sấu) vẫn chuyển động
+                requestAnimationFrame(update); // Kích hoạt lại vòng lặp để không bị treo
+                return;
+            }
+
+            cameraX += (targetCameraX - cameraX) * 0.05;
+
+            if (state === 'falling') {
+                stick.angle += 0.08; 
+                const landingX = stick.x + stick.length;
+                const target = platforms[1];
+                const isTooLong = landingX > target.x + target.width;
+                const isTooShort = landingX < target.x;
+
+                if (stick.angle >= 0) {
+                    SFX.place();
+                    if (isSuccess() || isTooLong) {
+                        stick.angle = 0; state = 'walking';
+                        character.targetX = isSuccess() ? target.x + target.width - 50 : landingX + 35;
+                    } else if (isTooShort) {
+                        if (stick.angle >= Math.PI / 2) {
+                            stick.angle = Math.PI / 2; state = 'walking'; character.targetX = stick.x + 5;
+                        }
+                    }
                 }
-
-                items.push({
-                    id: i,
-                    units: units,
-                    height: units * baseUnit,
-                    color: getRandomColor(),
-                    svg: generator(units * baseUnit, getRandomColor())
-                });
             }
 
-            // Select question based on number of items
-            const questionPool = isComparative ? prompts.comparative : prompts.superlative;
-            const question = questionPool[Math.floor(Math.random() * questionPool.length)];
-            
-            const sorted = [...items].sort((a, b) => question.compare({val: a.height}, {val: b.height}));
-            const correctId = sorted[0].id;
+            if (state === 'walking') {
+                character.x += 2; 
+                character.walkCycle += 0.1;
+                if(Math.floor(character.walkCycle) % 4 === 0 && Math.random() > 0.8) SFX.walk(); 
+                
+                if (character.x >= character.targetX) {
+                    character.x = character.targetX;
+                    if (isSuccess()) {
+                        SFX.success();
+                        placedSticks.push({ x: stick.x, length: stick.length, angle: 0 });
+                        score++; updateUI();
+                        if (score >= 10) triggerCompletion();
+                        else nextTurn();
+                    } else {
+                        SFX.fall(); 
+                        state = 'falling_down';
+                        character.fallOffset = 0; 
+                    }
+                }
+            }
 
-            return { items, question, correctId };
+            if (state === 'falling_down') {
+                character.fallOffset += 8; 
+                if (character.fallOffset > gh + 150) triggerMathChallenge();
+            }
+
+            draw(); 
+            requestAnimationFrame(update);
         }
 
-        function renderLevel() {
-            if(isMiniGameActive) return;
-            isProcessing = false;
-            currentLevelData = generateLevel();
-            const stage = document.getElementById('game-stage');
-            const promptText = document.getElementById('question-text');
-            
-            stage.innerHTML = '';
-            
-            let qText = currentLevelData.question.text;
-            // Stylize the keyword
-            const keyword = qText.split(' ').pop().replace('?', '');
-            const colorClass = (keyword.includes('LONG')) ? 'text-green-500' : 'text-red-500';
-            qText = qText.replace(keyword, `<span class="${colorClass}">${keyword}</span>`);
-            
-            promptText.innerHTML = qText;
+        function isSuccess() {
+            const landingX = stick.x + stick.length; const target = platforms[1];
+            return landingX >= target.x && landingX <= target.x + target.width;
+        }
 
-            currentLevelData.items.forEach(item => {
-                const container = document.createElement('div');
-                container.className = 'flex items-end gap-2 group game-object';
-                container.onclick = () => handleInput(item.id, container);
-                container.innerHTML = item.svg;
-                stage.appendChild(container);
+        function nextTurn() {
+            state = 'transitioning';
+            setTimeout(() => {
+                targetCameraX = platforms[1].x - 100; 
+                setTimeout(() => {
+                    platforms.shift(); addPlatform(); resetStick(); state = 'waiting';
+                    document.getElementById('lengthPicker').classList.remove('hidden');
+                    document.getElementById('hint').classList.remove('opacity-0');
+                }, 800); 
+            }, 300);
+        }
+
+        // --- DRAWING FUNCTIONS ---
+        // ĐÃ FIX TOÀN BỘ CÚ PHÁP LỖI roundRect() GÂY CRASH
+
+        function drawCuteHouse(x, y, roofColor, bodyColor) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            ctx.fillStyle = '#92400e';
+            ctx.fillRect(15, -95, 12, 30);
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.beginPath(); ctx.arc(20 + Math.sin(time*2)*5, -110 - (time*15)%20, 8 - (time*3)%4, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(22 + Math.sin(time*2+1)*5, -100 - (time*10)%20, 6, 0, Math.PI*2); ctx.fill();
+
+            ctx.fillStyle = bodyColor;
+            ctx.beginPath(); ctx.roundRect(-35, -50, 70, 50, 8); ctx.fill();
+            
+            // SỬA CÚ PHÁP MẢNG BO GÓC
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            ctx.beginPath(); ctx.roundRect(-35, -10, 70, 10, [0, 0, 8, 8]); ctx.fill();
+
+            ctx.fillStyle = roofColor;
+            ctx.beginPath(); ctx.moveTo(-45, -50); ctx.lineTo(0, -90); ctx.lineTo(45, -50);
+            ctx.roundRect(-45, -50, 90, 15, 6); ctx.fill();
+            
+            ctx.fillStyle = 'rgba(255,255,255,0.25)';
+            ctx.beginPath(); ctx.moveTo(-35, -50); ctx.lineTo(0, -80); ctx.lineTo(10, -80); ctx.lineTo(-25, -50); ctx.fill();
+
+            // SỬA CÚ PHÁP MẢNG BO GÓC CỬA
+            ctx.fillStyle = '#8b5cf6';
+            ctx.beginPath(); ctx.roundRect(-12, -25, 24, 25, [10, 10, 0, 0]); ctx.fill();
+            ctx.fillStyle = '#facc15';
+            ctx.beginPath(); ctx.arc(5, -12, 3, 0, Math.PI*2); ctx.fill();
+
+            ctx.fillStyle = '#93c5fd';
+            ctx.beginPath(); ctx.roundRect(-25, -35, 12, 12, 4); ctx.fill();
+            ctx.beginPath(); ctx.roundRect(13, -35, 12, 12, 4); ctx.fill();
+            
+            ctx.strokeStyle = 'white'; ctx.lineWidth = 2.5;
+            ctx.strokeRect(-25, -35, 12, 12); ctx.strokeRect(13, -35, 12, 12);
+            ctx.beginPath(); ctx.moveTo(-19, -35); ctx.lineTo(-19, -23); ctx.moveTo(-25, -29); ctx.lineTo(-13, -29); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(19, -35); ctx.lineTo(19, -23); ctx.moveTo(13, -29); ctx.lineTo(25, -29); ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawCuteWorker(x, currentY) {
+            ctx.save(); 
+            const fallY = (state === 'falling_down') ? character.fallOffset : 0;
+            ctx.translate(x, currentY + fallY);
+            
+            const isWalking = (state === 'walking');
+            const cycle = isWalking ? Math.sin(character.walkCycle) : 0;
+            const cycleAlt = isWalking ? Math.sin(character.walkCycle + Math.PI) : 0;
+            const bob = isWalking ? Math.abs(Math.sin(character.walkCycle * 2)) * 4 : 0;
+            
+            ctx.translate(0, -bob); 
+
+            ctx.fillStyle = '#1e3a8a';
+            ctx.beginPath(); ctx.roundRect(-12 + cycle*10, -28, 10, 28, 5); ctx.fill(); 
+            ctx.fillStyle = '#2563eb';
+            ctx.beginPath(); ctx.roundRect(2 + cycleAlt*10, -28, 10, 28, 5); ctx.fill(); 
+
+            ctx.fillStyle = '#f97316'; 
+            ctx.beginPath(); ctx.roundRect(-18, -53, 36, 35, 12); ctx.fill();
+            ctx.fillStyle = '#fde047'; 
+            ctx.fillRect(-18, -43, 36, 6); ctx.fillRect(-18, -28, 36, 6);
+
+            ctx.fillStyle = '#fcd34d'; 
+            ctx.beginPath(); ctx.arc(0, -63, 18, 0, Math.PI * 2); ctx.fill();
+            
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath(); ctx.arc(6, -66, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(14, -66, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#f87171'; ctx.globalAlpha = 0.5;
+            ctx.beginPath(); ctx.arc(2, -60, 4, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
+
+            ctx.fillStyle = '#facc15'; 
+            ctx.beginPath(); ctx.arc(0, -68, 20, Math.PI, 0); ctx.fill();
+            ctx.beginPath(); ctx.roundRect(-24, -71, 48, 6, 3); ctx.fill();
+            
+            ctx.fillStyle = '#3b82f6';
+            ctx.beginPath(); ctx.roundRect(-5 + cycleAlt*8, -48, 10, 22, 5); ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawDuolingoPlatform(p, isTarget, isLast) {
+            const h = PLATFORM_Y_OFFSET;
+            const topH = 25;
+            const y = gh - h;
+            ctx.save();
+            
+            ctx.fillStyle = '#78350f'; 
+            ctx.beginPath(); ctx.roundRect(p.x, y, p.width, h + 150, 16); ctx.fill();
+            ctx.fillStyle = '#92400e'; 
+            ctx.beginPath(); ctx.roundRect(p.x, y, p.width, h, 16); ctx.fill();
+            ctx.fillStyle = isLast ? '#22c55e' : (isTarget ? '#84cc16' : '#4ade80');
+            
+            ctx.beginPath(); ctx.roundRect(p.x - 4, y, p.width + 8, topH, 12); ctx.fill();
+            ctx.fillStyle = isLast ? '#16a34a' : (isTarget ? '#65a30d' : '#22c55e');
+            
+            // SỬA CÚ PHÁP MẢNG BO GÓC CỎ
+            ctx.beginPath(); ctx.roundRect(p.x - 4, y + topH - 8, p.width + 8, 8, [0, 0, 12, 12]); ctx.fill();
+
+            const flowerCount = Math.floor(p.width / 40);
+            for(let i=1; i<=flowerCount; i++) {
+                const fX = p.x + (i * 35) % (p.width - 20) + 10;
+                ctx.fillStyle = 'white';
+                ctx.beginPath(); ctx.arc(fX, y + 5, 4, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#facc15';
+                ctx.beginPath(); ctx.arc(fX, y + 5, 2, 0, Math.PI*2); ctx.fill();
+            }
+
+            if(isTarget && !isLast) { 
+                ctx.fillStyle = 'rgba(255,255,255,0.4)'; 
+                ctx.beginPath(); ctx.ellipse(p.x + p.width/2, y + topH/2, 20, 6, 0, 0, Math.PI*2); ctx.fill(); 
+            }
+
+            if(isLast) drawCuteHouse(p.x + p.width - 70, y, '#3b82f6', '#e0e7ff');
+
+            ctx.restore();
+        }
+
+        // --- SÓNG YÊN BÌNH ---
+        function drawRiver() {
+            const riverH = PLATFORM_Y_OFFSET - 40;
+            const yOffset = gh - riverH;
+            
+            ctx.fillStyle = '#0284c7';
+            ctx.fillRect(cameraX - 100, yOffset, gw + 200, riverH + 100);
+            
+            const waveColors = ['#0369a1', '#0ea5e9', '#38bdf8']; 
+            
+            for(let layer=0; layer<3; layer++) {
+                ctx.beginPath();
+                const startY = yOffset + 20 + layer * 30;
+                const speed = time * (0.3 + layer * 0.1); 
+                
+                ctx.fillStyle = waveColors[layer];
+                ctx.moveTo(cameraX - 100, gh + 100);
+                ctx.lineTo(cameraX - 100, startY);
+                
+                for(let wx = cameraX - 100; wx <= cameraX + gw + 100; wx += 20) {
+                    const waveY = startY + Math.sin(speed + wx * 0.008) * 8;
+                    ctx.lineTo(wx, waveY);
+                }
+                ctx.lineTo(cameraX + gw + 100, gh + 100);
+                ctx.fill();
+                
+                if (layer === 2) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                    for(let wx = cameraX; wx < cameraX + gw; wx += 150) {
+                        const waveY = startY + Math.sin(speed + wx * 0.008) * 8;
+                        ctx.beginPath(); ctx.arc(wx, waveY, 5, 0, Math.PI*2); ctx.fill();
+                        ctx.beginPath(); ctx.arc(wx + 10, waveY + 2, 3, 0, Math.PI*2); ctx.fill();
+                        ctx.beginPath(); ctx.arc(wx - 8, waveY + 3, 2, 0, Math.PI*2); ctx.fill();
+                    }
+                }
+            }
+        }
+
+        function drawCuteCrocodile() {
+            const crocBaseX = cameraX + gw/2 + Math.sin(time * 0.3) * (gw/3); 
+            const crocDir = Math.cos(time * 0.3) > 0 ? 1 : -1; 
+            const bob = Math.sin(time * 2) * 5; 
+            const y = gh - PLATFORM_Y_OFFSET/2 + bob + 10;
+
+            ctx.save();
+            ctx.translate(crocBaseX, y);
+            ctx.scale(crocDir, 1); 
+
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.beginPath(); ctx.ellipse(0, 15, 80, 10, 0, 0, Math.PI*2); ctx.fill();
+
+            ctx.fillStyle = '#15803d'; 
+            ctx.beginPath(); ctx.moveTo(-30, 0); ctx.quadraticCurveTo(-70, -25 + Math.sin(time*4)*15, -100, -5); ctx.lineTo(-30, 15); ctx.fill(); 
+            
+            ctx.fillStyle = '#16a34a'; 
+            ctx.beginPath(); ctx.ellipse(-5, 0, 50, 25, 0, 0, Math.PI * 2); ctx.fill(); 
+            ctx.fillStyle = '#86efac';
+            ctx.beginPath(); ctx.ellipse(-5, 10, 40, 12, 0, 0, Math.PI * 2); ctx.fill();
+
+            ctx.fillStyle = '#22c55e'; 
+            ctx.beginPath(); ctx.roundRect(20, -18, 45, 32, 16); ctx.fill();
+            
+            ctx.fillStyle = 'white';
+            ctx.beginPath(); ctx.arc(40, -22, 10, 0, Math.PI*2); ctx.fill(); 
+            ctx.beginPath(); ctx.arc(55, -20, 8, 0, Math.PI*2); ctx.fill();  
+            
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath(); ctx.arc(43, -22, 4.5, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(57, -20, 3.5, 0, Math.PI*2); ctx.fill();
+            
+            ctx.fillStyle = 'white';
+            ctx.beginPath(); ctx.arc(44, -23.5, 1.5, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(58, -21, 1, 0, Math.PI*2); ctx.fill();
+
+            ctx.fillStyle = 'rgba(248, 113, 113, 0.6)';
+            ctx.beginPath(); ctx.arc(33, -8, 6, 0, Math.PI*2); ctx.fill();
+
+            ctx.fillStyle = '#14532d';
+            ctx.beginPath(); ctx.arc(58, -5, 2, 0, Math.PI*2); ctx.fill();
+
+            ctx.fillStyle = 'white';
+            for(let i=0; i<3; i++) {
+                ctx.beginPath(); ctx.arc(35 + i*10, 14, 4, 0, Math.PI, true); ctx.fill();
+            }
+
+            ctx.fillStyle = '#065f46';
+            for(let i=-45; i<20; i+=18) { 
+                ctx.beginPath(); ctx.roundRect(i, -28, 12, 16, 6); ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, gw, gh);
+            ctx.save(); ctx.translate(-cameraX, 0);
+            
+            drawRiver();
+            drawCuteCrocodile();
+
+            drawCuteHouse(150, gh - PLATFORM_Y_OFFSET, '#ef4444', '#fef08a');
+
+            const floorY = gh - PLATFORM_Y_OFFSET;
+
+            platforms.forEach((p, idx) => drawDuolingoPlatform(p, idx === 1, idx === 1 && score >= 9));
+            
+            // --- VẼ KHỐI CUBE VUÔNG VỨC & ĐẸP HƠN ---
+            placedSticks.concat(state !== 'waiting' ? [stick] : []).forEach(s => {
+                ctx.save(); 
+                
+                ctx.translate(s.x, floorY); 
+                ctx.rotate(s.angle);
+                
+                const units = Math.round(s.length / UNIT_SIZE);
+                // Biến các khối thành hình vuông hoàn hảo
+                const blockHeight = UNIT_SIZE; 
+                
+                for(let i=0; i<units; i++) {
+                    const color = pickerColors[i % pickerColors.length];
+                    const blockX = i * UNIT_SIZE;
+
+                    // Mảng màu chính phủ toàn bộ khối vuông (neo tại y=0 đổ xuống, xoay lộn ngược khi đổ ngã)
+                    ctx.fillStyle = color;
+                    ctx.fillRect(blockX, 0, UNIT_SIZE, blockHeight);
+                    
+                    // Nâng cấp 3D: Highlight mặt trên
+                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                    ctx.fillRect(blockX, 0, UNIT_SIZE, 6);
+
+                    // Nâng cấp 3D: Bóng tối mặt dưới
+                    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                    ctx.fillRect(blockX, blockHeight - 8, UNIT_SIZE, 8);
+
+                    // Nâng cấp 3D: Viền sáng bên trái
+                    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                    ctx.fillRect(blockX, 0, 4, blockHeight);
+
+                    // Nâng cấp 3D: Bóng mờ bên phải
+                    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                    ctx.fillRect(blockX + UNIT_SIZE - 4, 0, 4, blockHeight);
+
+                    // Viền outline phân cách rõ ràng từng khối xếp hình
+                    ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(blockX, 0, UNIT_SIZE, blockHeight);
+                }
+                ctx.restore();
             });
 
-            setTimeout(speakCurrentPrompt, 600);
+            drawCuteWorker(character.x, floorY);
+            ctx.restore();
         }
 
-        function speakCurrentPrompt() {
-            if(currentLevelData && !isMiniGameActive) {
-                speak(currentLevelData.question.text);
+        // --- MATH REPAIR ---
+        function triggerMathChallenge() {
+            gameActive = false;
+            let ans = Math.floor(Math.random() * 8) + 2; 
+            let n1 = Math.floor(Math.random() * (ans - 1)) + 1; 
+            let n2 = ans - n1; 
+            
+            document.getElementById('mathQuestion').innerText = `${n1} + ${n2} = ?`;
+            const options = [ans];
+            while(options.length < 4) { 
+                const fake = ans + (Math.floor(Math.random() * 5) - 2); 
+                if (fake > 0 && !options.includes(fake)) options.push(fake); 
             }
+            options.sort(() => Math.random() - 0.5);
+            
+            const grid = document.getElementById('mathOptions'); grid.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "btn-duo btn-duo-yellow text-white text-4xl font-black py-4 rounded-2xl w-full shadow-lg";
+                btn.innerText = opt;
+                btn.onclick = () => { 
+                    SFX.tap();
+                    if (opt === ans) { SFX.success(); revive(); } 
+                    else { SFX.fail(); document.getElementById('mathRevivalScreen').classList.add('hidden'); gameOver(); } 
+                };
+                grid.appendChild(btn);
+            });
+            document.getElementById('mathRevivalScreen').classList.remove('hidden');
         }
 
-        function handleInput(id, element) {
-            if (isProcessing || isMiniGameActive) return;
+        function revive() {
+            document.getElementById('mathRevivalScreen').classList.add('hidden');
+            character.x = platforms[0].x + platforms[0].width - 50; character.targetX = character.x;
+            resetStick();
+            state = 'waiting'; gameActive = true; 
+            document.getElementById('lengthPicker').classList.remove('hidden');
+            document.getElementById('hint').classList.remove('opacity-0');
+        }
 
-            if (id === currentLevelData.correctId) {
-                // Correct
-                isProcessing = true;
-                playSuccessSound();
-                element.classList.add('animate-bounce-happy');
-                createConfetti(element);
+        // --- GAME FLOW (CONFETTI) ---
+        function triggerCompletion() {
+            state = 'congrats'; gameActive = false; SFX.win();
+            document.getElementById('congratsScreen').classList.remove('hidden');
+            document.getElementById('lengthPicker').classList.add('hidden');
+            document.getElementById('hint').classList.add('opacity-0');
+            
+            confettiParticles = [];
+            for(let i=0; i<150; i++) { 
+                createConfetti(); 
+            }
+            animateConfettiLoop();
+        }
+
+        function createConfetti() {
+            const colors = ['#facc15', '#f87171', '#60a5fa', '#4ade80', '#d946ef', '#f97316'];
+            confettiParticles.push({
+                x: Math.random() * gw,
+                y: Math.random() * gh - gh, 
+                w: Math.random() * 10 + 6,
+                h: Math.random() * 10 + 6,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                vx: Math.random() * 3 - 1.5,
+                vy: Math.random() * 3 + 2,
+                rot: Math.random() * 360,
+                rotSpeed: Math.random() * 10 - 5
+            });
+        }
+
+        function drawConfetti() {
+            cfCtx.clearRect(0, 0, gw, gh);
+            for(let i = confettiParticles.length - 1; i >= 0; i--) {
+                const p = confettiParticles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.rot += p.rotSpeed;
                 
-                score++;
-                updateStars();
+                p.vx += Math.sin(time * 2 + p.y * 0.01) * 0.1;
 
-                // Start mini-game after 1.5s
-                setTimeout(() => {
-                    startMiniGame();
-                }, 1500);
-
-            } else {
-                // Incorrect
-                playErrorSound();
-                element.classList.add('animate-wiggle');
-                speak("Try again!");
-                setTimeout(() => {
-                    element.classList.remove('animate-wiggle');
-                }, 500);
-            }
-        }
-
-        function updateStars() {
-            const container = document.getElementById('star-container');
-            container.innerHTML = '';
-            for(let i=0; i<maxScore; i++) {
-                if (i < score) {
-                    container.innerHTML += `<div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-white text-2xl shadow-lg border-2 border-white animate-pop star-icon">★</div>`;
-                } else {
-                    container.innerHTML += `<div class="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center text-white/50 text-xl border-2 border-transparent">★</div>`;
+                if (p.y > gh) {
+                    confettiParticles.splice(i, 1);
+                    if (state === 'congrats') createConfetti(); 
+                } else { 
+                    cfCtx.save();
+                    cfCtx.translate(p.x, p.y);
+                    cfCtx.rotate(p.rot * Math.PI / 180);
+                    cfCtx.fillStyle = p.color;
+                    cfCtx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+                    cfCtx.restore();
                 }
             }
         }
 
-        function createConfetti(target) {
-            const rect = target.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top;
-            for (let i = 0; i < 25; i++) {
-                const conf = document.createElement('div');
-                conf.classList.add('fixed', 'w-3', 'h-3', 'rounded-full');
-                conf.style.backgroundColor = getRandomColor();
-                conf.style.left = centerX + 'px';
-                conf.style.top = centerY + 'px';
-                conf.style.transition = 'all 0.8s ease-out';
-                conf.style.zIndex = 100;
-                document.body.appendChild(conf);
-                setTimeout(() => {
-                    const x = (Math.random() - 0.5) * 250;
-                    const y = (Math.random() - 1) * 250;
-                    conf.style.transform = `translate(${x}px, ${y}px) scale(0)`;
-                    conf.style.opacity = 0;
-                }, 10);
-                setTimeout(() => conf.remove(), 800);
-            }
+        function animateConfettiLoop() { 
+            if (state !== 'congrats') return; 
+            drawConfetti(); requestAnimationFrame(animateConfettiLoop); 
         }
 
-        // --- Mini-game Logic ---
-        let itemSpawnInterval;
-        let miniGameStartTime;
-        let basketPosition = 50; 
-        const basket = document.getElementById('basket');
-        const miniGameArea = document.getElementById('mini-game-area');
-        const fruitScoreEl = document.getElementById('fruit-score');
-
-        function startMiniGame() {
-            isMiniGameActive = true;
-            miniGameStartTime = Date.now();
-            
-            // UI Transition
-            document.getElementById('main-game-layer').classList.add('opacity-0', 'pointer-events-none');
-            document.getElementById('mini-game-layer').classList.remove('hidden', 'opacity-0', 'pointer-events-none');
-            document.getElementById('mini-game-layer').classList.add('flex');
-            
-            speak("Fruit party! Catch apples!");
-
-            // Reset
-            basketPosition = 50;
-            updateBasketPosition();
-
-            // Initial Spawn
-            scheduleNextSpawn();
-
-            // Listen to inputs
-            setupMiniGameControls();
+        function updateUI() { 
+            document.getElementById('currentScore').innerText = score;
+            document.getElementById('scoreBox').classList.remove('opacity-0');
         }
 
-        function scheduleNextSpawn() {
-            if(!isMiniGameActive) return;
-            
-            const elapsed = Date.now() - miniGameStartTime;
-            // Level 0 (0-5s), Level 1 (5-10s), Level 2 (10-15s)...
-            const level = Math.floor(elapsed / 5000); 
-
-            // Base delay decreases as level increases (faster spawning)
-            // L0: 700ms, L1: 600ms, L2: 500ms... Min 300ms
-            let delay = Math.max(300, 700 - (level * 100));
-
-            itemSpawnInterval = setTimeout(() => {
-                spawnItem();
-                scheduleNextSpawn();
-            }, delay);
+        function gameOver() {
+            gameActive = false; document.getElementById('gameOverScreen').classList.remove('hidden');
+            document.getElementById('lengthPicker').classList.add('hidden');
+            document.getElementById('hint').classList.add('opacity-0');
         }
 
-        function endMiniGame() {
-            clearTimeout(itemSpawnInterval);
-            document.querySelectorAll('.falling-item').forEach(el => el.remove());
-            teardownMiniGameControls();
-
-            isMiniGameActive = false;
-            
-            // Transition back
-            document.getElementById('mini-game-layer').classList.add('opacity-0', 'pointer-events-none');
-            setTimeout(() => {
-                 document.getElementById('mini-game-layer').classList.add('hidden');
-                 document.getElementById('mini-game-layer').classList.remove('flex');
-                 document.getElementById('main-game-layer').classList.remove('opacity-0', 'pointer-events-none');
-            }, 500);
-           
-            if (score >= maxScore) {
-                setTimeout(() => {
-                    document.getElementById('final-fruit-score').innerText = fruitScore;
-                    document.getElementById('victory-modal').classList.remove('hidden');
-                    playTone(523.25, 'square', 0.1);
-                    playTone(698.46, 'square', 0.1); // F5
-                    playTone(880.00, 'square', 0.4); // A5
-                    speak("Congratulations! You are amazing!");
-                }, 1500);
-            } else {
-                speak("Oh no, a bomb! Next round.");
-                setTimeout(renderLevel, 1500);
-            }
-        }
-
-        function spawnItem() {
-            const elapsed = Date.now() - miniGameStartTime;
-            const level = Math.floor(elapsed / 5000); 
-
-            let items = ['🍎', '🍊', '🍇', '🍓', '🍎']; 
-            
-            // Speed increases with level
-            // L0: 4, L1: 5, L2: 6... Max 12
-            let speed = Math.min(12, 4 + level);
-
-            // Bomb count increases with level
-            // L0: 1 bomb, L1: 2 bombs, L2: 3 bombs...
-            const bombCount = 1 + level;
-            for(let i=0; i<bombCount; i++) {
-                items.push('💣');
-            }
-
-            const item = items[Math.floor(Math.random() * items.length)];
-            const el = document.createElement('div');
-            el.classList.add('falling-item');
-            el.innerText = item;
-            el.style.left = Math.random() * 85 + 5 + '%'; // Keep within bounds
-            miniGameArea.appendChild(el);
-
-            let posY = -60;
-            
-            const fallInterval = setInterval(() => {
-                if(!isMiniGameActive) {
-                    clearInterval(fallInterval);
-                    el.remove();
-                    return;
-                }
-
-                posY += speed;
-                el.style.top = posY + 'px';
-
-                // Collision
-                const basketRect = basket.getBoundingClientRect();
-                const itemRect = el.getBoundingClientRect();
-
-                // Improved Hitbox
-                const hitY = posY > miniGameArea.offsetHeight - 130; 
-                if(hitY && 
-                   itemRect.right > basketRect.left + 20 && 
-                   itemRect.left < basketRect.right - 20) {
-                    
-                    clearInterval(fallInterval);
-                    el.remove();
-
-                    if(item === '💣') {
-                        playBombSound();
-                        basket.classList.add('animate-wiggle');
-                        setTimeout(() => basket.classList.remove('animate-wiggle'), 500);
-                        endMiniGame();
-                    } else {
-                        playCatchSound();
-                        fruitScore++;
-                        // Visual Pop
-                        const plusOne = document.createElement('div');
-                        plusOne.innerText = '+1';
-                        plusOne.className = 'absolute text-yellow-500 font-bold text-3xl animate-pop';
-                        plusOne.style.left = basketRect.left + 40 + 'px';
-                        plusOne.style.top = basketRect.top - 40 + 'px';
-                        miniGameArea.appendChild(plusOne);
-                        setTimeout(()=>plusOne.remove(), 500);
-                        fruitScoreEl.innerText = fruitScore;
-                    }
-
-                } else if (posY > miniGameArea.offsetHeight) {
-                    clearInterval(fallInterval);
-                    el.remove();
-                }
-            }, 20);
-        }
-
-        function setupMiniGameControls() {
-            miniGameArea.addEventListener('touchmove', handleMove, {passive: false});
-            miniGameArea.addEventListener('mousemove', handleMove);
-        }
-
-        function teardownMiniGameControls() {
-            miniGameArea.removeEventListener('touchmove', handleMove);
-            miniGameArea.removeEventListener('mousemove', handleMove);
-        }
-
-        function handleMove(e) {
-            if(!isMiniGameActive) return;
-            e.preventDefault();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const rect = miniGameArea.getBoundingClientRect();
-            let relativeX = clientX - rect.left;
-            basketPosition = (relativeX / rect.width) * 100;
-            updateBasketPosition();
-        }
-
-        function updateBasketPosition() {
-            basketPosition = Math.max(10, Math.min(90, basketPosition)); 
-            basket.style.left = basketPosition + '%';
-        }
-
-        function restartGame() {
-            score = 0;
-            fruitScore = 0;
-            fruitScoreEl.innerText = '0';
-            document.getElementById('victory-modal').classList.add('hidden');
-            updateStars();
-            renderLevel();
-        }
-
-        // Initialize
-        window.onload = () => {
-            updateStars();
-            renderLevel();
-            document.body.addEventListener('click', function() {
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-            }, {once:true});
+        // --- BUTTON EVENTS ---
+        document.getElementById('startBtn').onclick = () => {
+            initAudio(); SFX.tap();
+            document.getElementById('startScreen').classList.add('hidden');
+            gameActive = true; initGame(); 
+            requestAnimationFrame(update); 
         };
 
+        document.getElementById('retryBtn').onclick = () => {
+            SFX.tap(); document.getElementById('gameOverScreen').classList.add('hidden');
+            gameActive = true; initGame(); 
+        };
+
+        document.getElementById('finalResetBtn').onclick = () => {
+            SFX.tap(); document.getElementById('congratsScreen').classList.add('hidden');
+            cfCtx.clearRect(0, 0, gw, gh); 
+            initGame(); gameActive = true; 
+        };
+
+        draw();
     </script>
 </body>
 </html>

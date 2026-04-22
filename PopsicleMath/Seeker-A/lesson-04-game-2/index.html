@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../assets/brand.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Treasure Bond Hunt - Ver 6</title>
+    <!-- Import Poppins Font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;800;900&display=swap');
+
+        /* ==================================================
+           CSS VARIABLES & GLOBAL STYLES (CANDY THEME)
+           ================================================== */
+        :root {
+            --sky-top: #21d4fd;
+            --sky-bottom: #b721ff; 
+            --ocean-top: #00c6ff;
+            --ocean-bottom: #0072ff;
+            --sand-top: #ffeca1;
+            --sand-bottom: #f39c12;
+            --wood-dark: #4a2311;
+            --wood-light: #a0522d;
+            --wood-panel: #d35400;
+            --gold: #ffdd59;
+            --gold-shadow: #ff9f43;
+            --danger: #ff5252;
+            --success: #32ff7e;
+            --text-dark: #2c3e50;
+            --text-light: #ffffff;
+            --ui-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            /* Vibrant magical tropical background */
+            background: linear-gradient(
+                to bottom, 
+                var(--sky-top) 0%, 
+                #00c6ff 30%, 
+                var(--ocean-top) 40%, 
+                var(--ocean-bottom) 55%, 
+                var(--sand-top) 55%, 
+                var(--sand-bottom) 100%
+            );
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-dark);
+        }
+
+        #app-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+            background-color: transparent;
+        }
+
+        @media (min-width: 1024px) {
+            #app-container {
+                width: 95vw;
+                max-width: 1100px;
+                height: 90vh;
+                max-height: 800px;
+                border: 12px solid var(--wood-dark);
+                border-radius: 35px;
+            }
+        }
+
+        /* Scenery Decorations */
+        .decoration {
+            position: absolute;
+            z-index: 1;
+            pointer-events: none;
+            filter: drop-shadow(2px 5px 4px rgba(0,0,0,0.3));
+        }
+        /* Đẩy cây dừa lên cao (bottom 25%) để không bị block số đè lên */
+        .palm-left { bottom: 25%; left: -2%; font-size: 8rem; transform: scaleX(-1); filter: saturate(1.4) drop-shadow(5px 10px 5px rgba(0,0,0,0.5)); }
+        .palm-right { bottom: 25%; right: -2%; font-size: 8rem; filter: saturate(1.4) drop-shadow(-5px 10px 5px rgba(0,0,0,0.5)); }
+        
+        .sun { top: 5%; left: 8%; font-size: 7rem; animation: pulseSun 3s infinite alternate; filter: saturate(2) drop-shadow(0 0 30px #ffbe0b); }
+        
+        .cloud1 { top: 12%; right: 10%; font-size: 5rem; animation: floatX 18s linear infinite alternate; opacity: 0.95; }
+        .cloud2 { top: 22%; left: 25%; font-size: 4.5rem; animation: floatX 22s linear infinite alternate-reverse; opacity: 0.9; }
+        
+        .crab { bottom: 2%; right: 30%; font-size: 3rem; animation: scuttle 8s ease-in-out infinite; filter: saturate(1.5); }
+        .wave { position: absolute; width: 200%; height: 25px; background: rgba(255,255,255,0.5); border-radius: 50%; top: 48%; left: -50%; animation: floatX 7s ease-in-out infinite alternate; }
+
+        /* ==================================================
+           SCREENS
+           ================================================== */
+        .screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Start & End Screen Typography */
+        .title-box {
+            background: var(--ui-bg);
+            padding: 1.5rem 3.5rem;
+            border-radius: 40px;
+            border: 8px solid var(--gold);
+            text-align: center;
+            box-shadow: 0 15px 0 var(--gold-shadow), 0 20px 25px rgba(0,0,0,0.3);
+            margin-bottom: 1.5rem;
+            animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 90%;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            background: linear-gradient(45deg, #ff4757, #ffa502);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -webkit-text-stroke: 2.5px #fff;
+            filter: drop-shadow(4px 4px 0 var(--wood-dark));
+            margin-bottom: 0.2rem;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            font-size: clamp(1.1rem, 3vw, 1.8rem);
+            color: #1e90ff;
+            font-weight: 800;
+            text-shadow: 2px 2px 0 #fff;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(to bottom, #fff200, #ffb8b8);
+            color: var(--wood-dark);
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 900;
+            padding: 1rem 4rem;
+            border: 6px solid var(--wood-dark);
+            border-radius: 60px;
+            cursor: pointer;
+            box-shadow: 0 10px 0 var(--wood-dark), 0 15px 20px rgba(0,0,0,0.4);
+            transition: all 0.15s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: pulseBtn 2s infinite;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #fffa65, #ffb8b8);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: rgba(255,255,255,0.5);
+            transform: skewX(-20deg);
+            transition: 0.5s;
+        }
+        .btn:hover::after { left: 150%; }
+
+        .btn:active {
+            transform: translateY(10px);
+            box-shadow: 0 0 0 var(--wood-dark), 0 5px 5px rgba(0,0,0,0.3);
+            animation: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to bottom, #7bed9f, #2ed573);
+            box-shadow: 0 8px 0 #218c53, 0 10px 10px rgba(0,0,0,0.3);
+            animation: none;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            padding: 0.6rem 2.5rem;
+            border-color: #218c53;
+            color: #fff;
+        }
+        .btn-secondary:active {
+            box-shadow: 0 0 0 #218c53, 0 5px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Mode Select Box */
+        .mode-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            max-width: 900px;
+        }
+
+        .mode-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 6px solid #1e90ff;
+            border-radius: 30px;
+            padding: 2.5rem 2rem;
+            width: 320px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 10px 0 #1e90ff, 0 15px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .mode-card:hover { transform: translateY(-8px); background: #f1f2f6; }
+        .mode-card:active { transform: translateY(10px); box-shadow: 0 0 0 #1e90ff; }
+        .mode-icon { font-size: 5rem; margin-bottom: 0.5rem; filter: drop-shadow(2px 5px 0px rgba(0,0,0,0.2)); }
+        .mode-title { font-size: 2.2rem; font-weight: 900; color: var(--wood-dark); line-height: 1; }
+        .mode-desc { font-size: 1.1rem; color: #57606f; font-weight: 600; margin-top: 15px; }
+
+        /* ==================================================
+           GAME SCREEN UI
+           ================================================== */
+        #game-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            position: absolute;
+            top: 0;
+            z-index: 20;
+        }
+
+        .icon-btn {
+            background: linear-gradient(to bottom, #ffffff, #dfe4ea);
+            border: 4px solid var(--wood-dark);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--wood-dark);
+            transition: all 0.1s;
+        }
+        .icon-btn:active { transform: translateY(6px); box-shadow: 0 0 0 var(--wood-dark); }
+
+        .progress-container {
+            background: var(--ui-bg);
+            border: 5px solid var(--gold-shadow);
+            border-radius: 30px;
+            padding: 5px 20px 5px 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--wood-dark);
+            box-shadow: 0 6px 0 var(--gold-shadow);
+        }
+        .progress-icon {
+            width: 45px; height: 45px;
+            display: inline-block;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+        }
+        
+        /* Chests Area */
+        #chests-area {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 80px; 
+            min-height: 140px;
+            align-items: flex-end;
+            z-index: 5;
+            padding: 0 10px;
+        }
+
+        .chest-wrapper {
+            position: relative;
+            width: clamp(70px, 15vw, 110px);
+            height: clamp(70px, 15vw, 110px);
+            animation: float 3s ease-in-out infinite;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        .chest-wrapper:nth-child(2) { animation-delay: 0.2s; }
+        .chest-wrapper:nth-child(3) { animation-delay: 0.4s; }
+        .chest-wrapper:nth-child(4) { animation-delay: 0.6s; }
+        .chest-wrapper:nth-child(5) { animation-delay: 0.8s; }
+
+        .chest-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 15px 10px rgba(0,0,0,0.4));
+            transition: all 0.3s ease;
+        }
+        .chest-wrapper.open {
+            transform: scale(1.15) translateY(-10px);
+            animation: none;
+        }
+        .chest-wrapper.open .chest-svg {
+            filter: drop-shadow(0 20px 20px rgba(255, 215, 0, 0.8));
+        }
+
+        /* Message Board (Wood Sign Style) */
+        #message-board {
+            background: linear-gradient(to bottom, #ffd32a, #ffa801);
+            border: 6px solid var(--wood-dark);
+            border-radius: 20px;
+            padding: 10px 40px;
+            margin: 10px 0;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.4rem, 4vw, 2rem);
+            font-weight: 900;
+            color: var(--wood-dark);
+            box-shadow: 0 8px 0 var(--wood-panel), inset 0 0 15px rgba(255,255,255,0.4);
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.8);
+            text-align: center;
+            transition: all 0.3s;
+            z-index: 5;
+            position: relative;
+        }
+        /* Wooden nails */
+        #message-board::before, #message-board::after {
+            content: '';
+            position: absolute;
+            width: 12px; height: 12px;
+            background: #2f3542;
+            border-radius: 50%;
+            top: 50%; transform: translateY(-50%);
+            box-shadow: inset -2px -2px 0 rgba(0,0,0,0.5);
+        }
+        #message-board::before { left: 15px; }
+        #message-board::after { right: 15px; }
+
+        /* Interaction Area */
+        #interaction-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            z-index: 5;
+            flex-grow: 1;
+            justify-content: flex-start;
+        }
+
+        /* ==================================================
+           NUMBER BOND UI (Hoàn thiện - Đồng nhất layout)
+           ================================================== */
+        .number-bond {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: clamp(260px, 65vw, 360px); 
+            margin: 10px auto 20px auto;
+        }
+
+        .bond-top {
+            z-index: 3;
+            animation: pulseGently 2s infinite alternate;
+            margin-bottom: clamp(35px, 8vw, 50px); 
+        }
+
+        .bond-row {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            z-index: 3;
+        }
+
+        /* Đầu nối SVG khắc phục hoàn toàn lỗi lộ viền / đứt đoạn */
+        .bond-svg {
+            position: absolute;
+            top: 15%; 
+            left: 0;
+            width: 100%;
+            height: 70%; 
+            z-index: 1;
+            pointer-events: none;
+            overflow: visible; 
+        }
+
+        .bond-circle {
+            width: clamp(70px, 15vw, 95px);
+            height: clamp(70px, 15vw, 95px);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            border: 6px solid var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 900;
+            color: var(--text-dark);
+            box-shadow: 0 8px 0 var(--text-dark), inset 0 -4px 0 rgba(0,0,0,0.15);
+            transition: all 0.3s;
+            text-shadow: none;
+        }
+
+        /* Block Whole (Số 10) - Đổi sang màu vàng đồng nhất với Rương và Bảng */
+        .bond-circle.target {
+            background: linear-gradient(to bottom, #ffd32a, #ffa801); 
+            color: var(--wood-dark);
+            border-color: var(--wood-dark);
+            box-shadow: 0 8px 0 var(--wood-dark), inset 0 -4px 0 rgba(255,255,255,0.3);
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+        }
+
+        .bond-circle.filled {
+            background: var(--ui-bg);
+            color: #0097e6;
+            transform: scale(1.05);
+        }
+
+        .bond-circle.highlight {
+            border-color: var(--success);
+            box-shadow: 0 0 25px var(--success), 0 8px 0 var(--success);
+            color: var(--success);
+        }
+
+        /* Number Cards Row */
+        #cards-row, #options-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            max-width: 95%;
+            padding: 10px;
+        }
+
+        .num-card {
+            background: linear-gradient(135deg, #ffffff 0%, #dff9fb 100%);
+            border: 5px solid #0097e6;
+            border-radius: 20px;
+            width: clamp(55px, 10vw, 75px);
+            height: clamp(55px, 10vw, 75px);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 900;
+            color: #0097e6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #0097e6;
+            transition: all 0.15s;
+        }
+
+        .num-card:hover {
+            background: #fff9e6;
+            transform: translateY(-5px);
+            border-color: var(--gold-shadow);
+            color: var(--gold-shadow);
+            box-shadow: 0 13px 0 var(--gold-shadow);
+        }
+
+        .num-card:active {
+            transform: translateY(8px);
+            box-shadow: 0 0 0 #0097e6;
+        }
+
+        /* Challenge Options (Bigger Cards) */
+        .opt-card {
+            background: linear-gradient(to bottom, #fffa65, #ffb8b8);
+            border: 6px solid var(--wood-dark);
+            border-radius: 25px;
+            width: clamp(80px, 15vw, 120px);
+            height: clamp(80px, 15vw, 110px);
+            font-size: clamp(3rem, 6vw, 4rem);
+            font-weight: 900;
+            color: var(--wood-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 10px 0 var(--wood-dark);
+            transition: all 0.15s;
+        }
+        .opt-card:hover { transform: translateY(-5px); filter: brightness(1.1); }
+        .opt-card:active {
+            transform: translateY(10px);
+            box-shadow: 0 0 0 var(--wood-dark);
+        }
+
+        .clear-btn {
+            background: var(--danger);
+            color: white;
+            border: 4px solid #c23616;
+            border-radius: 20px;
+            padding: 8px 30px;
+            font-size: 1.4rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #c23616;
+            margin-top: 5px;
+            transition: all 0.1s;
+            text-transform: uppercase;
+        }
+        .clear-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #c23616; }
+
+        /* ==================================================
+           END SCREEN & FIREWORKS
+           ================================================== */
+        #fireworks-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .end-content {
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            overflow: hidden; 
+        }
+        .score-board {
+            background: var(--ui-bg);
+            border: 8px solid var(--gold);
+            border-radius: 35px;
+            padding: 1.5rem 1.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 12px 0 var(--gold-shadow), 0 20px 25px rgba(0,0,0,0.3);
+            animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 100%;
+            max-width: 450px;
+            box-sizing: border-box;
+        }
+        .stars-container {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            letter-spacing: 5px;
+            margin: 10px 0;
+            filter: drop-shadow(0 5px 0px var(--gold-shadow));
+        }
+        .stat-text {
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            font-weight: 800;
+            color: var(--wood-dark);
+            margin: 5px 0;
+        }
+
+        /* ==================================================
+           ANIMATIONS & EFFECTS
+           ================================================== */
+        .shake { animation: shake 0.5s ease-in-out; }
+        .success-pop { animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+        @keyframes floatX {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(80px); }
+        }
+        @keyframes pulseBtn {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes pulseGently {
+            0% { transform: scale(1); box-shadow: 0 8px 0 var(--wood-dark), inset 0 -4px 0 rgba(255,255,255,0.3); }
+            100% { transform: scale(1.05); box-shadow: 0 8px 0 var(--wood-dark), 0 0 20px rgba(255,215,0,0.8), inset 0 -4px 0 rgba(255,255,255,0.3); }
+        }
+        @keyframes pulseSun {
+            0% { transform: scale(1) rotate(0deg); filter: saturate(2) drop-shadow(0 0 25px #ffbe0b); }
+            100% { transform: scale(1.1) rotate(5deg); filter: saturate(2.5) drop-shadow(0 0 45px #ff9f1c); }
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-15px) rotate(-3deg); }
+            40%, 80% { transform: translateX(15px) rotate(3deg); }
+        }
+        @keyframes pop {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        @keyframes spinMagic {
+            100% { transform: rotate(360deg); }
+        }
+
+        .magic-rays {
+            transform-origin: 50px 45px;
+            animation: spinMagic 6s linear infinite;
+        }
+
+        /* Particles */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 100;
+            width: 30px; height: 30px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            animation: fall 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg) scale(0.5); opacity: 1; }
+            50% { transform: translateY(var(--ty)) rotate(180deg) scale(1.2); opacity: 1; }
+            100% { transform: translateY(calc(var(--ty) + 150px)) rotate(360deg) scale(1); opacity: 0; }
+        }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 600px) {
+            .mode-container { flex-direction: column; align-items: center; gap: 1rem; }
+            .mode-card { width: 90%; padding: 1.5rem; }
+            .mode-icon { font-size: 4rem; }
+            #game-header { padding: 10px; }
+            .progress-container { font-size: 1.6rem; padding: 5px 12px; }
+            .progress-icon { width: 35px; height: 35px; }
+            #chests-area { gap: 5px; margin-top: 60px; }
+            #message-board { padding: 5px 15px; margin: 5px; min-height: 50px; font-size: 1.2rem; }
+            .title-box { padding: 1rem 2rem; margin-bottom: 1rem; }
+            h1 { font-size: 2rem; }
+            .score-board { padding: 1rem; margin-bottom: 1rem; }
+        }
+
+    </style>
+</head>
+<body>
+<img src="../assets/logo-oodles-math.png" class="oodles-logo">
+<div id="app-container">
+    <!-- Background Decorations -->
+    <div class="wave"></div>
+    <div class="decoration sun">☀️</div>
+    <div class="decoration cloud1">☁️</div>
+    <div class="decoration cloud2">☁️</div>
+    <div class="decoration palm-left">🌴</div>
+    <div class="decoration palm-right">🌴</div>
+    <div class="decoration crab">🦀</div>
+
+    <!-- ==========================================
+         SCREEN 1: START SCREEN
+         ========================================== -->
+    <div id="start-screen" class="screen active">
+        <div class="title-box">
+            <h1>Treasure Bond</h1>
+            <h2>Find 2 numbers that make 10!</h2>
+        </div>
+        <button class="btn" onclick="app.showModeSelect()">Start Game</button>
+    </div>
+
+    <!-- ==========================================
+         SCREEN 2: MODE SELECTION
+         ========================================== -->
+    <div id="mode-select-screen" class="screen">
+        <div class="title-box" style="padding: 1.2rem 3rem; margin-bottom: 0;">
+            <h2>Choose Your Adventure!</h2>
+        </div>
+        <div class="mode-container">
+            <div class="mode-card" onclick="app.startGame('free')">
+                <div class="mode-icon">🧭</div>
+                <div class="mode-title">Free Play</div>
+                <div class="mode-desc">Make 10 any way you like to open chests!</div>
+            </div>
+            <div class="mode-card" onclick="app.startGame('challenge')">
+                <div class="mode-icon">📜</div>
+                <div class="mode-title">Challenge</div>
+                <div class="mode-desc">Complete the Number Bond for the treasure!</div>
+            </div>
+        </div>
+        <button class="btn-secondary btn" style="margin-top: 1.5rem;" onclick="app.showScreen('start-screen')">Home</button>
+    </div>
+
+    <!-- ==========================================
+         SCREEN 3: MAIN GAME SCREEN
+         ========================================== -->
+    <div id="game-screen" class="screen">
+        <!-- Header -->
+        <div id="game-header">
+            <button class="icon-btn" onclick="app.confirmHome()" title="Home">🏠</button>
+            <div class="progress-container">
+                <div class="progress-icon" id="header-gem-icon"></div>
+                <span id="chest-counter">0 / 5</span>
+            </div>
+            <button class="icon-btn" id="sound-btn" onclick="app.toggleSound()" title="Toggle Sound">🔊</button>
+        </div>
+
+        <!-- Chests -->
+        <div id="chests-area">
+            <!-- Populated by JS -->
+        </div>
+
+        <!-- Feedback Message -->
+        <div id="message-board">
+            Choose 2 numbers to make 10!
+        </div>
+
+        <!-- Interaction Area -->
+        <div id="interaction-area">
+            
+            <!-- Free Play Area with Number Bond UI -->
+            <div id="free-play-ui" style="display:none; width: 100%; align-items: center; flex-direction: column;">
+                <div class="number-bond">
+                    <div class="bond-top">
+                        <div class="bond-circle target">10</div>
+                    </div>
+                    <!-- SVG lines connect cleanly using overflow visible and exact percentages -->
+                    <svg class="bond-svg" preserveAspectRatio="none" overflow="visible">
+                        <line x1="50%" y1="0" x2="18%" y2="100%" stroke="#2c3e50" stroke-width="7" stroke-linecap="round"/>
+                        <line x1="50%" y1="0" x2="82%" y2="100%" stroke="#2c3e50" stroke-width="7" stroke-linecap="round"/>
+                    </svg>
+                    <div class="bond-row">
+                        <div id="slot1" class="bond-circle">?</div>
+                        <div id="slot2" class="bond-circle">?</div>
+                    </div>
+                </div>
+                
+                <div id="cards-row">
+                    <!-- Cards 0-10 populated by JS -->
+                </div>
+                <button class="clear-btn" id="clear-btn" onclick="app.clearSlots()" style="visibility:hidden;">Clear Choice</button>
+            </div>
+
+            <!-- Challenge Area with Number Bond UI -->
+            <div id="challenge-ui" style="display:none; width: 100%; align-items: center; flex-direction: column;">
+                <div class="number-bond" id="challenge-equation">
+                    <!-- Number Bond injected via JS -->
+                </div>
+                <div id="options-row">
+                    <!-- Options populated by JS -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ==========================================
+         SCREEN 4: END SCREEN
+         ========================================== -->
+    <div id="end-screen" class="screen">
+        <canvas id="fireworks-canvas"></canvas>
+        <div class="end-content">
+            <div class="title-box">
+                <h1 style="font-size: clamp(2rem, 5vw, 3.5rem);">Amazing Job!</h1>
+                <h2>You found all the treasures! 👑</h2>
+            </div>
+            
+            <div class="score-board">
+                <h2 style="color:#0072ff; font-size:clamp(1.5rem, 4vw, 2rem); margin-bottom: 5px;">Your Score</h2>
+                <div class="stars-container" id="stars-display">⭐⭐⭐</div>
+                <div class="stat-text" id="stat-mistakes">Mistakes: 0</div>
+                <div class="stat-text" style="color:var(--success)">Math Master!</div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; z-index: 10;">
+                <button class="btn" onclick="app.showModeSelect()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+/**
+ * ==================================================
+ * HIGH QUALITY SVG ASSETS
+ * ==================================================
+ */
+const SVGs = {
+    chestClosed: `
+        <svg class="chest-svg" viewBox="0 0 100 100" overflow="visible" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="woodGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#a0522d" />
+                    <stop offset="100%" stop-color="#5c3a21" />
+                </linearGradient>
+                <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#FFF8DC" />
+                    <stop offset="30%" stop-color="#FFD700" />
+                    <stop offset="100%" stop-color="#e67e22" />
+                </linearGradient>
+            </defs>
+            <ellipse cx="50" cy="92" rx="42" ry="8" fill="rgba(0,0,0,0.3)"/>
+            
+            <!-- Base Wood -->
+            <path d="M10,50 h80 v35 a5,5 0 0,1 -5,5 h-70 a5,5 0 0,1 -5,-5 z" fill="url(#woodGrad)" stroke="#4a2311" stroke-width="2"/>
+            <line x1="10" y1="60" x2="90" y2="60" stroke="#3e1b0d" stroke-width="2" opacity="0.5"/>
+            <line x1="10" y1="70" x2="90" y2="70" stroke="#3e1b0d" stroke-width="2" opacity="0.5"/>
+            <line x1="10" y1="80" x2="90" y2="80" stroke="#3e1b0d" stroke-width="2" opacity="0.5"/>
+            
+            <!-- Base Gold Trims -->
+            <rect x="15" y="50" width="12" height="40" fill="url(#goldGrad)" stroke="#b33939" stroke-width="2" rx="2"/>
+            <rect x="73" y="50" width="12" height="40" fill="url(#goldGrad)" stroke="#b33939" stroke-width="2" rx="2"/>
+            <rect x="10" y="45" width="80" height="8" fill="url(#goldGrad)" stroke="#b33939" stroke-width="2" rx="2"/>
+            <rect x="10" y="82" width="80" height="8" fill="url(#goldGrad)" stroke="#b33939" stroke-width="2" rx="2"/>
+            
+            <!-- Lid Wood -->
+            <path d="M10,45 v-10 a40,30 0 0,1 80,0 v10 z" fill="#b35b2c" stroke="#4a2311" stroke-width="2"/>
+            <path d="M14,40 v-5 a35,22 0 0,1 72,0 v5 z" fill="rgba(255,255,255,0.15)" />
+            
+            <path d="M25,18 q25,-12 50,0" stroke="#4a2311" stroke-width="2" fill="none" opacity="0.6"/>
+            <path d="M20,28 q30,-15 60,0" stroke="#4a2311" stroke-width="2" fill="none" opacity="0.6"/>
+            
+            <!-- Lid Gold Trims -->
+            <path d="M15,45 v-10 a30,25 0 0,1 12,-20 v30 z" fill="url(#goldGrad)" stroke="#b33939" stroke-width="2"/>
+            <path d="M73,45 v-10 a30,25 0 0,0 -12,-20 v30 z" fill="url(#goldGrad)" stroke="#b33939" stroke-width="2"/>
+            
+            <!-- Lock with Keyhole -->
+            <path d="M40,38 h20 v18 a10,10 0 0,1 -20,0 z" fill="#E0E0E0" stroke="#4a2311" stroke-width="2"/>
+            <path d="M42,40 h16 v16 a8,8 0 0,1 -16,0 z" fill="#F5F5F5"/>
+            <circle cx="50" cy="45" r="3" fill="#212121"/>
+            <path d="M48.5,45 l-1,6 h5 l-1,-6 z" fill="#212121"/>
+        </svg>
+    `,
+    chestOpen: `
+        <svg class="chest-svg" viewBox="0 0 100 100" overflow="visible" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="woodGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#a0522d" />
+                    <stop offset="100%" stop-color="#5c3a21" />
+                </linearGradient>
+                <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#FFF8DC" />
+                    <stop offset="30%" stop-color="#FFD700" />
+                    <stop offset="100%" stop-color="#e67e22" />
+                </linearGradient>
+                <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="rgba(255,215,0,0.8)" />
+                    <stop offset="100%" stop-color="rgba(255,215,0,0)" />
+                </radialGradient>
+            </defs>
+            <ellipse cx="50" cy="92" rx="42" ry="8" fill="rgba(0,0,0,0.3)"/>
+            
+            <!-- MAGIC RAYS (SPINNING) -->
+            <g class="magic-rays">
+                <polygon points="50,45 20,-10 30,-15" fill="rgba(255,255,255,0.4)"/>
+                <polygon points="50,45 80,-10 70,-15" fill="rgba(255,255,255,0.4)"/>
+                <polygon points="50,45 -10,30 -15,40" fill="rgba(255,255,255,0.4)"/>
+                <polygon points="50,45 110,30 115,40" fill="rgba(255,255,255,0.4)"/>
+                <polygon points="50,45 0,0 10,-10" fill="rgba(255,215,0,0.4)"/>
+                <polygon points="50,45 100,0 90,-10" fill="rgba(255,215,0,0.4)"/>
+            </g>
+
+            <circle cx="50" cy="35" r="35" fill="url(#glow)"/>
+
+            <!-- Treasures inside -->
+            <circle cx="35" cy="40" r="10" fill="#FFD700" stroke="#DAA520" stroke-width="1.5"/>
+            <circle cx="65" cy="40" r="10" fill="#FFD700" stroke="#DAA520" stroke-width="1.5"/>
+            <circle cx="50" cy="32" r="13" fill="#FFD700" stroke="#DAA520" stroke-width="1.5"/>
+            <circle cx="42" cy="46" r="11" fill="#FFD700" stroke="#DAA520" stroke-width="1.5"/>
+            <circle cx="58" cy="46" r="11" fill="#FFD700" stroke="#DAA520" stroke-width="1.5"/>
+            <circle cx="25" cy="45" r="9" fill="#FFD700" stroke="#DAA520" stroke-width="1.5"/>
+            <circle cx="75" cy="45" r="9" fill="#FFD700" stroke="#DAA520" stroke-width="1.5"/>
+            
+            <!-- Colorful Gems -->
+            <path d="M45,22 l5,8 l5,-8 l8,4 l-8,4 l5,8 l-8,-4 l-5,8 l-5,-8 l-8,4 l5,-8 l-8,-4 z" fill="#00ffff" stroke="#008080" stroke-width="1"/>
+            <path d="M65,18 l4,6 l4,-6 l6,3 l-6,3 l4,6 l-6,-3 l-4,6 l-4,-6 l-6,3 l4,-6 l-6,-3 z" fill="#ff4757" stroke="#8B0000" stroke-width="1"/>
+            <path d="M30,26 l4,6 l4,-6 l6,3 l-6,3 l4,6 l-6,-3 l-4,6 l-4,-6 l-6,3 l4,-6 l-6,-3 z" fill="#2ed573" stroke="#006400" stroke-width="1"/>
+
+            <!-- Base Wood -->
+            <path d="M10,50 h80 v35 a5,5 0 0,1 -5,5 h-70 a5,5 0 0,1 -5,-5 z" fill="url(#woodGrad)" stroke="#4a2311" stroke-width="2"/>
+            <line x1="10" y1="60" x2="90" y2="60" stroke="#3e1b0d" stroke-width="2" opacity="0.5"/>
+            <line x1="10" y1="70" x2="90" y2="70" stroke="#3e1b0d" stroke-width="2" opacity="0.5"/>
+            <line x1="10" y1="80" x2="90" y2="80" stroke="#3e1b0d" stroke-width="2" opacity="0.5"/>
+            
+            <!-- Base Gold Trims -->
+            <rect x="15" y="50" width="12" height="40" fill="url(#goldGrad)" stroke="#b33939" stroke-width="2" rx="2"/>
+            <rect x="73" y="50" width="12" height="40" fill="url(#goldGrad)" stroke="#b33939" stroke-width="2" rx="2"/>
+            <rect x="10" y="45" width="80" height="8" fill="url(#goldGrad)" stroke="#b33939" stroke-width="2" rx="2"/>
+            <rect x="10" y="82" width="80" height="8" fill="url(#goldGrad)" stroke="#b33939" stroke-width="2" rx="2"/>
+            
+            <!-- Open Lid -->
+            <g transform="translate(0, -28) scale(1, 0.6)">
+                <path d="M10,45 v-10 a40,30 0 0,1 80,0 v10 z" fill="#8B4513" stroke="#4a2311" stroke-width="2"/>
+                <path d="M15,45 v-10 a30,25 0 0,1 12,-20 v30 z" fill="url(#goldGrad)" stroke="#b33939" stroke-width="2"/>
+                <path d="M73,45 v-10 a30,25 0 0,0 -12,-20 v30 z" fill="url(#goldGrad)" stroke="#b33939" stroke-width="2"/>
+            </g>
+        </svg>
+    `,
+    gem: `
+        <svg viewBox="0 0 100 100" overflow="visible" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50,5 L85,35 L50,95 L15,35 Z" fill="#00E5FF" stroke="#0097A7" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M50,5 L85,35 L50,45 Z" fill="#E0FFFF"/>
+            <path d="M50,5 L15,35 L50,45 Z" fill="#84FFFF"/>
+            <path d="M15,35 L50,95 L50,45 Z" fill="#00B8D4"/>
+            <path d="M85,35 L50,95 L50,45 Z" fill="#0097A7"/>
+            <path d="M25,15 Q30,20 35,15 Q30,10 25,15 Z" fill="#FFFFFF"/>
+            <circle cx="35" cy="25" r="3" fill="#FFFFFF" opacity="0.8"/>
+        </svg>
+    `
+};
+
+document.getElementById('header-gem-icon').innerHTML = SVGs.gem;
+
+/**
+ * ==================================================
+ * AUDIO SYSTEM
+ * ==================================================
+ */
+const AudioEngine = {
+    ctx: null,
+    enabled: true,
+
+    init() {
+        if (!this.ctx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+    },
+
+    playTone(freq, type, duration, vol=0.1) {
+        if (!this.enabled || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.00001, this.ctx.currentTime + duration);
+        osc.stop(this.ctx.currentTime + duration);
+    },
+
+    playClick() { this.playTone(500, 'sine', 0.1, 0.15); },
+    playPop() { this.playTone(800, 'sine', 0.1, 0.15); },
+
+    playSuccess() {
+        if (!this.enabled || !this.ctx) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+        let time = this.ctx.currentTime;
+        notes.forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine'; 
+            osc.frequency.value = freq;
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(time + i * 0.05);
+            gain.gain.setValueAtTime(0.15, time + i * 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + i * 0.05 + 0.4);
+            osc.stop(time + i * 0.05 + 0.5);
+        });
+    },
+
+    playError() {
+        if (!this.enabled || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, this.ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
+        osc.stop(this.ctx.currentTime + 0.3);
+    },
+
+    playWin() {
+        if (!this.enabled || !this.ctx) return;
+        const melody = [
+            { f: 523.25, d: 0.15 }, { f: 659.25, d: 0.15 }, { f: 783.99, d: 0.15 },
+            { f: 1046.50, d: 0.3 }, { f: 783.99, d: 0.15 }, { f: 1046.50, d: 0.5 }
+        ];
+        let time = this.ctx.currentTime;
+        
+        for(let j=0; j<2; j++) {
+            melody.forEach((note) => {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.value = note.f;
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(time);
+                gain.gain.setValueAtTime(0.15, time);
+                gain.gain.exponentialRampToValueAtTime(0.001, time + note.d - 0.02);
+                osc.stop(time + note.d);
+                time += note.d;
+            });
+        }
+    }
+};
+
+/**
+ * ==================================================
+ * FIREWORKS SYSTEM
+ * ==================================================
+ */
+const Fireworks = {
+    canvas: null,
+    ctx: null,
+    particles: [],
+    isActive: false,
+    colors: ['#ff4757', '#ffa502', '#1e90ff', '#9b59b6', '#32ff7e', '#00f5d4'],
+
+    init() {
+        this.canvas = document.getElementById('fireworks-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+    },
+
+    resize() {
+        if(this.canvas) {
+            this.canvas.width = window.innerWidth;
+            this.canvas.height = window.innerHeight;
+        }
+    },
+
+    start() {
+        this.isActive = true;
+        this.particles = [];
+        this.loop();
+        this.launcher = setInterval(() => {
+            if(this.isActive) this.explode(
+                Math.random() * this.canvas.width, 
+                Math.random() * (this.canvas.height / 2)
+            );
+        }, 800);
+    },
+
+    stop() {
+        this.isActive = false;
+        clearInterval(this.launcher);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    },
+
+    explode(x, y) {
+        const count = 60 + Math.random() * 50;
+        const color = this.colors[Math.floor(Math.random() * this.colors.length)];
+        for(let i=0; i<count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 6 + 2;
+            this.particles.push({
+                x: x, y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                radius: Math.random() * 4 + 2,
+                color: Math.random() > 0.2 ? color : '#ffffff',
+                alpha: 1,
+                decay: Math.random() * 0.015 + 0.015
+            });
+        }
+    },
+
+    loop() {
+        if(!this.isActive) return;
+        requestAnimationFrame(() => this.loop());
+        this.ctx.globalCompositeOperation = 'destination-out';
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.globalCompositeOperation = 'lighter';
+
+        for(let i = this.particles.length - 1; i >= 0; i--) {
+            let p = this.particles[i];
+            p.vy += 0.1;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.alpha -= p.decay;
+
+            if(p.alpha <= 0) {
+                this.particles.splice(i, 1);
+                continue;
+            }
+
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            this.ctx.fillStyle = p.color;
+            this.ctx.globalAlpha = p.alpha;
+            this.ctx.fill();
+        }
+        this.ctx.globalAlpha = 1;
+    }
+};
+
+/**
+ * ==================================================
+ * GAME LOGIC & STATE
+ * ==================================================
+ */
+const app = {
+    mode: 'free', 
+    chestsOpened: 0,
+    totalChests: 5,
+    isProcessing: false,
+    currentMistakeCount: 0,
+    totalGameMistakes: 0,
+    
+    slots: [null, null], 
+    challengeData: { given: 0, missing: 0 },
+    usedChallenges: [], // Lưu các câu hỏi đã hỏi để tránh trùng lặp
+
+    init() {
+        const cardsRow = document.getElementById('cards-row');
+        for(let i=0; i<=10; i++) {
+            const btn = document.createElement('div');
+            btn.className = 'num-card';
+            btn.innerText = i;
+            btn.onclick = () => this.handleNumberClick(i);
+            cardsRow.appendChild(btn);
+        }
+        Fireworks.init();
+    },
+
+    toggleSound() {
+        AudioEngine.enabled = !AudioEngine.enabled;
+        document.getElementById('sound-btn').innerText = AudioEngine.enabled ? '🔊' : '🔇';
+        if(AudioEngine.enabled) AudioEngine.init();
+    },
+
+    showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        if(screenId === 'start-screen' || screenId === 'mode-select-screen') {
+            AudioEngine.init();
+            Fireworks.stop();
+        }
+    },
+
+    showModeSelect() {
+        AudioEngine.playClick();
+        this.showScreen('mode-select-screen');
+    },
+
+    confirmHome() {
+        AudioEngine.playClick();
+        if(confirm("Do you want to go back to the menu? Your progress will be lost.")) {
+            this.showScreen('mode-select-screen');
+        }
+    },
+
+    startGame(selectedMode) {
+        AudioEngine.playClick();
+        this.mode = selectedMode;
+        this.chestsOpened = 0;
+        this.currentMistakeCount = 0;
+        this.totalGameMistakes = 0;
+        this.isProcessing = false;
+        this.usedChallenges = []; // Khởi tạo lại danh sách câu hỏi đã hỏi
+        
+        this.updateChestCounter();
+        this.renderChests();
+        this.resetMessage();
+
+        if (this.mode === 'free') {
+            document.getElementById('free-play-ui').style.display = 'flex';
+            document.getElementById('challenge-ui').style.display = 'none';
+            this.clearSlots(false); 
+        } else {
+            document.getElementById('free-play-ui').style.display = 'none';
+            document.getElementById('challenge-ui').style.display = 'flex';
+            this.setupChallenge();
+        }
+
+        this.showScreen('game-screen');
+    },
+
+    renderChests() {
+        const area = document.getElementById('chests-area');
+        area.innerHTML = '';
+        for (let i = 0; i < this.totalChests; i++) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'chest-wrapper';
+            wrapper.id = `chest-${i}`;
+            wrapper.innerHTML = SVGs.chestClosed;
+            area.appendChild(wrapper);
+        }
+    },
+
+    updateChestCounter() {
+        document.getElementById('chest-counter').innerText = `${this.chestsOpened} / ${this.totalChests}`;
+    },
+
+    setMessage(text, type = 'normal') {
+        const board = document.getElementById('message-board');
+        board.innerText = text;
+        if(type === 'error') {
+            board.style.color = '#d63031';
+            board.classList.add('shake');
+            setTimeout(() => board.classList.remove('shake'), 500);
+        } else if (type === 'success') {
+            board.style.color = '#009432';
+            board.classList.add('success-pop');
+            setTimeout(() => board.classList.remove('success-pop'), 500);
+        } else {
+            board.style.color = 'var(--wood-dark)';
+        }
+    },
+
+    resetMessage() {
+        if(this.mode === 'free') {
+            this.setMessage("Choose 2 numbers to make 10!");
+        } else {
+            this.setMessage("Complete the Number Bond!");
+        }
+    },
+
+    // ==========================================
+    // FREE PLAY LOGIC
+    // ==========================================
+    handleNumberClick(num) {
+        if (this.isProcessing) return;
+        AudioEngine.playPop();
+
+        if (this.slots[0] === null) {
+            this.slots[0] = num;
+            const slot1 = document.getElementById('slot1');
+            slot1.innerText = num;
+            slot1.classList.add('filled');
+            document.getElementById('clear-btn').style.visibility = 'visible';
+        } else if (this.slots[1] === null) {
+            this.slots[1] = num;
+            const slot2 = document.getElementById('slot2');
+            slot2.innerText = num;
+            slot2.classList.add('filled');
+            this.checkFreePlaySum();
+        }
+    },
+
+    clearSlots(playSound = true) {
+        if(playSound) AudioEngine.playClick();
+        this.slots = [null, null];
+        
+        const s1 = document.getElementById('slot1');
+        const s2 = document.getElementById('slot2');
+        
+        s1.innerText = '?';
+        s1.classList.remove('filled', 'highlight');
+        s2.innerText = '?';
+        s2.classList.remove('filled', 'highlight');
+        
+        document.getElementById('clear-btn').style.visibility = 'hidden';
+        if(!this.isProcessing) this.resetMessage();
+    },
+
+    checkFreePlaySum() {
+        this.isProcessing = true;
+        const sum = this.slots[0] + this.slots[1];
+        const eqStr = `${this.slots[0]} and ${this.slots[1]} make ${sum}`;
+
+        if (sum === 10) {
+            this.handleCorrect(`${this.slots[0]} + ${this.slots[1]} = 10`);
+        } else {
+            this.handleWrong(eqStr, sum);
+        }
+    },
+
+    // ==========================================
+    // CHALLENGE LOGIC
+    // ==========================================
+    setupChallenge() {
+        const target = 10;
+        let missingNum;
+        
+        // Tạo số còn thiếu từ 1-9 (hạn chế số 0) và đảm bảo không bị trùng lại
+        do {
+            missingNum = Math.floor(Math.random() * 9) + 1; 
+        } while (this.usedChallenges.includes(missingNum));
+
+        // Lưu câu hỏi vào mảng lịch sử để không hỏi lại trong lượt này
+        this.usedChallenges.push(missingNum);
+
+        this.challengeData.missing = missingNum;
+        this.challengeData.given = target - this.challengeData.missing;
+
+        const eqArea = document.getElementById('challenge-equation');
+        const isMissingFirst = Math.random() > 0.5;
+        
+        let htmlContent = `
+            <div class="bond-top">
+                <div class="bond-circle target">10</div>
+            </div>
+            <svg class="bond-svg" preserveAspectRatio="none" overflow="visible">
+                <line x1="50%" y1="0" x2="18%" y2="100%" stroke="#2c3e50" stroke-width="7" stroke-linecap="round"/>
+                <line x1="50%" y1="0" x2="82%" y2="100%" stroke="#2c3e50" stroke-width="7" stroke-linecap="round"/>
+            </svg>
+            <div class="bond-row">
+        `;
+
+        if (isMissingFirst) {
+            htmlContent += `
+                <div id="chal-slot1" class="bond-circle">?</div>
+                <div id="chal-slot2" class="bond-circle filled">${this.challengeData.given}</div>
+            `;
+        } else {
+            htmlContent += `
+                <div id="chal-slot1" class="bond-circle filled">${this.challengeData.given}</div>
+                <div id="chal-slot2" class="bond-circle">?</div>
+            `;
+        }
+        htmlContent += `</div>`;
+        eqArea.innerHTML = htmlContent;
+
+        // Tạo mảng đáp án: cũng lấy từ 1 đến 9, không dùng số 0
+        let options = [this.challengeData.missing];
+        while (options.length < 4) {
+            let rnd = Math.floor(Math.random() * 9) + 1;
+            if (!options.includes(rnd)) options.push(rnd);
+        }
+        options.sort(() => Math.random() - 0.5);
+
+        const optRow = document.getElementById('options-row');
+        optRow.innerHTML = '';
+        options.forEach(opt => {
+            const btn = document.createElement('div');
+            btn.className = 'opt-card';
+            btn.innerText = opt;
+            btn.onclick = () => this.handleChallengeSelection(opt, isMissingFirst);
+            optRow.appendChild(btn);
+        });
+    },
+
+    handleChallengeSelection(selectedNum, isMissingFirst) {
+        if (this.isProcessing) return;
+        this.isProcessing = true;
+
+        const sum = selectedNum + this.challengeData.given;
+        let eqStr = "";
+        
+        const slot1 = document.getElementById('chal-slot1');
+        const slot2 = document.getElementById('chal-slot2');
+
+        if(isMissingFirst) {
+            eqStr = `${selectedNum} and ${this.challengeData.given} make ${sum}`;
+            slot1.innerText = selectedNum;
+            slot1.classList.add('filled');
+        } else {
+            eqStr = `${this.challengeData.given} and ${selectedNum} make ${sum}`;
+            slot2.innerText = selectedNum;
+            slot2.classList.add('filled');
+        }
+
+        if (sum === 10) {
+            let successStr = isMissingFirst 
+                ? `${selectedNum} + ${this.challengeData.given} = 10`
+                : `${this.challengeData.given} + ${selectedNum} = 10`;
+            this.handleCorrect(successStr);
+        } else {
+            this.handleWrong(eqStr, sum, () => {
+                if(isMissingFirst) {
+                    slot1.innerText = '?';
+                    slot1.classList.remove('filled');
+                } else {
+                    slot2.innerText = '?';
+                    slot2.classList.remove('filled');
+                }
+            });
+        }
+    },
+
+    // ==========================================
+    // SHARED LOGIC
+    // ==========================================
+    handleCorrect(eqStr) {
+        AudioEngine.playSuccess();
+        this.setMessage(`${eqStr}! Great job!`, 'success');
+        this.currentMistakeCount = 0;
+
+        const chestWrapper = document.getElementById(`chest-${this.chestsOpened}`);
+        
+        setTimeout(() => {
+            chestWrapper.classList.add('open');
+            chestWrapper.innerHTML = SVGs.chestOpen;
+            this.spawnConfetti(chestWrapper);
+            
+            this.chestsOpened++;
+            this.updateChestCounter();
+
+            setTimeout(() => {
+                if (this.chestsOpened >= this.totalChests) {
+                    this.triggerWin();
+                } else {
+                    this.resetForNextTurn();
+                }
+            }, 1200);
+        }, 500);
+    },
+
+    handleWrong(eqStr, actualSum, extraCallback) {
+        AudioEngine.playError();
+        this.currentMistakeCount++;
+        this.totalGameMistakes++;
+        
+        const interactionArea = document.getElementById('interaction-area');
+        interactionArea.classList.add('shake');
+        setTimeout(() => interactionArea.classList.remove('shake'), 500);
+
+        let msg = `${eqStr}. Try again!`;
+        if (this.currentMistakeCount >= 2) {
+            if (this.mode === 'free') {
+                msg = `Hint: What makes 10 with ${this.slots[0]}?`;
+            } else {
+                msg = `Hint: Count up from ${this.challengeData.given} to 10.`;
+            }
+        }
+        this.setMessage(msg, 'error');
+
+        setTimeout(() => {
+            if(extraCallback) extraCallback();
+            if (this.mode === 'free') this.clearSlots(false);
+            this.isProcessing = false;
+        }, 2000);
+    },
+
+    resetForNextTurn() {
+        if (this.mode === 'free') this.clearSlots(false);
+        else this.setupChallenge();
+        this.resetMessage();
+        this.isProcessing = false;
+    },
+
+    triggerWin() {
+        AudioEngine.playWin();
+        
+        let stars = "⭐⭐⭐";
+        let ratingText = "Math Master!";
+        if (this.totalGameMistakes > 2) { stars = "⭐⭐"; ratingText = "Great Job!"; }
+        if (this.totalGameMistakes > 5) { stars = "⭐"; ratingText = "Good Effort!"; }
+
+        document.getElementById('stars-display').innerText = stars;
+        document.getElementById('stat-mistakes').innerText = `Mistakes: ${this.totalGameMistakes}`;
+        document.getElementById('stat-mistakes').nextElementSibling.innerText = ratingText;
+
+        this.showScreen('end-screen');
+        Fireworks.start();
+    },
+
+    spawnConfetti(originElement) {
+        const rect = originElement.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        const svgURIs = [
+            `url("data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><circle cx='50' cy='50' r='40' fill='%23FFD700' stroke='%23DAA520' stroke-width='10'/></svg>")`, 
+            `url("data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><polygon points='50,10 85,40 50,90 15,40' fill='%2300FFFF'/></svg>")`, 
+            `url("data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><polygon points='50,5 95,50 50,95 5,50' fill='%23FF00FF'/></svg>")`, 
+            `url("data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><path d='M50,10 L60,40 L90,50 L60,60 L50,90 L40,60 L10,50 L40,40 Z' fill='%23FFFF00'/></svg>")` 
+        ];
+        
+        for (let i = 0; i < 25; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.backgroundImage = svgURIs[Math.floor(Math.random() * svgURIs.length)];
+            
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = 80 + Math.random() * 180;
+            const tx = Math.cos(angle) * velocity;
+            const ty = Math.sin(angle) * velocity - 120;
+            
+            particle.style.left = `${centerX - 15}px`;
+            particle.style.top = `${centerY - 15}px`;
+            particle.style.setProperty('--tx', `${tx}px`);
+            particle.style.setProperty('--ty', `${ty}px`);
+            
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 1500);
+        }
+    }
+};
+
+window.onload = () => {
+    app.init();
+};
+
+</script>
+</body>
+</html>

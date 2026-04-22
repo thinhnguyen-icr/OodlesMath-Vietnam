@@ -1,560 +1,561 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="../assets/brand.css">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Little Math Heroes: Subtraction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Little Math Heroes: Wizard Cup V5</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap');
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --accent: #facc15;
+            --bg-sky: #f0f9ff;
+        }
 
         body {
-            font-family: 'Nunito', sans-serif;
-            background-color: #E0F7FA;
-            background-image: radial-gradient(#B2EBF2 2px, transparent 2px);
-            background-size: 30px 30px;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-sky);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 30%),
+                radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 30%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            margin: 0;
             overflow: hidden;
-            touch-action: manipulation; /* Improve touch response */
+            touch-action: none;
         }
 
-        h1, h2, .btn-text, .bonus-text {
-            font-family: 'Fredoka One', cursive;
+        .game-card {
+            width: 95%;
+            max-width: 500px;
+            height: 92vh;
+            max-height: 850px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 60px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.1), inset 0 0 40px rgba(168, 85, 247, 0.05);
+            border: 12px solid #FFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Animations */
-        @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        /* Decorative Block Borders - Version 5 */
+        .decorated-block {
+            position: relative;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);
+            border-radius: 45px;
+            border: 6px solid #e0e7ff;
+            box-shadow: 0 12px 0 #d1d5db;
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
         }
 
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-10px) rotate(-5deg); }
-            50% { transform: translateX(10px) rotate(5deg); }
-            75% { transform: translateX(-10px) rotate(-5deg); }
-            100% { transform: translateX(0); }
+        .visual-container {
+            min-height: 160px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            gap: 12px;
         }
 
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-
-        /* Bonus Item Animation */
-        @keyframes floatUp {
-            0% { transform: translateY(110vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-10vh) rotate(360deg); opacity: 1; }
-        }
-
-        @keyframes disappear {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(1.5); opacity: 0; }
-        }
-
-        .animate-pop { animation: pop 0.3s ease-out; }
-        .animate-shake { animation: shake 0.4s ease-in-out; }
-        .animate-float { animation: float 3s ease-in-out infinite; }
-
-        .option-btn {
-            transition: all 0.2s;
-            border-bottom: 6px solid;
-        }
-        .option-btn:active {
-            transform: translateY(4px);
-            border-bottom: 2px solid;
-        }
-
-        /* Confetti Particle */
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: #f00;
-            animation: fall linear forwards;
-            z-index: 50;
-        }
-
-        @keyframes fall {
-            to { transform: translateY(100vh) rotate(720deg); }
-        }
-
-        /* Bonus Round Specifics */
-        .bonus-item {
-            position: absolute;
-            font-size: 4rem;
+        .math-icon {
+            font-size: 3.2rem;
             cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 6px 8px rgba(0,0,0,0.12));
             user-select: none;
-            z-index: 100;
-            animation: floatUp linear forwards;
         }
-        
-        .popped {
-            animation: disappear 0.2s ease-out forwards !important;
+        .math-icon.dimmed {
+            opacity: 0.15;
+            filter: grayscale(1) blur(2px);
+            transform: scale(0.7) translateY(10px);
+        }
+
+        /* Math Bubble - More Colorful */
+        .math-bubble {
+            background: linear-gradient(135deg, #fff9c4 0%, #fde047 100%);
+            border: 8px solid #fef08a;
+            border-radius: 40px;
+            padding: 22px;
+            box-shadow: 0 12px 0 #eab308, 0 15px 30px rgba(250, 204, 21, 0.2);
+            position: relative;
+        }
+
+        /* Wizard Hat - Turned Upward like a bowl for Ver 5 */
+        #wizard-hat {
+            position: absolute;
+            width: 130px;
+            height: 130px;
+            pointer-events: none;
+            z-index: 160;
+            transform: translate(-50%, -50%) rotate(180deg); /* Upside down */
+            filter: drop-shadow(0 -10px 15px rgba(0,0,0,0.3));
+            transition: transform 0.05s linear;
+        }
+
+        .bonus-star {
+            position: absolute;
+            font-size: 3rem;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+            z-index: 150;
             pointer-events: none;
         }
 
-        #bonus-overlay {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
+        /* Game Buttons */
+        .btn-game {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-bottom: 8px solid rgba(0,0,0,0.2);
+            user-select: none;
+        }
+        .btn-game:active {
+            transform: translateY(4px);
+            border-bottom-width: 2px;
+        }
+
+        #fireworks-canvas {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes bounce-gentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-bounce-gentle { animation: bounce-gentle 2.5s infinite ease-in-out; }
+
+        @keyframes float-clouds {
+            from { transform: translateX(-10%); }
+            to { transform: translateX(10%); }
+        }
+        .bg-cloud {
+            position: absolute;
+            opacity: 0.4;
+            animation: float-clouds 5s infinite alternate ease-in-out;
+            z-index: -1;
         }
     </style>
 </head>
-<body class="h-screen w-full flex items-center justify-center select-none text-gray-800">
-
-    <!-- GAME CONTAINER -->
-    <div id="game-container" class="relative bg-white w-full max-w-lg h-full md:h-auto md:min-h-[600px] md:rounded-3xl shadow-2xl overflow-hidden flex flex-col border-4 border-indigo-200">
-        
-        <!-- HEADER / PROGRESS -->
-        <div id="header-bar" class="bg-indigo-500 p-4 flex justify-between items-center text-white hidden z-20 relative">
-            <div class="flex flex-col w-full">
-                <div class="flex justify-between mb-1">
-                    <span class="font-bold text-lg">Question <span id="current-q-num">1</span>/10</span>
-                    <span class="font-bold text-lg text-yellow-300">Score: <span id="score-display" class="text-2xl">0</span></span>
+<body class="flex items-center justify-center h-screen p-4">
+    <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+    <div class="game-card">
+        <!-- HEADER -->
+        <div id="game-header" class="hidden p-6 pb-2">
+            <div class="flex justify-between items-center mb-4">
+                <div class="bg-indigo-50 px-5 py-2 rounded-2xl border-b-4 border-indigo-200">
+                    <span class="font-extrabold text-indigo-600 tracking-tight">SPELL <span id="q-count">1</span>/10</span>
                 </div>
-                <!-- Progress Bar -->
-                <div class="w-full bg-indigo-800 rounded-full h-4">
-                    <div id="progress-fill" class="bg-yellow-400 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+                <div class="bg-amber-50 px-5 py-2 rounded-2xl border-b-4 border-amber-200 flex items-center">
+                    <span class="mr-2">✨</span>
+                    <span id="score-text" class="font-black text-amber-600 text-2xl">0</span>
                 </div>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-5 overflow-hidden border-2 border-white shadow-inner">
+                <div id="progress-val" class="h-full bg-gradient-to-r from-indigo-400 via-purple-500 to-indigo-600 transition-all duration-700" style="width: 10%"></div>
             </div>
         </div>
 
-        <!-- SCREEN 1: INTRO -->
-        <div id="intro-screen" class="flex-1 flex flex-col items-center justify-center p-8 text-center bg-yellow-50 z-10">
-            <div class="text-8xl mb-4 animate-float">🦁</div>
-            <h1 class="text-4xl text-indigo-600 mb-4 leading-tight">Subtraction Fun!</h1>
-            <p class="text-xl text-gray-600 mb-8 font-bold">Let's learn to take away!</p>
-            <div class="bg-white p-4 rounded-xl shadow-md mb-8 w-full">
-                <p class="mb-2">📋 <strong>How to play:</strong></p>
-                <ul class="text-left text-lg text-gray-700 space-y-2">
-                    <li>1. Look at the pictures 🍎</li>
-                    <li>2. Solve the math problem ➖</li>
-                    <li>3. Tap the correct number ✅</li>
-                    <li class="text-indigo-600 font-bold">4. BONUS: Catch stars for extra points! ⭐️</li>
-                </ul>
+        <!-- INTRO SCREEN -->
+        <div id="screen-intro" class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+            <div class="animate-bounce-gentle mb-8 relative">
+                <!-- Corrected SVG Icon for Magic Wand / Hat -->
+                <svg width="140" height="140" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="#f5f3ff" />
+                    <path d="M40 10 L80 80 Q90 90 40 90 Q-10 90 20 80 Z" fill="#6366f1" transform="rotate(-15 50 50)"/>
+                    <rect x="25" y="70" width="50" height="8" fill="#2dd4bf" transform="rotate(-15 50 50)"/>
+                    <circle cx="50" cy="40" r="4" fill="#fbbf24" />
+                    <circle cx="65" cy="55" r="3" fill="#fbbf24" />
+                    <circle cx="35" cy="60" r="2" fill="#fbbf24" />
+                </svg>
             </div>
-            <button onclick="startGame()" class="option-btn bg-green-500 border-green-700 text-white text-2xl py-4 px-10 rounded-2xl w-full shadow-lg font-bold hover:bg-green-400">
-                PLAY NOW ▶
-            </button>
-        </div>
-
-        <!-- SCREEN 2: GAMEPLAY -->
-        <div id="game-screen" class="flex-1 flex flex-col p-6 hidden bg-white relative z-10">
+            <h1 class="text-5xl font-black text-indigo-700 mb-2 drop-shadow-sm">Math Wizard</h1>
+            <p class="text-xl text-indigo-400 font-bold mb-10">Magic Subtraction Academy</p>
             
-            <!-- Visual Representation -->
-            <div class="flex-1 flex flex-col items-center justify-center mb-4">
-                <div id="visual-container" class="flex flex-wrap justify-center gap-2 mb-4 text-5xl min-h-[60px]">
-                    <!-- Emojis injected via JS -->
+            <div class="bg-white p-6 rounded-[45px] border-4 border-indigo-50 shadow-xl mb-10 w-full relative">
+                <div class="flex flex-col gap-4">
+                    <div class="flex items-center gap-5 bg-indigo-50/50 p-4 rounded-3xl">
+                        <div class="bg-white p-2 rounded-xl shadow-sm">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                        </div>
+                        <p class="text-xs text-left font-extrabold text-indigo-800 uppercase tracking-tight">Solve to earn Magic Stars</p>
+                    </div>
+                    <div class="flex items-center gap-5 bg-amber-50/50 p-4 rounded-3xl">
+                        <div class="bg-white p-2 rounded-xl shadow-sm">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        </div>
+                        <p class="text-xs text-left font-extrabold text-amber-800 uppercase tracking-tight">Win a Bonus Catch Game!</p>
+                    </div>
                 </div>
-                
-                <div class="text-6xl font-bold text-indigo-600 bg-indigo-50 px-8 py-4 rounded-2xl border-2 border-indigo-100 shadow-inner">
-                    <span id="math-problem">5 - 2 = ?</span>
-                </div>
             </div>
 
-            <!-- Feedback Message -->
-            <div id="feedback-area" class="h-12 flex items-center justify-center mb-2">
-                <span id="feedback-text" class="text-2xl font-bold text-transparent transition-all">Placeholder</span>
-            </div>
-
-            <!-- Options Grid -->
-            <div id="options-grid" class="grid grid-cols-3 gap-4 mb-6">
-                <!-- Buttons injected via JS -->
-            </div>
-
-            <!-- Next Button (Hidden initially) -->
-            <button id="next-btn" onclick="nextQuestion()" class="hidden option-btn bg-blue-500 border-blue-700 text-white text-2xl py-3 rounded-xl w-full font-bold hover:bg-blue-400 animate-pop">
-                NEXT ➡
+            <button onclick="initGame()" class="btn-game w-full py-6 bg-indigo-600 text-white rounded-[35px] text-3xl font-black shadow-2xl hover:bg-indigo-500 transform hover:scale-105">
+                START SPELL!
             </button>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="screen-game" class="hidden flex-1 flex flex-col p-6 overflow-y-auto">
+            <div class="flex-1 flex flex-col items-center justify-center">
+                
+                <!-- Visual Block -->
+                <div class="decorated-block w-full">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-white px-4 py-1 rounded-full border-2 border-indigo-100 shadow-sm">
+                        <span class="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">Remove Items</span>
+                    </div>
+                    <div id="visual-area" class="visual-container">
+                        <!-- Icons injected here -->
+                    </div>
+                </div>
+
+                <!-- Equation Block -->
+                <div class="math-bubble w-full text-center mb-8">
+                    <span id="equation-text" class="text-7xl font-black text-indigo-900 tracking-tighter">
+                        ? - ? = ?
+                    </span>
+                </div>
+
+                <div id="feedback-msg" class="h-10 text-2xl font-black opacity-0 transition-all mb-4 text-center">
+                    Correct! ✨
+                </div>
+
+                <div id="choices-grid" class="grid grid-cols-3 gap-5 w-full">
+                    <!-- Buttons injected here -->
+                </div>
+            </div>
+
+            <button id="btn-next" onclick="nextStep()" class="hidden btn-game w-full py-5 mt-6 bg-indigo-600 text-white rounded-[30px] text-2xl font-black shadow-xl">
+                NEXT SPELL ➔
+            </button>
+        </div>
+
+        <!-- RESULT SCREEN -->
+        <div id="screen-result" class="hidden flex-1 flex flex-col items-center justify-center p-8 text-center relative">
+            <canvas id="fireworks-canvas"></canvas>
+            <div class="z-20">
+                <div class="text-[110px] mb-6 drop-shadow-2xl animate-bounce">🏆</div>
+                <h2 class="text-5xl font-black text-indigo-700 mb-2">GRAND WIZARD</h2>
+                <p class="text-indigo-400 font-bold mb-10">Magic Academy Graduated!</p>
+                
+                <div class="bg-gradient-to-br from-amber-100 to-orange-100 p-10 rounded-[50px] border-8 border-white shadow-2xl mb-12 transform -rotate-2">
+                    <span class="text-xs font-black text-amber-600 uppercase tracking-[0.3em]">Total Magic Power</span>
+                    <div id="final-score" class="text-8xl font-black text-orange-600 my-2">0</div>
+                    <div class="flex justify-center gap-2">
+                        <span>🌟</span><span>🌟</span><span>🌟</span>
+                    </div>
+                </div>
+
+                <button onclick="location.reload()" class="btn-game w-full py-6 bg-indigo-600 text-white rounded-[35px] text-3xl font-black shadow-2xl">
+                    PLAY AGAIN 🔄
+                </button>
+            </div>
         </div>
 
         <!-- BONUS OVERLAY -->
-        <div id="bonus-overlay" class="absolute inset-0 hidden flex flex-col items-center justify-center z-50 text-white">
-            <h2 class="text-5xl bonus-text text-yellow-300 mb-4 animate-pop drop-shadow-md">BONUS TIME!</h2>
-            <p class="text-2xl font-bold mb-8">Catch the Stars! ⭐️</p>
-            <div id="bonus-timer" class="text-6xl font-bold bg-white text-indigo-600 rounded-full w-24 h-24 flex items-center justify-center shadow-lg border-4 border-yellow-400">5</div>
-            <!-- Bonus items will be appended here directly to body or container to float -->
-        </div>
-
-        <!-- SCREEN 3: RESULTS -->
-        <div id="result-screen" class="flex-1 flex flex-col items-center justify-center p-8 text-center hidden bg-purple-50 z-10">
-            <div class="text-8xl mb-4" id="final-emoji">🏆</div>
-            <h1 class="text-4xl text-purple-600 mb-2">Game Over!</h1>
-            <p id="final-message" class="text-2xl text-gray-700 font-bold mb-6">You are a Math Star!</p>
-            
-            <div class="bg-white p-6 rounded-2xl shadow-lg border-2 border-purple-100 w-full mb-8">
-                <p class="text-gray-500 uppercase text-sm font-bold tracking-wider">Total Score</p>
-                <p class="text-6xl font-bold text-purple-600 my-2"><span id="final-score">0</span></p>
-                <p class="text-sm text-gray-400">(Includes Bonus Points!)</p>
+        <div id="bonus-overlay" class="hidden absolute inset-0 bg-indigo-900/60 backdrop-blur-md z-[100] flex flex-col items-center justify-center text-white overflow-hidden">
+            <!-- Wizard Hat SVG - Flipped for Ver 5 -->
+            <div id="wizard-hat">
+                <svg width="130" height="130" viewBox="0 0 100 100">
+                    <!-- The Hat as a Bowl (Brim is at bottom in SVG, but container is rotated 180) -->
+                    <path d="M10 80 Q50 95 90 80 Q95 95 50 95 Q5 95 10 80" fill="#4c1d95"/>
+                    <path d="M50 5 L85 75 Q95 85 50 85 Q5 85 15 75 Z" fill="#6b21a8"/>
+                    <rect x="23" y="65" width="54" height="10" fill="#2dd4bf" />
+                    <!-- Moon & Stars Inside -->
+                    <circle cx="50" cy="70" r="5" fill="#facc15" />
+                    <path d="M50 70 A3 3 0 1 1 50 64" fill="#6b21a8"/>
+                    <text x="35" y="35" font-size="12" fill="white" style="font-family: Arial;">★</text>
+                    <text x="55" y="50" font-size="10" fill="white" style="font-family: Arial;">★</text>
+                </svg>
             </div>
-
-            <button onclick="restartGame()" class="option-btn bg-yellow-400 border-yellow-600 text-yellow-900 text-2xl py-4 px-8 rounded-2xl w-full shadow-lg font-bold hover:bg-yellow-300">
-                Play Again 🔄
-            </button>
+            
+            <div class="z-10 flex flex-col items-center pointer-events-none">
+                <h3 class="text-7xl font-black text-accent mb-2 drop-shadow-2xl">STAR CATCH!</h3>
+                <p class="text-xl font-bold mb-10 opacity-90 tracking-wide">Catch them in your Magic Hat!</p>
+                <div id="bonus-timer" class="w-24 h-24 bg-white text-indigo-700 rounded-full flex items-center justify-center text-5xl font-black border-8 border-accent shadow-2xl">5</div>
+            </div>
         </div>
-
     </div>
 
-    <!-- AUDIO SYSTEM -->
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-
-            const now = audioCtx.currentTime;
-
-            if (type === 'correct') {
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(523.25, now);
-                oscillator.frequency.setValueAtTime(659.25, now + 0.1);
-                oscillator.frequency.setValueAtTime(783.99, now + 0.2);
-                gainNode.gain.setValueAtTime(0.1, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-                oscillator.start(now);
-                oscillator.stop(now + 0.6);
-            } else if (type === 'wrong') {
-                oscillator.type = 'sawtooth';
-                oscillator.frequency.setValueAtTime(150, now);
-                oscillator.frequency.linearRampToValueAtTime(80, now + 0.3);
-                gainNode.gain.setValueAtTime(0.1, now);
-                gainNode.gain.linearRampToValueAtTime(0.001, now + 0.3);
-                oscillator.start(now);
-                oscillator.stop(now + 0.3);
-            } else if (type === 'click') {
-                oscillator.type = 'triangle';
-                oscillator.frequency.setValueAtTime(400, now);
-                gainNode.gain.setValueAtTime(0.05, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-                oscillator.start(now);
-                oscillator.stop(now + 0.1);
-            } else if (type === 'bonus_pop') {
-                // High pitched pop for bonus items
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(800, now);
-                oscillator.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
-                gainNode.gain.setValueAtTime(0.1, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-                oscillator.start(now);
-                oscillator.stop(now + 0.15);
-            } else if (type === 'win') {
-                oscillator.type = 'square';
-                oscillator.frequency.setValueAtTime(440, now);
-                oscillator.frequency.setValueAtTime(880, now + 0.2);
-                gainNode.gain.setValueAtTime(0.05, now);
-                gainNode.gain.linearRampToValueAtTime(0.001, now + 0.5);
-                oscillator.start(now);
-                oscillator.stop(now + 0.5);
-            }
-        }
-    </script>
-
-    <!-- GAME LOGIC -->
-    <script>
-        // Data: Questions
-        const gameData = [
-            { q: "3 - 1", a: 2, icon: "🍎", options: [1, 2, 4] },
-            { q: "5 - 2", a: 3, icon: "🍌", options: [3, 2, 5] },
-            { q: "4 - 4", a: 0, icon: "🐱", options: [1, 0, 4] },
-            { q: "6 - 3", a: 3, icon: "🎈", options: [2, 3, 6] },
-            { q: "2 - 1", a: 1, icon: "🐶", options: [1, 2, 3] },
-            { q: "7 - 2", a: 5, icon: "⭐️", options: [5, 4, 6] },
-            { q: "8 - 4", a: 4, icon: "🍪", options: [3, 4, 8] },
-            { q: "9 - 1", a: 8, icon: "🐸", options: [7, 8, 9] },
-            { q: "5 - 5", a: 0, icon: "🧢", options: [5, 1, 0] },
-            { q: "10 - 5", a: 5, icon: "🦋", options: [5, 4, 6] }
+        // --- DATA ---
+        const QUESTIONS = [
+            { q: "3 - 1", a: 2, icon: "🍎", options: [2, 1, 3] },
+            { q: "5 - 2", a: 3, icon: "🦄", options: [2, 3, 4] },
+            { q: "4 - 3", a: 1, icon: "🍦", options: [1, 2, 0] },
+            { q: "6 - 4", a: 2, icon: "🎈", options: [1, 2, 3] },
+            { q: "2 - 2", a: 0, icon: "🍕", options: [0, 1, 2] },
+            { q: "8 - 5", a: 3, icon: "🍭", options: [2, 3, 5] },
+            { q: "5 - 1", a: 4, icon: "🚀", options: [4, 5, 3] },
+            { q: "7 - 3", a: 4, icon: "🐼", options: [4, 3, 5] },
+            { q: "9 - 2", a: 7, icon: "🎁", options: [6, 7, 8] },
+            { q: "10 - 6", a: 4, icon: "🦖", options: [4, 5, 3] }
         ];
 
-        let currentQuestion = 0;
+        // --- STATE ---
+        let currentIdx = 0;
         let score = 0;
-        let isAnswered = false;
-        let bonusInterval;
-        let bonusTimerInterval;
+        let isActive = false;
+        let isFirstAttempt = true;
+        let bagX = 0, bagY = 0;
 
-        // DOM Elements
-        const screens = {
-            intro: document.getElementById('intro-screen'),
-            game: document.getElementById('game-screen'),
-            result: document.getElementById('result-screen')
+        // --- AUDIO ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSfx(freqs, type = 'sine', duration = 0.2) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+            const gain = audioCtx.createGain();
+            gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
+
+            freqs.forEach((f, i) => {
+                const osc = audioCtx.createOscillator();
+                osc.type = type;
+                osc.frequency.setValueAtTime(f, now + (i * 0.05));
+                osc.connect(gain);
+                osc.start(now + (i * 0.05));
+                osc.stop(now + duration);
+            });
+        }
+
+        const sounds = {
+            click: () => playSfx([400], 'triangle', 0.1),
+            correct: () => playSfx([523, 659, 783], 'sine', 0.5),
+            wrong: () => playSfx([200, 150], 'sawtooth', 0.3),
+            pop: () => playSfx([800, 1200], 'sine', 0.1),
+            catch: () => playSfx([1000, 1500], 'sine', 0.1),
+            win: () => playSfx([523, 659, 783, 1046], 'square', 0.8)
         };
-        const headerBar = document.getElementById('header-bar');
-        const progressBar = document.getElementById('progress-fill');
-        const scoreDisplay = document.getElementById('score-display');
-        const qNumDisplay = document.getElementById('current-q-num');
-        const visualContainer = document.getElementById('visual-container');
-        const mathProblem = document.getElementById('math-problem');
-        const optionsGrid = document.getElementById('options-grid');
-        const nextBtn = document.getElementById('next-btn');
-        const feedbackText = document.getElementById('feedback-text');
-        
-        // Bonus Elements
-        const bonusOverlay = document.getElementById('bonus-overlay');
-        const bonusTimerDisplay = document.getElementById('bonus-timer');
-        const gameContainer = document.getElementById('game-container');
 
-        function startGame() {
-            playSound('click');
-            currentQuestion = 0;
-            score = 0;
-            scoreDisplay.innerText = 0;
-            
-            screens.intro.classList.add('hidden');
-            screens.game.classList.remove('hidden');
-            headerBar.classList.remove('hidden');
-            
+        // --- UI HELPERS ---
+        const $ = id => document.getElementById(id);
+        const hide = el => el.classList.add('hidden');
+        const show = el => el.classList.remove('hidden');
+
+        // --- CORE LOGIC ---
+        function initGame() {
+            sounds.click();
+            hide($('screen-intro'));
+            show($('screen-game'));
+            show($('game-header'));
             loadQuestion();
+
+            // Hat Tracking
+            const moveHandler = (e) => {
+                const rect = $('bonus-overlay').getBoundingClientRect();
+                const cx = e.touches ? e.touches[0].clientX : e.clientX;
+                const cy = e.touches ? e.touches[0].clientY : e.clientY;
+                bagX = cx - rect.left;
+                bagY = cy - rect.top;
+                $('wizard-hat').style.left = `${bagX}px`;
+                $('wizard-hat').style.top = `${bagY}px`;
+            };
+            window.addEventListener('mousemove', moveHandler);
+            window.addEventListener('touchmove', moveHandler, { passive: false });
         }
 
         function loadQuestion() {
-            isAnswered = false;
-            const data = gameData[currentQuestion];
+            isActive = true;
+            isFirstAttempt = true;
+            const data = QUESTIONS[currentIdx];
             
-            qNumDisplay.innerText = currentQuestion + 1;
-            const progressPercent = (currentQuestion / gameData.length) * 100;
-            progressBar.style.width = `${progressPercent}%`;
+            $('q-count').innerText = currentIdx + 1;
+            $('progress-val').style.width = ((currentIdx + 1) / QUESTIONS.length * 100) + '%';
+            $('equation-text').innerText = `${data.q} = ?`;
+            $('feedback-msg').classList.add('opacity-0');
+            hide($('btn-next'));
 
-            nextBtn.classList.add('hidden');
-            feedbackText.innerText = "";
-            feedbackText.classList.add('text-transparent');
-            
-            mathProblem.innerText = `${data.q} = ?`;
-
-            visualContainer.innerHTML = '';
-            const totalItems = parseInt(data.q.split(' - ')[0]);
-            
-            for(let i=0; i<totalItems; i++) {
+            const visualArea = $('visual-area');
+            visualArea.innerHTML = '';
+            const totalCount = parseInt(data.q.split(' - ')[0]);
+            for(let i=0; i<totalCount; i++) {
                 const span = document.createElement('span');
+                span.className = 'math-icon animate-bounce-gentle';
+                span.style.animationDelay = (i * 0.1) + 's';
                 span.innerText = data.icon;
-                span.style.animationDelay = `${i * 0.1}s`;
-                span.classList.add('animate-pop');
-                visualContainer.appendChild(span);
+                span.onclick = () => {
+                    sounds.pop();
+                    span.classList.toggle('dimmed');
+                };
+                visualArea.appendChild(span);
             }
 
-            optionsGrid.innerHTML = '';
-            data.options.forEach(opt => {
+            const choicesGrid = $('choices-grid');
+            choicesGrid.innerHTML = '';
+            data.options.forEach(val => {
                 const btn = document.createElement('button');
-                btn.innerText = opt;
-                btn.className = "option-btn bg-white border-gray-200 text-gray-700 text-4xl py-6 rounded-2xl shadow-md font-bold hover:bg-indigo-50 active:bg-indigo-100";
-                btn.onclick = () => checkAnswer(opt, btn);
-                optionsGrid.appendChild(btn);
+                btn.className = "btn-game py-6 bg-white border-4 border-indigo-50 rounded-[35px] text-5xl font-black text-indigo-900 shadow-xl hover:bg-indigo-50";
+                btn.innerText = val;
+                btn.onclick = () => checkAnswer(val, btn);
+                choicesGrid.appendChild(btn);
             });
         }
 
-        function checkAnswer(selectedVal, btnElement) {
-            if(isAnswered) return;
-            
-            const data = gameData[currentQuestion];
-            
-            if(selectedVal === data.a) {
-                // CORRECT
-                isAnswered = true;
-                score += 10; // Base score for correct answer
-                scoreDisplay.innerText = score;
-                playSound('correct');
-                
-                btnElement.classList.remove('bg-white', 'border-gray-200', 'text-gray-700');
-                btnElement.classList.add('bg-green-400', 'border-green-600', 'text-white');
-                
-                feedbackText.innerText = "Correct! Bonus Round Coming! ⭐️";
-                feedbackText.className = "text-2xl font-bold text-green-500 animate-pop";
-                
-                spawnConfetti();
+        function checkAnswer(val, btn) {
+            if(!isActive) return;
+            const data = QUESTIONS[currentIdx];
 
-                // Trigger Bonus Round after 1.5 seconds
-                setTimeout(() => {
-                    startBonusRound();
-                }, 1500);
-
+            if(val === data.a) {
+                isActive = false;
+                sounds.correct();
+                
+                if (isFirstAttempt) {
+                    score += 10;
+                    $('score-text').innerText = score;
+                    $('feedback-msg').innerText = "Perfect Spell! ✨";
+                    $('feedback-msg').classList.remove('opacity-0', 'text-rose-500');
+                    $('feedback-msg').classList.add('text-emerald-500');
+                    setTimeout(startBonus, 1200);
+                } else {
+                    $('feedback-msg').innerText = "Good! Move Next ➔";
+                    $('feedback-msg').classList.remove('opacity-0');
+                    $('feedback-msg').classList.add('text-amber-500');
+                    show($('btn-next'));
+                }
+                btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600');
             } else {
-                // WRONG
-                playSound('wrong');
-                btnElement.classList.add('animate-shake', 'bg-red-100', 'border-red-300');
-                feedbackText.innerText = "Oops! Try again! 💪";
-                feedbackText.className = "text-2xl font-bold text-orange-500";
+                sounds.wrong();
+                isFirstAttempt = false;
+                btn.classList.add('bg-rose-100', 'border-rose-300', 'animate-shake');
+                $('feedback-msg').innerText = "Try again! 💪";
+                $('feedback-msg').classList.remove('opacity-0');
+                $('feedback-msg').classList.add('text-rose-500');
                 setTimeout(() => {
-                    btnElement.classList.remove('animate-shake', 'bg-red-100', 'border-red-300');
-                }, 500);
+                    btn.classList.remove('animate-shake');
+                    $('feedback-msg').classList.add('opacity-0');
+                }, 1000);
             }
         }
 
-        // --- BONUS ROUND LOGIC ---
-        function startBonusRound() {
-            bonusOverlay.classList.remove('hidden');
-            bonusOverlay.classList.add('flex');
-            
-            let timeLeft = 5;
-            bonusTimerDisplay.innerText = timeLeft;
+        // --- BONUS ---
+        function startBonus() {
+            show($('bonus-overlay'));
+            let time = 5;
+            $('bonus-timer').innerText = time;
 
-            // Timer Countdown
-            bonusTimerInterval = setInterval(() => {
-                timeLeft--;
-                bonusTimerDisplay.innerText = timeLeft;
-                if(timeLeft <= 0) {
-                    endBonusRound();
+            const countdown = setInterval(() => {
+                time--;
+                $('bonus-timer').innerText = time;
+                if(time <= 0) {
+                    clearInterval(countdown);
+                    clearInterval(spawner);
+                    endBonus();
                 }
             }, 1000);
 
-            // Spawn Stars
-            bonusInterval = setInterval(createBonusItem, 400);
+            const spawner = setInterval(spawnStar, 450);
         }
 
-        function createBonusItem() {
-            const item = document.createElement('div');
-            item.innerText = '⭐️';
-            item.className = 'bonus-item';
-            
-            // Random Position X
-            const randomX = Math.random() * 80 + 10; // Keep within 10-90% width
-            item.style.left = randomX + '%';
-            
-            // Random Speed
-            const duration = Math.random() * 2 + 2; // 2-4 seconds
-            item.style.animationDuration = duration + 's';
+        function spawnStar() {
+            const star = document.createElement('div');
+            star.innerText = '⭐';
+            star.className = 'bonus-star';
+            star.style.left = (Math.random() * 80 + 10) + '%';
+            star.style.top = '-10%';
+            $('bonus-overlay').appendChild(star);
 
-            // Interaction
-            item.onmousedown = (e) => popBonusItem(e, item);
-            item.ontouchstart = (e) => popBonusItem(e, item); // Touch support
+            const duration = Math.random() * 1500 + 2500;
+            const anim = star.animate([
+                { top: '-10%', transform: 'rotate(0deg)' },
+                { top: '110%', transform: 'rotate(720deg)' }
+            ], { duration: duration, easing: 'linear' });
 
-            // Append to game container so it stays within bounds
-            gameContainer.appendChild(item);
+            const check = setInterval(() => {
+                const sRect = star.getBoundingClientRect();
+                const hRect = $('wizard-hat').getBoundingClientRect();
+                
+                const dx = (sRect.left + sRect.width/2) - (hRect.left + hRect.width/2);
+                const dy = (sRect.top + sRect.height/2) - (hRect.top + hRect.height/2);
+                const dist = Math.sqrt(dx*dx + dy*dy);
 
-            // Cleanup if missed
-            setTimeout(() => {
-                if(item && item.parentNode) item.remove();
-            }, duration * 1000);
+                // Collision with "bowl" opening (which is the top area now since it's flipped)
+                if(dist < 65) {
+                    sounds.catch();
+                    score += 2;
+                    $('score-text').innerText = score;
+                    star.innerHTML = '<span class="text-white text-xl">+2</span>';
+                    star.style.opacity = '0';
+                    clearInterval(check);
+                    setTimeout(() => star.remove(), 200);
+                }
+            }, 50);
+
+            anim.onfinish = () => { clearInterval(check); star.remove(); };
         }
 
-        function popBonusItem(e, item) {
-            e.stopPropagation(); // Prevent bubbling
-            e.preventDefault(); // Prevent double firing on touch devices
-            
-            if(item.classList.contains('popped')) return;
-
-            item.classList.add('popped');
-            playSound('bonus_pop');
-            
-            // Add Bonus Score
-            score += 1;
-            scoreDisplay.innerText = score;
-
-            // Show floating +1
-            showFloatingPoint(e.clientX, e.clientY);
+        function endBonus() {
+            hide($('bonus-overlay'));
+            nextStep();
         }
 
-        function showFloatingPoint(x, y) {
-            const el = document.createElement('div');
-            el.innerText = "+1";
-            el.style.position = 'fixed';
-            el.style.left = x + 'px';
-            el.style.top = y + 'px';
-            el.style.color = '#FFD700';
-            el.style.fontWeight = 'bold';
-            el.style.fontSize = '2rem';
-            el.style.pointerEvents = 'none';
-            el.style.zIndex = 200;
-            el.style.transition = 'all 0.5s ease-out';
-            
-            document.body.appendChild(el);
-            
-            // Animate up
-            requestAnimationFrame(() => {
-                el.style.transform = 'translateY(-50px)';
-                el.style.opacity = '0';
-            });
-
-            setTimeout(() => el.remove(), 500);
-        }
-
-        function endBonusRound() {
-            clearInterval(bonusInterval);
-            clearInterval(bonusTimerInterval);
-            
-            // Clear remaining items
-            const items = document.querySelectorAll('.bonus-item');
-            items.forEach(i => i.remove());
-
-            bonusOverlay.classList.add('hidden');
-            bonusOverlay.classList.remove('flex');
-
-            // Show next button now
-            nextBtn.classList.remove('hidden');
-            feedbackText.innerText = "Round Complete! Click Next.";
-        }
-
-        function nextQuestion() {
-            playSound('click');
-            currentQuestion++;
-            
-            if(currentQuestion < gameData.length) {
+        function nextStep() {
+            currentIdx++;
+            if(currentIdx < QUESTIONS.length) {
                 loadQuestion();
             } else {
-                endGame();
+                showResults();
             }
         }
 
-        function endGame() {
-            playSound('win');
-            screens.game.classList.add('hidden');
-            headerBar.classList.add('hidden');
-            screens.result.classList.remove('hidden');
-
-            const finalScoreEl = document.getElementById('final-score');
-            finalScoreEl.innerText = score;
-
-            const msg = document.getElementById('final-message');
-            const emoji = document.getElementById('final-emoji');
-            
-            // Adjusted logic for higher scores due to bonus
-            // Max base score = 100 (10 questions * 10 pts)
-            // Bonus potential ~ 50 pts
-            
-            if(score >= 120) {
-                msg.innerText = "UNBELIEVABLE! Ultimate Genius!";
-                emoji.innerText = "🚀🪐";
-            } else if (score >= 100) {
-                msg.innerText = "PERFECT! You are a Genius!";
-                emoji.innerText = "🏆👑";
-            } else if (score >= 70) {
-                msg.innerText = "Great Job! Keep it up!";
-                emoji.innerText = "🌟";
-            } else {
-                msg.innerText = "Good try! Let's practice more!";
-                emoji.innerText = "📚";
-            }
-            
-            spawnConfetti();
+        // --- RESULTS ---
+        function showResults() {
+            sounds.win();
+            hide($('screen-game'));
+            hide($('game-header'));
+            show($('screen-result'));
+            $('final-score').innerText = score;
+            startFireworks();
         }
 
-        function restartGame() {
-            playSound('click');
-            screens.result.classList.add('hidden');
-            startGame();
-        }
+        function startFireworks() {
+            const canvas = $('fireworks-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            let particles = [];
 
-        // --- CONFETTI SYSTEM ---
-        function spawnConfetti() {
-            const colors = ['#EF476F', '#FFD166', '#06D6A0', '#118AB2', '#073B4C'];
-            for(let i=0; i<30; i++) {
-                const conf = document.createElement('div');
-                conf.classList.add('confetti');
-                conf.style.left = Math.random() * 100 + 'vw';
-                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                conf.style.animationDuration = (Math.random() * 1 + 1) + 's';
-                conf.style.top = '-10px';
-                
-                document.body.appendChild(conf);
-                
-                setTimeout(() => {
-                    conf.remove();
-                }, 2000);
+            class P {
+                constructor(x, y, color) {
+                    this.x = x; this.y = y; this.color = color;
+                    this.vx = (Math.random() - 0.5) * 15;
+                    this.vy = (Math.random() - 0.5) * 15;
+                    this.a = 1;
+                }
+                draw() {
+                    ctx.globalAlpha = this.a;
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, 5, 0, Math.PI*2);
+                    ctx.fill();
+                }
+                update() {
+                    this.x += this.vx; this.y += this.vy;
+                    this.vy += 0.2;
+                    this.a -= 0.012;
+                }
             }
+
+            function fire() {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * (canvas.height/2);
+                const col = `hsl(${Math.random()*360}, 100%, 65%)`;
+                for(let i=0; i<40; i++) particles.push(new P(x, y, col));
+            }
+
+            const interval = setInterval(fire, 500);
+            function anim() {
+                ctx.clearRect(0,0,canvas.width, canvas.height);
+                particles = particles.filter(p => p.a > 0);
+                particles.forEach(p => { p.update(); p.draw(); });
+                requestAnimationFrame(anim);
+            }
+            anim();
+            setTimeout(() => clearInterval(interval), 8000);
         }
 
     </script>

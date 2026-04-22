@@ -1,591 +1,623 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ladybug Number Bonds Game</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Varela+Round&display=swap" rel="stylesheet">
-    <style>
+ <head>
+  <link rel="stylesheet" href="../assets/brand.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fruit Math Adventure</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
         body {
-            font-family: 'Varela Round', sans-serif;
-            background: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%);
-            overflow: hidden;
-            touch-action: none; /* Prevent scrolling on mobile */
-            user-select: none;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #FFE5F1, #E5F3FF, #F0FFE5);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
-
-        .font-bubble { font-family: 'Fredoka One', cursive; }
-
-        /* Ladybug Styling */
-        .ladybug-body {
-            background: #ff4757;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .wing-divider {
-            position: absolute;
-            left: 50%;
-            top: 20%;
-            bottom: 5%;
-            width: 4px;
-            background: rgba(0,0,0,0.3);
-            transform: translateX(-50%);
-            border-radius: 2px;
-        }
-
-        .dot {
-            width: 40px; /* Reduced from 45px for better fit */
-            height: 40px;
-            background: #2f3542;
-            border-radius: 50%;
-            box-shadow: 2px 4px 8px rgba(0,0,0,0.3);
-            position: absolute;
-            transform: translate(-50%, -50%);
-            z-index: 20;
-            transition: transform 0.1s, top 0.3s ease-out, left 0.3s ease-out, width 0.3s, height 0.3s;
-        }
-        
-        .dot.small {
-            width: 32px; /* Adjusted small size */
-            height: 32px;
-        }
-        
-        .dot::after {
-            content: '';
-            position: absolute;
-            top: 20%;
-            left: 20%;
-            width: 30%;
-            height: 30%;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-        }
-
-        /* Source Dot (in the tray) */
-        .source-dot {
-            width: 60px;
-            height: 60px;
-            background: #2f3542;
-            border-radius: 50%;
-            cursor: grab;
-            display: inline-block;
-            margin: 0 10px;
+        .game-container {
+            max-width: 750px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.1);
             position: relative;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .source-dot:active { cursor: grabbing; transform: scale(0.95); }
-
-        /* Drop Zones */
-        /* Heavily adjusted to define a strict "Safe Zone" inside the curve */
-        .wing-zone {
-            position: absolute;
-            top: 25%; /* Pushed down to avoid top curve */
-            width: 34%; /* Narrower to avoid side curves */
-            height: 52%; /* Shorter to avoid bottom curve */
-            /* border: 1px solid rgba(255,255,255,0.2); Debugging: shows safe zone */
             z-index: 10;
         }
-        .left-wing { left: 12%; } /* Pushed in from edge */
-        .right-wing { right: 12%; } /* Pushed in from edge */
-
-        /* Animations */
-        @keyframes pop {
-            0% { transform: scale(0); }
-            80% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+        .title {
+            text-align: center;
+            font-size: 2.2em;
+            font-weight: 800;
+            color: #2D3436;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #FF6B9D, #6C5CE7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-
-        @keyframes cheer {
-            0%, 100% { transform: translateY(0) rotate(0); }
-            25% { transform: translateY(-20px) rotate(-5deg); }
-            75% { transform: translateY(-10px) rotate(5deg); }
+        .progress-bar {
+            width: 100%;
+            height: 15px;
+            background: #f1f2f6;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
         }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF6B9D, #A29BFE);
+            border-radius: 20px;
+            transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        .animate-pop { animation: pop 0.4s ease-out forwards; }
-        .animate-cheer { animation: cheer 0.6s ease-in-out; }
-        .animate-shake { animation: shake 0.4s ease-in-out; }
-
-        /* Progress Bar */
-        .progress-pill {
-            width: 12px;
-            height: 12px;
-            background: rgba(255,255,255,0.3);
+        .question-text {
+            font-size: 1.6em;
+            color: #2D3436;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .display-area {
+            font-size: 3.5em;
+            margin: 20px 0;
+            min-height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            line-height: 1.2;
+        }
+        .fruit-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 40%;
+            gap: 5px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 20px;
+            border: 2px dashed rgba(0, 0, 0, 0.05);
+        }
+        .plus-sign-wrapper {
+            font-size: 1.5em;
+            color: #FF6B9D;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .number-bonds {
+            position: relative;
+            width: 200px;
+            height: 180px;
+            margin: 20px auto;
+        }
+        .bond-circle {
+            position: absolute;
             border-radius: 50%;
-            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .progress-pill.active { background: #ffeb3b; transform: scale(1.3); }
+        .part-circle { width: 60px; height: 60px; font-size: 1.4em; background: #00CEC9; top: 0; }
+        .part-left { left: 0px; }
+        .part-right { right: 0px; }
+        .whole-circle { background: #FF6B9D; width: 85px; height: 85px; font-size: 2em; bottom: 0; left: 57px; }
 
-        #start-overlay {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(5px);
+        .answer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 30px 0;
         }
+        .answer-btn {
+            padding: 15px 35px;
+            font-size: 1.6em;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            background: #ffffff;
+            color: #2D3436;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 2px solid #f1f2f6;
+            transition: all 0.2s;
+            min-width: 90px;
+        }
+        .answer-btn:hover {
+            border-color: #A29BFE;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .feedback {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin: 15px 0;
+            min-height: 40px;
+            text-align: center;
+        }
+        .correct { color: #00b894; animation: bounce 0.5s; }
+        .incorrect { color: #ff7675; }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .listen-btn {
+            background: #ffffff;
+            border: 2px solid #f1f2f6;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 10px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .listen-btn:hover { transform: scale(1.1); background: #f9f9f9; }
+
+        /* Butterfly Break Game Styles */
+        #butterflyBreakScreen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, #87CEEB 0%, #E0F7FA 100%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .butterfly-area {
+            width: 90vw;
+            max-width: 700px;
+            height: 450px;
+            background: rgba(255,255,255,0.3);
+            border: 4px solid #ffffff;
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            cursor: crosshair;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        }
+        .butterfly {
+            position: absolute;
+            font-size: 3.5rem;
+            user-select: none;
+            cursor: pointer;
+            transition: all 1.5s ease-in-out;
+            z-index: 110;
+        }
+        .butterfly-inner {
+            display: inline-block;
+            animation: flutter 0.3s infinite alternate;
+        }
+        @keyframes flutter {
+            from { transform: scaleX(1); }
+            to { transform: scaleX(0.7); }
+        }
+        .cloud {
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.6;
+            animation: drift 20s linear infinite;
+        }
+        @keyframes drift {
+            from { left: -100px; }
+            to { left: 110%; }
+        }
+        .grass {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 60px;
+            background: #2ecc71;
+            z-index: 105;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+
+        /* Celebration */
+        #celebrationScreen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #1e272e;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        #fireworksCanvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        .celebration-content {
+            position: relative;
+            z-index: 201;
+            text-align: center;
+        }
+        .action-btn {
+            padding: 15px 45px;
+            font-size: 1.3em;
+            font-weight: 700;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(90deg, #FF6B9D, #6C5CE7);
+            color: white;
+            cursor: pointer;
+            margin-top: 30px;
+            box-shadow: 0 10px 20px rgba(255, 107, 157, 0.3);
+            transition: transform 0.2s;
+        }
+        .action-btn:hover { transform: scale(1.05); }
+
+        .hidden { display: none !important; }
     </style>
-</head>
-<body class="h-screen w-screen flex flex-col items-center justify-between py-4">
+ </head>
+ <body>
+  <img src="../assets/logo-oodles-math.png" class="oodles-logo">
+  <div class="game-container">
+   <h1 class="title">Fruit Math Adventure</h1>
+   <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+   </div>
+   <div id="mathGameArea">
+    <div class="question-text" id="questionText"></div>
+    <div class="display-area" id="fruitDisplay"></div>
+    <div class="number-bonds hidden" id="numberBonds"></div>
+    <div class="answer-buttons" id="answerButtons"></div>
+    <div class="feedback" id="feedback"></div>
+   </div>
+  </div>
 
-    <!-- Custom Logo Area -->
-    <div class="absolute top-4 left-4 z-[60]">
-        <!-- PASTE YOUR LOGO LINK BELOW inside src="" -->
-        <!-- Example: src="https://example.com/my-logo.png" -->
-        <img src="https://image2url.com/r2/default/images/1770270908168-036a8878-e468-415d-9a50-73d8cbcc8574.png" 
-             alt="Game Logo" 
-             class="max-h-20 max-w-[150px] object-contain border-none shadow-sm hover:opacity-90 transition-opacity">
-    </div>
-
-    <!-- Start Screen Overlay -->
-    <div id="start-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-8 text-center">
-        <h1 class="font-bubble text-5xl text-green-600 mb-4">Ladybug Math</h1>
-        <div class="text-6xl mb-6">🐞</div>
-        <p class="text-xl text-gray-600 mb-8">Make the wings equal the target number!</p>
-        <button onclick="startGame()" class="bg-green-500 hover:bg-green-600 text-white font-bubble text-2xl px-8 py-4 rounded-full shadow-xl transition transform hover:scale-105 active:scale-95">
-            Play Game ▶
-        </button>
-    </div>
-
-    <!-- Top Bar: Target & Progress -->
-    <div class="w-full max-w-lg flex flex-col items-center z-10">
-        <!-- Progress Dots -->
-        <div class="flex gap-2 mb-2" id="progress-container">
-            <!-- Generated via JS -->
-        </div>
-
-        <!-- Target Display -->
-        <div class="relative bg-white/90 backdrop-blur rounded-3xl px-8 py-3 shadow-lg border-b-4 border-green-600 animate-bounce-slight">
-            <h2 class="text-gray-500 text-lg uppercase tracking-wider font-bold text-center leading-none">Make</h2>
-            <div class="text-6xl font-bubble text-green-600 leading-none" id="target-number">5</div>
+  <!-- Butterfly Break Screen -->
+  <div id="butterflyBreakScreen" class="hidden">
+    <div class="text-center mb-4">
+        <h2 class="text-4xl font-black text-gray-800">BREAK TIME! 🦋</h2>
+        <p class="text-xl font-bold text-blue-600">Catch the butterflies!</p>
+        <div class="flex justify-between w-full px-10 mt-2 text-2xl font-bold">
+            <span id="gameTimer">Time: 20s</span>
+            <span id="gameScore">Score: 0</span>
         </div>
     </div>
-
-    <!-- Game Area -->
-    <div class="flex-grow flex items-center justify-center w-full relative">
-        
-        <!-- The Ladybug -->
-        <div id="ladybug" class="ladybug-body relative w-[340px] h-[340px] md:w-[400px] md:h-[400px] rounded-full flex flex-col items-center">
-            
-            <!-- Head -->
-            <div class="absolute -top-12 w-32 h-32 bg-gray-800 rounded-full z-0 flex justify-center items-start pt-4">
-                <!-- Eyes -->
-                <div class="flex gap-4 mt-4">
-                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                        <div class="w-3 h-3 bg-black rounded-full"></div>
-                    </div>
-                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                        <div class="w-3 h-3 bg-black rounded-full"></div>
-                    </div>
-                </div>
-                <!-- Antennae -->
-                <div class="absolute -top-6 left-2 w-1 h-8 bg-black rotate-[-20deg]">
-                    <div class="absolute -top-2 -left-1 w-3 h-3 bg-black rounded-full"></div>
-                </div>
-                <div class="absolute -top-6 right-2 w-1 h-8 bg-black rotate-[20deg]">
-                    <div class="absolute -top-2 -left-1 w-3 h-3 bg-black rounded-full"></div>
-                </div>
-            </div>
-
-            <!-- Body Divider -->
-            <div class="wing-divider"></div>
-
-            <!-- Left Wing (Pre-filled) -->
-            <div id="left-wing" class="wing-zone left-wing"></div>
-
-            <!-- Right Wing (Drop Target) -->
-            <div id="right-wing" class="wing-zone right-wing"></div>
+    <div class="butterfly-area" id="butterflyArea">
+        <div class="cloud" style="top: 20px; animation-duration: 25s;">☁️</div>
+        <div class="cloud" style="top: 80px; animation-duration: 35s;">☁️</div>
+        <div class="grass">
+            <span>🌸</span><span>🌷</span><span>🌻</span><span>🌼</span><span>🌹</span>
+        </div>
+        <div id="startBreakOverlay" class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center z-[150] rounded-2xl">
+            <button class="action-btn" onclick="startButterflyGame()">Start Catching! ▶️</button>
         </div>
     </div>
+    <div id="breakFeedback" class="mt-4 text-2xl font-black h-10 text-blue-600"></div>
+  </div>
 
-    <!-- Bottom Tray: Draggable Dots -->
-    <div class="w-full bg-white/80 backdrop-blur-md h-32 rounded-t-3xl shadow-[0_-10px_30px_rgba(0,0,0,0.1)] z-20 flex flex-col items-center justify-center relative">
-        <p class="absolute -top-5 bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full font-bold text-sm shadow-md">Drag from here</p>
-        <div class="flex items-center justify-center w-full" id="dot-tray">
-            <div class="source-dot" id="drag-source"></div>
-            <div class="source-dot" style="opacity: 0.5; transform: scale(0.8);"></div>
-            <div class="source-dot" style="opacity: 0.3; transform: scale(0.6);"></div>
-        </div>
+  <!-- Celebration -->
+  <div id="celebrationScreen" class="hidden">
+    <canvas id="fireworksCanvas"></canvas>
+    <div class="celebration-content">
+        <h1 class="text-6xl font-black mb-4 tracking-tight">FANTASTIC! 🏆</h1>
+        <p class="text-2xl text-gray-300">You are a Math & Nature Master!</p>
+        <div id="finalScoreDisplay" class="text-4xl font-bold my-8 text-yellow-400"></div>
+        <button class="action-btn" onclick="location.reload()">PLAY AGAIN</button>
     </div>
+  </div>
 
-    <!-- Hidden audio helper -->
-    <div id="audio-helper"></div>
-
-<script>
-    // --- Game Configuration (15 Questions) ---
-    const levels = [
-        { target: 5, prefilled: 2 },
-        { target: 6, prefilled: 3 },
-        { target: 5, prefilled: 1 },
-        { target: 7, prefilled: 4 },
-        { target: 8, prefilled: 4 },
-        { target: 6, prefilled: 2 },
-        { target: 9, prefilled: 5 },
-        { target: 10, prefilled: 5 },
-        { target: 7, prefilled: 2 },
-        { target: 10, prefilled: 3 },
-        // New Levels added below
-        { target: 8, prefilled: 3 },
-        { target: 9, prefilled: 2 },
-        { target: 6, prefilled: 1 },
-        { target: 7, prefilled: 3 },
-        { target: 10, prefilled: 6 }
-    ];
-
-    let currentLevelIdx = 0;
-    let currentDotsOnRight = 0;
-    let audioContext = null;
-
-    // --- Dot Patterns (Percentage Top, Left) ---
-    // Refined for better spacing on the vertical wings
-    const dotPatterns = {
-        1: [{t:50, l:50}],
-        2: [{t:25, l:50}, {t:75, l:50}],
-        3: [{t:20, l:50}, {t:80, l:20}, {t:80, l:80}], // Triangle - wider base
-        4: [{t:20, l:20}, {t:20, l:80}, {t:80, l:20}, {t:80, l:80}], // Square - pushed to corners
-        5: [{t:15, l:15}, {t:15, l:85}, {t:50, l:50}, {t:85, l:15}, {t:85, l:85}], // Quincunx - wide
-        6: [{t:15, l:20}, {t:15, l:80}, {t:50, l:20}, {t:50, l:80}, {t:85, l:20}, {t:85, l:80}], // 2x3 Grid - wide
-        7: [{t:15, l:20}, {t:15, l:80}, {t:50, l:20}, {t:50, l:50}, {t:50, l:80}, {t:85, l:20}, {t:85, l:80}], // H-shape
-        8: [{t:10, l:20}, {t:10, l:80}, {t:37, l:20}, {t:37, l:80}, {t:63, l:20}, {t:63, l:80}, {t:90, l:20}, {t:90, l:80}], // 2x4 Grid
-        9: [{t:15, l:15}, {t:15, l:50}, {t:15, l:85}, {t:50, l:15}, {t:50, l:50}, {t:50, l:85}, {t:85, l:15}, {t:85, l:50}, {t:85, l:85}], // 3x3 Grid
-        10: [{t:8, l:20}, {t:8, l:80}, {t:29, l:20}, {t:29, l:80}, {t:50, l:20}, {t:50, l:80}, {t:71, l:20}, {t:71, l:80}, {t:92, l:20}, {t:92, l:80}] // 2x5 Grid
+  <script>
+    const fruits = ['🍎', '🍌', '🍊', '🍇', '🍓', '🍑', '🍐', '🥭'];
+    const fruitNames = {
+        '🍎': 'apples', '🍌': 'bananas', '🍊': 'oranges', 
+        '🍇': 'grapes', '🍓': 'strawberries', '🍑': 'peaches', 
+        '🍐': 'pears', '🥭': 'mangoes'
     };
+    
+    let currentQuestion = 0;
+    let currentStep = 1;
+    let fruit1, fruit2, count1, count2, correctAnswer;
+    let totalScore = 0;
+    let speechText = "";
 
-    // --- DOM Elements ---
-    const targetDisplay = document.getElementById('target-number');
-    const leftWing = document.getElementById('left-wing');
-    const rightWing = document.getElementById('right-wing');
-    const ladybug = document.getElementById('ladybug');
-    const dragSource = document.getElementById('drag-source');
-    const progressContainer = document.getElementById('progress-container');
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    // --- Initialization ---
-    function initProgress() {
-        progressContainer.innerHTML = '';
-        levels.forEach((_, idx) => {
-            const pill = document.createElement('div');
-            pill.className = `progress-pill ${idx === 0 ? 'active' : ''}`;
-            pill.id = `pill-${idx}`;
-            progressContainer.appendChild(pill);
+    function playTone(freq, type, duration, volume = 0.1) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    // --- MATH GAME LOGIC ---
+
+    function startMath() {
+        if (currentQuestion >= 3) {
+            showCelebration();
+            return;
+        }
+        currentStep = 1;
+        const i1 = Math.floor(Math.random() * fruits.length);
+        let i2 = Math.floor(Math.random() * fruits.length);
+        while (i1 === i2) i2 = Math.floor(Math.random() * fruits.length);
+        
+        fruit1 = fruits[i1];
+        fruit2 = fruits[i2];
+        count1 = Math.floor(Math.random() * 6) + 5; // 5-10
+        count2 = Math.floor(Math.random() * 6) + 5; // 5-10
+
+        updateProgress();
+        showMathStep();
+    }
+
+    function showMathStep() {
+        const qText = document.getElementById('questionText');
+        const display = document.getElementById('fruitDisplay');
+        const bonds = document.getElementById('numberBonds');
+        const feedback = document.getElementById('feedback');
+        feedback.textContent = "";
+
+        if (currentStep === 1) {
+            speechText = `How many ${fruitNames[fruit1]} do you see?`;
+            display.innerHTML = `<div class="fruit-group">${fruit1.repeat(count1)}</div>`;
+            bonds.classList.add('hidden');
+            correctAnswer = count1;
+        } else if (currentStep === 2) {
+            speechText = `How many ${fruitNames[fruit2]} do you see?`;
+            display.innerHTML = `<div class="fruit-group">${fruit2.repeat(count2)}</div>`;
+            correctAnswer = count2;
+        } else {
+            speechText = `How many fruits altogether?`;
+            display.innerHTML = `
+                <div class="fruit-group">${fruit1.repeat(count1)}</div>
+                <div class="plus-sign-wrapper">+</div>
+                <div class="fruit-group">${fruit2.repeat(count2)}</div>
+            `;
+            bonds.classList.remove('hidden');
+            bonds.innerHTML = `
+                <svg style="position:absolute; top:0; left:0; width:100%; height:100%;">
+                    <line x1="40" y1="30" x2="100" y2="140" stroke="#FF6B9D" stroke-width="4" stroke-linecap="round" />
+                    <line x1="160" y1="30" x2="100" y2="140" stroke="#FF6B9D" stroke-width="4" stroke-linecap="round" />
+                </svg>
+                <div class="bond-circle part-circle part-left">${count1}</div>
+                <div class="bond-circle part-circle part-right">${count2}</div>
+                <div class="bond-circle whole-circle">?</div>
+            `;
+            correctAnswer = count1 + count2;
+        }
+
+        qText.innerHTML = `<span>${speechText}</span><button class="listen-btn" onclick="speak()">🔊</button>`;
+        createButtons();
+    }
+
+    function createButtons() {
+        const container = document.getElementById('answerButtons');
+        container.innerHTML = "";
+        let options = [correctAnswer];
+        while(options.length < 3) {
+            let r = correctAnswer + (Math.floor(Math.random()*7)-3);
+            if(r > 0 && !options.includes(r)) options.push(r);
+        }
+        options.sort((a,b) => a - b);
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'answer-btn';
+            btn.textContent = opt;
+            btn.onclick = () => checkMath(opt, btn);
+            container.appendChild(btn);
         });
     }
 
-    function startGame() {
-        document.getElementById('start-overlay').style.display = 'none';
-        
-        // Init Audio Context for sound effects
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        audioContext = new AudioContext();
-
-        initProgress();
-        loadLevel(0);
-    }
-
-    function loadLevel(idx) {
-        currentLevelIdx = idx;
-        const level = levels[idx];
-        currentDotsOnRight = 0;
-
-        // Update UI
-        targetDisplay.innerText = level.target;
-        
-        // Update Progress Bar
-        document.querySelectorAll('.progress-pill').forEach((p, i) => {
-            if (i === idx) p.classList.add('active');
-            else p.classList.remove('active');
-            if (i < idx) p.style.backgroundColor = '#4CAF50'; // Green for completed
-        });
-
-        // Clear Wings
-        leftWing.innerHTML = '';
-        rightWing.innerHTML = '';
-
-        // Fill Left Wing (Pre-filled)
-        for(let i=0; i<level.prefilled; i++) {
-            createDot(leftWing, false);
-        }
-
-        // Voice Prompt
-        speak(`Look at this wing. Drag more dots to make ${level.target}.`);
-    }
-
-    function repositionDots(container) {
-        const dots = container.getElementsByClassName('dot');
-        const count = dots.length;
-        const pattern = dotPatterns[count] || dotPatterns[1]; // Fallback
-
-        if (count > 0) {
-            Array.from(dots).forEach((dot, index) => {
-                // Shrink dots if crowded (8 or more)
-                if (count >= 8) {
-                    dot.classList.add('small');
-                } else {
-                    dot.classList.remove('small');
-                }
-
-                const pos = pattern[index] || {t: 50, l: 50}; 
-                dot.style.top = pos.t + '%';
-                dot.style.left = pos.l + '%';
-            });
-        }
-    }
-
-    function createDot(container, isAnimated) {
-        const dot = document.createElement('div');
-        dot.className = isAnimated ? 'dot animate-pop' : 'dot';
-        
-        // Initial random position to pop from (visual flair), then it snaps to grid
-        if (isAnimated) {
-            dot.style.top = '50%';
-            dot.style.left = '50%';
-        }
-        
-        container.appendChild(dot);
-        repositionDots(container);
-    }
-
-    // --- Interaction Logic ---
-
-    // Drag Setup
-    let activeDrag = null;
-    let touchOffset = { x: 0, y: 0 };
-
-    function startDrag(e) {
-        e.preventDefault();
-        
-        // Determine input coordinates
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-        // Create a temporary flying dot
-        activeDrag = document.createElement('div');
-        activeDrag.className = 'dot';
-        activeDrag.style.position = 'fixed';
-        activeDrag.style.zIndex = 100;
-        activeDrag.style.width = '60px'; // Slightly larger while dragging
-        activeDrag.style.height = '60px';
-        activeDrag.style.pointerEvents = 'none'; // Let clicks pass through to detect drop zones
-        
-        // Center it on finger/cursor
-        activeDrag.style.left = clientX + 'px';
-        activeDrag.style.top = clientY + 'px';
-        
-        document.body.appendChild(activeDrag);
-        
-        playTone('pop');
-
-        document.addEventListener('mousemove', onDrag);
-        document.addEventListener('touchmove', onDrag, {passive: false});
-        document.addEventListener('mouseup', endDrag);
-        document.addEventListener('touchend', endDrag);
-    }
-
-    function onDrag(e) {
-        if (!activeDrag) return;
-        e.preventDefault();
-        
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-        activeDrag.style.left = clientX + 'px';
-        activeDrag.style.top = clientY + 'px';
-    }
-
-    function endDrag(e) {
-        if (!activeDrag) return;
-
-        // Get drop coordinates
-        // For touch, changedTouches gives the final position
-        const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-        const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
-
-        // Check collision with Right Wing
-        const rect = rightWing.getBoundingClientRect();
-        
-        // Simple bounding box check
-        if (clientX >= rect.left && clientX <= rect.right &&
-            clientY >= rect.top && clientY <= rect.bottom) {
-            
-            // Success Drop
-            handleDropSuccess();
-        } 
-
-        // Cleanup
-        activeDrag.remove();
-        activeDrag = null;
-        document.removeEventListener('mousemove', onDrag);
-        document.removeEventListener('touchmove', onDrag);
-        document.removeEventListener('mouseup', endDrag);
-        document.removeEventListener('touchend', endDrag);
-    }
-
-    dragSource.addEventListener('mousedown', startDrag);
-    dragSource.addEventListener('touchstart', startDrag, {passive: false});
-
-    // --- Game Mechanics ---
-
-    function handleDropSuccess() {
-        createDot(rightWing, true); // Create dot on wing
-        currentDotsOnRight++;
-        playTone('drop');
-        checkAnswer();
-    }
-
-    function checkAnswer() {
-        const level = levels[currentLevelIdx];
-        const currentTotal = level.prefilled + currentDotsOnRight;
-
-        if (currentTotal === level.target) {
-            // Correct!
-            handleCorrect();
-        } else if (currentTotal > level.target) {
-            // Too many!
-            handleIncorrect();
-        }
-        // If less, do nothing, keep playing
-    }
-
-    function handleCorrect() {
-        playTone('success');
-        ladybug.classList.add('animate-cheer');
-        
-        // confetti effect via simple DOM particles
-        spawnConfetti();
-
-        // Voice encouragement
-        setTimeout(() => {
-            speak("Great job!");
-        }, 500);
-
-        setTimeout(() => {
-            ladybug.classList.remove('animate-cheer');
-            
-            if (currentLevelIdx < levels.length - 1) {
-                loadLevel(currentLevelIdx + 1);
+    function checkMath(val, btn) {
+        const feedback = document.getElementById('feedback');
+        if (val === correctAnswer) {
+            playTone(600, 'sine', 0.2);
+            feedback.textContent = "Correct! You are amazing! 🎉";
+            feedback.className = "feedback correct";
+            if (currentStep === 3) {
+                document.querySelector('.whole-circle').textContent = correctAnswer;
+                setTimeout(initButterflyBreak, 1200);
             } else {
-                showWinScreen();
+                setTimeout(() => {
+                    currentStep++;
+                    showMathStep();
+                }, 1000);
             }
+        } else {
+            playTone(200, 'sawtooth', 0.3);
+            feedback.textContent = "Oops! Try counting again.";
+            feedback.className = "feedback incorrect";
+            btn.classList.add('incorrect');
+            setTimeout(() => btn.classList.remove('incorrect'), 500);
+        }
+    }
+
+    function speak() {
+        const msg = new SpeechSynthesisUtterance(speechText);
+        msg.rate = 0.9;
+        window.speechSynthesis.speak(msg);
+    }
+
+    function updateProgress() {
+        document.getElementById('progressFill').style.width = (currentQuestion / 3) * 100 + "%";
+    }
+
+    // --- BUTTERFLY BREAK MINI-GAME ---
+
+    let butterflyTimer = null;
+    let spawnTimer = null;
+    let catchCount = 0;
+    let timeLeft = 20;
+
+    function initButterflyBreak() {
+        document.getElementById('butterflyBreakScreen').classList.remove('hidden');
+        document.getElementById('startBreakOverlay').classList.remove('hidden');
+        document.getElementById('breakFeedback').textContent = "";
+        catchCount = 0;
+        timeLeft = 20;
+        document.getElementById('gameScore').textContent = `Score: 0`;
+        document.getElementById('gameTimer').textContent = `Time: 20s`;
+        
+        // Clear old butterflies
+        const area = document.getElementById('butterflyArea');
+        area.querySelectorAll('.butterfly').forEach(b => b.remove());
+    }
+
+    function startButterflyGame() {
+        document.getElementById('startBreakOverlay').classList.add('hidden');
+        
+        butterflyTimer = setInterval(() => {
+            timeLeft--;
+            document.getElementById('gameTimer').textContent = `Time: ${timeLeft}s`;
+            if (timeLeft <= 0) endButterflyGame();
+        }, 1000);
+
+        spawnTimer = setInterval(spawnButterfly, 800);
+    }
+
+    function spawnButterfly() {
+        const area = document.getElementById('butterflyArea');
+        const b = document.createElement('div');
+        b.className = 'butterfly';
+        
+        const inner = document.createElement('span');
+        inner.className = 'butterfly-inner';
+        const types = ['🦋', '🐝', '🐞'];
+        const type = types[Math.floor(Math.random() * types.length)];
+        inner.textContent = type;
+        
+        if (type === '🦋') {
+            const hue = Math.floor(Math.random() * 360);
+            inner.style.filter = `hue-rotate(${hue}deg)`;
+        }
+        
+        b.appendChild(inner);
+        
+        const x = Math.random() * (area.offsetWidth - 80);
+        const y = Math.random() * (area.offsetHeight - 120);
+        b.style.left = x + 'px';
+        b.style.top = y + 'px';
+        
+        b.onclick = (e) => {
+            e.stopPropagation();
+            catchCount++;
+            totalScore++;
+            document.getElementById('gameScore').textContent = `Score: ${catchCount}`;
+            playTone(800, 'sine', 0.1);
+            b.style.transform = 'scale(0) rotate(180deg)';
+            b.style.opacity = '0';
+            setTimeout(() => b.remove(), 300);
+        };
+
+        area.appendChild(b);
+
+        // Move butterfly
+        setTimeout(() => {
+            if (b.parentNode) {
+                b.style.left = Math.random() * (area.offsetWidth - 80) + 'px';
+                b.style.top = Math.random() * (area.offsetHeight - 120) + 'px';
+            }
+        }, 100);
+
+        // Remove if not caught
+        setTimeout(() => {
+            if (b.parentNode) {
+                b.style.opacity = '0';
+                setTimeout(() => b.remove(), 500);
+            }
+        }, 3000);
+    }
+
+    function endButterflyGame() {
+        clearInterval(butterflyTimer);
+        clearInterval(spawnTimer);
+        document.getElementById('breakFeedback').textContent = `Time's up! You caught ${catchCount}!`;
+        playTone(600, 'sine', 0.3);
+        
+        setTimeout(() => {
+            document.getElementById('butterflyBreakScreen').classList.add('hidden');
+            currentQuestion++;
+            startMath();
         }, 2000);
     }
 
-    function handleIncorrect() {
-        playTone('error');
-        ladybug.classList.add('animate-shake');
-        
-        // Remove the last added dot
-        setTimeout(() => {
-            if (rightWing.lastChild) {
-                rightWing.lastChild.remove();
-                currentDotsOnRight--;
-                repositionDots(rightWing); // Re-distribute remaining dots evenly
+    // --- CELEBRATION & FIREWORKS ---
+
+    function showCelebration() {
+        document.getElementById('celebrationScreen').classList.remove('hidden');
+        document.getElementById('finalScoreDisplay').textContent = `Total Butterflies Caught: ${totalScore}`;
+        initFireworks();
+    }
+
+    function initFireworks() {
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+        function createFirework() {
+            const x = Math.random() * canvas.width;
+            const targetY = Math.random() * (canvas.height * 0.6);
+            const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+            
+            for(let i=0; i<60; i++) {
+                particles.push({
+                    x, y: targetY,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10,
+                    color,
+                    alpha: 1,
+                    size: Math.random() * 3 + 1
+                });
             }
-            ladybug.classList.remove('animate-shake');
-            speak("Oops. Too many.");
-        }, 500);
+            playTone(200 + Math.random()*300, 'sine', 0.1, 0.05);
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(30, 39, 46, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            particles = particles.filter(p => p.alpha > 0);
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.08;
+                p.alpha -= 0.012;
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                ctx.fill();
+            });
+
+            if (Math.random() < 0.08) createFirework();
+            requestAnimationFrame(animate);
+        }
+        animate();
     }
 
-    function showWinScreen() {
-        const overlay = document.getElementById('start-overlay');
-        overlay.style.display = 'flex';
-        overlay.innerHTML = `
-            <h1 class="font-bubble text-5xl text-yellow-500 mb-4">You Did It!</h1>
-            <div class="text-6xl mb-6">🌟</div>
-            <p class="text-xl text-gray-600 mb-8">You finished all 15 questions!</p>
-            <button onclick="location.reload()" class="bg-blue-500 hover:bg-blue-600 text-white font-bubble text-2xl px-8 py-4 rounded-full shadow-xl">
-                Play Again ↺
-            </button>
-        `;
-        playTone('win');
-    }
-
-    // --- Audio Utilities ---
-
-    function speak(text) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US';
-            utterance.rate = 0.9; // Slightly slower for kids
-            utterance.pitch = 1.1; // Slightly higher/friendly
-            window.speechSynthesis.speak(utterance);
-        }
-    }
-
-    function playTone(type) {
-        if (!audioContext) return;
-        
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        osc.connect(gain);
-        gain.connect(audioContext.destination);
-
-        const now = audioContext.currentTime;
-
-        if (type === 'pop') {
-            osc.frequency.setValueAtTime(400, now);
-            osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.1);
-            osc.start(now);
-            osc.stop(now + 0.1);
-        }
-        else if (type === 'drop') {
-            osc.frequency.setValueAtTime(600, now);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.1);
-            osc.start(now);
-            osc.stop(now + 0.1);
-        }
-        else if (type === 'success') {
-            // Chime
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(523.25, now); // C
-            osc.frequency.setValueAtTime(659.25, now + 0.1); // E
-            osc.frequency.setValueAtTime(783.99, now + 0.2); // G
-            gain.gain.setValueAtTime(0.2, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.6);
-            osc.start(now);
-            osc.stop(now + 0.6);
-        }
-        else if (type === 'error') {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(150, now);
-            osc.frequency.linearRampToValueAtTime(100, now + 0.3);
-            gain.gain.setValueAtTime(0.2, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.3);
-            osc.start(now);
-            osc.stop(now + 0.3);
-        }
-    }
-
-    function spawnConfetti() {
-        for(let i=0; i<30; i++) {
-            const conf = document.createElement('div');
-            conf.style.position = 'absolute';
-            conf.style.left = '50%';
-            conf.style.top = '50%';
-            conf.style.width = '10px';
-            conf.style.height = '10px';
-            conf.style.backgroundColor = ['#ff0', '#f00', '#0f0', '#00f'][Math.floor(Math.random()*4)];
-            conf.style.transition = 'all 1s ease-out';
-            conf.style.zIndex = 100;
-            document.body.appendChild(conf);
-
-            // Animate out
-            setTimeout(() => {
-                const angle = Math.random() * Math.PI * 2;
-                const dist = 200 + Math.random() * 100;
-                conf.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px) rotate(${Math.random()*360}deg)`;
-                conf.style.opacity = 0;
-            }, 10);
-
-            setTimeout(() => conf.remove(), 1000);
-        }
-    }
-</script>
-</body>
+    window.onload = startMath;
+  </script>
+ </body>
 </html>
